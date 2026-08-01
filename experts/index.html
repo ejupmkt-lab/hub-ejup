@@ -42,13 +42,22 @@ body{
 }
 
 /* ---------- Palco 1600x900 escalado ---------- */
-#viewport{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden}
-#stage{
-  position:relative;width:1600px;height:900px;
-  transform-origin:center center;
-  background:var(--ink);
-  overflow:hidden;
-  box-shadow:0 40px 120px rgba(0,0,0,.7);
+#viewport {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1600px;
+  height: 900px;
+  transform-origin: center center;
+  background: var(--ink);
+  overflow: hidden;
+  box-shadow: 0 40px 120px rgba(0, 0, 0, .7);
 }
 
 /* ---------- Slides ---------- */
@@ -600,10 +609,16 @@ h3{font-size:22px;font-weight:700;letter-spacing:-.01em}
 @media (max-width:900px), (max-aspect-ratio:3/4){
 
   #viewport{display:block;overflow:hidden}
-  #stage{
-    width:100%;height:100vh;height:100dvh;
-    transform:none !important;box-shadow:none;
-  }
+ #stage {
+  position: relative;
+  left: auto;
+  top: auto;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  transform: none !important;
+  box-shadow: none;
+}
 
   .slide{
     display:block;overflow-y:auto;overflow-x:hidden;
@@ -1176,9 +1191,17 @@ var stage=document.getElementById('stage');
 var mq=window.matchMedia('(max-width:900px), (max-aspect-ratio:3/4)');
 function isMobile(){return mq.matches}
 function fit(){
-  if(isMobile()){ stage.style.transform='none'; return; }
-  var s=Math.min(window.innerWidth/1600, window.innerHeight/900);
-  stage.style.transform='scale('+s+')';
+  if(isMobile()){
+    stage.style.transform = 'none';
+    return;
+  }
+
+  var width = document.documentElement.clientWidth;
+  var height = document.documentElement.clientHeight;
+  var scale = Math.min(width / 1600, height / 900);
+
+  stage.style.transform =
+    'translate(-50%, -50%) scale(' + scale + ')';
 }
 window.addEventListener('resize',fit);
 window.addEventListener('orientationchange',function(){setTimeout(fit,120)});
