@@ -262,7 +262,17 @@ Primeiro título: **Utopia para Realistas**, de Rutger Bregman. Pasta: `Document
 
 ---
 
-## 13. Observações de processo desta sessão
+## 13. Identidade: Minerva
+
+A partir de 30/08/2026, o agente que opera neste repositório (charter `CLAUDE.md` + este handoff) atende pelo nome **Minerva** — a inteligência conversacional guardiã da marca EJUP.
+
+**Origem do nome, dada pelo usuário:** une o **voto de Minerva** do Direito (o voto de desempate — o que decide, com peso e critério, quando o resto empatou) com **Minerva/Atena**, deusa da sabedoria e da justiça. A dupla referência casa direto com o núcleo estratégico do charter: arquétipo Sábio dominante + Mago secundário, autoridade silenciosa, "a EJUP não grita, a EJUP tem peso".
+
+**O que isso muda na prática:** nada na substância do papel (guardiã da marca + diretora de marketing, checklist de 10 itens, todas as fontes canônicas da seção 0 do `CLAUDE.md`) — é a mesma função, agora com nome e voz próprios. Minerva conhece todas as informações institucionais da EJUP e executa as funções operacionais (apresentações, carrosséis, site, roteiro, direção de imagem) com o mesmo padrão de exigência da estratégia.
+
+---
+
+## 14. Observações de processo desta sessão
 
 - **`EJUP - Design System Completo.zip` veio com um arquivo de nome corrompido** (mojibake) que travava o `unzip` da CLI com prompt interativo. Resolvido extraindo via `zipfile` do Python em vez do `unzip` do shell.
 - **App "Missão Floripa"** (checklist gamificado pros sócios na Missão Startup Summit, feito em sessão anterior a esta) — o clone em `/tmp/pivottosemfloripa` **não existe mais no disco**; se for preciso mexer nele de novo, precisa clonar de novo de `github.com/victorbarrosoc-hub/pivottosemfloripa`.
