@@ -21,6 +21,26 @@ dourada atravessa todas sem interromper nas emendas, sobe com o argumento (gasto
 inadimplência, negativados) e desce quando a lei/o jurista entram. Detalhes da construção
 e da verificação de emenda estão na seção 11 do `HANDOFF-EJUP.md`.
 
+## `carrossel-quatro-competencias/`
+
+Carrossel conceitual de Instagram, 8 telas, 1080×1440, sobre o eixo temático de setembro:
+as quatro competências do jurista do presente (notório saber, alfabetização em IA, visão
+estratégica e de gestão, critério ético diante da inovação).
+
+- `tela-01.png` a `tela-08.png` — as peças em alta, prontas para publicar.
+- `EJUP-Carrossel-Quatro-Competencias.pdf` — as 8 telas em PDF, para aprovação.
+- `EJUP-Carrossel-Quatro-Competencias-PNG.zip` — os 8 PNGs.
+- `apresentacao.html` — visualizador com baixar individual/tudo/PDF. Precisa ser servido
+  (`python3 -m http.server` na pasta), senão o navegador bloqueia o download.
+- `carrossel.html` — a peça viva, com Gotham e logos embutidos; roda sozinha.
+- `_build/` — motor: `template.html`, `build.py` (embute fontes/logos/tokens),
+  `render.py` (mede e exporta os PNGs), `deliver.py` (PDF, ZIP, apresentação).
+
+Conceito **"As quatro colunas"**: uma ordem clássica depurada, desenhada em SVG, atravessa
+o carrossel. A capa mostra a colunata inteira apagada; a tela 2 mostra o frontão solto e
+fora de prumo (a pressa querendo o topo sem a base); cada competência acende uma coluna em
+dourado; na tela 7 as quatro sustentam o frontão. Detalhes na seção 15 do `HANDOFF-EJUP.md`.
+
 ## `a-estante-ejup/utopia-para-realistas/`
 
 Primeira edição do quadro "A Estante EJUP", quatro stories (1080×1920) recomendando

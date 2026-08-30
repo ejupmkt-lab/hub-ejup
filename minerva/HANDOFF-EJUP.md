@@ -272,7 +272,50 @@ A partir de 30/08/2026, o agente que opera neste repositório (charter `CLAUDE.m
 
 ---
 
-## 14. Observações de processo desta sessão
+## 14. Ferramental disponível (registrado em 30/08/2026)
+
+O usuário instalou skills e plugins novos e autorizou o uso **sempre que couber** — não precisa pedir permissão a cada peça.
+
+**Plugins ativos:** `design` (crítica, design system, UX writing, auditoria de acessibilidade, handoff) · `marketing` (conteúdo, campanha, análise de performance, consistência de voz) · `legal` (revisão contratual, pesquisa de precedente) · `productivity` (tarefas, agenda, memória de contexto) · `pdf-viewer` (visualizar, anotar e assinar PDF).
+
+**Skills ativas que mais servem à produção da EJUP:**
+- `banana` — direção criativa e geração/edição de imagem (Gemini Nano Banana). Substitui a busca em banco de imagem quando a peça pede quadro que não existe pronto.
+- `playwright-mcp` — abre browser real, screenshota cada página em vários tamanhos, compara com a referência e refatora o CSS até bater. **É o que fecha o ciclo de verificação visual** das peças e apresentações.
+- `critique-*` (sete skills) — crítica dirigida de tela: hierarquia visual, tipografia, cor e contraste, composição, densidade de informação, affordance e **consistência de marca**. Rodar antes de entregar peça nova.
+- `manual-video-editor` — plano de edição com timecode para Premiere/DaVinci/CapCut. Serve ao corte do EJUPcast.
+- `pdf`, `docx`, `xlsx`, `pptx` — produção e leitura de documento.
+
+**A skill `ejup-design` está versionada neste repositório** em `skills/ejup-design/` (não só em `~/.claude/skills/`), com fontes Gotham, logos SVG, tokens, `social/carousel.css` e as `reference-carousels/`. Em sessão remota, é essa cópia que vale — o `CLAUDE.md` dela carrega as regras fixas de diagramação de carrossel.
+
+---
+
+## 15. Carrossel "As quatro colunas" (eixo de setembro, 30/08/2026)
+
+Pasta: `peças/carrossel-quatro-competencias/`. Conteúdo veio pronto do usuário (8 telas), sobre as quatro competências do jurista do presente: **notório saber · alfabetização em IA · visão estratégica e de gestão · critério ético diante da inovação**.
+
+**Conceito visual — "As quatro colunas".** Uma ordem clássica depurada, desenhada em SVG (capitel, fuste com éntase, base, três caneluras), atravessa o carrossel como dispositivo contínuo, no mesmo espírito da linha dourada do carrossel de apostas:
+
+- **Capa** — a colunata inteira, grande e apagada, com feixe de luz macio. A estrutura que a peça vai erguer.
+- **Tela 2** — o frontão **solto e fora de prumo** sobre colunas quase invisíveis, rotulado "O TOPO SEM A BASE". É a pressa querendo o resultado sem a formação.
+- **Telas 3 a 6** — cada competência acende uma coluna em dourado e ganha seu rótulo (SABER · IA · ESTRATÉGIA · ÉTICA). Mecânica progressiva: força o arraste sem depender de isca.
+- **Tela 7** — as quatro completas sustentando o frontão. É o slide que se salva.
+- **Tela 8** — assinatura com painel de filete dourado, EJUPcast, site, `@ejup.oficial` e o slogan.
+
+**Correções de texto feitas no conteúdo recebido:** "Juntas, sustentam" → **"Juntos, sustentam"** (a lista mistura gêneros, masculino plural vence); "resultados além do processo em si" → "muito além do próprio processo" (evitava viúva de uma palavra); "o Direito exige" ligado com `&nbsp;` pelo mesmo motivo.
+
+**Armadilhas resolvidas nesta peça (valem para as próximas):**
+- Filete do numeral esticado com `flex:1` atravessa o símbolo do canto. Travar em largura fixa (430px).
+- Na capa, o filete do estilóbata da arte de fundo cruzava o título por baixo do scrim. A arte foi encurtada para 640px de altura e o scrim virou opaco a partir de ~y=605.
+- Faixa de colunas estreita (620px) deixava um buraco vertical entre texto e rodapé. A 784px ela vira o piso da peça e o vão fecha.
+- O frontão "solto" precisa de folga real: `translate(0,-30)` além da rotação, senão ele encosta nos capitéis e parece apoiado.
+
+**Verificação:** `_build/render.py` mede cada tela antes de exportar e falha se algo vazar da margem, se o corpo invadir o rodapé, se o contêiner da ordem ficar vazio ou se **a altura do logo variar entre telas**. As oito passaram.
+
+**Imagem: peça 100% vetorial, por bloqueio de rede.** O egress desta sessão nega `images.pexels.com` e o CDN do gerador (403 de política), então não houve como baixar foto. As fotos do Drive da EJUP (SEAHUB, Roberto) passam de 7 MB e não trafegam por base64 no MCP. O tratamento gráfico-arquitetônico é legítimo pelo mapa imagético ("arquitetura clássica reinterpretada, depurada e abstrata" + "geometria, grids, precisão gráfica"), mas **se a peça for reaproveitada, vale trocar a capa por foto real** — o slot está pronto.
+
+---
+
+## 16. Observações de processo desta sessão
 
 - **`EJUP - Design System Completo.zip` veio com um arquivo de nome corrompido** (mojibake) que travava o `unzip` da CLI com prompt interativo. Resolvido extraindo via `zipfile` do Python em vez do `unzip` do shell.
 - **App "Missão Floripa"** (checklist gamificado pros sócios na Missão Startup Summit, feito em sessão anterior a esta) — o clone em `/tmp/pivottosemfloripa` **não existe mais no disco**; se for preciso mexer nele de novo, precisa clonar de novo de `github.com/victorbarrosoc-hub/pivottosemfloripa`.

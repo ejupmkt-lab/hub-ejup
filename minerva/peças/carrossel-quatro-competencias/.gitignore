@@ -1,0 +1,7 @@
+# O ZIP é só um empacotamento dos PNGs que já estão versionados aqui ao lado.
+# Versioná-lo dobraria o peso da peça no repositório sem acrescentar nada.
+# Para regerar: python3 _build/deliver.py
+*-PNG.zip
+
+# Medidas da última renderização — diagnóstico, não entrega.
+_build/medidas.json
