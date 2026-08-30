@@ -19,3 +19,5 @@ Anexe (ou peça para o Claude ler) estes dois arquivos, nesta ordem:
   na máquina principal (tokens, fontes Gotham licenciadas, logos, motor de carrossel de
   Instagram). Se for reinstalar num Claude Code novo, copie esta pasta para
   `~/.claude/skills/ejup-design/`.
+- `peças/` — entregas finais de design já aprovadas (carrosséis, stories), prontas para
+  publicar ou reaproveitar. Ver `peças/README.md`.
