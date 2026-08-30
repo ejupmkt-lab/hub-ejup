@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Plataforma do Aluno" description="Área do aluno da EJUP: sidebar navy com progresso + dashboard de cursos. Cores MIV." -->
+<helmet>
+  <script src="./ds-base.js"></script>
+  <style>html,body{margin:0;height:100%;background:var(--surface-muted);font-family:var(--font-sans);color:var(--text-body)}*{box-sizing:border-box}</style>
+</helmet>
+<div style="display:flex;height:100vh;overflow:hidden">
+  <x-import component-from-global-scope="AppSidebar" from="../../ui_kits/plataforma/Sidebar.jsx" hint-size="248px,100%"></x-import>
+  <x-import component-from-global-scope="AppDashboard" from="../../ui_kits/plataforma/Dashboard.jsx" hint-size="100%,100%"></x-import>
+</div>
+</x-dc>
+</body>
+</html>

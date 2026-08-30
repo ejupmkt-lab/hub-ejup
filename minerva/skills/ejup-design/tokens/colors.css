@@ -1,0 +1,50 @@
+/* EJUP — Color tokens.
+   STRICTLY the Manual de Identidade Visual palette (MIV, p. "PALETA CORES").
+   The MIV defines exactly 8 colors (+ black & white). No colors are invented here;
+   lighter surfaces/borders are opacity TINTS of the MIV silver, not new hues. */
+:root {
+  /* ---- MIV palette (the only brand colors) ---- */
+  --ejup-ink:         #0d131a; /* C80 M70 Y60 K80 */
+  --ejup-navy:        #031c37; /* C98 M83 Y45 K60 — primary */
+  --ejup-graphite:    #414042; /* C0  M0  Y0  K90 */
+  --ejup-steel:       #304557; /* C84 M66 Y46 K34 — secondary */
+  --ejup-gray:        #5f6062; /* C0  M0  Y0  K77 */
+  --ejup-silver:      #d1d3d4; /* C0  M0  Y0  K20 */
+  --ejup-bronze:      #9b6b26; /* C0  M37 Y83 K45 */
+  --ejup-gold:        #f0b855; /* C0  M26 Y75 K5  — accent */
+  --ejup-black:       #000000;
+  --ejup-white:       #ffffff;
+
+  /* Back-compat aliases (map to the MIV names above; no new colors) */
+  --ejup-gray-900:    var(--ejup-graphite);
+  --ejup-gray-700:    var(--ejup-gray);
+  --ejup-gray-300:    var(--ejup-silver);
+
+  /* ---- Semantic aliases (all resolve to MIV colors or MIV tints) ---- */
+  --color-bg:            var(--ejup-white);
+  --color-bg-dark:       var(--ejup-navy);
+  --color-bg-ink:        var(--ejup-ink);
+
+  --surface-card:        var(--ejup-white);
+  --surface-card-dark:   var(--ejup-steel);
+  --surface-muted:       rgba(209, 211, 212, 0.28); /* silver tint */
+  --border-subtle:       rgba(209, 211, 212, 0.55); /* silver tint */
+  --border-strong:       var(--ejup-silver);
+
+  --text-heading:        var(--ejup-navy);
+  --text-body:           var(--ejup-graphite);
+  --text-muted:          var(--ejup-gray);
+  --text-on-dark:        var(--ejup-white);
+  --text-on-dark-muted:  var(--ejup-silver);
+
+  --accent:              var(--ejup-gold);
+  --accent-hover:        var(--ejup-bronze); /* bronze = the MIV's darker gold */
+  --accent-bronze:       var(--ejup-bronze);
+
+  --focus-ring:          var(--ejup-gold);
+
+  /* Functional states — the MIV has no status palette, so we map the two
+     states the brand can express onto real MIV colors. */
+  --state-info:       var(--ejup-steel);
+  --state-attention:  var(--ejup-bronze); /* errors / warnings / alerts */
+}
