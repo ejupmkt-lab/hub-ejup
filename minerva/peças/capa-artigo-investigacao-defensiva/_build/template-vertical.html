@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>EJUP — Card vertical · A legitimidade da investigação defensiva no processo penal</title>
+<style>
+__FONT_FACES__
+
+:root{
+  --navy:#031c37; --ink:#0d131a; --steel:#304557;
+  --silver:#d1d3d4; --gold:#f0b855; --bronze:#9b6b26;
+  --graphite:#414042; --gray:#5f6062;
+  --deep:#061424;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:#10151b;}
+body{display:flex;justify-content:center;padding:24px 0;font-family:'Gotham','Montserrat',system-ui,sans-serif;}
+
+/* 1080×1440 (3:4) — formato de feed da EJUP. Sem cantos arredondados:
+   no feed a peça é full bleed, o raio é coisa de card de site. */
+.cover{
+  position:relative; width:1080px; height:1440px; overflow:hidden;
+  background:
+    radial-gradient(46% 30% at 74% 68%, rgba(240,184,85,0.10) 0%, rgba(240,184,85,0) 70%),
+    radial-gradient(80% 46% at 12% 0%, #0a2340 0%, rgba(10,35,64,0) 62%),
+    linear-gradient(168deg, #071a2f 0%, var(--deep) 52%, #040d18 100%);
+  color:#fff;
+}
+
+.bokeh{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+.bokeh span{
+  position:absolute; border-radius:50%;
+  background:radial-gradient(circle, rgba(48,69,87,0.55) 0%, rgba(48,69,87,0) 70%);
+  filter:blur(2px);
+}
+.bokeh .b1{ width:250px; height:250px; left:700px; top:-70px; opacity:.5; }
+.bokeh .b2{ width:150px; height:150px; left:120px; top:520px; opacity:.35; }
+.bokeh .b3{ width:300px; height:300px; left:880px; top:900px; opacity:.45; }
+.bokeh .b4{ width:110px; height:110px; left:600px; top:1180px; opacity:.4; }
+
+.cover::before{
+  content:""; position:absolute; inset:0; z-index:6; pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+  opacity:.03; mix-blend-mode:overlay;
+}
+
+/* halo atrás das cabeças, que aqui ficam na metade de baixo */
+.halo{
+  position:absolute; z-index:1; pointer-events:none;
+  left:420px; top:735px; width:640px; height:640px; border-radius:50%;
+  background:radial-gradient(circle at 50% 45%, rgba(240,184,85,0.55) 0%, rgba(240,184,85,0.34) 32%, rgba(155,107,38,0.16) 54%, rgba(240,184,85,0) 72%);
+  filter:blur(26px);
+}
+
+/* ---- retratos: sangram no rodapé, como na versão horizontal ---- */
+.photo{ position:absolute; z-index:2; right:0; left:0; bottom:0; height:100%; }
+.photo img{
+  position:absolute; right:-6px; bottom:0; height:56%; width:auto;
+  filter:drop-shadow(0 24px 60px rgba(0,0,0,.55));
+  -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 13%);
+  mask-image:linear-gradient(90deg, transparent 0%, #000 13%);
+}
+.no-photo .photo .slot{
+  position:absolute; right:40px; bottom:0; width:620px; height:52%;
+  border:1.5px dashed rgba(240,184,85,.35); border-radius:24px 24px 0 0;
+  display:flex; align-items:center; justify-content:center; text-align:center;
+}
+.no-photo .photo .slot span{
+  font-size:18px; letter-spacing:.14em; color:rgba(255,255,255,.35); text-transform:uppercase; line-height:1.8;
+}
+.has-photo .slot{ display:none; }
+
+/* ---- texto: bloco superior ---- */
+.body{
+  position:relative; z-index:4;
+  padding:84px 80px 0;
+  display:flex; flex-direction:column; align-items:flex-start;
+}
+
+.tag{
+  display:inline-flex; align-items:center;
+  padding:12px 26px; border-radius:999px;
+  border:1.5px solid rgba(240,184,85,.7);
+  background:rgba(240,184,85,.06);
+  font-size:16px; font-weight:500; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--gold); margin:0 0 38px;
+}
+
+.title{
+  font-size:64px; font-weight:900; line-height:1.08; letter-spacing:-0.022em;
+  color:#fff; margin:0; max-width:830px;
+}
+.title .g{ color:var(--gold); font-weight:300; letter-spacing:-0.01em; }
+
+.subtitle{
+  font-size:26px; font-weight:300; line-height:1.5;
+  color:rgba(209,211,212,.78); margin:32px 0 0; max-width:760px;
+}
+
+.meta{
+  display:flex; align-items:center; margin:40px 0 0;
+  font-size:20px; font-weight:400; color:rgba(209,211,212,.85);
+}
+.meta .item{ display:flex; align-items:center; gap:12px; }
+.meta .item svg{ width:21px; height:21px; flex:none; }
+.meta .sep{ width:1px; height:26px; background:rgba(209,211,212,.28); margin:0 28px; }
+
+.authors{ display:flex; align-items:center; gap:14px; margin:22px 0 0; font-size:20px; font-weight:500; color:#fff; }
+.authors .dot{ width:5px; height:5px; border-radius:50%; background:var(--gold); }
+
+.cta{
+  display:inline-flex; align-items:center; gap:22px;
+  margin:52px 0 0; padding:0 40px; height:68px; border-radius:999px;
+  background:linear-gradient(90deg, #c99a48 0%, var(--gold) 45%, #c99a48 100%);
+  color:var(--navy); font-size:17px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  box-shadow:0 14px 40px rgba(240,184,85,0.22);
+}
+.cta svg{ width:24px; height:24px; }
+
+/* logo no rodapé à esquerda, no vazio que a foto deixa */
+.footer-logo{ position:absolute; left:80px; bottom:72px; z-index:5; }
+.footer-logo img{ height:38px; width:auto; }
+</style>
+</head>
+<body>
+
+<section class="cover __FOTO_CLASS__">
+  <div class="bokeh"><span class="b1"></span><span class="b2"></span><span class="b3"></span><span class="b4"></span></div>
+
+  <div class="halo"></div>
+  <div class="photo">
+    __FOTO_TAG__
+    <div class="slot"><span>Foto dos autores<br>recorte sem fundo</span></div>
+  </div>
+
+  <div class="body">
+    <span class="tag">EJUP · Artigo</span>
+
+    <!-- quebra forçada: sem ela "no" fica pendurado no fim da linha dourada -->
+    <h1 class="title">A legitimidade da <span class="g">investigação defensiva</span><br>no processo penal</h1>
+
+    <p class="subtitle">Fundamentos, limites e aplicação prática.</p>
+
+    <div class="meta">
+      <span class="item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#f0b855" stroke-width="1.8" stroke-linecap="round"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/></svg>
+        Coluna jurídica
+      </span>
+      <span class="sep"></span>
+      <span class="item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#f0b855" stroke-width="1.8" stroke-linecap="round"><path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z"/></svg>
+        Processo penal
+      </span>
+    </div>
+
+    <div class="authors">
+      <span>Thiago Praxedes de Vasconcelos</span><span class="dot"></span><span>Thiago de Moura Correia</span>
+    </div>
+
+    <span class="cta">Ler o artigo
+      <svg viewBox="0 0 24 24" fill="none" stroke="#031c37" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" fill="#031c37" stroke="none"/><path d="M8 12h8M13 8l4 4-4 4" stroke="#f0b855"/></svg>
+    </span>
+  </div>
+
+  <div class="footer-logo"><img src="__LOGO_WHITE__" alt="EJUP"></div>
+</section>
+</body>
+</html>

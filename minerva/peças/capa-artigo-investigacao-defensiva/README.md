@@ -71,7 +71,21 @@ premium, pode usar o dourado como na outra referência"). A v2:
 - Foto de pessoa real mantida em cor natural — duotone navy é tratamento para
   imagem de banco/ilustrativa, não para retrato de gente nomeada.
 
+## Dois formatos
+- **1600×900** (`capa.png`) — card da coluna jurídica no site. Texto à
+  esquerda, retratos à direita, cantos arredondados de card.
+- **1080×1440** (`capa-1080x1440.png`) — formato de feed da EJUP. Não é corte
+  do horizontal: 16:9 recortado para 3:4 destruiria a composição. É uma
+  **recomposição** — texto empilhado no terço superior, retratos sangrando no
+  rodapé, logo no canto inferior esquerdo (o vazio que a foto deixa), sem
+  cantos arredondados, porque no feed a peça é full bleed.
+
+No vertical o título leva uma quebra forçada depois de "defensiva": sem ela o
+"no" fica pendurado no fim da linha dourada.
+
 ## Arquivos
-- `capa.png` — a peça em 1600×900 (com placeholder de foto).
-- `capa.html` — versão viva, com Gotham e logo embutidos.
-- `_build/` — motor: `template.html`, `build.py`, `render.py`.
+- `capa.png` · `capa-1080x1440.png` — as peças finais.
+- `capa.html` · `capa-1080x1440.html` — versões vivas, com Gotham e logo embutidos.
+- `foto-autores.png` — recorte com alpha, compartilhado pelos dois formatos.
+- `_build/` — motor: `template.html`, `template-vertical.html`, `cutout.py`,
+  `build.py` (gera os dois), `render.py` (renderiza e mede os dois).

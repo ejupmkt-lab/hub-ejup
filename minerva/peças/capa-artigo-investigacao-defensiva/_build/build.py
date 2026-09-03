@@ -43,8 +43,20 @@ def svg_inline(path: pathlib.Path) -> str:
     return "data:image/svg+xml;base64," + b64(path)
 
 
+# (template, saída). O horizontal serve o site; o vertical, o feed.
+FORMATOS = [
+    ("template.html", "capa.html"),
+    ("template-vertical.html", "capa-1080x1440.html"),
+]
+
+
 def main() -> None:
-    html = (HERE / "template.html").read_text(encoding="utf-8")
+    for tpl, out in FORMATOS:
+        build_one(HERE / tpl, OUT / out)
+
+
+def build_one(tpl: pathlib.Path, dest: pathlib.Path) -> None:
+    html = tpl.read_text(encoding="utf-8")
     replacements = {
         "__FONT_FACES__": font_face_css(),
         "__LOGO_WHITE__": svg_inline(LOGOS / "ejup-horizontal-white.svg"),
@@ -72,9 +84,9 @@ def main() -> None:
             raise SystemExit(f"token não encontrado: {token}")
         html = html.replace(token, value)
 
-    dest = OUT / "capa.html"
     dest.write_text(html, encoding="utf-8")
-    print(f"gerado: {dest}  ({len(html)/1024:.0f} KB)  foto={'sim' if photo_path.exists() else 'placeholder'}")
+    print(f"gerado: {dest.name}  ({len(html)/1024:.0f} KB)  "
+          f"foto={'sim' if photo_path.exists() else 'placeholder'}")
 
 
 if __name__ == "__main__":
