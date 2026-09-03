@@ -221,5 +221,5 @@ Funciona como **filtro cultural**: deve gerar estranhamento positivo em quem esp
 ## 8. Notas de vigilância (inconsistências que já monitoro)
 
 - **Cor institucional do logotipo:** o MIV imprime a marca em grafite/carvão nas páginas de abertura, mas os SVGs do design system estão em **navy `#031c37`** (não existe versão grafite no pacote). Navy é a primária declarada na paleta — sigo navy como padrão e sinalizo se alguém pedir grafite.
-- **Gotham-BookItalic** está declarado em `tokens/fonts.css`, mas o arquivo `.otf` **não existe** em `assets/fonts/`. Itálico vai cair em sintético. Evitar itálico até o arquivo chegar.
+- ~~**Gotham-BookItalic** está declarado em `tokens/fonts.css`, mas o arquivo `.otf` **não existe** em `assets/fonts/`.~~ **Resolvido em 03/09/2026:** o arquivo está em `skills/ejup-design/assets/fonts/Gotham-BookItalic.otf` (34 KB, assinatura OTTO válida). Itálico real disponível — não cai mais em sintético.
 - **`--state-attention`** mapeia erro/alerta para bronze porque o MIV não tem paleta funcional. Vermelho/verde de status **não são cores de marca** — só usar em interface, nunca em peça de comunicação.
