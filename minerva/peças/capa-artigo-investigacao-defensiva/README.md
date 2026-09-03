@@ -12,6 +12,20 @@ Para finalizar: salvar a foto real dos dois advogados como
 `foto-autores.jpg` (ou `.png`) nesta pasta e rodar `_build/build.py` de novo
 — o template já tem o slot pronto e detecta o arquivo automaticamente.
 
+## Direção (v3 — card premium, referência direta do banner G4)
+Usuário mandou o banner "Formação G4" como modelo. A v3 reproduz a estrutura:
+tag em pílula com contorno dourado · título com a frase-chave em dourado
+(G4 usa serifa itálica; EJUP é só Gotham, então o contraste vem do peso:
+Black branco + Light dourado) · subtítulo Light · faixa de metadados com
+ícones dourados separados por filete · **botão em gradiente dourado**
+("Ler o artigo") · retratos **recortados sem fundo** com **halo dourado**
+por trás e piso escuro que os funde ao fundo · bokeh discreto em aço/navy ·
+cantos arredondados de card. Sem cantoneiras nem diagonal (v2 arquivada).
+
+A foto precisa chegar como arquivo para virar recorte; com o fundo bege
+uniforme do estúdio, a remoção pode ser feita por PIL (chroma por distância
+de cor + feather). Se não segurar, cai para a foto inteira com fusão de bordas.
+
 ## Direção (v2 — "premium editorial", referência G4)
 A v1 com friso de colunas no topo foi rejeitada pelo usuário ("algo mais
 premium, pode usar o dourado como na outra referência"). A v2:
