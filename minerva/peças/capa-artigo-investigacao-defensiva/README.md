@@ -19,6 +19,20 @@ menores que 12.000 px e feather de 1,3 px na borda.
 O corte reto que sobra no ombro esquerdo é dissolvido no CSS por uma máscara
 em degradê (`mask-image`), em vez de aparecer como aresta.
 
+**Três armadilhas que custaram rodadas (não repetir):**
+- *Limpeza por classe de cor na borda* (regra "se é bege/navy e está perto do
+  contorno, apaga"): reprovada. Pele em sombra e barba caem na mesma faixa
+  do bege e do navy — abriu buraco no rosto e no cabelo. O que funciona para
+  a franja de 1–2 px é o **estrangulamento da máscara** (erode 5×5), sem cor.
+- *Retângulo de frente garantida que sai do contorno*: o canto superior
+  direito do retângulo do rosto esquerdo ultrapassava o cabelo e forçava um
+  bloco de navy a virar frente. Semente de frente tem de caber **dentro** da
+  silhueta, com folga.
+- *Retângulo de fundo garantido invadindo o ombro*: a cunha bege entre as
+  cabeças só existe acima da linha do ombro (y≈400); prolongada até 455, ela
+  cortava terno de verdade. Quando a fronteira é inclinada, encurtar a semente
+  e deixar o GrabCut resolver a diagonal.
+
 Para refazer: `python3 _build/cutout.py && python3 _build/build.py && python3 _build/render.py`.
 
 ## Direção (v3 — card premium, referência direta do banner G4)

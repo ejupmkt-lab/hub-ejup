@@ -26,13 +26,16 @@ SURE_BG = [
     (1180, 40, 1270, 300),          # bege entre as duas cabeças
     (1500, 40, 1600, 260),          # bege no alto à direita
     (1148, 140, 1240, 305),         # navy remanescente entre as duas cabeças
-    (1170, 300, 1255, 455),         # cunha bege atrás do ombro esquerdo
+    (1102, 176, 1150, 221),         # bloco de navy colado à direita do cabelo esq.
+    (1170, 300, 1255, 398),         # cunha bege atrás do ombro esquerdo (só até
+                                    # a linha do ombro; abaixo é terno de verdade)
     (1500, 300, 1585, 445),         # cunha bege à direita da cabeça
     (0, 0, 900, 840),               # todo o lado do texto
 ]
 # Retângulos de FRENTE garantida
 SURE_FG = [
-    (1020, 180, 1140, 460),         # rosto do homem da esquerda
+    (1030, 232, 1122, 450),         # rosto do homem da esquerda (dentro do contorno;
+                                    # o canto superior direito não pode sair do cabelo)
     (1330, 200, 1450, 430),         # rosto do homem da direita
     (1000, 520, 1150, 830),         # terno do homem da esquerda
     (1280, 500, 1520, 830),         # terno do homem da direita
@@ -62,6 +65,12 @@ def main() -> None:
     k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
     fg = cv2.morphologyEx(fg, cv2.MORPH_OPEN, k)
     fg = cv2.morphologyEx(fg, cv2.MORPH_CLOSE, k)
+
+    # Limpeza por classe de cor foi testada e REPROVADA: pele em sombra e barba
+    # caem na mesma faixa do bege/navy e abrem buraco no rosto. O que funciona
+    # é estrangular a máscara 2 px (matte choke): a franja bege que o GrabCut
+    # deixa junto ao cabelo tem 1–2 px e some, sem tocar no interior.
+    fg = cv2.erode(fg, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
 
     n, lab, stats, _ = cv2.connectedComponentsWithStats(fg, 8)
     if n > 1:
