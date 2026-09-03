@@ -12,13 +12,25 @@ Para finalizar: salvar a foto real dos dois advogados como
 `foto-autores.jpg` (ou `.png`) nesta pasta e rodar `_build/build.py` de novo
 — o template já tem o slot pronto e detecta o arquivo automaticamente.
 
-## O que foi corrigido em relação ao rascunho original
-- Painel bege (fora das 8 cores do MIV) → fundo navy/aço/tinta, único degradê.
+## Direção (v2 — "premium editorial", referência G4)
+A v1 com friso de colunas no topo foi rejeitada pelo usuário ("algo mais
+premium, pode usar o dourado como na outra referência"). A v2:
+
+- **Cantoneiras douradas finas** em dois cantos opostos, enquadrando a peça.
+  É o gesto de moldura editorial de luxo; substitui qualquer ornamento.
+- **Costura diagonal dourada** de volta, herdada da referência original — só o
+  filete (com leve brilho), sem o painel bege. O recorte da foto segue a mesma
+  diagonal (5,08°), e o filete esconde a emenda.
+- **Dourado dentro do título**: "investigação defensiva" em `--gold`, o resto
+  em branco. Subtítulo inteiro em dourado Light, como no original.
+- Anéis dos autores ligados por uma haste dourada fina (detalhe que já existia
+  na referência e funcionava).
+- Brilho quente quase imperceptível (dourado a 7%) irradiando da foto para o
+  fundo — dá a temperatura "G4" sem sair da paleta.
+
+## O que foi corrigido em relação ao corte original
+- Painel bege (fora das 8 cores do MIV) → fundo navy/tinta, único degradê.
 - Título em serifada → Gotham Black 900, como manda a tipografia da marca.
-- Corte diagonal duro entre os dois blocos → costura fina dourada, com
-  gradiente suave fundindo a foto ao fundo.
-- Coluna decorativa recolocada como friso no topo, longe do texto (a área de
-  respiro em volta do título não pode ser invadida).
 - Foto de pessoa real mantida em cor natural — duotone navy é tratamento para
   imagem de banco/ilustrativa, não para retrato de gente nomeada.
 
