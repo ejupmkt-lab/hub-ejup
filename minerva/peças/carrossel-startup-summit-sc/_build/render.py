@@ -34,18 +34,20 @@ def foto_falsa() -> str:
 MEDIR = """
 () => Array.from(document.querySelectorAll('.slide')).map(s => {
   const r = s.getBoundingClientRect();
-  const foot = s.querySelector('.foot').getBoundingClientRect();
   const box  = s.querySelector('.box').getBoundingClientRect();
-  const num  = s.querySelector('.num').getBoundingClientRect();
+  const ultimo = s.querySelector('.foot') || s.querySelector('.box');
+  const u = ultimo.getBoundingClientRect();
   // recuo inferior útil: no painel é a margem do painel + o padding dele
-  const limite = s.classList.contains('slide--panel') ? 56 + 56 : 80;
+  const limite = s.classList.contains('lay-painel') ? 56 + 56 : 80;
   return {
     i: +s.dataset.i,
+    lay: (s.className.match(/lay-(\w+)/) || [])[1],
     frame: { w: s.offsetWidth, h: s.offsetHeight },
-    // com .foot em margin-top:auto, conteúdo demais empurra o rodapé para fora
-    sobra_rodape: Math.round(r.bottom - limite - foot.bottom),
-    // o quadrado do canto projeta 16px abaixo da caixa: a folga conta a partir dele
-    folga_caixa: Math.round(num.top - (box.bottom + 16)),
+    // quanto sobra entre o fim do conteúdo e a margem inferior da tela
+    sobra: Math.round(r.bottom - limite - u.bottom),
+    // o quadrado projeta 16px abaixo da caixa e pode avancar na margem;
+    // o que nao pode e chegar perto da borda da tela (minimo 40px)
+    folga_quadrado: Math.round(r.bottom - 40 - (box.bottom + 16)),
   };
 })
 """
@@ -63,11 +65,17 @@ def main() -> None:
         page = b.new_page(viewport={"width": 1300, "height": 1000}, device_scale_factor=1)
         page.goto(SRC.as_uri())
         # A prévia mostra as telas a 50%. Para medir e capturar em tamanho real
-        # é preciso desligar essa escala — senão o screenshot sai 540×720 e os
-        # retângulos vêm pela metade.
-        page.add_style_tag(content=".frame{width:1080px;height:1440px}"
-                                   ".frame .slide{transform:none}"
-                                   ".bar{display:none}")   # a barra entraria na captura
+        # é preciso desligar essa escala — senão o screenshot sai 540×720.
+        # O <style> da peça vive no BODY (o template é conteúdo puro, sem head),
+        # então um add_style_tag no head perderia na ordem do documento: o
+        # override precisa ser anexado ao fim do body.
+        page.evaluate("""() => {
+            const st = document.createElement('style');
+            st.textContent = '.frame{width:1080px;height:1440px}'
+                           + '.frame .slide{transform:none}'
+                           + '.bar{display:none}';
+            document.body.appendChild(st);
+        }""")
         page.wait_for_timeout(700)
 
         if com_foto:
@@ -80,12 +88,12 @@ def main() -> None:
             f = m["frame"]
             if (f["w"], f["h"]) != (1080, 1440):
                 problemas.append(f"tela {m['i']+1}: moldura {f} ≠ 1080×1440")
-            if m["sobra_rodape"] < -1:
+            if m["sobra"] < -1:
                 problemas.append(
-                    f"tela {m['i']+1}: conteúdo empurra o rodapé {-m['sobra_rodape']}px para fora")
-            if m["folga_caixa"] < 16:
+                    f"tela {m['i']+1} ({m['lay']}): conteúdo passa {-m['sobra']}px da margem")
+            if m["folga_quadrado"] < 0:
                 problemas.append(
-                    f"tela {m['i']+1}: caixa do fecho a {m['folga_caixa']}px do rodapé (mín. 16)")
+                    f"tela {m['i']+1} ({m['lay']}): quadrado da caixa fora da margem")
 
         for i in range(12):
             page.locator(f'.slide[data-i="{i}"]').screenshot(

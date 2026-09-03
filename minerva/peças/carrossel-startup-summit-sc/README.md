@@ -37,8 +37,24 @@ para dar uma camada escaneável que o texto corrido sozinho não oferece.
 
 ## Estrutura de cada tela
 título → linha de abertura (itálico) → corpo → **foto** → caixa com a linha de
-fecho → rodapé. Capa e fecho invertem: foto sangrando no fundo, painel escuro
-chanfrado por cima.
+fecho. Não há numeração de slide.
+
+## Cinco enquadramentos de foto
+A primeira versão repetia o mesmo corte em todas as telas e ficou monótona.
+Agora o campo `lay` de cada item do `CONTEUDO` escolhe o enquadramento, e a
+ordem alterna para que **duas telas vizinhas nunca repitam o mesmo**:
+
+| `lay` | corte |
+|---|---|
+| `banda` | foto larga entre o texto e a caixa, chanfro em cima à esquerda |
+| `topo` | foto sangrando pelo alto, chanfro embaixo à direita |
+| `colDir` | foto vertical à direita, sangrando na borda; texto na coluna |
+| `colEsq` | espelho do anterior |
+| `fundo` | foto ocupando a tela inteira, texto por cima com scrim |
+| `painel` | capa e fecho: foto ao fundo, painel escuro chanfrado por cima |
+
+Ordem atual: painel · topo · banda · colDir · fundo · banda · colEsq · topo ·
+banda · colDir · fundo · painel.
 
 ## Editar o texto
 Está no array `CONTEUDO`, no início do `<script>` de `_build/template.html`.
@@ -52,7 +68,14 @@ Depois de mexer: `python3 _build/build.py`.
   dentro do painel, sumia. Precisou de um contêiner irmão sem recorte.
 - **A prévia mostra as telas a 50%.** Ao medir e capturar é obrigatório
   desligar essa escala: `getBoundingClientRect` devolve valores em escala e o
-  screenshot sairia 540×720 em vez de 1080×1440.
+  screenshot sairia 540×720 em vez de 1080×1440. E como o template é conteúdo
+  puro, o `<style>` da peça vive no **body** — um `add_style_tag` no head perde
+  na ordem do documento, então o override tem de ser anexado ao fim do body.
+- **`scale()` exige número sem unidade.** `calc(540px / 1080)` devolve `px`, a
+  regra é descartada em silêncio e a tela sai em tamanho cheio, cortada pela
+  moldura. A escala é calculada em JS.
+- **Chanfro de canto precisa de 5 pontos no `polygon()`.** Com 4, a diagonal
+  atravessa a foto inteira em vez de cortar só o canto.
 - **`<em>` dentro do painel escuro** herdava a cor de texto do fundo claro e
   ficava ilegível. Destaque em fundo escuro clareia, não escurece.
 
