@@ -3,14 +3,23 @@
 Capa para a coluna jurídica do site, 1600×900. Autores: Thiago Praxedes de
 Vasconcelos e Thiago de Moura Correia.
 
-**Status: rascunho aguardando foto real dos autores.** O corte enviado pelo
-usuário chegou só como imagem na conversa, sem arquivo anexado — não há como
-extrair os pixels reais, e não se deve gerar rosto sintético no lugar de duas
-pessoas nomeadas e reais.
+**Status: fechada.** A foto veio da pasta do Drive "Investigação Defensiva -
+Versão 2" (ejup.mkt), arquivo "Modelo pra melhorar e também Ref".
 
-Para finalizar: salvar a foto real dos dois advogados como
-`foto-autores.jpg` (ou `.png`) nesta pasta e rodar `_build/build.py` de novo
-— o template já tem o slot pronto e detecta o arquivo automaticamente.
+## Recorte dos autores
+`_build/cutout.py` separa os dois advogados do fundo e grava
+`foto-autores.png` com alpha. Keying por cor **não** resolve neste material: o
+bege do painel encosta no tom de pele (chega a abrir buraco no rosto) e o navy
+do fundo encosta no cinza dos ternos. A separação é feita com **GrabCut**
+(OpenCV), semeado por retângulos de fundo garantido (painel bege, navy à
+esquerda, as duas cunhas bege entre as cabeças) e de frente garantida (rostos,
+camisas, ternos). Depois: abertura/fechamento morfológico, descarte de ilhas
+menores que 12.000 px e feather de 1,3 px na borda.
+
+O corte reto que sobra no ombro esquerdo é dissolvido no CSS por uma máscara
+em degradê (`mask-image`), em vez de aparecer como aresta.
+
+Para refazer: `python3 _build/cutout.py && python3 _build/build.py && python3 _build/render.py`.
 
 ## Direção (v3 — card premium, referência direta do banner G4)
 Usuário mandou o banner "Formação G4" como modelo. A v3 reproduz a estrutura:

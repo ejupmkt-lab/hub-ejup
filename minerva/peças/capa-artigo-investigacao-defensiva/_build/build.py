@@ -50,7 +50,9 @@ def main() -> None:
         "__LOGO_WHITE__": svg_inline(LOGOS / "ejup-horizontal-white.svg"),
     }
 
-    photo_path = OUT / "foto-autores.jpg"
+    # o recorte com alpha (PNG) tem prioridade sobre a foto chapada
+    photo_path = next((p for p in (OUT / "foto-autores.png", OUT / "foto-autores.jpg")
+                       if p.exists()), OUT / "foto-autores.jpg")
     if photo_path.exists():
         mime = "image/jpeg" if photo_path.suffix.lower() in (".jpg", ".jpeg") else "image/png"
         img_tag = (
