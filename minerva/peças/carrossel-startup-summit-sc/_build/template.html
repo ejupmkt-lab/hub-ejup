@@ -1,9 +1,4 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Startup Summit 2026 · Florianópolis — carrossel</title>
+<title>Carrossel Startup Summit</title>
 <style id="css">
 __FONT_FACES__
 
@@ -174,10 +169,14 @@ body{font-family:'Gotham','Montserrat',system-ui,sans-serif;}
 }
 .btn.ghost{ background:transparent; color:#e0bd79; border:1px solid #6b5a35; }
 .btn:disabled{ opacity:.45; cursor:default; }
-.card{ margin:0 0 34px; }
-.frame{ width:540px; height:720px; overflow:hidden; box-shadow:0 20px 50px rgba(0,0,0,.45); }
-.frame .slide{ transform:scale(.5); transform-origin:top left; }
-.ui{ display:flex; align-items:center; gap:12px; width:540px; padding:12px 2px 0;
+.btn:focus-visible,.ui button:focus-visible{ outline:2px solid #e0bd79; outline-offset:2px; }
+.ui .st{ color:#7f878e; font-size:12px; }
+.card{ margin:0 0 34px; --w:min(540px, calc(100vw - 56px)); }
+.frame{ width:var(--w); height:calc(var(--w) * 4 / 3); overflow:hidden;
+        box-shadow:0 20px 50px rgba(0,0,0,.45); }
+.frame .slide{ transform:scale(var(--k, .5)); transform-origin:top left; }
+.ui{ display:flex; align-items:center; gap:12px; width:var(--w); padding:12px 2px 0;
+     flex-wrap:wrap;
      color:#98a0a7; font-size:13px; font-weight:300; }
 .ui .tg{ font-weight:500; color:#cdd2d6; letter-spacing:.1em; font-size:12px; }
 .ui input[type=range]{ flex:1; accent-color:#e0bd79; }
@@ -200,14 +199,11 @@ body{font-family:'Gotham','Montserrat',system-ui,sans-serif;}
   @page{ size:1080px 1440px; margin:0; }
 }
 </style>
-</head>
-<body>
 <div class="wrap">
   <div class="bar">
     <h1>Startup Summit 2026 · Florianópolis
-      <small>Arraste uma foto para cada tela. Depois arraste dentro da foto para reenquadrar.</small></h1>
-    <button class="btn ghost" id="btn-pdf">Salvar PDF</button>
-    <button class="btn" id="btn-all">Baixar PNGs</button>
+      <small>Arraste uma foto para cada tela, reenquadre arrastando dentro dela e baixe uma a uma.</small></h1>
+    <span class="btn ghost" id="modo">verificando…</span>
   </div>
   <div class="row" id="row"></div>
 </div>
@@ -345,7 +341,8 @@ CONTEUDO.forEach((c, i) => {
     '<input type="range" min="1" max="3" step="0.01" value="1" title="Zoom">' +
     '<button data-act="troca">Trocar</button>' +
     '<button data-act="limpa">Limpar</button>' +
-    '<button data-act="png">PNG</button>';
+    '<button data-act="png">Baixar PNG</button>' +
+    '<span class="st"></span>';
 
   card.appendChild(frame); card.appendChild(ui); row.appendChild(card);
 
@@ -358,7 +355,7 @@ CONTEUDO.forEach((c, i) => {
     if (a === 'troca') escolher(i);
     if (a === 'limpa') { estado[i] = { src:null, scale:1, x:0, y:0 };
                          ui.querySelector('input').value = 1; aplicar(i); }
-    if (a === 'png') exportarPNG(i);
+    if (a === 'png') baixar(i, ui.querySelector('.st'));
   });
 });
 
@@ -382,8 +379,9 @@ function ligarFoto(shot, i){
   });
   window.addEventListener('mousemove', e => {
     if (!arrasta) return;
-    // a prévia está a 50%: o passo do mouse vale o dobro na peça
-    estado[i].x += (e.clientX - px) * 2; estado[i].y += (e.clientY - py) * 2;
+    // a moldura é responsiva: converte o passo do mouse para a escala real
+    const k = shot.closest('.frame').clientWidth / 1080 || 1;
+    estado[i].x += (e.clientX - px) / k; estado[i].y += (e.clientY - py) / k;
     px = e.clientX; py = e.clientY; aplicar(i);
   });
   window.addEventListener('mouseup', () => { arrasta = false; });
@@ -439,7 +437,19 @@ function slideParaSVG(slide){
          '</foreignObject></svg>';
 }
 
-function exportarPNG(i){
+/* O PNG é gerado no navegador e entregue de dois jeitos: dentro do artifact,
+   pela capacidade "downloads" (o visitante confirma o salvamento — a página
+   não pode baixar sozinha); fora dele, por link comum. */
+const dlPromise = (window.claude && window.claude.use)
+  ? Promise.resolve(window.claude.use('downloads')).catch(() => null)
+  : Promise.resolve(null);
+
+dlPromise.then(dl => {
+  document.getElementById('modo').textContent =
+    dl ? 'Download tela a tela' : 'Download direto';
+});
+
+function pngBlob(i){
   return new Promise((ok, falha) => {
     const slide = document.querySelector('.slide[data-i="' + i + '"]');
     const url = URL.createObjectURL(
@@ -450,36 +460,38 @@ function exportarPNG(i){
       cv.width = 1080; cv.height = 1440;
       cv.getContext('2d').drawImage(img, 0, 0);
       URL.revokeObjectURL(url);
-      cv.toBlob(b => {
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(b);
-        a.download = 'tela-' + String(i + 1).padStart(2, '0') + '.png';
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-        ok();
-      }, 'image/png');
+      cv.toBlob(b => b ? ok(b) : falha(new Error('canvas vazio')), 'image/png');
     };
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      alert('O navegador recusou a exportação em PNG desta tela.\n' +
-            'Use "Salvar PDF" — sai no tamanho exato, 1080×1440 por página.');
-      falha();
-    };
+    img.onerror = () => { URL.revokeObjectURL(url); falha(new Error('svg')); };
     img.src = url;
   });
 }
 
-document.getElementById('btn-all').addEventListener('click', async e => {
-  e.target.disabled = true;
-  const rot = e.target.textContent;
-  for (let i = 0; i < TOTAL; i++) {
-    e.target.textContent = (i + 1) + ' / ' + TOTAL;
-    try { await exportarPNG(i); } catch (_) { break; }
-    await new Promise(r => setTimeout(r, 260));   // sem respiro o navegador engasga
+async function baixar(i, st){
+  const nome = 'tela-' + String(i + 1).padStart(2, '0') + '.png';
+  st.textContent = 'Gerando…';
+  let blob;
+  try { blob = await pngBlob(i); }
+  catch (_) { st.textContent = 'Não consegui gerar esta tela.'; return; }
+
+  const dl = await dlPromise;
+  if (!dl) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = nome; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    st.textContent = 'Baixado.';
+    return;
   }
-  e.target.textContent = rot; e.target.disabled = false;
-});
-document.getElementById('btn-pdf').addEventListener('click', () => window.print());
+  try {
+    await dl.save({ filename: nome, data: blob });
+    st.textContent = 'Salvo.';
+  } catch (e) {
+    const c = e && e.code;
+    if (c === 'declined') { st.textContent = ''; return; }
+    st.textContent = c === 'rate_limited'
+      ? 'Espere um instante e tente de novo.'
+      : 'Não deu para salvar aqui.';
+  }
+}
+
 </script>
-</body>
-</html>

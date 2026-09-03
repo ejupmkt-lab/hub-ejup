@@ -47,9 +47,20 @@ def main() -> None:
         raise SystemExit(f"token não encontrado: {token}")
     html = html.replace(token, font_face_css())
 
-    dest = OUT / "carrossel.html"
-    dest.write_text(html, encoding="utf-8")
-    print(f"gerado: {dest.name} ({len(html)/1024:.0f} KB)")
+    # O template é conteúdo puro (sem doctype/head/body) — é o que o artifact
+    # espera. Para uso local ele é envelopado, só para declarar o charset.
+    artifact = OUT / "artifact.html"
+    artifact.write_text(html, encoding="utf-8")
+
+    local = OUT / "carrossel.html"
+    local.write_text(
+        '<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n'
+        '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+        "</head>\n<body>\n" + html + "\n</body>\n</html>\n",
+        encoding="utf-8")
+
+    for f in (artifact, local):
+        print(f"gerado: {f.name} ({f.stat().st_size/1024:.0f} KB)")
 
 
 if __name__ == "__main__":
