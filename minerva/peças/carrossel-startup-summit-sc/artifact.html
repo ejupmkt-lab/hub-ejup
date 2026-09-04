@@ -29,7 +29,9 @@
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;background:#23262a;}
-body{font-family:'Gotham','Montserrat',system-ui,sans-serif;}
+/* .slide também: no PNG a tela é serializada sem <body>, e uma regra
+   presa ao body deixaria o texto cair em serif. */
+body,.slide{font-family:'Gotham','Montserrat',system-ui,sans-serif;}
 
 /* ---- a tela ---- */
 .slide{
@@ -507,17 +509,21 @@ dlPromise.then(dl => {
 function pngBlob(i){
   return new Promise((ok, falha) => {
     const slide = document.querySelector('.slide[data-i="' + i + '"]');
-    const url = URL.createObjectURL(
-      new Blob([slideParaSVG(slide)], { type:'image/svg+xml;charset=utf-8' }));
+    // data: e não blob: — um SVG vindo de blob: contamina o canvas (origem
+    // opaca dentro do artifact e em file://), e aí toBlob morre em
+    // SecurityError. Com data: o canvas continua limpo.
+    const url = 'data:image/svg+xml;charset=utf-8,'
+              + encodeURIComponent(slideParaSVG(slide));
     const img = new Image();
     img.onload = () => {
       const cv = document.createElement('canvas');
       cv.width = 1080; cv.height = 1440;
       cv.getContext('2d').drawImage(img, 0, 0);
-      URL.revokeObjectURL(url);
-      cv.toBlob(b => b ? ok(b) : falha(new Error('canvas vazio')), 'image/png');
+      try {
+        cv.toBlob(b => b ? ok(b) : falha(new Error('canvas vazio')), 'image/png');
+      } catch (e) { falha(e); }
     };
-    img.onerror = () => { URL.revokeObjectURL(url); falha(new Error('svg')); };
+    img.onerror = () => falha(new Error('svg'));
     img.src = url;
   });
 }

@@ -69,6 +69,16 @@ Está no array `CONTEUDO`, no início do `<script>` de `_build/template.html`.
 Depois de mexer: `python3 _build/build.py`.
 
 ## Armadilhas resolvidas (não repetir)
+- **`blob:` no `<img>` do SVG contamina o canvas.** Dentro do artifact (origem
+  opaca) e em `file://`, `toBlob` morria em `SecurityError` e nenhum PNG saía.
+  A URL do SVG tem de ser `data:image/svg+xml;charset=utf-8,` + `encodeURIComponent`.
+- **O SVG não tem `<body>`.** A regra de fonte estava presa a `body`, então
+  dentro do `foreignObject` o texto caía em serif — layout e cores certos,
+  tipografia errada. A regra vale para `body,.slide`.
+- **Screenshot não prova download.** As duas falhas acima passaram pelo
+  `render.py` antigo, que só tirava screenshot. Agora `--fotos` chama o mesmo
+  `pngBlob()` do botão nas 12 telas e compara com o screenshot (diferença média
+  acima de 12 reprova; com o bug da serif dava 17, hoje dá 0,7).
 - **`clip-path` corta `border`.** A caixa contornada é feita com duas camadas
   recortadas: a de baixo pinta a linha, a de cima devolve o fundo 2px para
   dentro.

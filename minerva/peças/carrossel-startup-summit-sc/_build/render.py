@@ -3,13 +3,18 @@
 
 Injeta uma foto sintética em cada tela só para a prova: a peça real recebe as
 fotos por arrastar-e-soltar no navegador.
+
+Com --fotos também exercita o botão de download de verdade: chama o mesmo
+`pngBlob()` da peça e compara o PNG exportado com o screenshot da tela. Isso
+existe porque o download já quebrou duas vezes de um jeito que o screenshot
+não via — canvas contaminado e fonte caindo em serif dentro do SVG.
 """
 import base64
 import io
 import pathlib
 import sys
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageChops, ImageDraw, ImageStat
 from playwright.sync_api import sync_playwright
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -51,6 +56,47 @@ MEDIR = """
   };
 })
 """
+
+
+EXPORTAR = """
+async (i) => {
+  try {
+    const b = await pngBlob(i);
+    const d = await new Promise(r => {
+      const f = new FileReader(); f.onload = () => r(f.result); f.readAsDataURL(b);
+    });
+    return { ok:true, d };
+  } catch (e) { return { ok:false, err:String((e && e.message) || e) }; }
+}
+"""
+
+
+def conferir_download(page) -> list:
+    """Exporta as 12 telas pelo caminho real do botão e compara com o screenshot.
+
+    Uma diferença média alta significa que o PNG saiu diferente do que se vê —
+    foi assim que a queda para serif apareceu (o SVG não tem <body>, então uma
+    regra de fonte presa ao body não valia lá dentro).
+    """
+    problemas = []
+    for i in range(12):
+        r = page.evaluate(EXPORTAR, i)
+        if not r["ok"]:
+            problemas.append(f"tela {i+1}: download falhou ({r['err']})")
+            continue
+        png = base64.b64decode(r["d"].split(",", 1)[1])
+        (PREV / f"export-{i+1:02d}.png").write_bytes(png)
+        exp = Image.open(io.BytesIO(png)).convert("RGB")
+        if exp.size != (1080, 1440):
+            problemas.append(f"tela {i+1}: PNG exportado {exp.size} ≠ 1080×1440")
+            continue
+        ref = Image.open(PREV / f"tela-{i+1:02d}.png").convert("RGB")
+        d = ImageStat.Stat(ImageChops.difference(exp, ref)).mean
+        if max(d) > 12:
+            problemas.append(
+                f"tela {i+1}: PNG exportado destoa do screenshot "
+                f"(diferença média {max(d):.1f}) — confira fonte e enquadramento")
+    return problemas
 
 
 def main() -> None:
@@ -98,6 +144,9 @@ def main() -> None:
         for i in range(12):
             page.locator(f'.slide[data-i="{i}"]').screenshot(
                 path=str(PREV / f"tela-{i+1:02d}.png"))
+
+        if com_foto:
+            problemas += conferir_download(page)
         b.close()
 
     print(f"12 telas em {PREV}")
