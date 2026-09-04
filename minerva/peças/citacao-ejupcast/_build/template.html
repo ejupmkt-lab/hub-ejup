@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Citação EJUPcast</title>
+<style>
+__FONT_FACES__
+:root{
+  --navy:#031c37;      /* primária, texto da frase */
+  --graphite:#414042;  /* nome */
+  --gray:#5f6062;      /* função */
+  --silver:#d1d3d4;    /* grafismo e régua */
+  --bronze:#9b6b26;    /* acento sobre fundo claro (4,6:1) */
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#8a8f95;display:flex;justify-content:center;padding:40px;
+     font-family:'Gotham','Montserrat',system-ui,sans-serif;}
+
+.arte{
+  position:relative; width:1080px; height:1440px; overflow:hidden;
+  padding:120px 104px 96px;
+  display:flex; flex-direction:column;
+  /* branco no centro, esfriando para prata nas bordas */
+  background:
+    radial-gradient(120% 90% at 42% 40%, #ffffff 0%, #fbfbfc 38%, #eef0f1 74%, #e3e6e8 100%);
+}
+
+/* grafismo: o próprio símbolo, ampliado e sangrando pelo canto superior direito */
+.marca-fundo{
+  position:absolute; top:-168px; right:-186px; width:590px; opacity:.42;
+  pointer-events:none;
+}
+.marca-fundo svg{width:100%;height:auto;display:block}
+.marca-fundo path{fill:var(--silver) !important}
+
+.conteudo{position:relative; display:flex; flex-direction:column; height:100%}
+
+.aspa{ font-weight:700; color:var(--navy); line-height:.5;
+       letter-spacing:-.02em; font-size:118px; }
+.aspa.fecha{ align-self:flex-end; margin-top:56px; }
+
+/* a frase ocupa o meio da arte; o corpo é Light, o destaque é Bold */
+.frase{
+  margin-top:96px;
+  font-weight:300; color:var(--navy);
+  font-size:64px; line-height:1.26; letter-spacing:-.015em;
+  max-width:860px;
+}
+.frase b{ font-weight:700; }
+
+.rodape{ margin-top:auto; display:flex; flex-direction:column; }
+.regua{ width:104px; height:3px; background:var(--bronze); margin-bottom:34px; }
+.nome{ font-weight:700; font-size:46px; color:var(--navy); letter-spacing:-.015em; }
+.funcao{ font-weight:300; font-size:31px; color:var(--gray); margin-top:12px; }
+.origem{ font-weight:500; font-size:23px; color:var(--bronze);
+         text-transform:uppercase; letter-spacing:.14em; margin-top:30px; }
+
+.logo{ margin-top:96px; align-self:center; width:322px; }
+.logo svg{width:100%;height:auto;display:block}
+</style></head>
+<body>
+<div class="arte" id="arte">
+  <div class="marca-fundo">__SIMBOLO__</div>
+  <div class="conteudo">
+    <div class="aspa abre">&ldquo;</div>
+    <p class="frase" id="frase">__FRASE__</p>
+    <div class="aspa fecha">&rdquo;</div>
+    <div class="rodape">
+      <div class="regua"></div>
+      <p class="nome">__NOME__</p>
+      <p class="funcao">__FUNCAO__</p>
+      <p class="origem">__ORIGEM__</p>
+      <div class="logo">__LOGO__</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* A frase muda de tamanho a cada episódio. Em vez de acertar o corpo na mão,
+   o texto é ajustado ao espaço disponível: cresce até encostar no limite,
+   nunca passa. Assim uma frase curta fica imponente e uma longa continua
+   inteira dentro da arte, com a mesma margem. */
+(function ajustar(){
+  const frase = document.getElementById('frase');
+  const fecha = document.querySelector('.aspa.fecha');
+  const rodape = document.querySelector('.rodape');
+  const teto = 66, piso = 34;   // teto baixo de proposito: mantem o corpo parecido entre episodios
+  const cabe = px => {
+    frase.style.fontSize = px + 'px';
+    // o bloco frase+aspa de fecho não pode invadir o rodapé
+    return fecha.getBoundingClientRect().bottom
+         < rodape.getBoundingClientRect().top - 40;
+  };
+  let lo = piso, hi = teto, melhor = piso;
+  while (lo <= hi) {
+    const meio = Math.floor((lo + hi) / 2);
+    if (cabe(meio)) { melhor = meio; lo = meio + 1; } else { hi = meio - 1; }
+  }
+  frase.style.fontSize = melhor + 'px';
+  document.documentElement.dataset.corpo = melhor;
+})();
+</script>
+</body></html>
