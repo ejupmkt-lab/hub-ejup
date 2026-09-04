@@ -3,9 +3,11 @@
 Doze telas (1080×1440) sobre a viagem de Roberto e Leonardo a Santa Catarina.
 
 **Não é peça da EJUP.** É o perfil **pessoal** dos dois, então o charter da marca
-não se aplica: paleta, assinatura e tom são próprios. A regra da EJUP que proíbe
-travessão entre palavras também não vale aqui — o texto é de autoria deles e foi
-mantido como escrito.
+não se aplica: paleta, assinatura e tom são próprios.
+
+**Sem travessão entre palavras.** Vale aqui também, por decisão do Victor: dá
+cara de texto de IA. Os quatro que existiam viraram vírgula ou sumiram, sem
+mudar o sentido. Vale para as próximas revisões do texto.
 
 ## Como usar
 1. Abra `carrossel.html` no navegador (funciona offline, sem servidor).
@@ -34,6 +36,12 @@ profundo, latão) no lugar do vermelho/bordô do Sebrae, e bem mais respiro —
 o texto aqui é muito mais denso que o da referência, que é quase todo legenda
 curta. Cada tela ganhou um **título curto em caixa alta** derivado do conteúdo,
 para dar uma camada escaneável que o texto corrido sozinho não oferece.
+
+## Revisão ortográfica
+O texto veio dos autores e passa por revisão aqui. Já corrigido: início de frase
+em maiúscula no fecho da tela 7, os travessões, e **Florianópolis** com acento na
+assinatura de rodapé (o nome aparece em três lugares — capa, tela 2 e rodapé;
+conferir os três).
 
 ## Estrutura de cada tela
 título → linha de abertura (itálico) → corpo → **foto** → caixa com a linha de
