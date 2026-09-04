@@ -1,0 +1,11 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html",   "x": 0,    "y": 0, "w": 1440, "h": 5300, "title": "Desktop 1440", "print": "flow" },
+    { "file": "Mobile.dc.html", "x": 1640, "y": 0, "w": 390,  "h": 6700, "title": "Mobile 390",   "print": "flow" }
+  ],
+  "annotations": [
+    { "id": "placeholders", "x": 2160, "y": 0, "w": 300,
+      "text": "Tudo entre [colchetes] é fato pendente: nome do programa, data, carga horária, formato, valor e os professores. Substituir antes de publicar. As duas larguras saem do mesmo gerador (_build/gerar.py) — editar lá, nunca só num lado." }
+  ],
+  "launch": { "view": "canvas" }
+}
