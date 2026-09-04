@@ -1,0 +1,20 @@
+CARROSSEL STARTUP SUMMIT 2026 — 12 telas, PNG 1080x1440, fundo transparente
+
+O que está transparente: o campo de fundo da tela (o papel) e o retângulo
+reservado para a foto. É para você colocar a foto POR BAIXO destes arquivos,
+num editor (Canva, Photoshop, o editor do Instagram).
+
+O que continua opaco, porque é desenho e não fundo: o painel escuro das telas
+1 e 12, a caixa contornada do fecho, a etiqueta dourada e todo o texto.
+
+Telas 1, 5, 11 e 12 (capa, IA na operação, densidade das relações e fecho)
+carregam um véu escuro sobre a tela inteira. Ele é parte do projeto: é o que
+segura a leitura do texto branco por cima da foto. Se a sua foto já for
+escura, dá para dispensar — me peça a versão sem o véu.
+
+Atenção nas telas de fundo claro (2 a 10): o texto foi desenhado para papel
+claro, então é azul-escuro e cinza. Sobre foto escura ele some. Nessas, ou a
+foto entra só no espaço vago (que é o desenho original), ou o texto precisa
+ser reescrito em branco — me peça a versão clara.
+
+Fonte Gotham, 1080x1440 px, RGBA.

@@ -97,9 +97,18 @@ Depois de mexer: `python3 _build/build.py`.
 - **`<em>` dentro do painel escuro** herdava a cor de texto do fundo claro e
   ficava ilegível. Destaque em fundo escuro clareia, não escurece.
 
+## PNG com fundo transparente
+`python3 _build/exportar_transparente.py` gera `png-transparente/` com as 12
+telas em RGBA. Transparente = o campo de papel e o espaço da foto; painel
+escuro, scrim, caixa, etiqueta e texto continuam opacos. Serve para colocar a
+foto por baixo num editor. Duas ressalvas que vão no LEIA-ME do zip: as telas
+1, 5, 11 e 12 carregam o scrim sobre a tela inteira, e nas telas claras o
+texto é azul-escuro/cinza, feito para papel — sobre foto escura ele some.
+
 ## Arquivos
 - `carrossel.html` — a peça, pronta para uso.
 - `_build/template.html` — fonte (conteúdo + layout + interação).
 - `_build/build.py` — embute as fontes Gotham e gera o HTML final.
 - `_build/render.py` — renderiza as 12 telas para conferência e acusa texto
-  estourando (`--fotos` injeta uma foto sintética só para a prova).
+  estourando (`--fotos` injeta uma foto sintética e ainda exercita o download).
+- `_build/exportar_transparente.py` — as 12 telas em PNG com fundo transparente.
