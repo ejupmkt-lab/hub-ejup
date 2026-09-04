@@ -23,6 +23,10 @@ quebre no meio da linha.
   entre 34 e 66px que ainda deixa a frase inteira acima do rodapé. O teto é
   baixo de propósito: uma frase curta poderia crescer muito e a série ficaria
   desigual de uma semana para a outra.
+- **A citação fica centrada no espaço acima do rodapé.** Aspas e frase formam
+  um bloco só, com margens automáticas em cima e embaixo, então a sobra se
+  divide igual e a frase não cola no topo — vale para frase de qualquer
+  tamanho, sem acerto manual.
 - **Acento é bronze `#9b6b26`, não dourado.** O fundo é claro, e dourado sobre
   branco dá 1,8:1 — ilegível. Bronze dá 4,6:1. Vale para a régua e para o
   rótulo do episódio.

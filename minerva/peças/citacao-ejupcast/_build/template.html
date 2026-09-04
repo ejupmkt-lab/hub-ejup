@@ -32,13 +32,18 @@ body{background:#8a8f95;display:flex;justify-content:center;padding:40px;
 
 .conteudo{position:relative; display:flex; flex-direction:column; height:100%}
 
+/* aspas + frase formam um bloco só, centrado no espaço acima do rodapé:
+   as margens automáticas dividem a sobra em partes iguais em cima e embaixo,
+   então a citação fica no meio da arte independentemente do tamanho dela */
+.bloco{ margin-top:auto; margin-bottom:auto; display:flex; flex-direction:column; }
+
 .aspa{ font-weight:700; color:var(--navy); line-height:.5;
        letter-spacing:-.02em; font-size:118px; }
 .aspa.fecha{ align-self:flex-end; margin-top:56px; }
 
 /* a frase ocupa o meio da arte; o corpo é Light, o destaque é Bold */
 .frase{
-  margin-top:96px;
+  margin-top:76px;
   font-weight:300; color:var(--navy);
   font-size:64px; line-height:1.26; letter-spacing:-.015em;
   max-width:860px;
@@ -59,9 +64,11 @@ body{background:#8a8f95;display:flex;justify-content:center;padding:40px;
 <div class="arte" id="arte">
   <div class="marca-fundo">__SIMBOLO__</div>
   <div class="conteudo">
-    <div class="aspa abre">&ldquo;</div>
-    <p class="frase" id="frase">__FRASE__</p>
-    <div class="aspa fecha">&rdquo;</div>
+    <div class="bloco">
+      <div class="aspa abre">&ldquo;</div>
+      <p class="frase" id="frase">__FRASE__</p>
+      <div class="aspa fecha">&rdquo;</div>
+    </div>
     <div class="rodape">
       <div class="regua"></div>
       <p class="nome">__NOME__</p>
