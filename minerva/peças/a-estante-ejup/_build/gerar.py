@@ -32,7 +32,7 @@ LIVRO = {
     "pasta": "tribos",
     "titulo": "Tribos",
     "autor": "SETH GODIN",
-    "sobre": "Sobre o que faz um grupo de pessoas virar comunidade.",
+    "sobre": "“Nós precisamos que você nos lidere.”",
     "stories": [
         {
             "etapa": "LIVRO DA SEMANA",
