@@ -89,8 +89,14 @@ body{background:#5b6169; display:flex; flex-wrap:wrap; gap:32px; padding:32px;
 
 .fecho{ margin-top:70px; }
 .fecho .pergunta{ font-weight:500; font-size:.38em; color:var(--gold); }
-.fecho .assina{ margin-top:.34em; font-weight:300; font-size:.31em; color:var(--silver); }
-.fecho .assina b{ font-weight:900; color:#fff; letter-spacing:-.01em; }
+/* a assinatura da marca não é mais uma linha do texto: ganha fio, rótulo e
+   escala próprios, para ler como fecho e não como continuação da pergunta */
+.assina{ margin-top:.52em; padding-top:.34em;
+         border-top:1px solid rgba(255,255,255,.18); }
+.assina .marca{ font-weight:500; font-size:.22em; letter-spacing:.24em;
+                color:var(--gold); }
+.assina .slogan{ margin-top:.12em; font-weight:300; font-size:.42em;
+                 line-height:1.24; letter-spacing:-.012em; color:#fff; }
 
 .logo{ margin-top:auto; margin-bottom:104px; align-self:center; width:300px; }
 .logo svg{width:100%;height:auto;display:block}

@@ -39,5 +39,9 @@ fora.
 - **Sem emoji.** O 👉 do roteiro virou a seta da pílula de chamada, que já era
   o gesto da série. O charter proíbe emoji como muleta de tom; a seta faz o
   mesmo trabalho e é elemento de marca.
+- **A assinatura da marca é bloco próprio.** No último story, o slogan não é
+  mais a última linha do texto: fio fino em cima, rótulo "EJUP" em ouro e o
+  slogan em corpo maior, branco. Assim ele fecha a sequência em vez de parecer
+  continuação da pergunta.
 - **Ouro é acento, não fundo.** Um título inteiro em ouro perde o contraste
   hierárquico: destaque no máximo o fecho da frase.

@@ -77,7 +77,7 @@ LIVRO = {
             "livro": True,
             "pergunta": "Qual propósito você tem construído em volta do seu "
                         "trabalho? Conta pra gente no direct.",
-            "assina": "EJUP. <b>Alma clássica, repertório contemporâneo.</b>",
+            "slogan": "Alma clássica, repertório contemporâneo.",
         },
     ],
 }
@@ -143,13 +143,12 @@ def story_html(s: dict, i: int, simbolo: str, logo: str, capa: str,
     if s.get("pilula"):
         partes.append('<div class="pilula"><i>&rarr;</i><span>'
                       + s["pilula"] + '</span></div>')
-    if s.get("pergunta") or s.get("assina"):
-        fecho = '<div class="fecho">'
-        if s.get("pergunta"):
-            fecho += f'<p class="pergunta">{s["pergunta"]}</p>'
-        if s.get("assina"):
-            fecho += f'<p class="assina">{s["assina"]}</p>'
-        partes.append(fecho + "</div>")
+    if s.get("pergunta"):
+        partes.append('<div class="fecho">'
+                      f'<p class="pergunta">{s["pergunta"]}</p></div>')
+    if s.get("slogan"):
+        partes.append('<div class="assina"><p class="marca">EJUP</p>'
+                      f'<p class="slogan">{_html.escape(s["slogan"])}</p></div>')
 
     return (
         f'<div class="story" data-i="{i}">'
