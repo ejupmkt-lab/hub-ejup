@@ -119,6 +119,15 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;align-items:flex-start;
 .fmt-f .logo{left:50%;transform:translateX(-50%);bottom:64px}
 .fmt-f .logo img{height:44px}
 
+/* ---- só o fundo ----
+   Nada de texto, retrato ou assinatura, e sem o brilho dourado: fica só o
+   degradê navy com o bokeh de aço e o grão. É a base para receber arte por
+   cima. */
+.bg .foto,.bg .halo,.bg .piso,.bg .logo,.bg .texto{display:none}
+.bg{background:
+    radial-gradient(70% 80% at 8% 0%, #0a2340 0%, rgba(10,35,64,0) 60%),
+    linear-gradient(160deg, #071a2f 0%, var(--deep) 55%, #040d18 100%)}
+
 /* ---- versão limpa: sem retrato e sem logo ----
    Só some o que é imagem e assinatura. O texto NÃO se move: fica exatamente
    na mesma posição da versão com foto, para as duas serem intercambiáveis. */

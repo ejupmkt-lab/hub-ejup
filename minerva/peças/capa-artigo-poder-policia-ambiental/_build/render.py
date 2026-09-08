@@ -21,8 +21,11 @@ CORTE_H = 512
 MEDIR = """
 () => Array.from(document.querySelectorAll('.cover')).map(s => {
   const r = s.getBoundingClientRect();
-  const fim = Math.max(...Array.from(s.querySelectorAll('.texto > *'))
-                        .map(e => e.getBoundingClientRect().bottom));
+  const alvos = Array.from(s.querySelectorAll('.texto > *'))
+                     .filter(e => e.offsetParent);
+  const fim = alvos.length
+    ? Math.max(...alvos.map(e => e.getBoundingClientRect().bottom))
+    : r.top;
   const el = s.querySelector('.logo');
   const logo = (el && el.offsetParent) ? el.getBoundingClientRect().top - r.top
                                        : null;
@@ -55,7 +58,7 @@ def main() -> None:
         page.wait_for_timeout(700)
 
         for m in page.evaluate(MEDIR):
-            base = m["fmt"].replace("-limpa", "")
+            base = m["fmt"].split("-")[0]
             esperado = {"horizontal": (1600, 900), "story": (1080, 1920),
                         "feed": (1080, 1440)}[base]
             if (m["w"], m["h"]) != esperado:

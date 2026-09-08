@@ -44,6 +44,11 @@ arte poder receber outra imagem por cima sem sair de registro.
 Serve para quando a arte vai receber outra imagem por cima, ou quando a
 assinatura vem de fora (perfil, template de terceiro).
 
+## Só o fundo (`capa-*-bg.png`)
+Nos três tamanhos, o fundo sozinho: degradê navy, bokeh de aço e grão. **Sem
+o brilho dourado** — ele existe para receber o retrato e, sem ninguém em cima,
+viraria uma mancha solta. Serve como base para receber arte por fora.
+
 ## Diagramação dos verticais
 No story e no feed o retrato entra **por baixo do texto**, nunca atrás dele: o
 topo da imagem tem de ficar abaixo da última linha (a assinatura). O
