@@ -63,15 +63,15 @@ def fontes() -> str:
 
 
 def data_uri(caminho: pathlib.Path) -> str:
-    mime = {"jpg": "jpeg", "jpeg": "jpeg", "png": "png",
+    mime = {"jpg": "jpeg", "jpeg": "jpeg", "png": "png", "webp": "webp",
             "svg": "svg+xml"}[caminho.suffix.lstrip(".").lower()]
     b64 = base64.b64encode(caminho.read_bytes()).decode("ascii")
     return f"data:image/{mime};base64,{b64}"
 
 
 def foto() -> tuple:
-    for ext in ("jpg", "jpeg", "png"):
-        arq = OUT / f"foto.{ext}"
+    # a tratada vem primeiro: é a que tem o degradê de borda
+    for arq in (HERE / "foto-tratada.webp", OUT / "foto.jpg", OUT / "foto.png"):
         if arq.exists():
             return "has-foto", (f'<img src="{data_uri(arq)}" '
                                 f'alt="{_html.escape(ARTIGO["autor"])}">')

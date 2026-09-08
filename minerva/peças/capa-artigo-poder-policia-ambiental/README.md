@@ -34,3 +34,12 @@ escuro é justamente o caso em que a separação falha — não tente.
 Edite `ARTIGO` em `_build/gerar.py`: pílula, título (a segunda parte vai em
 dourado Light), subtítulo, coluna, tema, autor e cargo. Os três formatos saem
 do mesmo dicionário, então não há como um divergir do outro.
+
+## Como a foto entrou
+`_build/tratar_foto.py` aperta o enquadramento, reduz para 2100px de altura e
+aplica **alpha em degradê nas quatro bordas**; `_build/foto-tratada.webp`
+(207 KB) é o que vai embutido. WebP e não PNG porque a mesma imagem com alpha
+sai dez vezes menor, e ela entra em base64 nos três formatos do mesmo arquivo.
+
+O original tem 4000×6000 e 4,5 MB. Ele fica em `foto.jpg` nesta pasta; o
+tratamento é reprodutível a partir dele.
