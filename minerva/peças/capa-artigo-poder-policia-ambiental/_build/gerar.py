@@ -79,10 +79,12 @@ def foto() -> tuple:
 
 
 def cover(nome: str, classe: str, tag_foto: str, classe_foto: str,
-          logo: str) -> str:
+          logo: str, limpa: bool = False) -> str:
     a = ARTIGO
     return (
-        f'<section class="cover {classe} {classe_foto}" data-fmt="{nome}">'
+        f'<section class="cover {classe} {classe_foto}'
+        f'{" limpa" if limpa else ""}" '
+        f'data-fmt="{nome}{"-limpa" if limpa else ""}">'
         '<div class="bokeh"><span class="b1"></span><span class="b2"></span>'
         '<span class="b3"></span></div>'
         '<div class="halo"></div>'
@@ -111,8 +113,10 @@ def main() -> None:
     if classe_foto == "sem-foto":
         print("aviso: foto.jpg não encontrada — o lugar do retrato sai marcado")
     logo = data_uri(LOGOS / "ejup-horizontal-white.svg")
-    covers = "\n".join(cover(n, c, tag_foto, classe_foto, logo)
-                       for n, c, _, _ in FORMATOS)
+    covers = "\n".join(
+        cover(n, c, tag_foto, classe_foto, logo, limpa)
+        for limpa in (False, True)
+        for n, c, _, _ in FORMATOS)
 
     html = (HERE / "template.html").read_text(encoding="utf-8")
     for marca, valor in (("__FONT_FACES__", fontes()), ("__COVERS__", covers)):

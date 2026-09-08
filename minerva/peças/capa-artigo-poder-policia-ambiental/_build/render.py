@@ -23,14 +23,17 @@ MEDIR = """
   const r = s.getBoundingClientRect();
   const fim = Math.max(...Array.from(s.querySelectorAll('.texto > *'))
                         .map(e => e.getBoundingClientRect().bottom));
-  const logo = s.querySelector('.logo').getBoundingClientRect();
-  const img = s.querySelector('.foto img');
+  const el = s.querySelector('.logo');
+  const logo = (el && el.offsetParent) ? el.getBoundingClientRect().top - r.top
+                                       : null;
+  const cx = s.querySelector('.foto');
+  const img = (cx && cx.offsetParent) ? s.querySelector('.foto img') : null;
   const foto = img ? img.getBoundingClientRect().top - r.top : null;
   return {
     fmt: s.dataset.fmt,
     w: Math.round(r.width), h: Math.round(r.height),
     textoFim: Math.round(fim - r.top),
-    logoTopo: Math.round(logo.top - r.top),
+    logoTopo: logo === null ? null : Math.round(logo),
     fotoTopo: foto === null ? null : Math.round(foto),
   };
 })
@@ -52,24 +55,25 @@ def main() -> None:
         page.wait_for_timeout(700)
 
         for m in page.evaluate(MEDIR):
+            base = m["fmt"].replace("-limpa", "")
             esperado = {"horizontal": (1600, 900), "story": (1080, 1920),
-                        "feed": (1080, 1440)}[m["fmt"]]
+                        "feed": (1080, 1440)}[base]
             if (m["w"], m["h"]) != esperado:
                 problemas.append(f"{m['fmt']}: {m['w']}×{m['h']} ≠ "
                                  f"{esperado[0]}×{esperado[1]}")
-            if m["fmt"] == "horizontal" and m["textoFim"] > CORTE_H:
+            if base == "horizontal" and m["textoFim"] > CORTE_H:
                 problemas.append(
                     f"horizontal: o texto termina em {m['textoFim']}px e o site "
                     f"corta em {CORTE_H}px — some {m['textoFim']-CORTE_H}px")
             # no story e no feed o retrato entra por baixo do texto; se o
             # topo dele sobe acima da última linha, a foto passa por trás
-            if (m["fmt"] in ("story", "feed") and m["fotoTopo"] is not None
+            if (base in ("story", "feed") and m["fotoTopo"] is not None
                     and m["fotoTopo"] < m["textoFim"]):
                 problemas.append(
                     f"{m['fmt']}: o retrato começa em {m['fotoTopo']}px e o "
                     f"texto só termina em {m['textoFim']}px — a foto passa "
                     "por trás do texto")
-            if m["textoFim"] > m["logoTopo"]:
+            if m["logoTopo"] is not None and m["textoFim"] > m["logoTopo"]:
                 problemas.append(f"{m['fmt']}: o texto encosta no logo")
             print(f"{m['fmt']}: {m['w']}×{m['h']}, texto até {m['textoFim']}px"
                   + (f", retrato a partir de {m['fotoTopo']}px"

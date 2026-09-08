@@ -35,6 +35,16 @@ Edite `ARTIGO` em `_build/gerar.py`: pílula, título (a segunda parte vai em
 dourado Light), subtítulo, coluna, tema, autor e cargo. Os três formatos saem
 do mesmo dicionário, então não há como um divergir do outro.
 
+## Versão limpa (sem retrato e sem logo)
+Cada formato sai também como `capa-*-limpa.png`: mesmo texto, sem foto, sem
+halo, sem piso e sem assinatura. Nos verticais o texto passa a ser **centrado
+na altura** — preso no topo, a metade de baixo ficaria vazia sem o retrato
+para ocupá-la. No horizontal ele fica onde está, porque o site corta a parte
+de baixo de qualquer jeito.
+
+Serve para quando a arte vai receber outra imagem por cima, ou quando a
+assinatura vem de fora (perfil, template de terceiro).
+
 ## Diagramação dos verticais
 No story e no feed o retrato entra **por baixo do texto**, nunca atrás dele: o
 topo da imagem tem de ficar abaixo da última linha (a assinatura). O
