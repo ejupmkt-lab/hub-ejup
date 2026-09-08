@@ -35,6 +35,16 @@ Edite `ARTIGO` em `_build/gerar.py`: pílula, título (a segunda parte vai em
 dourado Light), subtítulo, coluna, tema, autor e cargo. Os três formatos saem
 do mesmo dicionário, então não há como um divergir do outro.
 
+## Diagramação dos verticais
+No story e no feed o retrato entra **por baixo do texto**, nunca atrás dele: o
+topo da imagem tem de ficar abaixo da última linha (a assinatura). O
+`render.py` compara as duas medidas e reprova se a foto subir demais — foi
+assim que o feed foi pego passando por trás do texto. Quando faltar espaço, a
+correção é **descer o retrato**, não encolher: reduzir tira presença dele.
+
+O logo dos dois verticais é centralizado e maior que o do horizontal, onde ele
+fica no canto porque o site corta a parte de baixo.
+
 ## Como a foto entrou
 `_build/tratar_foto.py` escolhe o caminho pelo próprio arquivo:
 

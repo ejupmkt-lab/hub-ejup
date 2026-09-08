@@ -24,11 +24,14 @@ MEDIR = """
   const fim = Math.max(...Array.from(s.querySelectorAll('.texto > *'))
                         .map(e => e.getBoundingClientRect().bottom));
   const logo = s.querySelector('.logo').getBoundingClientRect();
+  const img = s.querySelector('.foto img');
+  const foto = img ? img.getBoundingClientRect().top - r.top : null;
   return {
     fmt: s.dataset.fmt,
     w: Math.round(r.width), h: Math.round(r.height),
     textoFim: Math.round(fim - r.top),
     logoTopo: Math.round(logo.top - r.top),
+    fotoTopo: foto === null ? null : Math.round(foto),
   };
 })
 """
@@ -58,9 +61,19 @@ def main() -> None:
                 problemas.append(
                     f"horizontal: o texto termina em {m['textoFim']}px e o site "
                     f"corta em {CORTE_H}px — some {m['textoFim']-CORTE_H}px")
+            # no story e no feed o retrato entra por baixo do texto; se o
+            # topo dele sobe acima da última linha, a foto passa por trás
+            if (m["fmt"] in ("story", "feed") and m["fotoTopo"] is not None
+                    and m["fotoTopo"] < m["textoFim"]):
+                problemas.append(
+                    f"{m['fmt']}: o retrato começa em {m['fotoTopo']}px e o "
+                    f"texto só termina em {m['textoFim']}px — a foto passa "
+                    "por trás do texto")
             if m["textoFim"] > m["logoTopo"]:
                 problemas.append(f"{m['fmt']}: o texto encosta no logo")
-            print(f"{m['fmt']}: {m['w']}×{m['h']}, texto até {m['textoFim']}px")
+            print(f"{m['fmt']}: {m['w']}×{m['h']}, texto até {m['textoFim']}px"
+                  + (f", retrato a partir de {m['fotoTopo']}px"
+                     if m["fotoTopo"] is not None else ""))
             page.locator(f'.cover[data-fmt="{m["fmt"]}"]').screenshot(
                 path=str(OUT / f"capa-{m['fmt']}.png"))
         b.close()
