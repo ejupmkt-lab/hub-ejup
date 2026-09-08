@@ -37,10 +37,9 @@ do mesmo dicionário, então não há como um divergir do outro.
 
 ## Versão limpa (sem retrato e sem logo)
 Cada formato sai também como `capa-*-limpa.png`: mesmo texto, sem foto, sem
-halo, sem piso e sem assinatura. Nos verticais o texto passa a ser **centrado
-na altura** — preso no topo, a metade de baixo ficaria vazia sem o retrato
-para ocupá-la. No horizontal ele fica onde está, porque o site corta a parte
-de baixo de qualquer jeito.
+halo, sem piso e sem assinatura. **O texto não se move** — fica exatamente na
+mesma posição da versão com foto, para as duas serem intercambiáveis e para a
+arte poder receber outra imagem por cima sem sair de registro.
 
 Serve para quando a arte vai receber outra imagem por cima, ou quando a
 assinatura vem de fora (perfil, template de terceiro).

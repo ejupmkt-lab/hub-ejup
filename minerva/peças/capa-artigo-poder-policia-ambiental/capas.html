@@ -124,13 +124,9 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;align-items:flex-start;
 .fmt-f .logo img{height:44px}
 
 /* ---- versão limpa: sem retrato e sem logo ----
-   Some tudo que é imagem e assinatura. Nos verticais o texto passa a ser
-   centrado na altura: preso no topo, ele deixaria a metade de baixo vazia,
-   porque não há mais retrato para ocupá-la. No horizontal ele fica onde
-   está, porque o site corta a parte de baixo de qualquer jeito. */
+   Só some o que é imagem e assinatura. O texto NÃO se move: fica exatamente
+   na mesma posição da versão com foto, para as duas serem intercambiáveis. */
 .limpa .foto,.limpa .halo,.limpa .piso,.limpa .logo{display:none}
-.limpa.fmt-v .texto,.limpa.fmt-f .texto{top:0;bottom:0;height:100%;
-  display:flex;flex-direction:column;justify-content:center}
 
 /* guia da faixa visível do site, só na prova (--guia) */
 .guia .fmt-h::after{content:"faixa visível no site";position:absolute;left:0;right:0;
