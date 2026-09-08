@@ -36,10 +36,19 @@ dourado Light), subtítulo, coluna, tema, autor e cargo. Os três formatos saem
 do mesmo dicionário, então não há como um divergir do outro.
 
 ## Como a foto entrou
-`_build/tratar_foto.py` aperta o enquadramento, reduz para 2100px de altura e
-aplica **alpha em degradê nas quatro bordas**; `_build/foto-tratada.webp`
-(207 KB) é o que vai embutido. WebP e não PNG porque a mesma imagem com alpha
-sai dez vezes menor, e ela entra em base64 nos três formatos do mesmo arquivo.
+`_build/tratar_foto.py` escolhe o caminho pelo próprio arquivo:
 
-O original tem 4000×6000 e 4,5 MB. Ele fica em `foto.jpg` nesta pasta; o
-tratamento é reprodutível a partir dele.
+- **`foto.png` com recorte** (fundo já removido) — o caso atual. Apara pela
+  silhueta, reduz para 2100px de altura e esfuma **só a base**, para o busto se
+  dissolver no piso escuro em vez de terminar em corte reto.
+- **`foto.jpg` sem recorte** — entra inteira com alpha em degradê nas quatro
+  bordas. Funciona porque o fundo do estúdio é quase preto e se funde ao navy.
+
+Não tente recortar aqui por GrabCut: terno escuro sobre fundo escuro é
+exatamente onde a separação falha. Ou o recorte vem pronto, ou usa-se o
+degradê de borda.
+
+`_build/foto-tratada.webp` (315 KB) é o que vai embutido. WebP e não PNG porque
+a mesma imagem com alpha sai dez vezes menor, e ela entra em base64 nos três
+formatos do mesmo arquivo. O original de 4000×6000 fica em `foto.png`, fora do
+versionamento.

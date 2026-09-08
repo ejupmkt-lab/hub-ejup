@@ -71,7 +71,7 @@ def data_uri(caminho: pathlib.Path) -> str:
 
 def foto() -> tuple:
     # a tratada vem primeiro: é a que tem o degradê de borda
-    for arq in (HERE / "foto-tratada.webp", OUT / "foto.jpg", OUT / "foto.png"):
+    for arq in (HERE / "foto-tratada.webp", OUT / "foto.png", OUT / "foto.jpg"):
         if arq.exists():
             return "has-foto", (f'<img src="{data_uri(arq)}" '
                                 f'alt="{_html.escape(ARTIGO["autor"])}">')
