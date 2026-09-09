@@ -1,36 +1,31 @@
 # Carrossel — "O poder de polícia ambiental municipal"
 
-Doze telas 1080×1440, casadas com as capas do mesmo artigo
+Nove telas 1080×1440, casadas com as capas do mesmo artigo
 (`../capa-artigo-poder-policia-ambiental/`). Autor: Leonardo Pivotto.
 
 ```
-python3 _build/tratar_fotos.py   # duotone das fotos (só quando trocar foto)
+python3 _build/tratar_fotos.py   # duotone das fotos (só ao trocar foto)
 python3 _build/gerar.py
-python3 _build/render.py         # exporta telas/ e confere as medidas
+python3 _build/render.py         # limpa telas/, exporta e confere medidas
 ```
 
-## Os quatro dispositivos que fazem disso um carrossel, e não oito cartazes
+## O sistema
+Montado nas regras de `skills/ejup-design/CARROSSEL.md`, que foram extraídas
+do carrossel de superendividamento (o aprovado) **depois de duas versões
+reprovadas desta peça**. Ler aquele arquivo antes de mexer aqui.
 
-**1. Fio condutor.** Uma linha dourada entra em cada tela na altura exata em
-que saiu da anterior. Passando o dedo, é uma linha só atravessando as doze.
-As alturas estão no array `FIO` em `gerar.py`; elas vivem na faixa 1150 a 1300
-de propósito, onde não cruzam texto nem diagrama. O `render.py` reprova se o
-conteúdo descer até o fio. **É o mesmo princípio da linha contínua do
-carrossel de superendividamento, que foi aprovado.**
+O que a segunda versão errou, e que aqui está corrigido: scrim cobrindo a foto
+inteira em vez de só a parte de baixo; texto centrado por cima do assunto da
+foto em vez de ancorado no terço inferior; título todo em Black em vez de
+pesos mistos na mesma frase; corpo com bandeira em vez de justificado; fundo
+claro branco com uma frase solta em vez de papel com lista e cartões; fio de
+1px apagado no rodapé em vez de linha de 3px com nó atravessando por cima da
+foto; dado em texto corrido em vez de anel.
 
-**2. Ritmo escuro/claro.** As telas 3, 7 e 9 são brancas e carregam uma frase
-sozinha. São o respiro entre blocos densos, e no fundo claro o acento vira
-bronze, nunca dourado (dourado sobre branco dá 1,8:1).
-
-**3. Diagramas.** Cinco, em `_build/figuras.py`, todos mostrando mecanismo:
-federação e a soma com o interesse local · os três requisitos e o desvio
-quando falta um · **o fluxo comparado, que é o coração do argumento** (no rito
-ordinário o controle está na análise prévia; na LAC, depois da licença) ·
-matriz de 167 quadrados com 13 em dourado · responsabilidade em três frentes.
-
-**4. Fotos em duotone navy.** Sangradas no fundo (telas 1 e 8) e em caixa
-dentro da coluna (telas 2 e 11), com filete dourado no alto. Fontes e critério
-em `fotos/CREDITOS.md`.
+**A linha muda de nível dentro da margem de 80px**, à esquerda, e atravessa a
+área de conteúdo sempre reta. É o que permite ela passar por cima da foto sem
+cortar texto. As alturas estão no array `LINHA` em `gerar.py`: alta nas telas
+de foto (logo acima do bloco), baixa nas claras (embaixo do bloco).
 
 ## Correções de fato aplicadas ao roteiro
 - **ADI 4.757 foi julgada em 12/12/2022**, não em 2023.

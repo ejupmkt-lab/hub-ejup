@@ -7,6 +7,7 @@ __FONT_FACES__
   --navy:#031c37; --deep:#061424; --ink:#0d131a; --steel:#304557;
   --graphite:#414042; --gray:#5f6062; --silver:#d1d3d4;
   --gold:#f0b855; --bronze:#9b6b26;
+  --papel:#f2f1ee;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:#5b6169}
@@ -14,133 +15,147 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;
      font-family:'Gotham','Montserrat',system-ui,sans-serif}
 
 .slide{position:relative;width:1080px;height:1440px;overflow:hidden;
-       padding:88px 80px 0;display:flex;flex-direction:column}
+       display:flex;flex-direction:column}
 
-/* ---------- dois fundos, alternados para dar ritmo ---------- */
-.escuro{color:#fff;
-  background:
-    radial-gradient(70% 70% at 8% 0%, #0a2340 0%, rgba(10,35,64,0) 62%),
-    linear-gradient(160deg, #071a2f 0%, var(--deep) 55%, #040d18 100%)}
-.escuro::before{content:"";position:absolute;inset:0;z-index:6;pointer-events:none;
-  opacity:.03;mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>")}
-.claro{color:var(--navy);background:#fff}
+/* ================= fundos ================= */
+.escuro{color:#fff;background:linear-gradient(165deg,#08243f 0%,#061625 52%,#04101b 100%)}
+.claro{color:var(--navy);
+  background:radial-gradient(120% 90% at 78% 88%, #efece5 0%, var(--papel) 46%, #f6f5f3 100%)}
 
-/* grafismo da marca, só no escuro */
-.marca-fundo{position:absolute;top:-160px;right:-190px;width:620px;opacity:.14;
-  pointer-events:none}
+/* foto: sangra na tela inteira; o scrim escurece SÓ a parte de baixo, para a
+   imagem continuar sendo imagem na metade de cima */
+.foto{position:absolute;inset:0;z-index:0}
+.foto img{width:100%;height:100%;object-fit:cover;display:block}
+.foto::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,
+    rgba(4,16,27,.30) 0%, rgba(4,16,27,.18) 26%, rgba(4,16,27,.62) 47%,
+    rgba(4,16,27,.93) 66%, #04101b 84%)}
+
+/* grafismo da marca, só quando não há foto */
+.marca-fundo{position:absolute;top:-150px;right:-180px;width:560px;opacity:.13;
+  pointer-events:none;z-index:0}
 .marca-fundo svg{width:100%;height:auto;display:block}
 .marca-fundo path{fill:#8fb4d8 !important}
 
-/* ---------- o fio: entra onde o slide anterior saiu ----------
-   Desenhado de borda a borda, atrás do conteúdo. Passando o dedo, a linha
-   parece uma só atravessando o carrossel inteiro. */
-.fio{position:absolute;inset:0;z-index:1;pointer-events:none}
-.fio svg{width:100%;height:100%;display:block}
+/* numeral gigante vazado, sangrando pela direita */
+.numeral{position:absolute;right:-46px;top:190px;z-index:1;
+  font-weight:900;font-size:520px;line-height:.8;letter-spacing:-.04em;
+  color:transparent;-webkit-text-stroke:2px rgba(155,107,38,.42)}
+.escuro .numeral{-webkit-text-stroke-color:rgba(240,184,85,.22)}
 
-/* trilha de progresso, sem número de slide */
-.trilha{display:flex;gap:8px;position:relative;z-index:4;margin-bottom:56px}
-.trilha i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.16)}
-.trilha i.aqui{background:var(--gold)}
-.claro .trilha i{background:#e7e5e0}
-.claro .trilha i.aqui{background:var(--bronze)}
+/* ================= a linha ================= */
+.linha{position:absolute;inset:0;z-index:1;pointer-events:none}
+.linha svg{width:100%;height:100%;display:block}
 
-.corpo{position:relative;z-index:4;display:flex;flex-direction:column;
-       font-size:100px;margin-top:auto;margin-bottom:auto}
+/* ================= conteúdo ================= */
+.bloco{position:absolute;left:0;right:0;z-index:3;padding:0 80px;
+        font-size:100px}
+/* em tela de foto o texto mora no terço inferior, ancorado pela base */
+.abaixo{bottom:150px}
+.meio{top:50%;transform:translateY(-50%)}
 
-.rotulo{font-weight:500;font-size:.23em;letter-spacing:.2em;text-transform:uppercase;
-        color:var(--gold);margin:0 0 .4em}
+.rotulo{font-weight:500;font-size:.21em;letter-spacing:.2em;text-transform:uppercase;
+        color:var(--gold);margin:0 0 .34em}
 .claro .rotulo{color:var(--bronze)}
-.titulo{font-weight:900;font-size:.7em;line-height:1.1;letter-spacing:-.022em;margin:0}
-.titulo b{color:var(--gold);font-weight:900}
-.claro .titulo b{color:var(--bronze)}
-.texto{margin-top:.42em}
-.texto p{font-weight:300;font-size:.36em;line-height:1.52;color:var(--silver);
-         margin:0 0 .26em}
-.texto p:last-child{margin-bottom:0}
-.texto b{font-weight:500;color:#fff}
-.claro .texto p{color:var(--graphite)}
-.claro .texto b{color:var(--navy)}
 
-.fecho{margin-top:.5em;padding-left:.28em;border-left:3px solid var(--gold)}
-.fecho p{font-weight:500;font-size:.38em;line-height:1.36;color:#fff;margin:0}
-.claro .fecho{border-color:var(--bronze)}
-.claro .fecho p{color:var(--navy)}
+/* título de pesos mistos: é o contraste de peso que dá a voz, não só a cor */
+.titulo{margin:0;font-size:.66em;line-height:1.14;letter-spacing:-.022em}
+.titulo .k{font-weight:900;color:#fff;display:inline}
+.titulo .l{font-weight:300;color:rgba(255,255,255,.82);display:inline}
+.titulo .g{font-weight:900;color:var(--gold);display:inline}
+.claro .titulo .k{color:var(--navy)}
+.claro .titulo .l{color:var(--graphite)}
+.claro .titulo .g{color:var(--bronze)}
 
-/* ---------- respiro: uma frase só, no branco ---------- */
-.respiro{font-size:100px;display:flex;flex-direction:column;
-         margin-top:auto;margin-bottom:auto;position:relative;z-index:4}
-.respiro .regua{width:1.1em;height:4px;background:var(--bronze);margin-bottom:.42em}
-.respiro p{font-weight:900;font-size:.78em;line-height:1.12;letter-spacing:-.022em;
-           color:var(--navy);margin:0;max-width:11.5em}
-.respiro p b{color:var(--bronze);font-weight:900}
-.respiro .nota{margin-top:.44em;font-weight:300;font-size:.3em;line-height:1.5;
-               letter-spacing:0;color:var(--gray);max-width:16em}
+.corpo{margin:.34em 0 0;font-weight:300;font-size:.31em;line-height:1.62;
+       text-align:justify;color:rgba(209,211,212,.9)}
+.corpo b{font-weight:500;color:#fff}
+.claro .corpo{color:var(--graphite)}
+.claro .corpo b{color:var(--navy)}
+.corpo + .corpo{margin-top:.2em}
 
-/* ---------- diagramas ---------- */
-.fig{margin-top:.44em}
-.fig svg{width:100%;height:auto;display:block}
-.fig .cap{margin-top:.2em;font-weight:500;font-size:.2em;letter-spacing:.16em;
-          text-transform:uppercase;color:var(--gray)}
+/* lista numerada com filetes */
+.lista{margin:.42em 0 0;border-top:1px solid rgba(3,28,55,.14)}
+.escuro .lista{border-top-color:rgba(255,255,255,.14)}
+.lista .it{display:flex;align-items:baseline;gap:.3em;padding:.24em 0;
+  border-bottom:1px solid rgba(3,28,55,.14)}
+.escuro .lista .it{border-bottom-color:rgba(255,255,255,.14)}
+.lista .n{font-weight:900;font-size:.3em;color:var(--bronze);min-width:1em}
+.escuro .lista .n{color:var(--gold)}
+.lista .t{font-weight:700;font-size:.3em;color:var(--navy);line-height:1.3}
+.escuro .lista .t{color:#fff}
+.lista .t small{display:block;font-weight:300;font-size:.78em;
+  color:var(--gray);margin-top:.12em}
+.escuro .lista .t small{color:rgba(209,211,212,.82)}
 
-/* ---------- dado ---------- */
-.dado{display:flex;align-items:baseline;gap:.14em}
-.dado .n{font-weight:900;font-size:1.9em;line-height:.9;letter-spacing:-.04em;
-         color:var(--gold)}
-.dado .de{font-weight:300;font-size:.46em;color:var(--silver)}
-.legenda{font-weight:300;font-size:.34em;line-height:1.45;color:var(--silver);
-         margin:.2em 0 0;max-width:21em}
+/* grade de cartões */
+.cartoes{display:grid;grid-template-columns:1fr 1fr;gap:.18em;margin:.42em 0 0}
+.cartoes .c{background:#fff;border:1px solid rgba(3,28,55,.1);border-radius:8px;
+  padding:.24em .26em;box-shadow:0 8px 22px rgba(3,28,55,.07)}
+.escuro .cartoes .c{background:rgba(255,255,255,.045);
+  border-color:rgba(255,255,255,.16);box-shadow:none}
+.cartoes .c .i{font-weight:500;font-size:.19em;letter-spacing:.18em;
+  color:var(--bronze)}
+.escuro .cartoes .c .i{color:var(--gold)}
+.cartoes .c .r{margin-top:.06em;font-weight:700;font-size:.27em;color:var(--navy);
+  line-height:1.24}
+.escuro .cartoes .c .r{color:#fff}
+.cartoes .c.destaque{border-color:var(--bronze);border-width:1.5px}
+.escuro .cartoes .c.destaque{border-color:var(--gold);
+  background:rgba(240,184,85,.08)}
 
-/* ---------- chamada, cta, assinatura ---------- */
-.chamada{margin-top:.56em;display:inline-flex;align-self:flex-start;align-items:center;
-  gap:.22em;padding:.3em .42em;border-radius:999px;
-  border:1px solid rgba(240,184,85,.55)}
-.chamada i{font-style:normal;color:var(--gold);font-size:.36em;line-height:1}
-.chamada span{font-weight:500;font-size:.3em;line-height:1.3}
-.cta{margin-top:.5em}
-.cta p{font-weight:300;font-size:.34em;line-height:1.5;color:var(--silver);margin:0}
-.cta .link{font-weight:500;font-size:.3em;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--gold);margin-top:.32em;display:block}
-.autoria{margin-top:.46em;display:flex;align-items:center;gap:.2em}
-.autoria .rosto{width:1.1em;height:1.1em;border-radius:50%;overflow:hidden;
-  flex:none;border:1.5px solid rgba(240,184,85,.5)}
-.autoria .rosto img{width:100%;height:100%;object-fit:cover;object-position:50% 12%;
-  display:block}
-.autoria .quem{font-weight:500;font-size:.28em;color:#fff;line-height:1.35}
-.autoria .quem span{display:block;font-weight:300;color:var(--silver)}
-.assina{margin-top:.5em;padding-top:.3em;border-top:1px solid rgba(255,255,255,.18)}
-.assina .m{font-weight:500;font-size:.21em;letter-spacing:.24em;color:var(--gold)}
-.assina .s{margin-top:.1em;font-weight:300;font-size:.36em;line-height:1.24;
-           letter-spacing:-.012em;color:#fff}
+/* citação: bloco de decisão judicial */
+.citacao{margin:.42em 0 0;padding:.26em .3em;border-left:3px solid var(--gold);
+  background:rgba(255,255,255,.04)}
+.claro .citacao{border-left-color:var(--bronze);background:rgba(3,28,55,.03)}
+.citacao p{margin:0;font-weight:300;font-size:.3em;line-height:1.56;
+  color:#fff;text-align:justify}
+.claro .citacao p{color:var(--navy)}
+.citacao .ref{margin-top:.16em;font-weight:500;font-size:.19em;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.claro .citacao .ref{color:var(--bronze)}
 
-/* ---------- foto ----------
-   Dois usos, como no carrossel aprovado: sangrada no fundo, e em caixa dentro
-   da coluna de texto. Sempre em duotone navy, para conviver com a paleta de
-   oito cores sem inventar cor nova. */
-.foto-bg{position:absolute;inset:0;z-index:0}
-.foto-bg img{width:100%;height:100%;object-fit:cover;display:block}
-/* o scrim segura a leitura do texto por cima; mais forte de um lado, para o
-   olho ainda ver que existe uma foto ali */
-.foto-bg::after{content:"";position:absolute;inset:0;
-  background:linear-gradient(175deg, rgba(3,18,32,.62) 0%, rgba(3,18,32,.86) 46%,
-             rgba(4,13,24,.96) 78%, #040d18 100%)}
-.caixa-foto{margin-top:.44em;border-radius:6px;overflow:hidden;position:relative}
-.caixa-foto img{width:100%;height:auto;display:block}
-/* filete dourado no alto da caixa: amarra a foto ao sistema da peça */
-.caixa-foto::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;
-  background:var(--gold);z-index:2}
+/* fecho de raciocínio */
+.fecho{margin:.42em 0 0;font-weight:500;font-size:.34em;line-height:1.34;
+       color:#fff}
+.fecho b{color:var(--gold)}
+.claro .fecho{color:var(--navy)}
+.claro .fecho b{color:var(--bronze)}
 
-/* espaço reservado para foto, quando a foto ainda não chegou */
-.slot{margin-top:.44em;border:1.5px dashed rgba(240,184,85,.4);border-radius:8px;
-      height:3.4em;display:flex;align-items:center;justify-content:center;
-      text-align:center}
-.slot span{font-weight:500;font-size:.19em;letter-spacing:.16em;text-transform:uppercase;
-           color:rgba(255,255,255,.4);line-height:2}
-.slot img{width:100%;height:100%;object-fit:cover;border-radius:8px;display:block}
-.slot.cheio{border:0}
+/* dado em anel */
+.anel{display:flex;align-items:center;gap:.34em;margin:.42em 0 0}
+.anel svg{width:2.9em;height:2.9em;flex:none}
+.anel .txt{font-weight:300;font-size:.3em;line-height:1.5;
+  color:rgba(209,211,212,.92)}
+.anel .txt b{font-weight:500;color:#fff}
+.claro .anel .txt{color:var(--graphite)}
+.claro .anel .txt b{color:var(--navy)}
+.fonte{margin:.24em 0 0;font-weight:500;font-size:.17em;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--gray)}
 
-.logo{position:relative;z-index:4;margin-top:auto;margin-bottom:76px;
-      align-self:center;width:250px}
+/* chamada, cta, assinatura */
+.pilula{margin:.4em 0 0;display:inline-flex;align-items:center;gap:.2em;
+  padding:.26em .36em;border-radius:999px;border:1px solid rgba(240,184,85,.55);
+  background:rgba(240,184,85,.05)}
+.pilula i{font-style:normal;color:var(--gold);font-size:.3em;line-height:1}
+.pilula span{font-weight:500;font-size:.27em}
+.link{display:block;margin:.3em 0 0;font-weight:500;font-size:.26em;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.autoria{margin:.4em 0 0;display:flex;align-items:center;gap:.2em}
+.autoria .rosto{width:1em;height:1em;border-radius:50%;overflow:hidden;flex:none;
+  border:1.5px solid rgba(240,184,85,.5)}
+.autoria .rosto img{width:100%;height:100%;object-fit:cover;
+  object-position:50% 12%;display:block}
+.autoria .quem{font-weight:500;font-size:.26em;color:#fff;line-height:1.34}
+.autoria .quem span{display:block;font-weight:300;color:rgba(209,211,212,.85)}
+.assina{margin:.4em 0 0;padding-top:.26em;border-top:1px solid rgba(255,255,255,.2)}
+.assina .m{font-weight:500;font-size:.19em;letter-spacing:.24em;color:var(--gold)}
+.assina .s{margin-top:.08em;font-weight:300;font-size:.32em;line-height:1.26;
+  letter-spacing:-.012em;color:#fff}
+
+.logo{position:absolute;left:0;right:0;bottom:64px;z-index:3;
+      display:flex;justify-content:center}
+.logo div{width:244px}
 .logo svg{width:100%;height:auto;display:block}
 .escuro .logo path{fill:#fff !important}
 .claro .logo path{fill:var(--navy) !important}
@@ -148,15 +163,21 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;
 <body>
 __SLIDES__
 <script>
-/* O conteúdo encolhe até caber ACIMA DO FIO, não do logo: é o fio que define
-   o limite inferior útil da tela, e ele precisa passar limpo. */
+/* O bloco encolhe até respeitar o espaço da sua âncora.
+   Ancorado embaixo (tela de foto): tem de sobrar foto visível acima, então o
+   topo do bloco não pode subir além de 400px.
+   Ancorado no meio: precisa caber entre as margens de 120px. */
 document.querySelectorAll('.slide').forEach(s => {
-  const c = s.querySelector('.corpo') || s.querySelector('.respiro');
-  const l = s.querySelector('.logo');
-  const teto = s.getBoundingClientRect().top + (+s.dataset.fio) - 28;
-  const cabe = () => c.getBoundingClientRect().bottom < teto;
+  const b = s.querySelector('.bloco');
+  const abaixo = b.classList.contains('abaixo');
+  const alturaMax = 1440 - 240;
+  const passa = () => {
+    const r = b.getBoundingClientRect();
+    return abaixo ? (r.top - s.getBoundingClientRect().top) < 400
+                  : r.height > alturaMax;
+  };
   let k = 100;
-  while (k > 54 && !cabe()) { k -= 2; c.style.fontSize = k + 'px'; }
+  while (k > 56 && passa()) { k -= 2; b.style.fontSize = k + 'px'; }
   s.dataset.escala = k;
 });
 </script>

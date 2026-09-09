@@ -19,18 +19,24 @@ SOMBRA, LUZ = (3, 16, 30), (168, 198, 224)
 
 # largura de saída por uso: fundo sangrado precisa cobrir 1080 de largura;
 # caixa de imagem ocupa a coluna útil de 920
-ALVOS = {"cidade": (1080, 1440), "colunas": (1080, 1440),
-         "natureza": (920, 330), "declaracao": (920, 330)}
+# tudo sangrado agora: no sistema aprovado a foto ocupa a tela inteira e o
+# scrim escurece só a parte de baixo
+ALVOS = {"cidade": (1080, 1440), "cidade2": (1080, 1440),
+         "colunas": (1080, 1440), "natureza": (1080, 1440),
+         "declaracao": (1080, 1440)}
 
 # recorte relativo aplicado ANTES do enquadramento, quando a foto inteira não
 # serve. `declaracao` precisa: o formulário original está de cabeça para baixo
 # e em inglês, então fecha-se na mão e na caneta, onde não se lê texto.
-RECORTE = {"declaracao": (0.14, 0.00, 0.80, 0.48)}
+RECORTE = {"declaracao": (0.14, 0.00, 0.80, 0.60),
+           # cidade2 é a mesma foto da capa em outro enquadramento,
+           # para a tela de fecho não repetir a de abertura
+           "cidade2": (0.34, 0.10, 1.00, 0.92)}
 
 # quanto do duotone entra. 1 = duotone puro. A vegetação fica irreconhecível
 # em duotone cheio (parece floresta congelada), então ela mistura com o
 # original e mantém o verde suficiente para ler como mata.
-MISTURA = {"natureza": 0.55}
+MISTURA = {"natureza": 0.5}
 
 
 def duotone(im: Image.Image, mistura: float = 1.0) -> Image.Image:
