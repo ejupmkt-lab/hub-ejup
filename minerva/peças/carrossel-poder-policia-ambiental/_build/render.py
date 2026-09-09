@@ -29,7 +29,7 @@ import importlib.util as _il
 _spec = _il.spec_from_file_location("gerar", HERE / "gerar.py")
 _gerar = _il.module_from_spec(_spec)
 _spec.loader.exec_module(_gerar)
-LINHA = _gerar.LINHA
+MOLDURA = _gerar.MOLDURA
 
 
 def main() -> None:

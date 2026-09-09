@@ -22,10 +22,16 @@ claro branco com uma frase solta em vez de papel com lista e cartões; fio de
 1px apagado no rodapé em vez de linha de 3px com nó atravessando por cima da
 foto; dado em texto corrido em vez de anel.
 
-**A linha muda de nível dentro da margem de 80px**, à esquerda, e atravessa a
-área de conteúdo sempre reta. É o que permite ela passar por cima da foto sem
-cortar texto. As alturas estão no array `LINHA` em `gerar.py`: alta nas telas
-de foto (logo acima do bloco), baixa nas claras (embaixo do bloco).
+**O que liga as telas é uma moldura que se completa**, não uma linha
+atravessando. A linha contínua era o dispositivo do carrossel de
+superendividamento, e lá ela *era* o assunto: ligava a aposta ao nome
+negativado. Aqui não significava nada, e repetir por repetir é maneirismo.
+
+A moldura avança um trecho do perímetro por tela e fecha na nona, com um ponto
+marcando onde o traço parou; por baixo dela fica o quadro inteiro quase
+apagado, que é a promessa do que falta. O argumento do artigo é que a
+competência só se sustenta com a estrutura inteira: o quadro fechando é isso
+em forma. E, por viver na borda, ela nunca disputa espaço com o texto.
 
 ## Correções de fato aplicadas ao roteiro
 - **ADI 4.757 foi julgada em 12/12/2022**, não em 2023.

@@ -12,8 +12,8 @@ versão sem ele foi reprovada:
 * título de **pesos mistos** na mesma frase (Black / Light / Black dourado);
 * corpo **justificado**;
 * fundo claro de papel, com lista numerada e grade de cartões, acento bronze;
-* **linha dourada grossa com nó**, atravessando de borda a borda, por cima da
-  foto, subindo e descendo com o argumento;
+* **moldura que se completa** ligando as telas: o contorno avança um trecho
+  por tela e fecha na última, com um ponto marcando onde parou;
 * percentual e proporção em **anel**;
 * tela preenchida, sem terço vazio embaixo.
 
@@ -34,12 +34,17 @@ FACES = [("Gotham-Light.otf", 300), ("Gotham-Book.otf", 400),
          ("Gotham-Medium.otf", 500), ("Gotham-Bold.otf", 700),
          ("Gotham-Black.otf", 900)]
 
-# Altura em que a linha corre em cada tela. A entrada de uma é a altura da
-# anterior, e a mudança de nível acontece dentro da margem de 80px, à
-# esquerda: assim a linha atravessa a área de conteúdo sempre reta e nunca
-# corta texto. Nas telas de foto ela corre logo acima do bloco de texto, na
-# fronteira onde o scrim começa; nas claras, embaixo do bloco.
-LINHA = [600, 1230, 575, 1205, 550, 1250, 585, 1215, 560]
+# ---------------------------------------------------------------- a moldura
+# O que liga uma tela à outra é uma **moldura que se completa**: um retângulo
+# em contorno, encostado na borda, desenhado por partes. A tela 1 traz só o
+# começo do lado de cima; cada tela seguinte avança um trecho do perímetro; a
+# última fecha o quadro. Um ponto marca onde o traço parou.
+#
+# Não é enfeite: o argumento do artigo é que a competência só se sustenta
+# quando a estrutura está inteira. A moldura fechando é esse argumento em
+# forma. E, diferente de uma linha atravessando a tela, ela nunca disputa
+# espaço com o texto, porque vive fora da área de conteúdo.
+MOLDURA = (44, 44, 992, 1352)      # x, y, largura, altura
 
 T = [
     # ---------------------------------------------------------------- 1
@@ -209,15 +214,36 @@ def anel_svg(parte: int, total: int, n: str, de: str, claro=False) -> str:
             f'font-weight="500" letter-spacing=".1em">{de}</text></svg>')
 
 
-def linha_svg(entra: int, plano: int, claro: bool) -> str:
-    """Linha grossa com nó. Reta na área de conteúdo; o degrau de nível
-    acontece dentro da margem esquerda, onde não há texto."""
+def ponto_na_moldura(feito: float):
+    """Onde o traço parou, andando o perímetro no sentido dos ponteiros."""
+    x, y, w, h = MOLDURA
+    trechos = [((x, y), (x + w, y)), ((x + w, y), (x + w, y + h)),
+               ((x + w, y + h), (x, y + h)), ((x, y + h), (x, y))]
+    andado = 0.0
+    for (x1, y1), (x2, y2) in trechos:
+        tam = abs(x2 - x1) + abs(y2 - y1)
+        if andado + tam >= feito:
+            t = (feito - andado) / tam
+            return x1 + (x2 - x1) * t, y1 + (y2 - y1) * t
+        andado += tam
+    return x, y
+
+
+def moldura_svg(i: int, total: int, claro: bool) -> str:
     cor = "#9b6b26" if claro else "#f0b855"
-    return ('<div class="linha"><svg viewBox="0 0 1080 1440" '
+    x, y, w, h = MOLDURA
+    perimetro = 2 * (w + h)
+    feito = perimetro * (i + 1) / total
+    px, py = ponto_na_moldura(feito)
+    return ('<div class="moldura"><svg viewBox="0 0 1080 1440" '
             'xmlns="http://www.w3.org/2000/svg">'
-            f'<path d="M0 {entra}C22 {entra} 52 {plano} 78 {plano}'
-            f'L1080 {plano}" fill="none" stroke="{cor}" stroke-width="3"/>'
-            f'<circle cx="540" cy="{plano}" r="9" fill="{cor}"/>'
+            # o quadro inteiro, quase apagado: dá a promessa do que falta
+            f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="none" '
+            f'stroke="{cor}" stroke-opacity=".16" stroke-width="2"/>'
+            # o trecho já percorrido
+            f'<path d="M{x} {y}H{x+w}V{y+h}H{x}Z" fill="none" stroke="{cor}" '
+            f'stroke-width="3" stroke-dasharray="{feito:.0f} {perimetro}"/>'
+            f'<circle cx="{px:.0f}" cy="{py:.0f}" r="9" fill="{cor}"/>'
             '</svg></div>')
 
 
@@ -294,7 +320,7 @@ def slide_html(s: dict, i: int, logo: str, simbolo: str) -> str:
                if s.get("numeral") else "")
     return (f'<section class="slide {s["fundo"]}" data-i="{i}">'
             + fundo + numeral
-            + linha_svg(LINHA[i - 1], LINHA[i], claro)
+            + moldura_svg(i, len(T), claro)
             + bloco_html(s)
             + f'<div class="logo"><div>{logo}</div></div></section>')
 

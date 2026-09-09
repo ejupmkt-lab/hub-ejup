@@ -36,11 +36,21 @@ não serve para uma frase solta no meio do vazio: é onde entram **lista
 numerada com filetes**, **grade de cartões** e tabela. Nessas telas o acento é
 **bronze**, nunca dourado.
 
-## 6. A linha é grossa, dourada, com nó
-2 a 3px, dourada no escuro e bronze no claro, atravessando de borda a borda
-com um **ponto** marcando o nó. Ela sobe e desce conforme o argumento, e
-**passa por cima da foto**. Fio fino e apagado no rodapé não é dispositivo,
-é sujeira: ninguém vê.
+## 6. O que liga uma tela à outra tem de ter razão de ser
+Linha atravessando a tela funcionou no carrossel de superendividamento porque
+**ali a linha era o assunto**: ligava a aposta de ontem ao nome negativado
+hoje, e a capa dizia isso em voz alta ("a linha não se interrompe entre as
+páginas"). Repetir o mesmo traço num carrossel onde ele não significa nada é
+maneirismo, e o Victor reprovou.
+
+Cada peça precisa do seu dispositivo, tirado do próprio argumento. No de poder
+de polícia ambiental é uma **moldura que se completa**: contorno na borda,
+avançando um trecho por tela, fechando na última, com um ponto marcando onde
+o traço parou. A tese do artigo é que a competência só se sustenta quando a
+estrutura está inteira; o quadro fechando é essa tese em forma.
+
+Vantagem prática, além do sentido: vivendo na borda, fora da área de conteúdo,
+ele nunca disputa espaço com o texto.
 
 ## 7. Dado grande vira anel
 Percentual vai em **anel** (donut) com o número dentro, arco dourado sobre
