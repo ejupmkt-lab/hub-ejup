@@ -6,6 +6,8 @@ Onze telas 1080×1440, montadas no sistema descrito em
 superendividamento (o aprovado). Em resumo, e cada item existe porque a
 versão sem ele foi reprovada:
 
+* **sem rótulo de seção**: o título é a entrada da tela. Etiquetar cada tela
+  com o nome do bloco do roteiro é vício de gerador, não de design;
 * foto sangrada com scrim **só embaixo**, texto no terço inferior;
 * título de **pesos mistos** na mesma frase (Black / Light / Black dourado);
 * corpo **justificado**;
@@ -42,7 +44,6 @@ LINHA = [600, 1230, 575, 1205, 550, 1250, 585, 1215, 560]
 T = [
     # ---------------------------------------------------------------- 1
     {"fundo": "escuro", "foto": "cidade", "ancora": "abaixo",
-     "rotulo": "Poder de polícia ambiental",
      "titulo": [("k", "Seu município pode licenciar hoje mesmo. "),
                 ("l", "Mas está "),
                 ("g", "preparado para isso?")],
@@ -53,7 +54,6 @@ T = [
 
     # ---------------------------------------------------------------- 2
     {"fundo": "claro", "ancora": "meio", "numeral": "1",
-     "rotulo": "O que está em jogo",
      "titulo": [("k", "Poder de polícia ambiental "),
                 ("l", "se exerce por "),
                 ("g", "três instrumentos.")],
@@ -68,7 +68,6 @@ T = [
 
     # ---------------------------------------------------------------- 3
     {"fundo": "escuro", "foto": "natureza", "ancora": "abaixo",
-     "rotulo": "A base constitucional",
      "titulo": [("k", "Competência comum "),
                 ("l", "para proteger o meio ambiente, somada ao "),
                 ("g", "interesse local.")],
@@ -80,7 +79,6 @@ T = [
 
     # ---------------------------------------------------------------- 4
     {"fundo": "claro", "ancora": "meio", "numeral": "2",
-     "rotulo": "O requisito que muda tudo",
      "titulo": [("k", "A LC 140/2011 "),
                 ("l", "não deixa margem: "),
                 ("g", "sem estrutura, não há competência.")],
@@ -96,7 +94,6 @@ T = [
 
     # ---------------------------------------------------------------- 5
     {"fundo": "escuro", "foto": "declaracao", "ancora": "abaixo",
-     "rotulo": "A busca por agilidade",
      "titulo": [("k", "O rito simplificado "),
                 ("l", "tira a análise técnica "),
                 ("g", "da frente da licença.")],
@@ -110,7 +107,6 @@ T = [
 
     # ---------------------------------------------------------------- 6
     {"fundo": "claro", "ancora": "meio", "numeral": "3",
-     "rotulo": "O que o STF decidiu",
      "titulo": [("k", "Capacidade institucional "),
                 ("l", "não é formalidade. É "),
                 ("g", "requisito de competência.")],
@@ -124,7 +120,6 @@ T = [
 
     # ---------------------------------------------------------------- 7
     {"fundo": "escuro", "foto": "colunas", "ancora": "abaixo",
-     "rotulo": "A realidade no Rio Grande do Norte",
      "titulo": [("k", "A competência existe para todos. "),
                 ("l", "A capacidade de "),
                 ("g", "exercê-la, não.")],
@@ -136,7 +131,6 @@ T = [
 
     # ---------------------------------------------------------------- 8
     {"fundo": "claro", "ancora": "meio", "numeral": "4",
-     "rotulo": "O risco de ignorar isso",
      "titulo": [("k", "Simplificar o rito "),
                 ("l", "não pode significar "),
                 ("g", "simplificar a responsabilidade.")],
@@ -151,7 +145,6 @@ T = [
 
     # ---------------------------------------------------------------- 9
     {"fundo": "escuro", "foto": "cidade2", "ancora": "abaixo",
-     "rotulo": "O artigo completo",
      "titulo": [("k", "Fundamentos, limites e "),
                 ("g", "aplicação prática.")],
      "corpo": ["Para entender o cenário com profundidade, dados e base legal "
@@ -236,8 +229,6 @@ def titulo_html(partes) -> str:
 
 def bloco_html(s: dict) -> str:
     p = []
-    if s.get("rotulo"):
-        p.append(f'<p class="rotulo">{_html.escape(s["rotulo"])}</p>')
     if s.get("titulo"):
         p.append(titulo_html(s["titulo"]))
     for t in s.get("corpo", []):

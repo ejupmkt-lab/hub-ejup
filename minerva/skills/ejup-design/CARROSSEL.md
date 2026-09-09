@@ -4,6 +4,13 @@ Extraído do carrossel de apostas/superendividamento, **aprovado pelo Victor**,
 depois de uma versão que ele reprovou. Antes de desenhar carrossel nesta marca,
 ler isto. Cada regra aqui existe porque a versão sem ela foi reprovada.
 
+## 0. Sem rótulo de seção
+Nenhuma tela leva etiqueta com o nome do bloco ("O QUE ESTÁ EM JOGO", "O
+REQUISITO QUE MUDA TUDO"). O **título é a entrada da tela**. Etiquetar cada
+tela com o nome que o bloco tem no roteiro é vício de gerador: dá cara de
+template preenchido. O carrossel aprovado não tem um único rótulo desses.
+Quem marca capítulo é o numeral vazado na borda.
+
 ## 1. Foto é fotografia, não textura
 O scrim escurece **só a parte de baixo**, de transparente até o navy quase
 opaco. A metade de cima da foto fica **visível e legível**: dá para ver o
