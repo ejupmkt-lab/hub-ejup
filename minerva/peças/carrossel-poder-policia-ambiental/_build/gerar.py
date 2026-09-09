@@ -6,6 +6,8 @@ Onze telas 1080×1440, montadas no sistema descrito em
 superendividamento (o aprovado). Em resumo, e cada item existe porque a
 versão sem ele foi reprovada:
 
+* **sem a figura "não é X, é Y"**, que o charter proíbe e que é marca de texto
+  de máquina. Toda proposição vai na afirmativa;
 * **sem rótulo de seção**: o título é a entrada da tela. Etiquetar cada tela
   com o nome do bloco do roteiro é vício de gerador, não de design;
 * foto sangrada com scrim **só embaixo**, texto no terço inferior;
@@ -85,14 +87,14 @@ T = [
     # ---------------------------------------------------------------- 4
     {"fundo": "claro", "ancora": "meio", "numeral": "2",
      "titulo": [("k", "A LC 140/2011 "),
-                ("l", "não deixa margem: "),
-                ("g", "sem estrutura, não há competência.")],
+                ("l", "condiciona o exercício a "),
+                ("g", "três requisitos.")],
      "lista": [("1", "Órgão ambiental capacitado", "Estrutura administrativa "
                                                    "própria para licenciar."),
                ("2", "Técnicos habilitados", "Corpo técnico com formação para "
                                              "a análise que a licença exige."),
                ("3", "Conselho de Meio Ambiente",
-                "Em funcionamento regular, não apenas criado por lei.")],
+                "Instalado e em funcionamento regular.")],
      "cartoes": [("com os três", "O município licencia", True),
                  ("falta um", "Licencia o Estado", False)],
      "fecho": "Mesmo que o município queira assumir."},
@@ -113,21 +115,21 @@ T = [
     # ---------------------------------------------------------------- 6
     {"fundo": "claro", "ancora": "meio", "numeral": "3",
      "titulo": [("k", "Capacidade institucional "),
-                ("l", "não é formalidade. É "),
-                ("g", "requisito de competência.")],
+                ("l", "integra a "),
+                ("g", "própria competência.")],
      "citacao": ("Em dezembro de 2022, o Supremo Tribunal Federal validou o "
-                 "modelo descentralizado de competências ambientais. O detalhe "
-                 "está na letra miúda: a Corte tratou a capacidade "
-                 "institucional do órgão ambiental como requisito da própria "
-                 "competência, não como exigência dispensável.",
+                 "modelo descentralizado de competências ambientais. E, ao "
+                 "validá-lo, amarrou o exercício à estrutura: na leitura da "
+                 "Corte, a capacidade institucional do órgão ambiental entra "
+                 "como requisito da própria competência.",
                  "ADI 4.757 · julgada em 12/12/2022"),
-     "fecho": "Agilidade sem estrutura não é simplificação. <b>É risco.</b>"},
+     "fecho": "Sem estrutura, agilidade <b>vira risco</b>."},
 
     # ---------------------------------------------------------------- 7
     {"fundo": "escuro", "foto": "colunas", "ancora": "abaixo",
-     "titulo": [("k", "A competência existe para todos. "),
-                ("l", "A capacidade de "),
-                ("g", "exercê-la, não.")],
+     "titulo": [("k", "Todos têm a competência. "),
+                ("l", "Treze têm a "),
+                ("g", "estrutura para exercê-la.")],
      "anel": (13, 167, "13", "de 167",
               "municípios potiguares têm <b>estrutura própria</b> de "
               "licenciamento ambiental. Nos outros 154, quem licencia "
@@ -146,7 +148,7 @@ T = [
                  ("02", "Responsabilidade administrativa", False),
                  ("03", "Responsabilidade criminal", False),
                  ("04", "Anulação da própria licença", True)],
-     "fecho": "O rito encurta. O dever, não."},
+     "fecho": "O rito encurta. O dever permanece inteiro."},
 
     # ---------------------------------------------------------------- 9
     {"fundo": "escuro", "foto": "cidade2", "ancora": "abaixo",

@@ -95,6 +95,10 @@ O **jurista da profundidade consciente**. Já percorreu caminho, tem base, e por
 - ❌ Promessa de resultado replicável: "método infalível", "passo a passo definitivo", "em 7 dias".
 - ❌ Hipérbole vazia: "revolucionário", "incrível", "imperdível", "o melhor do Brasil".
 - ❌ Emoji como muleta de tom. Caixa alta gritada. Excesso de exclamação.
+- ❌ **A figura "não é X, é Y"** e suas variantes ("não como", "não apenas",
+  "X. Y, não."). É o vício de linguagem de máquina mais fácil de reconhecer.
+  Toda proposição vai na afirmativa: em vez de "não é formalidade, é
+  requisito", escreva "integra a própria competência".
 - ❌ Isca de engajamento ("comenta EU QUERO"), dor fabricada, chamada apelativa.
 - ❌ Infantilizar o Direito para "democratizar". Simplificar ≠ esvaziar.
 - ❌ Posar de antagonista do ensino formal, do Judiciário ou das instituições.
