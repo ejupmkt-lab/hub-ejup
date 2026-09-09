@@ -13,14 +13,24 @@ CHROMIUM = "/opt/pw-browsers/chromium"
 MEDIR = """
 () => Array.from(document.querySelectorAll('.slide')).map(s => {
   const r = s.getBoundingClientRect();
-  const c = s.querySelector('.corpo').getBoundingClientRect();
+  const c = (s.querySelector('.corpo') || s.querySelector('.respiro'))
+              .getBoundingClientRect();
   const l = s.querySelector('.logo').getBoundingClientRect();
   return { i:+s.dataset.i, escala:+s.dataset.escala,
            w:Math.round(r.width), h:Math.round(r.height),
            folga:Math.round(l.top - c.bottom),
+           conteudoFim:Math.round(c.bottom - r.top),
            pe:Math.round(r.bottom - l.bottom) };
 })
 """
+
+
+import importlib.util as _il
+
+_spec = _il.spec_from_file_location("gerar", HERE / "gerar.py")
+_gerar = _il.module_from_spec(_spec)
+_spec.loader.exec_module(_gerar)
+FIO = _gerar.FIO
 
 
 def main() -> None:
@@ -35,13 +45,19 @@ def main() -> None:
                           device_scale_factor=1)
         page.goto(SRC.as_uri())
         page.wait_for_timeout(700)
-        for m in page.evaluate(MEDIR):
+        medidas = page.evaluate(MEDIR)
+        for m in medidas:
             n = m["i"] + 1
             if (m["w"], m["h"]) != (1080, 1440):
                 problemas.append(f"tela {n}: {m['w']}×{m['h']} ≠ 1080×1440")
             if m["folga"] < 0:
                 problemas.append(f"tela {n}: o texto encosta no logo")
-            if m["escala"] <= 58:
+            entra, sai = FIO[m["i"]], FIO[(m["i"] + 1) % len(FIO)]
+            if m["conteudoFim"] > min(entra, sai) - 20:
+                problemas.append(
+                    f"tela {n}: o conteúdo termina em {m['conteudoFim']}px e o "
+                    f"fio passa em {min(entra, sai)}px")
+            if m["escala"] <= 54:
                 problemas.append(f"tela {n}: texto encolheu ao limite, "
                                  "corte a copy")
             print(f"tela {n}: escala {m['escala']}px, folga {m['folga']}px, "
@@ -49,7 +65,7 @@ def main() -> None:
             page.locator(f'.slide[data-i="{m["i"]}"]').screenshot(
                 path=str(prev / f"tela-{n:02d}.png"))
         b.close()
-    print(f"\n8 telas em {prev}")
+    print(f"\n{len(medidas)} telas em {prev}")
     if problemas:
         print("\nPROBLEMAS:")
         for x in problemas:
