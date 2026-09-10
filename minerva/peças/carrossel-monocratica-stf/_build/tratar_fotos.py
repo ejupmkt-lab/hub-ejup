@@ -1,19 +1,10 @@
 #!/usr/bin/env python3
-"""Corta UMA fotografia em cinco fatias, uma por tela escura.
+"""Recorta e tinge as fotografias, uma por uso.
 
-O carrossel inteiro roda sobre uma imagem só. As telas escuras são recortes
-consecutivos dela, na ordem, então passar o dedo é **percorrer a fotografia**:
-a arcada continua de uma tela para a seguinte, e o ponto de fuga cai no meio
-do argumento. As telas claras entram como pausas, e quando o escuro volta a
-imagem retoma de onde parou.
-
-É o mesmo princípio da tela única de 15.120px do carrossel de
-superendividamento, que foi aprovado, mas resolvido de outro jeito: lá uma
-curva desenhada atravessava as telas; aqui é a própria fotografia que
-atravessa.
-
-A conta que torna isso possível: cinco telas escuras somam 5400×1440. O
-original tem 6000×4000, então a faixa sai por **redução**, sem esticar pixel.
+Cada tela com foto recebe o próprio recorte, já na medida em que entra, para
+não haver zoom no navegador: o que se vê é o enquadramento decidido aqui.
+Tom: duotone navy misturado meio a meio com o original, para a foto ficar
+reconhecível (a crítica ao carrossel anterior) e ainda assim fundo.
 """
 import pathlib
 
@@ -22,67 +13,52 @@ from PIL import Image, ImageOps
 HERE = pathlib.Path(__file__).resolve().parent
 FOTOS = HERE.parent / "fotos"
 DEST = HERE / "duotone"
-
-# luz baixa de propósito: a faixa é fundo, e o texto vive por cima
 SOMBRA, LUZ = (3, 14, 26), (126, 156, 186)
+MISTURA = 0.5        # 0 = original · 1 = duotone puro
 
-ORIGEM = "arcada.jpg"
-FATIAS = 4                      # telas escuras que recebem fatia da arcada
+# nome → (arquivo, janela em fração x0,y0,x1,y1, largura, altura de saída)
+USOS = {
+    # tela 1: a Justiça de Ceschiatti diante do STF
+    "estatua": ("estatua.jpg", (0.00, 0.00, 0.86, 1.00), 1080, 900),
+    # tela 3: o Congresso, porque a frase popular aponta para outro Poder
+    "congresso": ("congresso-alto.jpg", (0.08, 0.00, 0.92, 1.00), 1080, 860),
+    # tela 4: duas caixas, uma por coluna
+    "senado": ("senado-teto.jpg", (0.10, 0.05, 0.90, 0.95), 420, 460),
+    "tribunal": ("plenario-vazio.jpg", (0.36, 0.10, 0.95, 0.95), 420, 460),
+    # tela 7: sessão plenária, sem a parede da direita (crucifixo)
+    "sessao": ("sessao.jpg", (0.00, 0.04, 0.76, 1.00), 1080, 780),
+    # tela 8: dentro do painel dourado do Plenário
+    "plenario": ("plenario-vazio.jpg", (0.05, 0.15, 0.95, 0.95), 560, 360),
+    # tela 9: a fachada, ao fim do dia
+    "fachada": ("fachada.jpg", (0.05, 0.00, 0.95, 1.00), 1080, 760),
+}
 
-# A continuidade se rompe uma vez, de propósito, na tela do Senado: ali entra
-# outro edifício, porque ali o texto fala de outro Poder. O corte respeita a
-# altura cheia do original, sem decepar as torres.
-AVULSA = "congresso.jpg"
-# recorte da avulsa em fração da altura: sem isso as torres caem no rodapé da
-# tela, atrás do texto, e o prédio deixa de ser reconhecível
-JANELA_AVULSA = (0.34, 1.00)
-LARG, ALT = 1080, 1440
-# Janela recortada do original, em fração (x0, x1, y0, y1). O corte em x
-# termina antes da borda direita para deixar de fora a grade com um crucifixo:
-# símbolo religioso não entra em peça sobre o Supremo. O corte em y mantém as
-# arcadas e o ponto de fuga e descarta o piso vazio.
-JANELA = (0.00, 0.84, 0.05, 0.52)
 
-
-def duotone(im: Image.Image) -> Image.Image:
+def tingir(im: Image.Image) -> Image.Image:
     cinza = ImageOps.autocontrast(ImageOps.grayscale(im), cutoff=(1, 3))
-    return ImageOps.colorize(cinza, black=SOMBRA, white=LUZ)
+    duo = ImageOps.colorize(cinza, black=SOMBRA, white=LUZ)
+    return Image.blend(im, duo, MISTURA)
+
+
+def recortar(im: Image.Image, jan, w, h) -> Image.Image:
+    x0, y0, x1, y1 = jan
+    im = im.crop((int(im.width * x0), int(im.height * y0),
+                  int(im.width * x1), int(im.height * y1)))
+    esc = max(w / im.width, h / im.height)
+    im = im.resize((round(im.width * esc), round(im.height * esc)),
+                   Image.LANCZOS)
+    ex, ey = (im.width - w) // 2, (im.height - h) // 2
+    return im.crop((ex, ey, ex + w, ey + h))
 
 
 def main() -> None:
     DEST.mkdir(exist_ok=True)
-    im = Image.open(FOTOS / ORIGEM).convert("RGB")
-    x0, x1, y0, y1 = JANELA
-    faixa = im.crop((int(im.width * x0), int(im.height * y0),
-                     int(im.width * x1), int(im.height * y1)))
-
-    alvo_l, alvo_a = LARG * FATIAS, ALT
-    escala = max(alvo_l / faixa.width, alvo_a / faixa.height)
-    faixa = faixa.resize((round(faixa.width * escala),
-                          round(faixa.height * escala)), Image.LANCZOS)
-    esq = (faixa.width - alvo_l) // 2
-    topo = (faixa.height - alvo_a) // 2
-    faixa = faixa.crop((esq, topo, esq + alvo_l, topo + alvo_a))
-    faixa = duotone(faixa)
-    print(f"faixa contínua: {faixa.width}×{faixa.height}")
-
-    for i in range(FATIAS):
-        pedaco = faixa.crop((i * LARG, 0, (i + 1) * LARG, ALT))
-        saida = DEST / f"pan{i + 1}.webp"
-        pedaco.save(saida, "WEBP", quality=88, method=6)
-        print(f"  {saida.name}: {pedaco.size} "
-              f"({saida.stat().st_size/1024:.0f} KB)")
-
-    av = Image.open(FOTOS / AVULSA).convert("RGB")
-    ay0, ay1 = JANELA_AVULSA
-    av = av.crop((0, int(av.height * ay0), av.width, int(av.height * ay1)))
-    esc = ALT / av.height
-    av = av.resize((round(av.width * esc), ALT), Image.LANCZOS)
-    esq = (av.width - LARG) // 2
-    av = duotone(av.crop((esq, 0, esq + LARG, ALT)))
-    saida = DEST / "congresso.webp"
-    av.save(saida, "WEBP", quality=88, method=6)
-    print(f"  {saida.name}: {av.size} ({saida.stat().st_size/1024:.0f} KB)")
+    for nome, (arq, jan, w, h) in USOS.items():
+        im = Image.open(FOTOS / arq).convert("RGB")
+        out = tingir(recortar(im, jan, w, h))
+        saida = DEST / f"{nome}.webp"
+        out.save(saida, "WEBP", quality=86, method=6)
+        print(f"{saida.name}: {out.size} ({saida.stat().st_size/1024:.0f} KB)")
 
 
 if __name__ == "__main__":

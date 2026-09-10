@@ -53,8 +53,25 @@ PAINEIS = {
 
 
 # ---------------------------------------------------------------- peças
+def duo(nome: str) -> str:
+    arq = HERE / "duotone" / f"{nome}.webp"
+    if not arq.exists():
+        sys.exit(f"foto tratada ausente: {arq} (rode tratar_fotos.py)")
+    return ("data:image/webp;base64,"
+            + base64.b64encode(arq.read_bytes()).decode("ascii"))
+
+
+def foto(nome):
+    return f'<div class="foto"><img src="{duo(nome)}" alt=""></div>'
+
+
+def caixa(nome, x, y, w, h):
+    return (f'<div class="caixa" style="left:{x}px;top:{y}px;width:{w}px;'
+            f'height:{h}px"><img src="{duo(nome)}" alt=""></div>')
+
+
 def painel(nome, x, y, cls="a", escala=1.0, selo=None, rot=None,
-           vazio=False):
+           vazio=False, foto=None):
     car, verbo, de = PAINEIS[nome]
     ang = {"a": -2.4, "b": 2.2}.get(cls.split()[0], 0) if rot is None else rot
     selo_html = f'<div class="selo">{selo}</div>' if selo else ""
@@ -62,9 +79,11 @@ def painel(nome, x, y, cls="a", escala=1.0, selo=None, rot=None,
         return (f'<div class="painel {cls}" style="left:{x}px;top:{y}px;'
                 f'transform-origin:0 0;transform:rotate({ang}deg) '
                 f'scale({escala})"></div>')
+    dentro = (f'<div class="dentro"><img src="{duo(foto)}" alt=""></div>'
+              if foto else "")
     return (f'<div class="painel {cls}" style="left:{x}px;top:{y}px;'
             f'transform-origin:0 0;transform:rotate({ang}deg) scale({escala})">'
-            f'<div class="car">{_html.escape(car)}</div>'
+            f'{dentro}<div class="car">{_html.escape(car)}</div>'
             f'<div><div class="verbo">{verbo}</div>'
             f'<div class="de">{_html.escape(de)}</div></div>{selo_html}</div>')
 
@@ -198,9 +217,13 @@ def tres_caminhos(y0):
 
 
 # ---------------------------------------------------------------- telas
+# Telas 1, 3, 7 e 9: foto no alto, texto embaixo, os painéis sobre a foto.
+# Tela 4: uma caixa de foto por coluna. Tela 8: a foto dentro do painel.
+# Telas 2, 5 e 6: só desenho.
 def palco_1():
-    return [tag("A primeira camada", 80, 1010, cinza=True),
-            painel("afasta", 470, 890, "a", selo="1")]
+    return [foto("estatua"),
+            tag("A primeira camada", 66, 300, cinza=True),
+            painel("afasta", 60, 336, "a", .8, selo="1")]
 
 
 def palco_2():
@@ -211,21 +234,24 @@ def palco_2():
 
 
 def palco_3():
-    return [painel("afasta", 90, 640, "a apagado", .9),
-            painel("reintegra", 430, 790, "b apagado", .9),
-            choque(432, 796, 162, 126, .45)]
+    return [foto("congresso"),
+            painel("afasta", 60, 400, "a apagado", .8),
+            painel("reintegra", 400, 520, "b apagado", .8),
+            choque(402, 526, 108, 96, .45)]
 
 
 def palco_4():
-    return [hair(539, 500, 2, 500),
-            tag("Senado", 80, 500), pessoa(110, 570),
+    return [hair(539, 500, 2, 520),
+            caixa("senado", 80, 552, 420, 468),
+            tag("Senado", 80, 500), pessoa(190, 600),
             legenda("A pessoa", "Julga o ministro por crime de "
-                    "responsabilidade. Nada diz sobre a decisão.", 80, 820, 380),
-            tag("Tribunal", 620, 500),
-            painel("afasta", 620, 570, "a apagado", .5),
-            painel("reintegra", 700, 650, "b", .5),
+                    "responsabilidade. Nada diz sobre a decisão.", 100, 860, 380),
+            caixa("tribunal", 580, 552, 420, 468),
+            tag("Tribunal", 580, 500),
+            painel("afasta", 610, 600, "a apagado", .45),
+            painel("reintegra", 690, 670, "b", .45),
             legenda("O ato", "Revisa o conteúdo da decisão pelas vias do "
-                    "próprio processo.", 620, 820, 380)]
+                    "próprio processo.", 600, 860, 380)]
 
 
 def palco_5():
@@ -240,31 +266,32 @@ def palco_6():
 
 
 def palco_7():
-    return [congela(64, 780, 952, 452, "Suspensas · Presidência"),
-            painel("afasta", 100, 810, "a apagado", .8, selo="1"),
-            painel("reintegra", 430, 900, "b apagado", .8, selo="2"),
-            choque(432, 906, 118, 100, .5)]
+    return [foto("sessao"),
+            congela(64, 476, 952, 326, "Suspensas · Presidência"),
+            painel("afasta", 100, 500, "a apagado", .6, selo="1"),
+            painel("reintegra", 470, 570, "b apagado", .6, selo="2"),
+            choque(472, 574, 62, 60, .5)]
 
 
 def palco_8():
     return [painel("afasta", 230, 400, "apagado", .85, rot=0, vazio=True),
             painel("reintegra", 266, 436, "apagado", .85, rot=0, vazio=True),
-            painel("plenario", 302, 472, "ouro", .85, rot=0)]
+            painel("plenario", 302, 472, "ouro", .85, rot=0, foto="plenario")]
 
 
 def palco_9():
-    p = []
+    p = [foto("fachada")]
     for i, n in enumerate(("afasta", "reintegra", "suspende")):
-        p.append(painel(n, 420 + i * 22, 880 + i * 22, "apagado", .6, rot=0,
+        p.append(painel(n, 420 + i * 22, 300 + i * 22, "apagado", .6, rot=0,
                         vazio=True))
-    p.append(painel("plenario", 486, 946, "ouro", .6, rot=0))
-    p.append(tag("O caso, em 10 · 09 · 2026", 80, 1010, cinza=True))
+    p.append(painel("plenario", 486, 366, "ouro", .6, rot=0))
+    p.append(tag("O caso, em 10 · 09 · 2026", 80, 430, cinza=True))
     return p
 
 
 T = [
     # ---------------------------------------------------------------- 1
-    {"ancora": "topo", "max": 640, "palco": palco_1,
+    {"ancora": "base", "max": 640, "palco": palco_1,
      "titulo": [("k", "Em 48 horas, três ministros do STF decidiram sobre o "
                       "mesmo cargo. "),
                 ("l", "O desempate não coube a "),
@@ -283,7 +310,7 @@ T = [
               "fecho": "Nos comentários, uma frase se repetiu."}},
 
     # ---------------------------------------------------------------- 3
-    {"ancora": "topo", "max": 760, "palco": palco_3,
+    {"ancora": "base", "max": 440, "palco": palco_3,
      "titulo": [("k", "“Um ministro não pode anular a decisão do outro. "),
                 ("g", "Isso é papel do Senado.”")],
      "corpo": ["A primeira metade da frase está certa, e é exatamente o que a "
@@ -327,14 +354,14 @@ T = [
               "fecho": "Foi o segundo caminho que se abriu primeiro."}},
 
     # ---------------------------------------------------------------- 7
-    {"ancora": "topo", "max": 600, "palco": palco_7,
+    {"ancora": "base", "max": 480, "palco": palco_7,
      "titulo": [("k", "A Presidência suspendeu as duas decisões "),
                 ("l", "e devolveu a palavra a "),
                 ("g", "quem decide junto.")],
      "corpo": ["O fundamento invocado foi a sobreposição: decisões "
                "monocráticas sucessivas, sobre os mesmos fatos, com comandos "
                "incompatíveis entre si. O mérito fica com o Plenário."],
-     "base": {"max": 110, "fecho": "15 de setembro, sessão extraordinária."}},
+     "fecho": "15 de setembro, sessão extraordinária."},
 
     # ---------------------------------------------------------------- 8
     {"ancora": "topo", "max": 270, "palco": palco_8,
@@ -355,7 +382,7 @@ T = [
                        "a este caso."}},
 
     # ---------------------------------------------------------------- 9
-    {"ancora": "topo", "max": 720, "palco": palco_9,
+    {"ancora": "base", "max": 520, "palco": palco_9,
      "titulo": [("k", "Interpretar o próprio tempo "),
                 ("l", "exige "),
                 ("g", "repertório.")],

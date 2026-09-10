@@ -13,12 +13,13 @@ CHROMIUM = "/opt/pw-browsers/chromium"
 MEDIR = """
 () => Array.from(document.querySelectorAll('.slide')).map(s => {
   const r = s.getBoundingClientRect();
-  const topo = s.querySelector('.bloco.topo').getBoundingClientRect();
+  const topoEl = s.querySelector('.bloco.topo');
+  const topo = topoEl ? topoEl.getBoundingClientRect() : {top:r.top+110, bottom:r.top+110};
   const baseEl = s.querySelector('.bloco.base');
   const base = baseEl ? baseEl.getBoundingClientRect() : null;
   const l = s.querySelector('.logo').getBoundingClientRect();
   let pTop = 1e9, pBot = -1e9;
-  for (const e of s.querySelectorAll('.palco > *')) {
+  for (const e of s.querySelectorAll('.palco > *:not(.foto)')) {
     const b = e.getBoundingClientRect();
     pTop = Math.min(pTop, b.top); pBot = Math.max(pBot, b.bottom);
   }

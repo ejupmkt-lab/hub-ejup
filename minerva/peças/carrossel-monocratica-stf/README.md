@@ -20,12 +20,16 @@ saem da pilha (6) · a Presidência congela as duas numa moldura tracejada (7)
 · a pilha se recolhe atrás de um painel dourado único, o Plenário (8) · o
 caso fica arquivado, alinhado (9).
 
-Sem foto e sem alternância claro/escuro. É o mesmo objeto mudando de estado,
-e o estado é o argumento. As fotos em `fotos/` e `_build/tratar_fotos.py`
-ficaram da versão anterior e não entram na peça.
+As fotos entram como camada de fundo nas telas 1, 3, 7 e 9 (alto da tela,
+dissolvendo no navy antes do texto), como caixas por coluna na 4 e dentro do
+painel dourado na 8. As telas 2, 5 e 6 são só desenho: linha do tempo, o
+círculo dos onze assentos e os três caminhos, em SVG gerado no próprio
+`_build/gerar.py`. Sem alternância mecânica claro/escuro: a foto aparece onde
+o argumento a pede (a Justiça diante do STF, o Congresso quando a frase fala
+de outro Poder, a sessão plenária quando a Presidência convoca o colegiado).
 
-Os desenhos (linha do tempo, silhueta, colegiado, três caminhos) são SVG
-gerado em `_build/gerar.py`; `_build/figuras.py` é da versão anterior.
+Fotos e licenças em `fotos/CREDITOS.md`. Crédito vai na legenda do post.
+`_build/figuras.py` é da versão anterior.
 
 ## Postura editorial
 Descreve o mecanismo processual, sem defender resultado e sem atribuir
