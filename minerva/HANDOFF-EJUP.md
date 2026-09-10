@@ -321,3 +321,43 @@ Pasta: `peças/carrossel-quatro-competencias/`. Conteúdo veio pronto do usuári
 - **App "Missão Floripa"** (checklist gamificado pros sócios na Missão Startup Summit, feito em sessão anterior a esta) — o clone em `/tmp/pivottosemfloripa` **não existe mais no disco**; se for preciso mexer nele de novo, precisa clonar de novo de `github.com/victorbarrosoc-hub/pivottosemfloripa`.
 - **Repositório `github.com/victorbarrosoc-hub/EJUPMinerva`** existe mas está **vazio** (só `README.md` com o título) — é o destino deste documento de handoff, pra sincronizar contexto entre o Claude Code do computador e o do celular.
 - Pipeline de imagem usado nesta sessão: buscar candidatas via `WebSearch` restrito a `pexels.com`/`unsplash.com`, baixar com `curl`, conferir visualmente com `Read` antes de embutir — nunca supor que a primeira imagem encontrada serve.
+
+
+---
+
+## 17. Rede: o que está bloqueado e como liberar
+
+Diagnóstico feito em 10/09/2026 com `curl -sS "$HTTPS_PROXY/__agentproxy/status"`.
+O proxy local está com `selective: false` e os bloqueios vêm como **403 do
+gateway ao CONNECT**, ou seja, **política de egresso da organização**, não
+configuração do container. Não há como contornar de dentro, e não se deve
+tentar.
+
+**Passa hoje:** `images.pexels.com` e `api.pexels.com`.
+
+**Bloqueado (testado, todos 403/000):** `upload.wikimedia.org`,
+`commons.wikimedia.org`, `portal.stf.jus.br`, `www.stf.jus.br`,
+`agenciabrasil.ebc.com.br`, `agenciagov.ebc.com.br`, `live.staticflickr.com`,
+`www.flickr.com`, `images.unsplash.com`, `cdn.pixabay.com`, além da maioria
+dos domínios de imprensa (exame, olhardigital, meioemensagem, propmark,
+timesbrasil, spacemoney).
+
+**Como liberar:** a política de rede é escolhida na criação do ambiente, em
+claude.ai/code. Editar o ambiente (ou criar outro) com política mais
+permissiva, ou com allowlist incluindo os domínios acima. Documentação:
+https://code.claude.com/docs/en/claude-code-on-the-web
+
+**Domínios que valem a pena pedir, por ordem de utilidade para a EJUP:**
+1. `upload.wikimedia.org` e `commons.wikimedia.org` — é onde vivem as fotos
+   oficiais da Agência Brasil em domínio público e CC, incluindo plenário do
+   STF, posses, sessões. Resolve o buraco de "foto institucional brasileira".
+2. `agenciabrasil.ebc.com.br` — CC BY 3.0 BR, foto e texto.
+3. `live.staticflickr.com` e `www.flickr.com` — Agência Senado e Câmara
+   publicam lá com licença aberta.
+4. `portal.stf.jus.br` — decisões e o inteiro teor, que hoje só chegam por
+   resumo de imprensa.
+5. `images.unsplash.com` e `cdn.pixabay.com` — mais bancos de imagem.
+
+**Enquanto não liberar:** subir o arquivo no repositório funciona e já foi
+usado duas vezes (foto do Leonardo, foto do Tribos). É o caminho de contorno
+oficial desta operação.

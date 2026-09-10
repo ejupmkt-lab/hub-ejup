@@ -93,7 +93,7 @@ T = [
      "corpo": ["A decisão de um ministro se submete ao órgão de que ele faz "
                "parte, e a Presidência tem competências próprias de "
                "ordenação. Ministro é par de ministro, e par não revisa par."],
-     "figura": "eixo_aberto",
+     "figura": "colisao",
      "fecho": "São três caminhos, e eles não se confundem."},
 
     # ---------------------------------------------------------------- 6
@@ -132,6 +132,7 @@ T = [
                ("3", "Quando chamar o colegiado?",
                 "Antes de a divergência aparecer, ou depois que ela já "
                 "produziu efeitos no mundo.")],
+     "figura": "eixo_aberto",
      "fecho": "É pergunta de desenho institucional, e ela sobrevive a este "
               "caso."},
 

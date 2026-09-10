@@ -164,5 +164,55 @@ def eixo_aberto(claro=False) -> str:
     return _svg(p, 130)
 
 
-FIGURAS = {"linha_do_tempo": linha_do_tempo, "dois_trilhos": dois_trilhos,
+def colisao(claro=False) -> str:
+    """A situação desenhada: duas ordens contrárias sobre o mesmo objeto.
+
+    É o diagrama que explica a peça inteira para quem não é do Direito. Dois
+    emissores no mesmo nível, uma seta cada, o mesmo alvo no meio, e o choque
+    marcado onde as duas se encontram.
+    """
+    c = _cx(claro)
+    p = []
+    alvo_x, alvo_y, alvo_l, alvo_a = 340, 96, 240, 96
+    # os dois emissores, no MESMO nível: é o ponto do desenho
+    for lado, nome, ordem in ((0, "MINISTRO", "afasta"),
+                              (1, "MINISTRO", "reintegra")):
+        x = 0 if lado == 0 else LARG - 228
+        p.append(f'<rect x="{x}" y="{alvo_y}" width="228" height="96" rx="4" '
+                 f'fill="none" stroke="{c["li"]}" stroke-width="1.5"/>')
+        p.append(_t(x + 114, alvo_y + 42, nome, 21, 500, c["ap"], trk=".16em"))
+        p.append(_t(x + 114, alvo_y + 72, ordem, 26, 700, c["tx"], trk="0"))
+        # seta apontando para o alvo
+        if lado == 0:
+            p.append(f'<path d="M236 {alvo_y+48}H{alvo_x-16}" stroke="{c["ac"]}" '
+                     f'stroke-width="3"/>'
+                     f'<path d="M{alvo_x-26} {alvo_y+40}l12 8-12 8z" '
+                     f'fill="{c["ac"]}"/>')
+        else:
+            p.append(f'<path d="M{LARG-236} {alvo_y+48}H{alvo_x+alvo_l+16}" '
+                     f'stroke="{c["ac"]}" stroke-width="3"/>'
+                     f'<path d="M{alvo_x+alvo_l+26} {alvo_y+40}l-12 8 12 8z" '
+                     f'fill="{c["ac"]}"/>')
+    # o alvo
+    p.append(f'<rect x="{alvo_x}" y="{alvo_y}" width="{alvo_l}" '
+             f'height="{alvo_a}" rx="4" fill="none" stroke="{c["ac"]}" '
+             f'stroke-width="3"/>')
+    p.append(_t(alvo_x + alvo_l/2, alvo_y + 42, "O MESMO", 19, 500, c["ac"],
+                trk=".16em"))
+    p.append(_t(alvo_x + alvo_l/2, alvo_y + 74, "cargo", 28, 700, c["tx"],
+                trk="0"))
+    # a marca do choque
+    p.append(_t(LARG/2, 44, "COMANDOS INCOMPATÍVEIS", 19, 500, c["ac"],
+                trk=".18em"))
+    p.append(f'<path d="M{LARG/2-90} 60h180" stroke="{c["ac"]}" '
+             f'stroke-width="2" stroke-opacity=".5"/>')
+    # nenhum dos dois está acima do outro
+    p.append(f'<path d="M0 236H{LARG}" stroke="{c["li"]}" stroke-width="1.5" '
+             f'stroke-dasharray="7 7"/>')
+    p.append(_t(LARG/2, 268, "MESMO NÍVEL: NENHUM REVISA O OUTRO", 20, 500,
+                c["ap"], trk=".16em"))
+    return _svg(p, 286)
+
+
+FIGURAS = {"colisao": colisao, "linha_do_tempo": linha_do_tempo, "dois_trilhos": dois_trilhos,
            "convergencia": convergencia, "eixo_aberto": eixo_aberto}
