@@ -10,49 +10,22 @@ python3 _build/tratar_fotos.py && python3 _build/gerar.py && python3 _build/rend
 Retrata a situação em **10/09/2026**. O Plenário do STF decide em **15/09**.
 Depois dessa data a peça está vencida: ou sai antes, ou é refeita.
 
-## O dispositivo: o placar do caso
-Uma régua fixa no alto de todas as telas, com os quatro atores (Mendonça ·
-Dino · Presidência · Plenário) e o estado de cada um: agiu, teve a decisão
-suspensa, é a vez dele, está à espera. O mesmo objeto na mesma posição em
-todas as telas, mudando quando a história muda.
+## O dispositivo: as camadas
+Cada decisão é um painel translúcido, e a composição evolui de tela em tela:
+uma ordem entra pela borda (1) · duas se cruzam e a zona do cruzamento fica
+hachurada (2) · a frase popular passa por cima das duas, apagadas (3) ·
+Senado e tribunal em duas colunas, pessoa de um lado, ato do outro (4) · o
+colegiado de onze assentos cerca a decisão individual (5) · três caminhos
+saem da pilha (6) · a Presidência congela as duas numa moldura tracejada (7)
+· a pilha se recolhe atrás de um painel dourado único, o Plenário (8) · o
+caso fica arquivado, alinhado (9).
 
-Liga as telas **e** informa: o leitor sempre sabe em que ponto do caso está.
+Sem foto e sem alternância claro/escuro. É o mesmo objeto mudando de estado,
+e o estado é o argumento. As fotos em `fotos/` e `_build/tratar_fotos.py`
+ficaram da versão anterior e não entram na peça.
 
-A moldura que se completa ficou no carrossel anterior, de propósito. Repetir
-dispositivo entre peças é o que faz virar template, e foi essa a crítica.
-
-## Os diagramas
-Quatro, em `_build/figuras.py`, todos de mecanismo: a **linha do tempo** dos
-quatro movimentos em 48 horas · os **dois trilhos** separando controle da
-pessoa e controle do ato · o **eixo em aberto** entre decisão individual e
-decisão conjunta · a **convergência** dos três caminhos para o colegiado.
-
-## As fotos: uma faixa cortada, e uma quebra proposital
-As telas escuras 1, 5, 7 e 9 são fatias consecutivas da mesma fotografia de
-arcada: passar o dedo é percorrer a imagem. A tela 3 rompe a continuidade de
-propósito, com o Congresso Nacional, porque é ali que o texto fala de outro
-Poder. A quebra visual é o argumento.
-
-## O que falta: foto real do STF
-**A saída de rede desta sessão bloqueia tudo menos o Pexels.** Wikimedia, Flickr, Agência Brasil, o portal do STF, Unsplash e Pixabay respondem 000. Não existe foto do plenário do STF acessível daqui, e usar uma Suprema Corte estrangeira do Pexels seria erro pior que a falta.\n\nCaminho que funciona, e já funcionou com a foto do Leonardo: subir os
-arquivos no repositório, em `peças/carrossel-monocratica-stf/fotos/`, e me
-avisar. Com foto do plenário em mãos, as telas 1, 5, 7 e 9 trocam de imagem
-sem mexer em mais nada.
-
-## O dispositivo antigo: uma foto só, cortada em cinco
-As telas escuras são **fatias consecutivas da mesma fotografia**, na ordem em
-que aparecem. Passar o dedo é percorrer a imagem: a arcada continua de uma
-tela para a seguinte e o ponto de fuga cai no meio do argumento, na tela que
-diz que quem corrige o individual é o coletivo. As telas claras entram como
-pausas, e quando o escuro volta a fotografia retoma de onde parou.
-
-É o princípio da tela única de 15.120px do carrossel de superendividamento
-(aprovado), resolvido de outro jeito: lá uma curva desenhada atravessava as
-telas, aqui é a própria fotografia que atravessa.
-
-Vantagem de produção, além da estética: **acaba o banco de imagens avulsas**.
-Uma peça, uma foto, zero risco de repetir imagem que já rodou em outro
-carrossel.
+Os desenhos (linha do tempo, silhueta, colegiado, três caminhos) são SVG
+gerado em `_build/gerar.py`; `_build/figuras.py` é da versão anterior.
 
 ## Postura editorial
 Descreve o mecanismo processual, sem defender resultado e sem atribuir

@@ -4,23 +4,27 @@
 Nove telas 1080×1440 sobre a sucessão de decisões monocráticas no STF em
 setembro de 2026, pela lente do processo, sem tomar lado.
 
-O gancho não é isca: é **assimetria real de informação**. O leitor viu a
-manchete e não viu o mecanismo. E há uma crença errada circulando nos
-comentários ("isso é papel do Senado") que a peça corrige com o artigo na mão.
-Contrariar um erro popular com precisão gera discussão de quem sabe e de quem
-achava que sabia, sem pedir comentário a ninguém.
+O gancho é **assimetria real de informação**: o leitor viu a manchete e não
+viu o mecanismo. E há uma crença errada circulando nos comentários ("isso é
+papel do Senado") que a peça corrige com o artigo na mão. Cada tela termina
+numa linha que a seguinte responde.
 
-Cada tela termina numa linha que a seguinte responde.
+O dispositivo visual são AS CAMADAS: cada decisão é um painel translúcido, e
+a composição evolui de tela em tela. Uma ordem entra pela borda; duas se
+cruzam e a zona do cruzamento fica hachurada; uma frase popular passa por
+cima delas; Senado e tribunal se separam em duas colunas; o colegiado cerca a
+decisão individual; três caminhos saem da pilha; a Presidência congela as
+duas numa moldura tracejada; a pilha se recolhe atrás de um painel dourado
+único, o Plenário; e o caso fica arquivado, alinhado, ao fim. Sem foto, sem
+alternância claro/escuro: o mesmo objeto mudando de estado.
 
-**Peça datada.** Retrata a situação em 10/09/2026, com sessão plenária
-extraordinária marcada para 15/09. Reconferir antes de publicar.
+**Peça datada.** Situação em 10/09/2026, sessão plenária extraordinária
+marcada para 15/09. Reconferir antes de publicar.
 """
 
 import base64
 import html as _html
 import pathlib
-
-import figuras
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -33,18 +37,234 @@ FACES = [("Gotham-Light.otf", 300), ("Gotham-Book.otf", 400),
          ("Gotham-Medium.otf", 500), ("Gotham-Bold.otf", 700),
          ("Gotham-Black.otf", 900)]
 
-# O que liga as telas é o PLACAR DO CASO, em figuras.py: quatro atores numa
-# régua fixa no alto, mudando de estado a cada tela. A moldura que se completa
-# ficou no carrossel anterior; repetir dispositivo entre peças é o que faz
-# virar template.
-#
-# Estados: '.' inerte · '+' agiu · 'x' decisão suspensa · '>' é a vez dele
-#          '?' à espera
+GOLD, SILVER, STEEL = "#f0b855", "#d1d3d4", "#304557"
+
+# Os painéis, um por decisão. A composição de cada tela usa o subconjunto.
+PAINEIS = {
+    "afasta": ("1ª decisão · ministro Mendonça", "AFASTA",
+               "o diretor-geral da PF deixa o cargo"),
+    "reintegra": ("2ª decisão · ministro Dino", "REINTEGRA",
+                  "o mesmo diretor volta ao cargo"),
+    "suspende": ("Presidência · ministro Fachin", "SUSPENDE",
+                 "as duas decisões, até o Plenário"),
+    "plenario": ("15 de setembro · sessão extraordinária", "PLENÁRIO",
+                 "onze ministros decidem juntos"),
+}
+
+
+# ---------------------------------------------------------------- peças
+def painel(nome, x, y, cls="a", escala=1.0, selo=None, rot=None,
+           vazio=False):
+    car, verbo, de = PAINEIS[nome]
+    ang = {"a": -2.4, "b": 2.2}.get(cls.split()[0], 0) if rot is None else rot
+    selo_html = f'<div class="selo">{selo}</div>' if selo else ""
+    if vazio:  # folha atrás da pilha: só a borda, sem texto
+        return (f'<div class="painel {cls}" style="left:{x}px;top:{y}px;'
+                f'transform-origin:0 0;transform:rotate({ang}deg) '
+                f'scale({escala})"></div>')
+    return (f'<div class="painel {cls}" style="left:{x}px;top:{y}px;'
+            f'transform-origin:0 0;transform:rotate({ang}deg) scale({escala})">'
+            f'<div class="car">{_html.escape(car)}</div>'
+            f'<div><div class="verbo">{verbo}</div>'
+            f'<div class="de">{_html.escape(de)}</div></div>{selo_html}</div>')
+
+
+def choque(x, y, w, h, opac=1.0):
+    return (f'<div class="choque" style="left:{x}px;top:{y}px;width:{w}px;'
+            f'height:{h}px;opacity:{opac}"></div>')
+
+
+def tag(txt, x, y, cinza=False):
+    return (f'<div class="tag{" cinza" if cinza else ""}" '
+            f'style="left:{x}px;top:{y}px">{_html.escape(txt)}</div>')
+
+
+def legenda(titulo, txt, x, y, w=300, ouro=False):
+    return (f'<div class="legenda" style="left:{x}px;top:{y}px;width:{w}px">'
+            f'<b{" class=ouro" if ouro else ""}>{_html.escape(titulo)}</b>'
+            f'{_html.escape(txt)}</div>')
+
+
+def hair(x, y, w, h):
+    return (f'<div class="hair" style="left:{x}px;top:{y}px;width:{w}px;'
+            f'height:{h}px"></div>')
+
+
+def fio(x, y, w, h, svg_inner):
+    return (f'<div class="fio" style="left:{x}px;top:{y}px;width:{w}px;'
+            f'height:{h}px"><svg viewBox="0 0 {w} {h}" '
+            f'xmlns="http://www.w3.org/2000/svg">{svg_inner}</svg></div>')
+
+
+def congela(x, y, w, h, rot):
+    return (f'<div class="congela" style="left:{x}px;top:{y}px;width:{w}px;'
+            f'height:{h}px"><span class="rot">{_html.escape(rot)}</span></div>')
+
+
+# ---------------------------------------------------------------- figuras
+def linha_do_tempo():
+    """Quatro movimentos numa régua; a chave de 48 h cobre os três primeiros."""
+    w, h = 920, 150
+    xs = [60, 320, 580, 830]
+    nomes = [("afasta", "1ª monocrática"), ("reintegra", "2ª monocrática"),
+             ("suspende as duas", "Presidência"), ("Plenário", "15 de setembro")]
+    y = 78
+    s = [f'<line x1="{xs[0]}" y1="{y}" x2="{xs[-1]}" y2="{y}" '
+         f'stroke="{SILVER}" stroke-opacity=".35" stroke-width="2"/>']
+    for i, (x, (n, sub)) in enumerate(zip(xs, nomes)):
+        cor = GOLD if i < 3 else SILVER
+        fill = GOLD if i < 3 else "none"
+        s.append(f'<circle cx="{x}" cy="{y}" r="9" fill="{fill}" '
+                 f'stroke="{cor}" stroke-width="3"/>')
+        s.append(f'<text x="{x}" y="{y + 40}" text-anchor="middle" '
+                 f'fill="#fff" font-family="Gotham" font-weight="700" '
+                 f'font-size="20">{n}</text>')
+        s.append(f'<text x="{x}" y="{y + 64}" text-anchor="middle" '
+                 f'fill="{SILVER}" fill-opacity=".8" font-family="Gotham" '
+                 f'font-weight="300" font-size="17">{sub}</text>')
+    # chave das 48 horas
+    s.append(f'<path d="M{xs[0]} 34 v-12 h{xs[2] - xs[0]} v12" fill="none" '
+             f'stroke="{GOLD}" stroke-width="2"/>')
+    s.append(f'<text x="{(xs[0] + xs[2]) / 2}" y="14" text-anchor="middle" '
+             f'fill="{GOLD}" font-family="Gotham" font-weight="500" '
+             f'font-size="17" letter-spacing="3">48 HORAS</text>')
+    return fio(80, 1060, w, h, "".join(s))
+
+
+def pessoa(x, y):
+    """Silhueta institucional: a pessoa do ministro, e só ela."""
+    w, h = 200, 220
+    s = (f'<circle cx="100" cy="62" r="46" fill="none" stroke="{GOLD}" '
+         f'stroke-width="3"/>'
+         f'<path d="M22 214 a78 78 0 0 1 156 0" fill="none" stroke="{GOLD}" '
+         f'stroke-width="3"/>')
+    return fio(x, y, w, h, s)
+
+
+def colegiado(cx, cy, r):
+    """Onze assentos em círculo. Um só destacado: o que decidiu sozinho."""
+    import math
+    s = [f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" '
+         f'stroke="{SILVER}" stroke-opacity=".28" stroke-width="2" '
+         f'stroke-dasharray="4 10"/>']
+    for i in range(11):
+        a = -math.pi / 2 + i * 2 * math.pi / 11
+        x, y = cx + r * math.cos(a), cy + r * math.sin(a)
+        if i == 0:
+            s.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="26" '
+                     f'fill="{GOLD}"/>')
+            s.append(f'<text x="{x:.1f}" y="{y + 7:.1f}" text-anchor="middle" '
+                     f'fill="#031c37" font-family="Gotham" font-weight="900" '
+                     f'font-size="20">1</text>')
+        else:
+            s.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="22" fill="none" '
+                     f'stroke="{GOLD}" stroke-width="3"/>')
+    s.append(f'<text x="{cx}" y="{cy + r + 62}" text-anchor="middle" '
+             f'fill="{SILVER}" font-family="Gotham" font-weight="500" '
+             f'font-size="19" letter-spacing="4">ONZE MINISTROS</text>')
+    m = r + 30
+    inner = "".join(s).replace(f'cx="{cx}"', f'cx="{m}"')
+    # coordenadas relativas à caixa do desenho
+    import re
+    inner = re.sub(r'cx="([\d.]+)" cy="([\d.]+)"',
+                   lambda k: f'cx="{float(k[1]) - cx + m:.1f}" '
+                             f'cy="{float(k[2]) - cy + m:.1f}"', "".join(s))
+    inner = re.sub(r'<text x="([\d.]+)" y="([\d.]+)"',
+                   lambda k: f'<text x="{float(k[1]) - cx + m:.1f}" '
+                             f'y="{float(k[2]) - cy + m:.1f}"', inner)
+    return fio(cx - m, cy - m, 2 * m, 2 * m + 60, inner)
+
+
+def tres_caminhos(y0):
+    """Da pilha, três traços para três destinos. Nenhum deles é um par."""
+    w, h = 920, 460
+    dest = [("1", "AGRAVO INTERNO", "o colegiado revisa a decisão"),
+            ("2", "PRESIDÊNCIA", "ordena o andamento do processo"),
+            ("3", "PREVENÇÃO", "define quem é o relator do caso")]
+    s = []
+    x0, x1 = 340, 560
+    ys = [70, 230, 390]
+    for (n, t, d), y in zip(dest, ys):
+        s.append(f'<path d="M{x0} 230 C {x0 + 120} 230, {x1 - 120} {y}, '
+                 f'{x1} {y}" fill="none" stroke="{GOLD}" stroke-width="2"/>')
+        s.append(f'<circle cx="{x1}" cy="{y}" r="7" fill="{GOLD}"/>')
+        s.append(f'<text x="{x1 + 24}" y="{y - 8}" fill="{GOLD}" '
+                 f'font-family="Gotham" font-weight="500" font-size="19" '
+                 f'letter-spacing="4">{n} · {t}</text>')
+        s.append(f'<text x="{x1 + 24}" y="{y + 22}" fill="{SILVER}" '
+                 f'font-family="Gotham" font-weight="300" font-size="21">'
+                 f'{d}</text>')
+    return fio(80, y0, w, h, "".join(s))
+
+
+# ---------------------------------------------------------------- telas
+def palco_1():
+    return [tag("A primeira camada", 80, 1010, cinza=True),
+            painel("afasta", 470, 890, "a", selo="1")]
+
+
+def palco_2():
+    return [painel("afasta", 80, 470, "a", selo="1"),
+            painel("reintegra", 440, 680, "b", selo="2"),
+            choque(442, 690, 196, 140),
+            linha_do_tempo()]
+
+
+def palco_3():
+    return [painel("afasta", 90, 640, "a apagado", .9),
+            painel("reintegra", 430, 790, "b apagado", .9),
+            choque(432, 796, 162, 126, .45)]
+
+
+def palco_4():
+    return [hair(539, 500, 2, 500),
+            tag("Senado", 80, 500), pessoa(110, 570),
+            legenda("A pessoa", "Julga o ministro por crime de "
+                    "responsabilidade. Nada diz sobre a decisão.", 80, 820, 380),
+            tag("Tribunal", 620, 500),
+            painel("afasta", 620, 570, "a apagado", .5),
+            painel("reintegra", 700, 650, "b", .5),
+            legenda("O ato", "Revisa o conteúdo da decisão pelas vias do "
+                    "próprio processo.", 620, 820, 380)]
+
+
+def palco_5():
+    return [colegiado(540, 730, 215),
+            painel("afasta", 425, 685, "a", .42, rot=-2.4)]
+
+
+def palco_6():
+    return [painel("afasta", 70, 640, "a apagado", .48),
+            painel("reintegra", 110, 700, "b apagado", .48),
+            tres_caminhos(520)]
+
+
+def palco_7():
+    return [congela(64, 780, 952, 452, "Suspensas · Presidência"),
+            painel("afasta", 100, 810, "a apagado", .8, selo="1"),
+            painel("reintegra", 430, 900, "b apagado", .8, selo="2"),
+            choque(432, 906, 118, 100, .5)]
+
+
+def palco_8():
+    return [painel("afasta", 230, 400, "apagado", .85, rot=0, vazio=True),
+            painel("reintegra", 266, 436, "apagado", .85, rot=0, vazio=True),
+            painel("plenario", 302, 472, "ouro", .85, rot=0)]
+
+
+def palco_9():
+    p = []
+    for i, n in enumerate(("afasta", "reintegra", "suspende")):
+        p.append(painel(n, 420 + i * 22, 880 + i * 22, "apagado", .6, rot=0,
+                        vazio=True))
+    p.append(painel("plenario", 486, 946, "ouro", .6, rot=0))
+    p.append(tag("O caso, em 10 · 09 · 2026", 80, 1010, cinza=True))
+    return p
+
 
 T = [
     # ---------------------------------------------------------------- 1
-    {"fundo": "escuro", "foto": "pan", "ancora": "abaixo",
-     "placar": "....",
+    {"ancora": "topo", "max": 640, "palco": palco_1,
      "titulo": [("k", "Em 48 horas, três ministros do STF decidiram sobre o "
                       "mesmo cargo. "),
                 ("l", "O desempate não coube a "),
@@ -55,17 +275,15 @@ T = [
      "pilula": "Arraste: o que o processo diz sobre um ministro revisar outro"},
 
     # ---------------------------------------------------------------- 2
-    {"fundo": "claro", "ancora": "meio", "numeral": "1",
-     "placar": "++x?",
+    {"ancora": "topo", "max": 300, "palco": palco_2,
      "titulo": [("k", "Quatro movimentos "),
                 ("l", "em pouco mais de "),
                 ("g", "dois dias.")],
-     "figura": "linha_do_tempo",
-     "fecho": "Nos comentários, uma frase se repetiu."},
+     "base": {"max": 110,
+              "fecho": "Nos comentários, uma frase se repetiu."}},
 
     # ---------------------------------------------------------------- 3
-    {"fundo": "escuro", "foto": "congresso", "ancora": "abaixo",
-     "placar": "++x?",
+    {"ancora": "topo", "max": 760, "palco": palco_3,
      "titulo": [("k", "“Um ministro não pode anular a decisão do outro. "),
                 ("g", "Isso é papel do Senado.”")],
      "corpo": ["A primeira metade da frase está certa, e é exatamente o que a "
@@ -74,71 +292,70 @@ T = [
      "fecho": "O Senado entra em outro lugar, e é um lugar preciso."},
 
     # ---------------------------------------------------------------- 4
-    {"fundo": "claro", "ancora": "meio", "numeral": "2",
-     "placar": "++x?",
+    {"ancora": "topo", "max": 330, "palco": palco_4,
      "titulo": [("k", "O Senado julga o ministro. "),
                 ("l", "Quem revisa a decisão é "),
                 ("g", "o próprio tribunal.")],
-     "figura": "dois_trilhos",
-     "corpo": ["São trilhos separados. Um apura conduta de magistrado; o "
-               "outro corrige conteúdo de decisão. Cada um resolve o seu."],
-     "fecho": "Dentro do tribunal, então, o que corrige uma monocrática?"},
+     "base": {"max": 250,
+              "corpo": ["São trilhos separados. Um apura conduta de "
+                        "magistrado; o outro corrige conteúdo de decisão. "
+                        "Cada um resolve o seu."],
+              "fecho": "Dentro do tribunal, então, o que corrige uma "
+                       "monocrática?"}},
 
     # ---------------------------------------------------------------- 5
-    {"fundo": "escuro", "foto": "pan", "ancora": "abaixo",
-     "placar": "++x?",
+    {"ancora": "topo", "max": 330, "palco": palco_5,
      "titulo": [("k", "Num tribunal colegiado, "),
                 ("l", "quem corrige o individual é "),
                 ("g", "o coletivo.")],
-     "corpo": ["A decisão de um ministro se submete ao órgão de que ele faz "
-               "parte, e a Presidência tem competências próprias de "
-               "ordenação. Ministro é par de ministro, e par não revisa par."],
-     "figura": "colisao",
-     "fecho": "São três caminhos, e eles não se confundem."},
+     "base": {"max": 290,
+              "corpo": ["A decisão de um ministro se submete ao órgão de que "
+                        "ele faz parte, e a Presidência tem competências "
+                        "próprias de ordenação. Ministro é par de ministro, "
+                        "e par não revisa par."],
+              "fecho": "São três caminhos, e eles não se confundem."}},
 
     # ---------------------------------------------------------------- 6
-    {"fundo": "claro", "ancora": "meio", "numeral": "3",
-     "placar": "++x?",
+    {"ancora": "topo", "max": 330, "palco": palco_6,
      "titulo": [("k", "Três caminhos "),
                 ("l", "que o processo oferece, e "),
                 ("g", "nenhum é outro ministro.")],
-     "figura": "convergencia",
-     "fecho": "Foi o segundo caminho que se abriu primeiro."},
+     "base": {"max": 250,
+              "corpo": ["Recurso ao colegiado, ordenação pela Presidência, "
+                        "prevenção do relator. Cada um tem pressuposto "
+                        "próprio e nenhum passa por um segundo voto isolado."],
+              "fecho": "Foi o segundo caminho que se abriu primeiro."}},
 
     # ---------------------------------------------------------------- 7
-    {"fundo": "escuro", "foto": "pan", "ancora": "abaixo",
-     "placar": "++>?",
+    {"ancora": "topo", "max": 600, "palco": palco_7,
      "titulo": [("k", "A Presidência suspendeu as duas decisões "),
                 ("l", "e devolveu a palavra a "),
                 ("g", "quem decide junto.")],
      "corpo": ["O fundamento invocado foi a sobreposição: decisões "
                "monocráticas sucessivas, sobre os mesmos fatos, com comandos "
-               "incompatíveis entre si.",
-               "O mérito fica com o Plenário."],
-     "fecho": "15 de setembro, sessão extraordinária."},
+               "incompatíveis entre si. O mérito fica com o Plenário."],
+     "base": {"max": 110, "fecho": "15 de setembro, sessão extraordinária."}},
 
     # ---------------------------------------------------------------- 8
-    {"fundo": "claro", "ancora": "meio", "numeral": "4",
-     "placar": "++x?",
+    {"ancora": "topo", "max": 270, "palco": palco_8,
      "titulo": [("k", "O caso passa. "),
                 ("l", "A pergunta que ele abre "),
                 ("g", "fica.")],
-     "lista": [("1", "Até onde vai a monocrática?",
-                "Qual o limite da decisão individual num órgão que existe "
-                "para decidir em conjunto."),
-               ("2", "O que a Presidência pode ordenar?",
-                "Onde termina a ordenação do processo e começa a "
-                "substituição do relator."),
-               ("3", "Quando chamar o colegiado?",
-                "Antes de a divergência aparecer, ou depois que ela já "
-                "produziu efeitos no mundo.")],
-     "figura": "eixo_aberto",
-     "fecho": "É pergunta de desenho institucional, e ela sobrevive a este "
-              "caso."},
+     "base": {"max": 520,
+              "lista": [("1", "Até onde vai a monocrática?",
+                         "Qual o limite da decisão individual num órgão que "
+                         "existe para decidir em conjunto."),
+                        ("2", "O que a Presidência pode ordenar?",
+                         "Onde termina a ordenação do processo e começa a "
+                         "substituição do relator."),
+                        ("3", "Quando chamar o colegiado?",
+                         "Antes de a divergência aparecer, ou depois que ela "
+                         "já produziu efeitos no mundo.")],
+              "fecho": "É pergunta de desenho institucional, e ela sobrevive "
+                       "a este caso."}},
 
     # ---------------------------------------------------------------- 9
-    {"fundo": "escuro", "foto": "pan", "ancora": "abaixo",
-     "placar": "++x>",
+    {"ancora": "topo", "max": 720, "palco": palco_9,
      "titulo": [("k", "Interpretar o próprio tempo "),
                 ("l", "exige "),
                 ("g", "repertório.")],
@@ -149,6 +366,7 @@ T = [
 ]
 
 
+# ---------------------------------------------------------------- montagem
 def fontes() -> str:
     out = []
     for nome, peso in FACES:
@@ -166,50 +384,13 @@ def logo_svg() -> str:
     return (LOGOS / "ejup-horizontal-navy.svg").read_text(encoding="utf-8")
 
 
-def simbolo_svg() -> str:
-    return (LOGOS / "ejup-symbol-navy.svg").read_text(encoding="utf-8")
-
-
-def duo(nome: str) -> str:
-    arq = HERE / "duotone" / f"{nome}.webp"
-    if not arq.exists():
-        return ""
-    return ("data:image/webp;base64,"
-            + base64.b64encode(arq.read_bytes()).decode("ascii"))
-
-
-def anel_svg(parte: int, total: int, n: str, de: str, claro=False) -> str:
-    """Anel com a fração marcada e o número dentro. Arco dourado sobre trilha
-    em aço, como o anel de 29% do carrossel aprovado."""
-    r, cx = 46, 56
-    circ = 2 * 3.14159265 * r
-    feito = circ * parte / total
-    arco = "#9b6b26" if claro else "#f0b855"
-    trilha = "#d9d6d0" if claro else "#304557"
-    num = "#031c37" if claro else "#f0b855"
-    apoio = "#5f6062" if claro else "#d1d3d4"
-    return (f'<svg viewBox="0 0 112 112" xmlns="http://www.w3.org/2000/svg">'
-            f'<circle cx="{cx}" cy="{cx}" r="{r}" fill="none" '
-            f'stroke="{trilha}" stroke-width="11"/>'
-            f'<circle cx="{cx}" cy="{cx}" r="{r}" fill="none" stroke="{arco}" '
-            f'stroke-width="11" stroke-linecap="round" '
-            f'stroke-dasharray="{feito:.1f} {circ:.1f}" '
-            f'transform="rotate(-90 {cx} {cx})"/>'
-            f'<text x="{cx}" y="{cx + 4}" text-anchor="middle" fill="{num}" '
-            f'font-family="Gotham" font-size="34" font-weight="900" '
-            f'letter-spacing="-.03em">{n}</text>'
-            f'<text x="{cx}" y="{cx + 24}" text-anchor="middle" '
-            f'fill="{apoio}" font-family="Gotham" font-size="12" '
-            f'font-weight="500" letter-spacing=".1em">{de}</text></svg>')
-
-
 def titulo_html(partes) -> str:
     return ('<h2 class="titulo">'
             + "".join(f'<span class="{k}">{_html.escape(t)}</span>'
                       for k, t in partes) + '</h2>')
 
 
-def bloco_html(s: dict) -> str:
+def bloco_html(s: dict, ancora: str) -> str:
     p = []
     if s.get("titulo"):
         p.append(titulo_html(s["titulo"]))
@@ -222,59 +403,31 @@ def bloco_html(s: dict) -> str:
             f'<small>{_html.escape(d)}</small></span></div>'
             for n, t, d in s["lista"])
         p.append(f'<div class="lista">{itens}</div>')
-    if s.get("cartoes"):
-        cs = "".join(
-            f'<div class="c{" destaque" if dest else ""}">'
-            f'<p class="i">{_html.escape(i.upper())}</p>'
-            f'<p class="r">{_html.escape(r)}</p></div>'
-            for i, r, dest in s["cartoes"])
-        p.append(f'<div class="cartoes">{cs}</div>')
-    if s.get("figura"):
-        p.append('<div class="fig">'
-                 + figuras.FIGURAS[s["figura"]](s["fundo"] == "claro")
-                 + '</div>')
-    if s.get("citacao"):
-        txt, ref = s["citacao"]
-        p.append(f'<div class="citacao"><p>{_html.escape(txt)}</p>'
-                 f'<p class="ref">{_html.escape(ref)}</p></div>')
-    if s.get("fonte"):
-        p.append(f'<p class="fonte">{_html.escape(s["fonte"])}</p>')
     if s.get("fecho"):
         p.append(f'<p class="fecho">{s["fecho"]}</p>')
     if s.get("pilula"):
         p.append('<div class="pilula"><i>&rarr;</i><span>'
                  + _html.escape(s["pilula"]) + '</span></div>')
-    if s.get("link"):
-        p.append(f'<span class="link">{_html.escape(s["link"])}</span>')
     if s.get("slogan"):
         p.append('<div class="assina"><p class="m">EJUP</p>'
                  f'<p class="s">{_html.escape(s["slogan"])}</p></div>')
-    return f'<div class="bloco {s["ancora"]}">{"".join(p)}</div>'
+    return (f'<div class="bloco {ancora}" data-max="{s.get("max", 9999)}">'
+            f'{"".join(p)}</div>')
 
 
-def slide_html(s: dict, i: int, logo: str, simbolo: str) -> str:
-    claro = s["fundo"] == "claro"
-    fundo = ""
-    if s.get("foto") == "pan":
-        # a enésima tela escura recebe a enésima fatia da faixa
-        ordem = [j for j, t in enumerate(T) if t.get("foto") == "pan"]
-        s = dict(s, foto=f"pan{ordem.index(i) + 1}")
-    if s.get("foto") and duo(s["foto"]):
-        fundo = f'<div class="foto"><img src="{duo(s["foto"])}" alt=""></div>'
-    elif not claro:
-        fundo = f'<div class="marca-fundo">{simbolo}</div>'
-    numeral = (f'<div class="numeral">{s["numeral"]}</div>'
-               if s.get("numeral") else "")
-    return (f'<section class="slide {s["fundo"]}" data-i="{i}">'
-            + fundo + numeral
-            + f'<div class="placar">{figuras.placar(s["placar"], claro)}</div>'
-            + bloco_html(s)
-            + f'<div class="logo"><div>{logo}</div></div></section>')
+def slide_html(s: dict, i: int, logo: str) -> str:
+    partes = [f'<section class="slide" data-i="{i}">',
+              '<div class="palco">', *s["palco"](), '</div>',
+              bloco_html(s, s["ancora"])]
+    if s.get("base"):
+        partes.append(bloco_html(s["base"], "base"))
+    partes.append(f'<div class="logo"><div>{logo}</div></div></section>')
+    return "".join(partes)
 
 
 def main() -> None:
-    logo, simbolo = logo_svg(), simbolo_svg()
-    corpo = "\n".join(slide_html(s, i, logo, simbolo) for i, s in enumerate(T))
+    logo = logo_svg()
+    corpo = "\n".join(slide_html(s, i, logo) for i, s in enumerate(T))
     html = (HERE / "template.html").read_text(encoding="utf-8")
     for marca, valor in (("__FONT_FACES__", fontes()), ("__SLIDES__", corpo)):
         if marca not in html:
