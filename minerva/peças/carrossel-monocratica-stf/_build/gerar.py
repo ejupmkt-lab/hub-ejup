@@ -19,6 +19,8 @@ extraordinária marcada para 15/09. Reconferir antes de publicar.
 import base64
 import html as _html
 import pathlib
+
+import figuras
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -31,14 +33,18 @@ FACES = [("Gotham-Light.otf", 300), ("Gotham-Book.otf", 400),
          ("Gotham-Medium.otf", 500), ("Gotham-Bold.otf", 700),
          ("Gotham-Black.otf", 900)]
 
-# A moldura que se completa liga as telas (ver skills/ejup-design/CARROSSEL.md).
-# Aqui ela tem sentido próprio: o quadro só fecha no fim, que é onde o
-# colegiado decide.
-MOLDURA = (44, 44, 992, 1352)      # x, y, largura, altura
+# O que liga as telas é o PLACAR DO CASO, em figuras.py: quatro atores numa
+# régua fixa no alto, mudando de estado a cada tela. A moldura que se completa
+# ficou no carrossel anterior; repetir dispositivo entre peças é o que faz
+# virar template.
+#
+# Estados: '.' inerte · '+' agiu · 'x' decisão suspensa · '>' é a vez dele
+#          '?' à espera
 
 T = [
     # ---------------------------------------------------------------- 1
     {"fundo": "escuro", "foto": "pan", "ancora": "abaixo",
+     "placar": "....",
      "titulo": [("k", "Em 48 horas, três ministros do STF decidiram sobre o "
                       "mesmo cargo. "),
                 ("l", "O desempate não coube a "),
@@ -50,23 +56,16 @@ T = [
 
     # ---------------------------------------------------------------- 2
     {"fundo": "claro", "ancora": "meio", "numeral": "1",
+     "placar": "++x?",
      "titulo": [("k", "Quatro movimentos "),
                 ("l", "em pouco mais de "),
                 ("g", "dois dias.")],
-     "lista": [("1", "Mendonça afasta",
-                "Determina o afastamento do diretor-geral da PF e do diretor "
-                "de Inteligência."),
-               ("2", "Dino reintegra",
-                "Decide em sentido contrário e manda recolocá-los nos cargos."),
-               ("3", "Fachin suspende as duas",
-                "A Presidência do STF susta os dois comandos e pede "
-                "informações em 48 horas."),
-               ("4", "O caso vai ao Plenário",
-                "Sessão extraordinária convocada para 15 de setembro.")],
+     "figura": "linha_do_tempo",
      "fecho": "Nos comentários, uma frase se repetiu."},
 
     # ---------------------------------------------------------------- 3
-    {"fundo": "escuro", "foto": "pan", "ancora": "abaixo",
+    {"fundo": "escuro", "foto": "congresso", "ancora": "abaixo",
+     "placar": "++x?",
      "titulo": [("k", "“Um ministro não pode anular a decisão do outro. "),
                 ("g", "Isso é papel do Senado.”")],
      "corpo": ["A primeira metade da frase está certa, e é exatamente o que a "
@@ -76,46 +75,39 @@ T = [
 
     # ---------------------------------------------------------------- 4
     {"fundo": "claro", "ancora": "meio", "numeral": "2",
+     "placar": "++x?",
      "titulo": [("k", "O Senado julga o ministro. "),
                 ("l", "Quem revisa a decisão é "),
                 ("g", "o próprio tribunal.")],
-     "cartoes": [("Controle da pessoa",
-                  "Senado, nos crimes de responsabilidade · CF, art. 52, II",
-                  False),
-                 ("Controle do ato",
-                  "O colegiado do próprio STF, pela via recursal", True)],
+     "figura": "dois_trilhos",
      "corpo": ["São trilhos separados. Um apura conduta de magistrado; o "
                "outro corrige conteúdo de decisão. Cada um resolve o seu."],
      "fecho": "Dentro do tribunal, então, o que corrige uma monocrática?"},
 
     # ---------------------------------------------------------------- 5
     {"fundo": "escuro", "foto": "pan", "ancora": "abaixo",
+     "placar": "++x?",
      "titulo": [("k", "Num tribunal colegiado, "),
                 ("l", "quem corrige o individual é "),
                 ("g", "o coletivo.")],
      "corpo": ["A decisão de um ministro se submete ao órgão de que ele faz "
                "parte, e a Presidência tem competências próprias de "
                "ordenação. Ministro é par de ministro, e par não revisa par."],
+     "figura": "eixo_aberto",
      "fecho": "São três caminhos, e eles não se confundem."},
 
     # ---------------------------------------------------------------- 6
     {"fundo": "claro", "ancora": "meio", "numeral": "3",
+     "placar": "++x?",
      "titulo": [("k", "Três caminhos "),
                 ("l", "que o processo oferece, e "),
                 ("g", "nenhum é outro ministro.")],
-     "lista": [("1", "Agravo interno",
-                "Leva a decisão do relator ao colegiado, Turma ou Plenário. É "
-                "a via ordinária de revisão."),
-               ("2", "Competência da Presidência",
-                "Alcança o pedido de suspensão e a ordenação dos processos, "
-                "sem entrar no mérito do relator."),
-               ("3", "Prevenção e distribuição",
-                "Define de saída quem relata o tema. É o que evita a "
-                "sobreposição antes de ela existir.")],
+     "figura": "convergencia",
      "fecho": "Foi o segundo caminho que se abriu primeiro."},
 
     # ---------------------------------------------------------------- 7
     {"fundo": "escuro", "foto": "pan", "ancora": "abaixo",
+     "placar": "++>?",
      "titulo": [("k", "A Presidência suspendeu as duas decisões "),
                 ("l", "e devolveu a palavra a "),
                 ("g", "quem decide junto.")],
@@ -127,6 +119,7 @@ T = [
 
     # ---------------------------------------------------------------- 8
     {"fundo": "claro", "ancora": "meio", "numeral": "4",
+     "placar": "++x?",
      "titulo": [("k", "O caso passa. "),
                 ("l", "A pergunta que ele abre "),
                 ("g", "fica.")],
@@ -144,6 +137,7 @@ T = [
 
     # ---------------------------------------------------------------- 9
     {"fundo": "escuro", "foto": "pan", "ancora": "abaixo",
+     "placar": "++x>",
      "titulo": [("k", "Interpretar o próprio tempo "),
                 ("l", "exige "),
                 ("g", "repertório.")],
@@ -208,39 +202,6 @@ def anel_svg(parte: int, total: int, n: str, de: str, claro=False) -> str:
             f'font-weight="500" letter-spacing=".1em">{de}</text></svg>')
 
 
-def ponto_na_moldura(feito: float):
-    """Onde o traço parou, andando o perímetro no sentido dos ponteiros."""
-    x, y, w, h = MOLDURA
-    trechos = [((x, y), (x + w, y)), ((x + w, y), (x + w, y + h)),
-               ((x + w, y + h), (x, y + h)), ((x, y + h), (x, y))]
-    andado = 0.0
-    for (x1, y1), (x2, y2) in trechos:
-        tam = abs(x2 - x1) + abs(y2 - y1)
-        if andado + tam >= feito:
-            t = (feito - andado) / tam
-            return x1 + (x2 - x1) * t, y1 + (y2 - y1) * t
-        andado += tam
-    return x, y
-
-
-def moldura_svg(i: int, total: int, claro: bool) -> str:
-    cor = "#9b6b26" if claro else "#f0b855"
-    x, y, w, h = MOLDURA
-    perimetro = 2 * (w + h)
-    feito = perimetro * (i + 1) / total
-    px, py = ponto_na_moldura(feito)
-    return ('<div class="moldura"><svg viewBox="0 0 1080 1440" '
-            'xmlns="http://www.w3.org/2000/svg">'
-            # o quadro inteiro, quase apagado: dá a promessa do que falta
-            f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="none" '
-            f'stroke="{cor}" stroke-opacity=".16" stroke-width="2"/>'
-            # o trecho já percorrido
-            f'<path d="M{x} {y}H{x+w}V{y+h}H{x}Z" fill="none" stroke="{cor}" '
-            f'stroke-width="3" stroke-dasharray="{feito:.0f} {perimetro}"/>'
-            f'<circle cx="{px:.0f}" cy="{py:.0f}" r="9" fill="{cor}"/>'
-            '</svg></div>')
-
-
 def titulo_html(partes) -> str:
     return ('<h2 class="titulo">'
             + "".join(f'<span class="{k}">{_html.escape(t)}</span>'
@@ -267,6 +228,10 @@ def bloco_html(s: dict) -> str:
             f'<p class="r">{_html.escape(r)}</p></div>'
             for i, r, dest in s["cartoes"])
         p.append(f'<div class="cartoes">{cs}</div>')
+    if s.get("figura"):
+        p.append('<div class="fig">'
+                 + figuras.FIGURAS[s["figura"]](s["fundo"] == "claro")
+                 + '</div>')
     if s.get("citacao"):
         txt, ref = s["citacao"]
         p.append(f'<div class="citacao"><p>{_html.escape(txt)}</p>'
@@ -301,7 +266,7 @@ def slide_html(s: dict, i: int, logo: str, simbolo: str) -> str:
                if s.get("numeral") else "")
     return (f'<section class="slide {s["fundo"]}" data-i="{i}">'
             + fundo + numeral
-            + moldura_svg(i, len(T), claro)
+            + f'<div class="placar">{figuras.placar(s["placar"], claro)}</div>'
             + bloco_html(s)
             + f'<div class="logo"><div>{logo}</div></div></section>')
 

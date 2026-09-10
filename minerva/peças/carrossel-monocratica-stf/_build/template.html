@@ -28,8 +28,8 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;
 .foto img{width:100%;height:100%;object-fit:cover;display:block}
 .foto::after{content:"";position:absolute;inset:0;
   background:linear-gradient(180deg,
-    rgba(4,16,27,.30) 0%, rgba(4,16,27,.18) 26%, rgba(4,16,27,.62) 47%,
-    rgba(4,16,27,.93) 66%, #04101b 84%)}
+    rgba(4,16,27,.34) 0%, rgba(4,16,27,.10) 30%, rgba(4,16,27,.30) 52%,
+    rgba(4,16,27,.80) 70%, rgba(4,16,27,.97) 86%)}
 
 /* grafismo da marca, só quando não há foto */
 .marca-fundo{position:absolute;top:-150px;right:-180px;width:560px;opacity:.13;
@@ -43,11 +43,12 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;
   color:transparent;-webkit-text-stroke:2px rgba(155,107,38,.42)}
 .escuro .numeral{-webkit-text-stroke-color:rgba(240,184,85,.22)}
 
-/* ============ a moldura que se completa ============
-   Vive na borda, fora da área de conteúdo: nunca disputa espaço com o texto,
-   que era o problema da linha atravessando a tela. */
-.moldura{position:absolute;inset:0;z-index:2;pointer-events:none}
-.moldura svg{width:100%;height:100%;display:block}
+/* ============ o placar do caso ============
+   O mesmo objeto em todas as telas, na mesma posição, mudando de estado.
+   É ele que liga uma tela à outra, e de quebra é informação: o leitor sempre
+   sabe em que ponto do caso está. */
+.placar{position:absolute;left:80px;right:80px;top:64px;z-index:3}
+.placar svg{width:100%;height:auto;display:block}
 
 /* ================= conteúdo ================= */
 .bloco{position:absolute;left:0;right:0;z-index:3;padding:0 80px;
@@ -105,6 +106,10 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;
 .cartoes .c.destaque{border-color:var(--bronze);border-width:1.5px}
 .escuro .cartoes .c.destaque{border-color:var(--gold);
   background:rgba(240,184,85,.08)}
+
+/* figura: diagrama dentro do bloco de conteúdo */
+.fig{margin:.4em 0 0}
+.fig svg{width:100%;height:auto;display:block}
 
 /* citação: bloco de decisão judicial */
 .citacao{margin:.42em 0 0;padding:.26em .3em;border-left:3px solid var(--gold);

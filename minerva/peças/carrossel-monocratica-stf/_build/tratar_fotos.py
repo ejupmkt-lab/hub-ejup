@@ -27,7 +27,15 @@ DEST = HERE / "duotone"
 SOMBRA, LUZ = (3, 14, 26), (126, 156, 186)
 
 ORIGEM = "arcada.jpg"
-FATIAS = 5                      # telas escuras
+FATIAS = 4                      # telas escuras que recebem fatia da arcada
+
+# A continuidade se rompe uma vez, de propósito, na tela do Senado: ali entra
+# outro edifício, porque ali o texto fala de outro Poder. O corte respeita a
+# altura cheia do original, sem decepar as torres.
+AVULSA = "congresso.jpg"
+# recorte da avulsa em fração da altura: sem isso as torres caem no rodapé da
+# tela, atrás do texto, e o prédio deixa de ser reconhecível
+JANELA_AVULSA = (0.34, 1.00)
 LARG, ALT = 1080, 1440
 # Janela recortada do original, em fração (x0, x1, y0, y1). O corte em x
 # termina antes da borda direita para deixar de fora a grade com um crucifixo:
@@ -64,6 +72,17 @@ def main() -> None:
         pedaco.save(saida, "WEBP", quality=88, method=6)
         print(f"  {saida.name}: {pedaco.size} "
               f"({saida.stat().st_size/1024:.0f} KB)")
+
+    av = Image.open(FOTOS / AVULSA).convert("RGB")
+    ay0, ay1 = JANELA_AVULSA
+    av = av.crop((0, int(av.height * ay0), av.width, int(av.height * ay1)))
+    esc = ALT / av.height
+    av = av.resize((round(av.width * esc), ALT), Image.LANCZOS)
+    esq = (av.width - LARG) // 2
+    av = duotone(av.crop((esq, 0, esq + LARG, ALT)))
+    saida = DEST / "congresso.webp"
+    av.save(saida, "WEBP", quality=88, method=6)
+    print(f"  {saida.name}: {av.size} ({saida.stat().st_size/1024:.0f} KB)")
 
 
 if __name__ == "__main__":
