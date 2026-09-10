@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
-"""Converte as fotos para duotone navy e grava em WebP.
+"""Corta UMA fotografia em cinco fatias, uma por tela escura.
 
-A foto entra na peça como matéria da marca, não como imagem crua: vira duotone
-sobre a primária. É o mesmo tratamento do carrossel de superendividamento, que
-foi aprovado, e é o que permite foto de banco conviver com a paleta de oito
-cores sem inventar cor nova.
+O carrossel inteiro roda sobre uma imagem só. As telas escuras são recortes
+consecutivos dela, na ordem, então passar o dedo é **percorrer a fotografia**:
+a arcada continua de uma tela para a seguinte, e o ponto de fuga cai no meio
+do argumento. As telas claras entram como pausas, e quando o escuro volta a
+imagem retoma de onde parou.
+
+É o mesmo princípio da tela única de 15.120px do carrossel de
+superendividamento, que foi aprovado, mas resolvido de outro jeito: lá uma
+curva desenhada atravessava as telas; aqui é a própria fotografia que
+atravessa.
+
+A conta que torna isso possível: cinco telas escuras somam 5400×1440. O
+original tem 6000×4000, então a faixa sai por **redução**, sem esticar pixel.
 """
 import pathlib
 
@@ -14,64 +23,47 @@ HERE = pathlib.Path(__file__).resolve().parent
 FOTOS = HERE.parent / "fotos"
 DEST = HERE / "duotone"
 
-# sombra e luz do duotone: navy profundo até um azul-prata claro
-SOMBRA, LUZ = (3, 16, 30), (168, 198, 224)
+# luz baixa de propósito: a faixa é fundo, e o texto vive por cima
+SOMBRA, LUZ = (3, 14, 26), (126, 156, 186)
 
-# largura de saída por uso: fundo sangrado precisa cobrir 1080 de largura;
-# caixa de imagem ocupa a coluna útil de 920
-# tudo sangrado agora: no sistema aprovado a foto ocupa a tela inteira e o
-# scrim escurece só a parte de baixo
-ALVOS = {"colunas": (1080, 1440), "congresso": (1080, 1440),
-         "congresso2": (1080, 1440), "acervo": (1080, 1440)}
-
-# recorte relativo aplicado ANTES do enquadramento, quando a foto inteira não
-# serve. `declaracao` precisa: o formulário original está de cabeça para baixo
-# e em inglês, então fecha-se na mão e na caneta, onde não se lê texto.
-RECORTE = {}
-
-# quanto do duotone entra. 1 = duotone puro. A vegetação fica irreconhecível
-# em duotone cheio (parece floresta congelada), então ela mistura com o
-# original e mantém o verde suficiente para ler como mata.
-MISTURA = {}
+ORIGEM = "arcada.jpg"
+FATIAS = 5                      # telas escuras
+LARG, ALT = 1080, 1440
+# Janela recortada do original, em fração (x0, x1, y0, y1). O corte em x
+# termina antes da borda direita para deixar de fora a grade com um crucifixo:
+# símbolo religioso não entra em peça sobre o Supremo. O corte em y mantém as
+# arcadas e o ponto de fuga e descarta o piso vazio.
+JANELA = (0.00, 0.84, 0.05, 0.52)
 
 
-def duotone(im: Image.Image, mistura: float = 1.0) -> Image.Image:
-    cinza = ImageOps.grayscale(im)
-    # leve compressão de contraste antes de tingir: duotone em imagem muito
-    # contrastada estoura a luz e perde o meio-tom
-    cinza = ImageOps.autocontrast(cinza, cutoff=(1, 3))
-    tingida = ImageOps.colorize(cinza, black=SOMBRA, white=LUZ)
-    if mistura >= 1:
-        return tingida
-    return Image.blend(im, tingida, mistura)
-
-
-def cobrir(im: Image.Image, w: int, h: int) -> Image.Image:
-    escala = max(w / im.width, h / im.height)
-    im = im.resize((round(im.width * escala), round(im.height * escala)),
-                   Image.LANCZOS)
-    esq = (im.width - w) // 2
-    topo = int((im.height - h) * 0.35)      # 0.35: privilegia o terço superior
-    return im.crop((esq, topo, esq + w, topo + h))
+def duotone(im: Image.Image) -> Image.Image:
+    cinza = ImageOps.autocontrast(ImageOps.grayscale(im), cutoff=(1, 3))
+    return ImageOps.colorize(cinza, black=SOMBRA, white=LUZ)
 
 
 def main() -> None:
     DEST.mkdir(exist_ok=True)
-    for nome, (w, h) in ALVOS.items():
-        orig = FOTOS / f"{nome}.jpg"
-        if not orig.exists():
-            print(f"ausente: {orig.name}")
-            continue
-        im = Image.open(orig).convert("RGB")
-        if nome in RECORTE:
-            x0, y0, x1, y1 = RECORTE[nome]
-            im = im.crop((int(im.width * x0), int(im.height * y0),
-                          int(im.width * x1), int(im.height * y1)))
-        im = duotone(im, MISTURA.get(nome, 1.0))
-        im = cobrir(im, w, h)
-        saida = DEST / f"{nome}.webp"
-        im.save(saida, "WEBP", quality=86, method=6)
-        print(f"{saida.name}: {w}×{h} ({saida.stat().st_size/1024:.0f} KB)")
+    im = Image.open(FOTOS / ORIGEM).convert("RGB")
+    x0, x1, y0, y1 = JANELA
+    faixa = im.crop((int(im.width * x0), int(im.height * y0),
+                     int(im.width * x1), int(im.height * y1)))
+
+    alvo_l, alvo_a = LARG * FATIAS, ALT
+    escala = max(alvo_l / faixa.width, alvo_a / faixa.height)
+    faixa = faixa.resize((round(faixa.width * escala),
+                          round(faixa.height * escala)), Image.LANCZOS)
+    esq = (faixa.width - alvo_l) // 2
+    topo = (faixa.height - alvo_a) // 2
+    faixa = faixa.crop((esq, topo, esq + alvo_l, topo + alvo_a))
+    faixa = duotone(faixa)
+    print(f"faixa contínua: {faixa.width}×{faixa.height}")
+
+    for i in range(FATIAS):
+        pedaco = faixa.crop((i * LARG, 0, (i + 1) * LARG, ALT))
+        saida = DEST / f"pan{i + 1}.webp"
+        pedaco.save(saida, "WEBP", quality=88, method=6)
+        print(f"  {saida.name}: {pedaco.size} "
+              f"({saida.stat().st_size/1024:.0f} KB)")
 
 
 if __name__ == "__main__":

@@ -10,6 +10,21 @@ python3 _build/tratar_fotos.py && python3 _build/gerar.py && python3 _build/rend
 Retrata a situação em **10/09/2026**. O Plenário do STF decide em **15/09**.
 Depois dessa data a peça está vencida: ou sai antes, ou é refeita.
 
+## O dispositivo: uma foto só, cortada em cinco
+As telas escuras são **fatias consecutivas da mesma fotografia**, na ordem em
+que aparecem. Passar o dedo é percorrer a imagem: a arcada continua de uma
+tela para a seguinte e o ponto de fuga cai no meio do argumento, na tela que
+diz que quem corrige o individual é o coletivo. As telas claras entram como
+pausas, e quando o escuro volta a fotografia retoma de onde parou.
+
+É o princípio da tela única de 15.120px do carrossel de superendividamento
+(aprovado), resolvido de outro jeito: lá uma curva desenhada atravessava as
+telas, aqui é a própria fotografia que atravessa.
+
+Vantagem de produção, além da estética: **acaba o banco de imagens avulsas**.
+Uma peça, uma foto, zero risco de repetir imagem que já rodou em outro
+carrossel.
+
 ## Postura editorial
 Descreve o mecanismo processual, sem defender resultado e sem atribuir
 motivo a ministro nenhum. Os verbos são os dos autos: afastou, reintegrou,

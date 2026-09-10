@@ -38,7 +38,7 @@ MOLDURA = (44, 44, 992, 1352)      # x, y, largura, altura
 
 T = [
     # ---------------------------------------------------------------- 1
-    {"fundo": "escuro", "foto": "colunas", "ancora": "abaixo",
+    {"fundo": "escuro", "foto": "pan", "ancora": "abaixo",
      "titulo": [("k", "Em 48 horas, três ministros do STF decidiram sobre o "
                       "mesmo cargo. "),
                 ("l", "O desempate não coube a "),
@@ -66,7 +66,7 @@ T = [
      "fecho": "Nos comentários, uma frase se repetiu."},
 
     # ---------------------------------------------------------------- 3
-    {"fundo": "escuro", "foto": "congresso", "ancora": "abaixo",
+    {"fundo": "escuro", "foto": "pan", "ancora": "abaixo",
      "titulo": [("k", "“Um ministro não pode anular a decisão do outro. "),
                 ("g", "Isso é papel do Senado.”")],
      "corpo": ["A primeira metade da frase está certa, e é exatamente o que a "
@@ -89,7 +89,7 @@ T = [
      "fecho": "Dentro do tribunal, então, o que corrige uma monocrática?"},
 
     # ---------------------------------------------------------------- 5
-    {"fundo": "escuro", "foto": "colunas", "ancora": "abaixo",
+    {"fundo": "escuro", "foto": "pan", "ancora": "abaixo",
      "titulo": [("k", "Num tribunal colegiado, "),
                 ("l", "quem corrige o individual é "),
                 ("g", "o coletivo.")],
@@ -115,7 +115,7 @@ T = [
      "fecho": "Foi o segundo caminho que se abriu primeiro."},
 
     # ---------------------------------------------------------------- 7
-    {"fundo": "escuro", "foto": "congresso2", "ancora": "abaixo",
+    {"fundo": "escuro", "foto": "pan", "ancora": "abaixo",
      "titulo": [("k", "A Presidência suspendeu as duas decisões "),
                 ("l", "e devolveu a palavra a "),
                 ("g", "quem decide junto.")],
@@ -143,7 +143,7 @@ T = [
               "caso."},
 
     # ---------------------------------------------------------------- 9
-    {"fundo": "escuro", "foto": "acervo", "ancora": "abaixo",
+    {"fundo": "escuro", "foto": "pan", "ancora": "abaixo",
      "titulo": [("k", "Interpretar o próprio tempo "),
                 ("l", "exige "),
                 ("g", "repertório.")],
@@ -289,6 +289,10 @@ def bloco_html(s: dict) -> str:
 def slide_html(s: dict, i: int, logo: str, simbolo: str) -> str:
     claro = s["fundo"] == "claro"
     fundo = ""
+    if s.get("foto") == "pan":
+        # a enésima tela escura recebe a enésima fatia da faixa
+        ordem = [j for j, t in enumerate(T) if t.get("foto") == "pan"]
+        s = dict(s, foto=f"pan{ordem.index(i) + 1}")
     if s.get("foto") and duo(s["foto"]):
         fundo = f'<div class="foto"><img src="{duo(s["foto"])}" alt=""></div>'
     elif not claro:

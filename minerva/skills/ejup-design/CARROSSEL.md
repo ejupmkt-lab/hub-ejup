@@ -52,6 +52,23 @@ estrutura está inteira; o quadro fechando é essa tese em forma.
 Vantagem prática, além do sentido: vivendo na borda, fora da área de conteúdo,
 ele nunca disputa espaço com o texto.
 
+## 6b. Uma foto só, cortada em fatias
+O jeito mais forte de ligar as telas: **uma fotografia recortada em pedaços
+consecutivos**, um por tela escura. Passar o dedo vira percorrer a imagem.
+
+A conta: N telas de 1080 somam N×1080 de largura. Baixar a foto em **tamanho
+original** (o CDN do Pexels entrega 6000px+ sem parâmetro de largura) e cortar
+a faixa por redução, nunca esticando. Cinco telas cabem folgado num original
+de 6000.
+
+Escolher foto com **estrutura horizontal** (arcada, colunata, fachada, vista
+aérea): panorâmica de assunto, não só de formato. E conferir a faixa inteira
+antes de fatiar, procurando o que não pode entrar — na peça do STF havia um
+crucifixo na borda direita, e o corte em x parou antes dele.
+
+Benefício de produção: acaba o banco de imagens avulsas e o risco de repetir
+foto entre carrosséis.
+
 ## 7. Dado grande vira anel
 Percentual vai em **anel** (donut) com o número dentro, arco dourado sobre
 trilha em aço, e a fonte em caixa alta pequena embaixo. Número solto no meio
