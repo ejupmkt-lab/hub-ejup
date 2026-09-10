@@ -50,19 +50,18 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;
    estado: uma ordem, duas ordens em choque, as duas congeladas, uma só no fim.
    Não há foto e não há alternância claro/escuro: a composição evolui. */
 .palco{position:absolute;left:0;right:0;z-index:1}
-.painel{position:absolute;width:560px;height:360px;padding:34px 38px;
+.painel{position:absolute;width:520px;height:340px;padding:32px 36px;
   border:2px solid rgba(209,211,212,.42);background:rgba(48,69,87,.42);
   backdrop-filter:blur(2px);display:flex;flex-direction:column;
   justify-content:space-between}
-.painel.a{transform:rotate(-2.4deg)}
-.painel.b{transform:rotate(2.2deg);background:rgba(209,211,212,.10)}
+.painel.b{background:rgba(209,211,212,.10)}
 .painel.ouro{border-color:var(--gold);background:rgba(8,32,58,.96);
   box-shadow:0 24px 60px rgba(3,14,26,.55)}
 .painel.apagado{opacity:.36}
 .painel .car{font-weight:500;font-size:20px;letter-spacing:.2em;
   text-transform:uppercase;color:var(--gold)}
 .painel.apagado .car{color:var(--silver)}
-.painel .verbo{font-weight:900;font-size:76px;line-height:1;letter-spacing:-.03em}
+.painel .verbo{font-weight:900;font-size:72px;line-height:1;letter-spacing:-.03em}
 .painel .de{font-weight:300;font-size:22px;color:var(--silver);margin-top:8px}
 .painel .selo{position:absolute;right:26px;top:26px;width:54px;height:54px;
   border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;
@@ -129,6 +128,30 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;
 .logo div{width:244px}
 .logo svg{width:100%;height:auto;display:block}
 .logo path{fill:#fff !important}
+
+/* ============ tela clara ============ */
+.slide.claro{background:#f3f1ec;color:var(--navy)}
+.slide.claro::before{opacity:.06}
+.claro .titulo .k{color:var(--navy)}
+.claro .titulo .l{color:var(--graphite)}
+.claro .titulo .g{color:var(--bronze)}
+.claro .corpo{color:var(--graphite)}
+.claro .corpo b{color:var(--navy)}
+.claro .fecho{color:var(--navy)}
+.claro .fecho b{color:var(--bronze)}
+.claro .painel{border-color:rgba(65,64,66,.4);background:rgba(48,69,87,.05);
+  backdrop-filter:none}
+.claro .painel.apagado{opacity:.7}
+.claro .painel .car,.claro .painel.apagado .car{color:var(--bronze)}
+.claro .painel .verbo{color:var(--navy)}
+.claro .painel .de{color:var(--gray)}
+.claro .painel .selo{border-color:var(--bronze);color:var(--bronze)}
+.claro .choque{background:repeating-linear-gradient(135deg,rgba(155,107,38,.6) 0 3px,
+  transparent 3px 14px)}
+.claro .tag{color:var(--bronze)}
+.claro .tag.cinza{color:var(--gray)}
+.claro .hair{background:rgba(65,64,66,.25)}
+.claro .logo path{fill:var(--navy) !important}
 </style></head>
 <body>
 __SLIDES__

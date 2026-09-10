@@ -10,23 +10,17 @@ python3 _build/tratar_fotos.py && python3 _build/gerar.py && python3 _build/rend
 Retrata a situação em **10/09/2026**. O Plenário do STF decide em **15/09**.
 Depois dessa data a peça está vencida: ou sai antes, ou é refeita.
 
-## O dispositivo: as camadas
-Cada decisão é um painel translúcido, e a composição evolui de tela em tela:
-uma ordem entra pela borda (1) · duas se cruzam e a zona do cruzamento fica
-hachurada (2) · a frase popular passa por cima das duas, apagadas (3) ·
-Senado e tribunal em duas colunas, pessoa de um lado, ato do outro (4) · o
-colegiado de onze assentos cerca a decisão individual (5) · três caminhos
-saem da pilha (6) · a Presidência congela as duas numa moldura tracejada (7)
-· a pilha se recolhe atrás de um painel dourado único, o Plenário (8) · o
-caso fica arquivado, alinhado (9).
+## O dispositivo: os cards atravessam a borda
+Cada decisão é um card de 520×340, sempre na mesma grade, sem rotação. A
+ligação entre telas é o card **cruzando a borda**: sai cortado pela direita
+de uma tela (x = 820) e entra pela esquerda da seguinte (x = −260), na mesma
+altura. Acontece quatro vezes, onde a história passa o bastão: AFASTA (1→2),
+REINTEGRA (2→3), SUSPENDE (6→7) e PLENÁRIO (8→9). Na fita, o carrossel lê
+como uma tira contínua.
 
-As fotos entram como camada de fundo nas telas 1, 3, 7 e 9 (alto da tela,
-dissolvendo no navy antes do texto), como caixas por coluna na 4 e dentro do
-painel dourado na 8. As telas 2, 5 e 6 são só desenho: linha do tempo, o
-círculo dos onze assentos e os três caminhos, em SVG gerado no próprio
-`_build/gerar.py`. Sem alternância mecânica claro/escuro: a foto aparece onde
-o argumento a pede (a Justiça diante do STF, o Congresso quando a frase fala
-de outro Poder, a sessão plenária quando a Presidência convoca o colegiado).
+Ritmo de fundo: foto (1) · desenho (2) · **branco** (3, a frase popular) ·
+caixas de foto (4) · desenho (5, 6) · **uma foto da sessão plenária dividida
+ao meio** (7 e 8) · foto (9). Desenhos em SVG no próprio `_build/gerar.py`.
 
 Fotos e licenças em `fotos/CREDITOS.md`. Crédito vai na legenda do post.
 `_build/figuras.py` é da versão anterior.

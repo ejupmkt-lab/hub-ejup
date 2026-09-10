@@ -73,7 +73,7 @@ def caixa(nome, x, y, w, h):
 def painel(nome, x, y, cls="a", escala=1.0, selo=None, rot=None,
            vazio=False, foto=None):
     car, verbo, de = PAINEIS[nome]
-    ang = {"a": -2.4, "b": 2.2}.get(cls.split()[0], 0) if rot is None else rot
+    ang = 0 if rot is None else rot
     selo_html = f'<div class="selo">{selo}</div>' if selo else ""
     if vazio:  # folha atrás da pilha: só a borda, sem texto
         return (f'<div class="painel {cls}" style="left:{x}px;top:{y}px;'
@@ -121,10 +121,11 @@ def congela(x, y, w, h, rot):
 
 
 # ---------------------------------------------------------------- figuras
-def linha_do_tempo():
+def linha_do_tempo(px=80, py=1060, w=920):
     """Quatro movimentos numa régua; a chave de 48 h cobre os três primeiros."""
-    w, h = 920, 150
-    xs = [60, 320, 580, 830]
+    h = 150
+    passo = (w - 120) / 3
+    xs = [60 + i * passo for i in range(4)]
     nomes = [("afasta", "1ª monocrática"), ("reintegra", "2ª monocrática"),
              ("suspende as duas", "Presidência"), ("Plenário", "15 de setembro")]
     y = 78
@@ -147,7 +148,7 @@ def linha_do_tempo():
     s.append(f'<text x="{(xs[0] + xs[2]) / 2}" y="14" text-anchor="middle" '
              f'fill="{GOLD}" font-family="Gotham" font-weight="500" '
              f'font-size="17" letter-spacing="3">48 HORAS</text>')
-    return fio(80, 1060, w, h, "".join(s))
+    return fio(px, py, w, h, "".join(s))
 
 
 def pessoa(x, y):
@@ -201,9 +202,14 @@ def tres_caminhos(y0):
             ("2", "PRESIDÊNCIA", "ordena o andamento do processo"),
             ("3", "PREVENÇÃO", "define quem é o relator do caso")]
     s = []
-    x0, x1 = 340, 560
-    ys = [70, 230, 390]
+    x0, x1 = 340, 440
+    ys = [70, 170, 420]
     for (n, t, d), y in zip(dest, ys):
+        if n == "2":  # o traço chega ao card que sai pela borda
+            s.append(f'<path d="M{x0} 230 C {x0 + 160} 230, {SAI - 80 - 160} '
+                     f'{y}, {SAI - 80} {y}" fill="none" stroke="{GOLD}" '
+                     f'stroke-width="2"/>')
+            continue
         s.append(f'<path d="M{x0} 230 C {x0 + 120} 230, {x1 - 120} {y}, '
                  f'{x1} {y}" fill="none" stroke="{GOLD}" stroke-width="2"/>')
         s.append(f'<circle cx="{x1}" cy="{y}" r="7" fill="{GOLD}"/>')
@@ -217,27 +223,29 @@ def tres_caminhos(y0):
 
 
 # ---------------------------------------------------------------- telas
-# Telas 1, 3, 7 e 9: foto no alto, texto embaixo, os painéis sobre a foto.
-# Tela 4: uma caixa de foto por coluna. Tela 8: a foto dentro do painel.
-# Telas 2, 5 e 6: só desenho.
+# Grade: cards de 520×340, sem rotação, sempre nas mesmas linhas (y = 300,
+# 470, 610). A conexão entre telas é o card ATRAVESSANDO a borda: sai cortado
+# à direita (x = 820) e entra pela esquerda da tela seguinte (x = -260).
+# Telas 7 e 8 dividem uma única fotografia da sessão plenária.
+SAI, ENTRA = 820, -260
+
+
 def palco_1():
     return [foto("estatua"),
-            tag("A primeira camada", 66, 300, cinza=True),
-            painel("afasta", 60, 336, "a", .8, selo="1")]
+            tag("A primeira camada", SAI, 264, cinza=True),
+            painel("afasta", SAI, 300, "a", selo="1")]
 
 
 def palco_2():
-    return [painel("afasta", 80, 470, "a", selo="1"),
-            painel("reintegra", 440, 680, "b", selo="2"),
-            choque(442, 690, 196, 140),
-            linha_do_tempo()]
+    return [painel("afasta", ENTRA, 300, "a", selo="1"),
+            painel("reintegra", SAI, 610, "b", selo="2"),
+            linha_do_tempo(80, 990, 920)]
 
 
 def palco_3():
-    return [foto("congresso"),
-            painel("afasta", 60, 400, "a apagado", .8),
-            painel("reintegra", 400, 520, "b apagado", .8),
-            choque(402, 526, 108, 96, .45)]
+    return [painel("reintegra", ENTRA, 610, "b apagado", selo="2"),
+            painel("afasta", 140, 700, "a apagado", selo="1"),
+            choque(140, 700, 120, 250)]
 
 
 def palco_4():
@@ -248,45 +256,45 @@ def palco_4():
                     "responsabilidade. Nada diz sobre a decisão.", 100, 860, 380),
             caixa("tribunal", 580, 552, 420, 468),
             tag("Tribunal", 580, 500),
-            painel("afasta", 610, 600, "a apagado", .45),
-            painel("reintegra", 690, 670, "b", .45),
+            painel("afasta", 604, 600, "a apagado", .45),
+            painel("reintegra", 680, 680, "b", .45),
             legenda("O ato", "Revisa o conteúdo da decisão pelas vias do "
                     "próprio processo.", 600, 860, 380)]
 
 
 def palco_5():
     return [colegiado(540, 730, 215),
-            painel("afasta", 425, 685, "a", .42, rot=-2.4)]
+            painel("afasta", 431, 659, "a", .42)]
 
 
 def palco_6():
-    return [painel("afasta", 70, 640, "a apagado", .48),
-            painel("reintegra", 110, 700, "b apagado", .48),
-            tres_caminhos(520)]
+    return [painel("afasta", 80, 600, "a apagado", .48),
+            painel("reintegra", 120, 660, "b apagado", .48),
+            tres_caminhos(520),
+            painel("suspende", SAI, 470, "a", selo="P")]
 
 
 def palco_7():
-    return [foto("sessao"),
-            congela(64, 476, 952, 326, "Suspensas · Presidência"),
-            painel("afasta", 100, 500, "a apagado", .6, selo="1"),
-            painel("reintegra", 470, 570, "b apagado", .6, selo="2"),
-            choque(472, 574, 62, 60, .5)]
+    return [foto("sessao-esq"),
+            painel("suspende", ENTRA, 470, "a", selo="P"),
+            congela(300, 470, 716, 340, "Suspensas"),
+            painel("afasta", 330, 500, "a apagado", .5, selo="1"),
+            painel("reintegra", 650, 590, "b apagado", .5, selo="2")]
 
 
 def palco_8():
-    return [painel("afasta", 230, 400, "apagado", .85, rot=0, vazio=True),
-            painel("reintegra", 266, 436, "apagado", .85, rot=0, vazio=True),
-            painel("plenario", 302, 472, "ouro", .85, rot=0, foto="plenario")]
+    return [foto("sessao-dir"),
+            painel("afasta", SAI - 36, 404, "apagado", vazio=True),
+            painel("reintegra", SAI - 18, 422, "apagado", vazio=True),
+            painel("plenario", SAI, 440, "ouro")]
 
 
 def palco_9():
-    p = [foto("fachada")]
-    for i, n in enumerate(("afasta", "reintegra", "suspende")):
-        p.append(painel(n, 420 + i * 22, 300 + i * 22, "apagado", .6, rot=0,
-                        vazio=True))
-    p.append(painel("plenario", 486, 366, "ouro", .6, rot=0))
-    p.append(tag("O caso, em 10 · 09 · 2026", 80, 430, cinza=True))
-    return p
+    return [foto("fachada"),
+            painel("afasta", ENTRA - 36, 404, "apagado", vazio=True),
+            painel("reintegra", ENTRA - 18, 422, "apagado", vazio=True),
+            painel("plenario", ENTRA, 440, "ouro"),
+            tag("O caso, em 10 · 09 · 2026", 300, 470, cinza=True)]
 
 
 T = [
@@ -310,7 +318,7 @@ T = [
               "fecho": "Nos comentários, uma frase se repetiu."}},
 
     # ---------------------------------------------------------------- 3
-    {"ancora": "base", "max": 440, "palco": palco_3,
+    {"fundo": "claro", "ancora": "topo", "max": 470, "palco": palco_3,
      "titulo": [("k", "“Um ministro não pode anular a decisão do outro. "),
                 ("g", "Isso é papel do Senado.”")],
      "corpo": ["A primeira metade da frase está certa, e é exatamente o que a "
@@ -354,7 +362,7 @@ T = [
               "fecho": "Foi o segundo caminho que se abriu primeiro."}},
 
     # ---------------------------------------------------------------- 7
-    {"ancora": "base", "max": 480, "palco": palco_7,
+    {"ancora": "base", "max": 440, "palco": palco_7,
      "titulo": [("k", "A Presidência suspendeu as duas decisões "),
                 ("l", "e devolveu a palavra a "),
                 ("g", "quem decide junto.")],
@@ -382,7 +390,7 @@ T = [
                        "a este caso."}},
 
     # ---------------------------------------------------------------- 9
-    {"ancora": "base", "max": 520, "palco": palco_9,
+    {"ancora": "base", "max": 490, "palco": palco_9,
      "titulo": [("k", "Interpretar o próprio tempo "),
                 ("l", "exige "),
                 ("g", "repertório.")],
@@ -443,7 +451,7 @@ def bloco_html(s: dict, ancora: str) -> str:
 
 
 def slide_html(s: dict, i: int, logo: str) -> str:
-    partes = [f'<section class="slide" data-i="{i}">',
+    partes = [f'<section class="slide {s.get("fundo", "")}" data-i="{i}">',
               '<div class="palco">', *s["palco"](), '</div>',
               bloco_html(s, s["ancora"])]
     if s.get("base"):

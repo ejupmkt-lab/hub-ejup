@@ -19,14 +19,16 @@ MISTURA = 0.5        # 0 = original · 1 = duotone puro
 # nome → (arquivo, janela em fração x0,y0,x1,y1, largura, altura de saída)
 USOS = {
     # tela 1: a Justiça de Ceschiatti diante do STF
-    "estatua": ("estatua.jpg", (0.00, 0.00, 0.86, 1.00), 1080, 900),
+    "estatua": ("estatua.jpg", (0.40, 0.02, 1.00, 1.00), 1080, 900),
     # tela 3: o Congresso, porque a frase popular aponta para outro Poder
     "congresso": ("congresso-alto.jpg", (0.08, 0.00, 0.92, 1.00), 1080, 860),
     # tela 4: duas caixas, uma por coluna
     "senado": ("senado-teto.jpg", (0.10, 0.05, 0.90, 0.95), 420, 460),
     "tribunal": ("plenario-vazio.jpg", (0.36, 0.10, 0.95, 0.95), 420, 460),
-    # tela 7: sessão plenária, sem a parede da direita (crucifixo)
-    "sessao": ("sessao.jpg", (0.00, 0.04, 0.76, 1.00), 1080, 780),
+    # telas 7 e 8: UMA foto da sessão plenária, cortada ao meio, uma metade
+    # por tela. Passar o dedo é percorrer a bancada. O corte em x para antes
+    # da parede com o crucifixo.
+    "sessao": ("sessao.jpg", (0.00, 0.04, 0.80, 1.00), 2160, 1000),
     # tela 8: dentro do painel dourado do Plenário
     "plenario": ("plenario-vazio.jpg", (0.05, 0.15, 0.95, 0.95), 560, 360),
     # tela 9: a fachada, ao fim do dia
@@ -56,6 +58,13 @@ def main() -> None:
     for nome, (arq, jan, w, h) in USOS.items():
         im = Image.open(FOTOS / arq).convert("RGB")
         out = tingir(recortar(im, jan, w, h))
+        if out.width > 1080:  # par de telas: fatia esquerda e direita
+            for lado, x in (("esq", 0), ("dir", 1080)):
+                saida = DEST / f"{nome}-{lado}.webp"
+                out.crop((x, 0, x + 1080, out.height)).save(
+                    saida, "WEBP", quality=86, method=6)
+                print(f"{saida.name}: {saida.stat().st_size/1024:.0f} KB")
+            continue
         saida = DEST / f"{nome}.webp"
         out.save(saida, "WEBP", quality=86, method=6)
         print(f"{saida.name}: {out.size} ({saida.stat().st_size/1024:.0f} KB)")
