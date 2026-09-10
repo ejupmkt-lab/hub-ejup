@@ -342,12 +342,52 @@ tentar.
 dos domínios de imprensa (exame, olhardigital, meioemensagem, propmark,
 timesbrasil, spacemoney).
 
-**Como liberar:** a política de rede é escolhida na criação do ambiente, em
-claude.ai/code. Editar o ambiente (ou criar outro) com política mais
-permissiva, ou com allowlist incluindo os domínios acima. Documentação:
-https://code.claude.com/docs/en/claude-code-on-the-web
+**Como liberar (passo a passo, conferido na documentação em 10/09/2026):**
 
-**Domínios que valem a pena pedir, por ordem de utilidade para a EJUP:**
+1. Abrir **claude.ai/code**.
+2. Na linha acima da caixa de mensagem, clicar no **ícone de nuvem** com o
+   nome do ambiente atual. Não existe página de configurações nem URL direta
+   para esse seletor.
+3. **Add cloud environment**, ou passar o mouse sobre o ambiente existente e
+   clicar no **ícone de engrenagem** que aparece à direita.
+4. No campo **Network access**, escolher **Custom**.
+5. Em **Allowed domains**, um domínio por linha.
+6. Marcar **Also include default list of common package managers**, senão só
+   valem os domínios listados e o resto quebra.
+7. **Create environment** (ou salvar, se for edição).
+
+Os quatro níveis: **None** (nada), **Trusted** (padrão, só a allowlist da
+Anthropic: registries, GitHub, SDKs), **Full** (qualquer domínio) e **Custom**
+(lista própria). `Full` resolve tudo de uma vez; `Custom` é o meio-termo
+recomendado.
+
+Dá para editar depois de criado, e a mudança vale para **sessões novas** —
+a sessão em andamento continua com a política com que começou.
+
+Documentação: https://code.claude.com/docs/en/cloud-environments
+
+**Lista pronta para colar em Allowed domains:**
+
+```
+upload.wikimedia.org
+commons.wikimedia.org
+*.wikimedia.org
+agenciabrasil.ebc.com.br
+*.ebc.com.br
+live.staticflickr.com
+www.flickr.com
+portal.stf.jus.br
+www.stf.jus.br
+images.unsplash.com
+cdn.pixabay.com
+images.pexels.com
+api.pexels.com
+www.conjur.com.br
+www.migalhas.com.br
+www.jota.info
+```
+
+**Por ordem de utilidade para a EJUP:**
 1. `upload.wikimedia.org` e `commons.wikimedia.org` — é onde vivem as fotos
    oficiais da Agência Brasil em domínio público e CC, incluindo plenário do
    STF, posses, sessões. Resolve o buraco de "foto institucional brasileira".
