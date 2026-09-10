@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<title>Carrossel — quem pode autorizar a quebra de cada sigilo</title>
+<style>
+__FONT_FACES__
+:root{
+  --navy:#031c37; --deep:#061424; --ink:#0d131a; --steel:#304557;
+  --graphite:#414042; --gray:#5f6062; --silver:#d1d3d4;
+  --gold:#f0b855; --bronze:#9b6b26; --papel:#f3f1ec;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#5b6169}
+body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;
+     font-family:'Gotham','Montserrat',system-ui,sans-serif}
+
+.slide{position:relative;width:1080px;height:1440px;overflow:hidden;color:#fff;
+  background:linear-gradient(168deg,#0a2a49 0%,#061a30 46%,#04101c 100%)}
+.slide::before{content:"";position:absolute;inset:0;z-index:0;opacity:.035;
+  mix-blend-mode:overlay;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>")}
+
+/* ============ fotografia, sempre embaixo ============ */
+.foto{position:absolute;left:0;bottom:0;width:1080px;z-index:0;overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 26%,#000 100%);
+  mask-image:linear-gradient(180deg,transparent 0%,#000 26%,#000 100%)}
+.foto img{display:block;width:100%;height:auto}
+.foto::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(4,16,28,.30) 0%,rgba(4,16,28,.18) 55%,
+             rgba(4,16,28,.92) 100%)}
+
+/* ============ O TRILHO ============
+   Três colunas fixas no alto de toda tela: quem pode autorizar. A coluna da
+   vez acende em dourado, as já percorridas ficam em prata, as que ainda vêm
+   ficam apagadas. É o mesmo objeto na mesma posição, mudando de estado, e no
+   fim ele vira o cabeçalho da tabela. */
+.trilho{position:absolute;left:80px;right:80px;top:108px;z-index:5;
+  display:flex;border-top:1px solid rgba(209,211,212,.28)}
+.trilho .col{flex:1;padding:16px 0 0;position:relative}
+.trilho .col b{display:block;font-weight:500;font-size:19px;letter-spacing:.16em;
+  text-transform:uppercase;color:rgba(209,211,212,.34)}
+.trilho .col small{display:block;margin-top:5px;font-weight:300;font-size:17px;
+  color:rgba(209,211,212,.26)}
+.trilho .col.visto b{color:rgba(209,211,212,.72)}
+.trilho .col.visto small{color:rgba(209,211,212,.5)}
+.trilho .col.ativo b{color:var(--gold)}
+.trilho .col.ativo small{color:rgba(240,184,85,.75)}
+.trilho .col.ativo::before,.trilho .col.visto::before{content:"";position:absolute;
+  left:0;top:-1px;width:76%;height:3px;background:var(--gold)}
+.trilho .col.visto::before{background:rgba(209,211,212,.5)}
+
+/* ============ a tabela ============ */
+.matriz{width:100%;border-collapse:collapse;margin:.34em 0 0}
+.matriz th,.matriz td{text-align:left;padding:.26em .2em;
+  border-bottom:1px solid rgba(255,255,255,.16);vertical-align:top}
+.matriz thead th{font-weight:500;font-size:.19em;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--gold);border-bottom-color:var(--gold)}
+.matriz tbody th{font-weight:700;font-size:.25em;line-height:1.24;width:32%}
+.matriz tbody th small{display:block;font-weight:300;font-size:.76em;
+  color:rgba(209,211,212,.8);margin-top:.14em}
+.matriz td{font-weight:300;font-size:.21em;line-height:1.42;
+  color:rgba(209,211,212,.9)}
+.matriz td i{font-style:normal;display:block;font-weight:400;font-size:1.15em;
+  line-height:1;margin-bottom:.16em;color:var(--gold)}
+.matriz td.nao i{color:rgba(209,211,212,.42)}
+.matriz td.nao{color:rgba(209,211,212,.45)}
+
+/* ============ os regimes (tela 2) ============ */
+.regimes{margin:.34em 0 0;border-top:1px solid rgba(255,255,255,.18)}
+.regimes .r{display:flex;gap:.3em;align-items:baseline;padding:.24em 0;
+  border-bottom:1px solid rgba(255,255,255,.18)}
+.regimes .r span.n{font-weight:900;font-size:.3em;color:var(--gold);min-width:1.1em}
+.regimes .r div{flex:1}
+.regimes .r b{display:block;font-weight:700;font-size:.27em;line-height:1.2}
+.regimes .r small{display:block;font-weight:300;font-size:.22em;line-height:1.4;
+  color:rgba(209,211,212,.85);margin-top:.1em}
+
+/* ============ texto ============ */
+.bloco{position:absolute;left:80px;right:80px;z-index:5;font-size:100px}
+.topo{top:230px}
+.meio{top:300px}
+.titulo{margin:0;font-size:.6em;line-height:1.12;letter-spacing:-.022em}
+.titulo .k{font-weight:900;color:#fff}
+.titulo .l{font-weight:300;color:rgba(255,255,255,.82)}
+.titulo .g{font-weight:900;color:var(--gold)}
+.corpo{margin:.3em 0 0;font-weight:300;font-size:.29em;line-height:1.58;
+  text-align:justify;color:rgba(209,211,212,.9)}
+.corpo b{font-weight:500;color:#fff}
+.fonte{margin:.22em 0 0;font-weight:500;font-size:.17em;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gold)}
+.fecho{margin:.32em 0 0;font-weight:500;font-size:.3em;line-height:1.36}
+.fecho b{color:var(--gold)}
+.pilula{margin:.38em 0 0;display:inline-flex;align-items:center;gap:.2em;
+  padding:.26em .36em;border-radius:999px;border:1px solid rgba(240,184,85,.55)}
+.pilula i{font-style:normal;color:var(--gold);font-size:.3em;line-height:1}
+.pilula span{font-weight:500;font-size:.26em}
+.assina{margin:.4em 0 0;padding-top:.24em;border-top:1px solid rgba(255,255,255,.2)}
+.assina .m{font-weight:500;font-size:.19em;letter-spacing:.24em;color:var(--gold)}
+.assina .s{margin-top:.08em;font-weight:300;font-size:.32em;line-height:1.26;
+  letter-spacing:-.012em}
+
+.logo{position:absolute;left:0;right:0;bottom:64px;z-index:5;display:flex;
+  justify-content:center}
+.logo div{width:244px}
+.logo svg{width:100%;height:auto;display:block}
+.logo path{fill:#fff !important}
+
+/* ============ tela clara ============ */
+.slide.claro{background:var(--papel);color:var(--navy)}
+.slide.claro::before{opacity:.05}
+.claro .titulo .k{color:var(--navy)}
+.claro .titulo .l{color:var(--graphite)}
+.claro .titulo .g{color:var(--bronze)}
+.claro .corpo{color:var(--graphite)}
+.claro .fonte{color:var(--bronze)}
+.claro .fecho{color:var(--navy)}
+.claro .trilho{border-top-color:rgba(65,64,66,.3)}
+.claro .trilho .col b{color:var(--navy)}
+.claro .trilho .col small{color:var(--gray)}
+.claro .trilho .col.visto::before,.claro .trilho .col.ativo::before{
+  background:var(--bronze)}
+.claro .matriz th,.claro .matriz td{border-bottom-color:rgba(65,64,66,.22)}
+.claro .matriz thead th{color:var(--bronze);border-bottom-color:var(--bronze)}
+.claro .matriz tbody th small{color:var(--gray)}
+.claro .matriz td{color:var(--graphite)}
+.claro .matriz td i{color:var(--bronze)}
+.claro .matriz td.nao,.claro .matriz td.nao i{color:rgba(95,96,98,.5)}
+.claro .logo path{fill:var(--navy) !important}
+</style></head>
+<body>
+__SLIDES__
+<script>
+for (const b of document.querySelectorAll('.bloco')) {
+  const max = +b.dataset.max || 9999;
+  let f = +b.dataset.base || 100;
+  b.style.fontSize = f + 'px';
+  while (b.getBoundingClientRect().height > max && f > 46) {
+    f -= 1; b.style.fontSize = f + 'px';
+  }
+  b.closest('.slide').dataset.escala = f;
+}
+</script>
+</body></html>
