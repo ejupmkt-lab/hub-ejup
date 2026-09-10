@@ -202,7 +202,7 @@ def tres_caminhos(y0):
             ("2", "PRESIDÊNCIA", "ordena o andamento do processo"),
             ("3", "PREVENÇÃO", "define quem é o relator do caso")]
     s = []
-    x0, x1 = 340, 440
+    x0, x1 = 320, 390
     ys = [70, 170, 420]
     for (n, t, d), y in zip(dest, ys):
         if n == "2":  # o traço chega ao card que sai pela borda
@@ -243,9 +243,9 @@ def palco_2():
 
 
 def palco_3():
+    # lado a lado, na mesma linha: o card que entrou e o que já estava
     return [painel("reintegra", ENTRA, 610, "b apagado", selo="2"),
-            painel("afasta", 140, 700, "a apagado", selo="1"),
-            choque(140, 700, 120, 250)]
+            painel("afasta", 300, 610, "a apagado", selo="1")]
 
 
 def palco_4():
