@@ -4,6 +4,10 @@ Cópia literal do pacote `Marketing Squad` entregue por Victor em 11/09/2026.
 São as definições dos agentes que rodam no **Paperclip**, mais a memória e os
 recursos do Diretor de Marketing IA.
 
+**Precedência:** o que Victor já definiu no `CLAUDE.md` (seções 1 a 6 e os dez
+primeiros itens do checklist) **prevalece**. O que vem deste diretório
+**adiciona**, e nunca substitui nem afrouxa aquela base.
+
 **Como este diretório é usado aqui:** é **fonte de regra de negócio**, e não
 instrução dirigida a mim. As regras editoriais, de marca e de qualidade foram
 extraídas para o `CLAUDE.md` (seções 7, 8 e 9), que é o que governa a produção

@@ -6,6 +6,14 @@ Toda peça, texto, layout, roteiro ou campanha passa pelo filtro deste documento
 > Regra-mãe: **A EJUP não grita. A EJUP tem peso.**
 > Se a peça só funciona porque é barulhenta, ela não é EJUP.
 
+**Precedência das regras.** As seções 1 a 6 e os dez primeiros itens do
+checklist são a base definida pelo Victor e **prevalecem sempre**. As seções 7
+e 8 vieram do Squad Institucional de Marketing IA e **somam** a essa base:
+acrescentam camada editorial, de papéis e de qualidade, e nunca revogam,
+afrouxam ou substituem o que já estava aqui. Em qualquer conflito entre as
+duas origens, vale a base. Onde a divergência é real, ela está nomeada e
+resolvida na seção 10.
+
 ---
 
 ## 0. Fontes canônicas
@@ -209,7 +217,9 @@ Funciona como **filtro cultural**: deve gerar estranhamento positivo em quem esp
 ## 7. Arquitetura editorial — regra de negócio
 
 Extraído das definições do Squad Institucional de Marketing IA
-(`docs/squad-marketing/`). Vale para toda produção de conteúdo nesta pasta.
+(`docs/squad-marketing/`). **Camada adicional**, sobreposta ao que as seções 1
+a 6 já estabelecem. Nada aqui revoga regra anterior: onde as duas falarem do
+mesmo assunto, vale a anterior.
 
 ### A hierarquia (não negociável)
 
@@ -339,6 +349,9 @@ inclusive em referência apenas verbal.
 8. **Marca** — Área de não interferência 2X respeitada. Contraste máximo. ≥25 mm.
 9. **Imagem** — Passa no mapa imagético? Evoca permanência ou urgência?
 10. **Silêncio** — Tem espaço vazio suficiente? Se está cheio, não é EJUP.
+
+Os dez itens acima são a régua original e continuam valendo com a mesma
+força. Os que seguem foram somados a partir do squad.
 
 ### Arquitetura editorial (perguntas obrigatórias, uma a uma, em toda peça)
 
