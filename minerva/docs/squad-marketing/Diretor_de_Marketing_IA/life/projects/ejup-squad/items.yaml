@@ -1,0 +1,51 @@
+---
+name: ejup-squad-state
+description: Estado atualizado do squad de marketing IA EJUP, com agentes existentes, hires pendentes e issues de onboarding
+metadata:
+  type: project
+---
+facts:
+  - id: ejup-squad-mae-EJUA-1
+    fact: "Issue-mãe do squad: [EJUA-1] Estruturar o Squad de Marketing IA da EJUP — status blocked, parent de todas as questions de onboarding e da Fase 2 (hires)."
+    status: active
+    captured_at: 2026-05-27
+  - id: ejup-projeto-onboarding
+    fact: "Projeto Paperclip: Onboarding (91a00cab-bea9-411c-890c-475bd65f5890)."
+    status: active
+    captured_at: 2026-05-27
+  - id: ejup-agente-ceo
+    fact: "Diretor de Marketing IA (CEO do squad): id 8960a048-3de7-4750-ab33-18b74c38e3a4 — eu."
+    status: active
+    captured_at: 2026-05-27
+  - id: ejup-agente-guardiao
+    fact: "Guardião da Marca EJUP: id 51f267c7-8d28-4e1b-b8bb-dddc48dbd9c0. Reporta ao Diretor. Custódia do Manual da Marca. Define Direção Criativa Institucional (DCI) por peça."
+    status: active
+    captured_at: 2026-05-27
+  - id: ejup-agente-estrategista
+    fact: "Estrategista de Conteúdo e Demanda EJUP: id 86cb01f3-af94-4ad1-945b-2eb16d7bcceb (hire 1/5 da Fase 2). Reporta ao Diretor. Dono do briefing estratégico (8 campos obrigatórios). Adapter claude_local, modelo claude-sonnet-4-6, ícone target."
+    status: active
+    captured_at: 2026-05-27
+  - id: ejup-estrategista-duplicado
+    fact: "Duplicata acidental do Estrategista por retry em chamada de API: id df95cbc7-2aad-4c1f-868a-0eed37c5fe29 com nome '[EJUP] Estrategista de Conteudo e Demanda 2'. Não consigo deletar (precisa board access). Pedido de cleanup pendente em EJUA-8."
+    status: needs_cleanup
+    captured_at: 2026-05-27
+  - id: ejup-fase-2-hires-pendentes
+    fact: "Hires 2/5 a 5/5 pendentes: Copywriter, Designer, Social Media Planner, Revisor de Qualidade. Todos vão compartilhar scaffolding do AGENTS.md (identidade de marca, voz, restrições não negociáveis, execution contract, linhas duras) com o Estrategista. Antes de replicar 4 vezes, recomendado board review do padrão."
+    status: active
+    captured_at: 2026-05-27
+  - id: ejup-fase-2-issue-umbrella
+    fact: "Umbrella da Fase 2: [EJUA-8] — criada em 2026-05-27. Auto-claimada por run paralelo 0cda2a37 quando criada com status=in_progress. Run paralelo deve dar continuidade aos hires e ao comentário de pattern review que eu não consegui postar do meu run."
+    status: active
+    captured_at: 2026-05-27
+  - id: ejup-peca-teste-tema
+    fact: "Tema da peça-teste interna: Tema A v3 — 'Advogadas multadas em R$ 84 mil por colar prompt oculto em petição. A pergunta não é sobre IA. É sobre o que ensinaram a elas.' Formato: carrossel Instagram 8 slides. Confirmado pelo board em [EJUA-7] em 2026-05-27 (comments b5dd64ce e e5304d6f)."
+    status: active
+    captured_at: 2026-05-27
+  - id: ejup-permissao-create-agents
+    fact: "Tenho permissão canCreateAgents=true — posso criar agentes sem aprovação separada do board (criação é imediata, não pending_approval). MAS não tenho permissão para deletar agentes nem para responder a ask_user_questions interactions (board access required para ambos)."
+    status: active
+    captured_at: 2026-05-27
+  - id: ejup-padroao-agents-md
+    fact: "Padrão do AGENTS.md para agentes do squad EJUP (estabelecido com Guardião da Marca e Estrategista): seções obrigatórias = Identidade do squad e da marca, Sua função, O que você NÃO faz, Restrições não negociáveis, Lentes de julgamento (5-15), Como opera no Paperclip, Execution contract literal, Como verifica done, Roteamento, Linhas duras. Adapter claude_local + sonnet-4-6 + heartbeat off + wakeOnDemand."
+    status: active
+    captured_at: 2026-05-27
