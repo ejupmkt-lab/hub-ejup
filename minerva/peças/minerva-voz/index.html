@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Minerva</title>
+<style>
+@font-face{font-family:'Gotham';font-weight:300;src:url(/fonts/Gotham-Light.otf) format('opentype')}
+@font-face{font-family:'Gotham';font-weight:500;src:url(/fonts/Gotham-Medium.otf) format('opentype')}
+@font-face{font-family:'Gotham';font-weight:900;src:url(/fonts/Gotham-Black.otf) format('opentype')}
+:root{--navy:#031c37;--deep:#061424;--ink:#0d131a;--gold:#f0b855;--silver:#d1d3d4;--steel:#304557}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(120% 90% at 50% 40%,#0a2a49 0%,#061a30 45%,#04101c 100%);
+  color:var(--silver);font-family:'Gotham','Montserrat',system-ui,sans-serif;font-weight:300;
+  display:grid;grid-template-rows:auto 1fr auto;padding:24px 16px;overflow:hidden}
+header{display:flex;justify-content:space-between;align-items:center;max-width:760px;width:100%;margin:0 auto}
+header .nome{font-weight:900;font-size:18px;letter-spacing:-.02em;color:#fff}
+header .nome small{display:block;font-weight:500;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(209,211,212,.5);margin-top:3px}
+header .acoes{display:flex;gap:8px}
+button{font:inherit;font-weight:500;font-size:12px;letter-spacing:.06em;color:var(--silver);background:transparent;
+  border:1px solid rgba(209,211,212,.28);border-radius:4px;padding:8px 12px;cursor:pointer}
+button:hover{border-color:var(--gold);color:var(--gold)}
+button[aria-pressed="true"]{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+
+/* ---- o círculo ---- */
+.palco{display:grid;place-items:center;position:relative}
+#orb{width:min(62vmin,420px);height:min(62vmin,420px);cursor:pointer;display:block;
+  filter:drop-shadow(0 0 40px rgba(240,184,85,.10))}
+.estado{position:absolute;bottom:8%;left:0;right:0;text-align:center;font-weight:500;font-size:11px;
+  letter-spacing:.2em;text-transform:uppercase;color:rgba(240,184,85,.8)}
+.dica{position:absolute;top:6%;left:0;right:0;text-align:center;font-size:15px;color:rgba(209,211,212,.7)}
+
+/* ---- legendas ---- */
+.legenda{max-width:720px;width:100%;margin:0 auto;min-height:120px;display:flex;flex-direction:column;gap:10px;text-align:center}
+.legenda .voce{font-size:14px;color:rgba(209,211,212,.55)}
+.legenda .voce::before{content:"Você  ";font-weight:500;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:rgba(209,211,212,.4)}
+.legenda .ela{font-size:19px;line-height:1.5;color:#fff;text-wrap:balance}
+.legenda .erro{font-size:13px;color:var(--gold)}
+.teclado{display:none;gap:8px;max-width:720px;width:100%;margin:12px auto 0}
+.teclado.aberto{display:flex}
+.teclado input{flex:1;font:inherit;font-size:15px;padding:10px 14px;border-radius:4px;border:1px solid rgba(209,211,212,.28);
+  background:rgba(255,255,255,.04);color:#fff}
+.teclado input:focus{outline:2px solid var(--gold);outline-offset:1px}
+@media (prefers-reduced-motion: reduce){#orb{transition:none}}
+</style></head>
+<body>
+<header>
+  <div class="nome">Minerva<small>EJUP · por voz</small></div>
+  <div class="acoes">
+    <button id="mudo" aria-pressed="false" title="Silenciar a voz dela">Voz</button>
+    <button id="btnTeclado" title="Escrever em vez de falar">Teclado</button>
+    <button id="nova" title="Esquecer esta conversa">Nova conversa</button>
+  </div>
+</header>
+
+<section class="palco">
+  <div class="dica" id="dica">Toque no círculo para começar</div>
+  <canvas id="orb" width="840" height="840" role="button" aria-label="Falar com a Minerva"></canvas>
+  <div class="estado" id="estado"></div>
+</section>
+
+<section class="legenda" id="legenda">
+  <div class="voce" id="voce" hidden></div>
+  <div class="ela" id="ela"></div>
+  <div class="erro" id="erro" hidden></div>
+</section>
+<form class="teclado" id="teclado"><input id="entrada" placeholder="Escreva para a Minerva" autocomplete="off"><button type="submit">Enviar</button></form>
+
+<script>
+/* ================= estado ================= */
+const $ = s => document.querySelector(s);
+const orb = $('#orb'), cx = orb.getContext('2d');
+const estadoEl = $('#estado'), dica = $('#dica'), voceEl = $('#voce'), elaEl = $('#ela'), erroEl = $('#erro');
+let fase = 'parada';            // parada · ouvindo · pensando · falando
+let turnos = [];                // {role, content}
+let ligada = false, muda = false;
+let ctlChat = null;             // AbortController da resposta em curso
+let audioCtx = null, analisador = null, mic = null, micAnalisador = null, micFonte = null;
+let filaTTS = [], tocando = false, geracao = 0;   // geração invalida áudios de respostas antigas
+let rec = null;
+
+try { muda = localStorage.getItem('minerva.muda') === '1'; } catch (e) {}
+$('#mudo').setAttribute('aria-pressed', String(!muda));
+
+function setFase(f, txt){ fase = f; estadoEl.textContent = txt ?? ({parada:'', ouvindo:'ouvindo', pensando:'pensando', falando:'falando'})[f]; }
+function erro(msg){ erroEl.textContent = msg; erroEl.hidden = !msg; }
+
+/* ================= o círculo: desenho reativo ================= */
+let nivel = 0, alvo = 0, t0 = performance.now();
+const reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function medir(an){
+  if (!an) return 0;
+  const buf = new Uint8Array(an.fftSize); an.getByteTimeDomainData(buf);
+  let s = 0; for (const v of buf){ const d = (v - 128) / 128; s += d * d; }
+  return Math.min(1, Math.sqrt(s / buf.length) * 4);
+}
+function desenhar(now){
+  const t = (now - t0) / 1000, W = orb.width, H = orb.height, c = W / 2, base = W * 0.27;
+  alvo = fase === 'falando' ? medir(analisador) : fase === 'ouvindo' ? medir(micAnalisador) * .8 : 0;
+  nivel += (alvo - nivel) * 0.18;
+  cx.clearRect(0, 0, W, H);
+  const resp = reduzido ? 0 : Math.sin(t * (fase === 'pensando' ? 2.6 : 1.1)) * (fase === 'parada' ? 4 : 7);
+  const r = base + resp + nivel * base * 0.45;
+
+  // halo
+  const halo = cx.createRadialGradient(c, c, r * .6, c, c, r * 1.9);
+  halo.addColorStop(0, `rgba(240,184,85,${0.10 + nivel * 0.25})`); halo.addColorStop(1, 'rgba(240,184,85,0)');
+  cx.fillStyle = halo; cx.beginPath(); cx.arc(c, c, r * 1.9, 0, Math.PI * 2); cx.fill();
+
+  // corpo
+  const corpo = cx.createRadialGradient(c - r * .3, c - r * .35, r * .1, c, c, r);
+  corpo.addColorStop(0, '#0f3a63'); corpo.addColorStop(1, '#031c37');
+  cx.fillStyle = corpo; cx.beginPath(); cx.arc(c, c, r, 0, Math.PI * 2); cx.fill();
+
+  // anel principal
+  cx.lineWidth = 3 + nivel * 6; cx.strokeStyle = `rgba(240,184,85,${fase === 'parada' ? .55 : .95})`;
+  cx.beginPath(); cx.arc(c, c, r, 0, Math.PI * 2); cx.stroke();
+
+  // anéis de eco (ouvindo/falando)
+  if (fase === 'ouvindo' || fase === 'falando'){
+    for (let i = 1; i <= 3; i++){
+      const rr = r + i * (22 + nivel * 40);
+      cx.lineWidth = 1; cx.strokeStyle = `rgba(240,184,85,${(0.35 - i * 0.09) * (0.4 + nivel)})`;
+      cx.beginPath(); cx.arc(c, c, rr, 0, Math.PI * 2); cx.stroke();
+    }
+  }
+  // arco girante (pensando)
+  if (fase === 'pensando'){
+    const a = reduzido ? 0 : t * 2.2;
+    cx.lineWidth = 5; cx.strokeStyle = 'rgba(240,184,85,.95)';
+    cx.beginPath(); cx.arc(c, c, r + 16, a, a + Math.PI * .7); cx.stroke();
+  }
+  requestAnimationFrame(desenhar);
+}
+requestAnimationFrame(desenhar);
+
+/* ================= áudio ================= */
+async function ligarAudio(){
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analisador = audioCtx.createAnalyser(); analisador.fftSize = 512;
+  try {
+    mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+    micFonte = audioCtx.createMediaStreamSource(mic);
+    micAnalisador = audioCtx.createAnalyser(); micAnalisador.fftSize = 512;
+    micFonte.connect(micAnalisador);
+  } catch (e) { erro('Sem acesso ao microfone. Use o teclado.'); abrirTeclado(); }
+}
+
+function pararAudio(){
+  geracao++; filaTTS = [];
+  if (tocando){ try { tocando.pause(); } catch (e) {} tocando = false; }
+}
+
+async function tocarFila(){
+  if (tocando || !filaTTS.length) return;
+  const { texto, g } = filaTTS.shift();
+  if (g !== geracao) return tocarFila();
+  try {
+    const r = await fetch('/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: texto }) });
+    if (!r.ok) throw new Error(await r.text());
+    const blob = await r.blob();
+    if (g !== geracao) return tocarFila();
+    const a = new Audio(URL.createObjectURL(blob));
+    const fonte = audioCtx.createMediaElementSource(a);
+    fonte.connect(analisador); analisador.connect(audioCtx.destination);
+    tocando = a; setFase('falando');
+    await new Promise(res => { a.onended = res; a.onerror = res; a.play().catch(res); });
+    URL.revokeObjectURL(a.src); tocando = false;
+  } catch (e) {
+    tocando = false; erro('A voz falhou: ' + String(e.message).slice(0, 120));
+  }
+  if (filaTTS.length) return tocarFila();
+  if (fase === 'falando') depoisDeFalar();
+}
+
+function depoisDeFalar(){ if (ligada) ouvir(); else setFase('parada'); }
+
+/* corta o texto em frases prontas para a voz */
+function fatiar(buf){
+  const frases = []; let m;
+  const re = /[^.!?…]+[.!?…]+["”)]?\s+/g;
+  let ultimo = 0;
+  while ((m = re.exec(buf))){ frases.push(m[0].trim()); ultimo = re.lastIndex; }
+  return { frases, resto: buf.slice(ultimo) };
+}
+
+/* ================= conversa ================= */
+async function perguntar(texto){
+  texto = texto.trim(); if (!texto) return;
+  pararAudio(); ctlChat?.abort(); pararReconhecimento();
+  erro('');
+  voceEl.hidden = false; voceEl.textContent = texto; elaEl.textContent = '';
+  turnos.push({ role: 'user', content: texto });
+  setFase('pensando');
+  ctlChat = new AbortController(); const g = geracao;
+  let completo = '', pendente = '';
+  try {
+    const r = await fetch('/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: turnos.slice(-20) }), signal: ctlChat.signal });
+    if (!r.ok) throw new Error(await r.text());
+    const leitor = r.body.getReader(), dec = new TextDecoder();
+    while (true){
+      const { value, done } = await leitor.read(); if (done) break;
+      const trecho = dec.decode(value, { stream: true });
+      completo += trecho; pendente += trecho; elaEl.textContent = completo;
+      const { frases, resto } = fatiar(pendente); pendente = resto;
+      for (const f of frases) if (!muda) { filaTTS.push({ texto: f, g }); tocarFila(); }
+    }
+    if (pendente.trim() && !muda) { filaTTS.push({ texto: pendente.trim(), g }); tocarFila(); }
+    turnos.push({ role: 'assistant', content: completo });
+    if (muda || (!filaTTS.length && !tocando)) depoisDeFalar();
+  } catch (e) {
+    if (e.name === 'AbortError') return;
+    erro('Não consegui falar com o servidor: ' + String(e.message).slice(0, 140));
+    if (completo) turnos.push({ role: 'assistant', content: completo });
+    depoisDeFalar();
+  } finally { ctlChat = null; }
+}
+
+/* ================= ouvir ================= */
+const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+function pararReconhecimento(){ if (rec){ const r = rec; rec = null; try { r.onend = null; r.stop(); } catch (e) {} } }
+function ouvir(){
+  if (!Rec){ erro('Este navegador não reconhece fala. Use o Chrome, ou o teclado.'); abrirTeclado(); setFase('parada'); return; }
+  pararReconhecimento();
+  const r = new Rec(); rec = r;
+  r.lang = 'pt-BR'; r.interimResults = true; r.continuous = false; r.maxAlternatives = 1;
+  let final = '';
+  r.onresult = ev => {
+    let parcial = '';
+    for (const res of ev.results) (res.isFinal ? (final += res[0].transcript) : (parcial += res[0].transcript));
+    voceEl.hidden = false; voceEl.textContent = final || parcial;
+  };
+  r.onerror = ev => { if (ev.error === 'not-allowed'){ erro('Microfone bloqueado. Use o teclado.'); abrirTeclado(); ligada = false; setFase('parada'); } };
+  r.onend = () => {
+    if (rec !== r) return; rec = null;
+    if (final.trim()) perguntar(final);
+    else if (ligada && fase === 'ouvindo') ouvir();   // silêncio: continua ouvindo
+  };
+  setFase('ouvindo'); dica.textContent = ''; r.start();
+}
+
+/* barge-in: se você falar enquanto ela fala, ela para e ouve */
+setInterval(() => {
+  if (fase !== 'falando' || !micAnalisador) return;
+  if (medir(micAnalisador) > 0.22){ pararAudio(); ctlChat?.abort(); ouvir(); }
+}, 120);
+
+/* ================= controles ================= */
+orb.addEventListener('click', async () => {
+  await ligarAudio(); if (audioCtx.state === 'suspended') await audioCtx.resume();
+  if (!ligada){ ligada = true; dica.textContent = ''; ouvir(); }
+  else if (fase === 'falando'){ pararAudio(); ctlChat?.abort(); ouvir(); }
+  else if (fase === 'ouvindo'){ ligada = false; pararReconhecimento(); setFase('parada'); dica.textContent = 'Toque para voltar a ouvir'; }
+  else if (fase === 'parada'){ ligada = true; ouvir(); }
+});
+$('#mudo').addEventListener('click', e => {
+  muda = !muda; e.currentTarget.setAttribute('aria-pressed', String(!muda));
+  try { localStorage.setItem('minerva.muda', muda ? '1' : '0'); } catch (x) {}
+  if (muda) pararAudio();
+});
+function abrirTeclado(){ $('#teclado').classList.add('aberto'); $('#entrada').focus(); }
+$('#btnTeclado').addEventListener('click', () => { $('#teclado').classList.toggle('aberto'); $('#entrada').focus(); });
+$('#teclado').addEventListener('submit', async e => {
+  e.preventDefault(); const v = $('#entrada').value; $('#entrada').value = '';
+  await ligarAudio(); if (audioCtx.state === 'suspended') await audioCtx.resume();
+  perguntar(v);
+});
+$('#nova').addEventListener('click', () => { pararAudio(); ctlChat?.abort(); turnos = []; voceEl.hidden = true; elaEl.textContent = ''; erro(''); });
+</script>
+</body></html>
