@@ -1,0 +1,325 @@
+<title>Minerva</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;900&display=swap">
+<style>
+__FONTS__
+:root{
+  --ground:#f3f1ec; --surface:#ffffff; --surface-2:#ebe8e1;
+  --ink:#031c37; --text:#2b2f36; --muted:#5f6062; --line:rgba(65,64,66,.18);
+  --accent:#9b6b26; --accent-ink:#ffffff; --bubble-me:#031c37; --bubble-me-text:#f3f1ec;
+  --shadow:0 18px 48px rgba(3,28,55,.14);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#061424; --surface:#0a2038; --surface-2:#0e2742;
+    --ink:#ffffff; --text:#e4e6ea; --muted:rgba(209,211,212,.62); --line:rgba(209,211,212,.16);
+    --accent:#f0b855; --accent-ink:#031c37; --bubble-me:#f0b855; --bubble-me-text:#031c37;
+    --shadow:0 18px 48px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#061424; --surface:#0a2038; --surface-2:#0e2742;
+  --ink:#ffffff; --text:#e4e6ea; --muted:rgba(209,211,212,.62); --line:rgba(209,211,212,.16);
+  --accent:#f0b855; --accent-ink:#031c37; --bubble-me:#f0b855; --bubble-me-text:#031c37;
+  --shadow:0 18px 48px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--text);
+  font-family:'Gotham','Montserrat',system-ui,sans-serif;font-weight:300;
+  font-size:16px;line-height:1.6;display:flex;flex-direction:column;
+  padding-inline:16px}
+.app{width:min(100%,860px);margin:0 auto;flex:1;display:flex;flex-direction:column;min-height:100%}
+
+/* ---- cabeçalho ---- */
+header{display:flex;align-items:center;gap:16px;padding-block:22px 14px;
+  border-bottom:1px solid var(--line)}
+.orb{width:52px;height:52px;flex:none;position:relative;display:grid;place-items:center}
+.orb svg{width:40px;height:40px;display:block}
+.orb::before{content:"";position:absolute;inset:0;border-radius:50%;
+  border:1px solid var(--accent);opacity:.35;transform:scale(1)}
+.orb.pensando::before{animation:respira 1.8s ease-in-out infinite}
+.orb.pensando svg{animation:gira 9s linear infinite}
+.orb.falando::before{animation:respira .9s ease-in-out infinite}
+@keyframes respira{0%,100%{transform:scale(1);opacity:.35}50%{transform:scale(1.22);opacity:.9}}
+@keyframes gira{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.orb.pensando::before,.orb.falando::before,.orb.pensando svg{animation:none}
+  .orb.pensando::before{opacity:.9}}
+.titulo{flex:1;min-width:0}
+.titulo h1{margin:0;font-weight:900;font-size:24px;letter-spacing:-.02em;color:var(--ink);line-height:1.1}
+.titulo p{margin:4px 0 0;font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.estado{font-size:12px;color:var(--muted);font-weight:300;text-align:right;min-width:0}
+.acoes{display:flex;gap:8px;flex:none}
+button{font:inherit;font-weight:500;font-size:13px;color:var(--ink);background:transparent;
+  border:1px solid var(--line);border-radius:4px;padding:8px 12px;cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}
+button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+
+/* ---- conversa ---- */
+main{flex:1;display:flex;flex-direction:column;gap:18px;padding-block:24px 12px;overflow-y:auto}
+.msg{display:flex;flex-direction:column;gap:6px;max-width:72ch}
+.msg .quem{font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.msg .txt{white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.eu{align-self:flex-end;align-items:flex-end}
+.msg.eu .txt{background:var(--bubble-me);color:var(--bubble-me-text);padding:12px 16px;border-radius:8px 8px 2px 8px;font-weight:400}
+.msg.ela .txt{border-left:2px solid var(--accent);padding:2px 0 2px 16px}
+.msg.ela .txt.pensando{color:var(--muted);font-style:normal}
+.msg .nota{font-size:12px;color:var(--muted)}
+.vazio{margin:auto 0;max-width:60ch}
+.vazio h2{margin:0 0 6px;font-weight:900;font-size:32px;letter-spacing:-.02em;color:var(--ink);line-height:1.1;text-wrap:balance}
+.vazio p{margin:0 0 20px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{border-radius:999px;font-weight:300;font-size:14px;color:var(--text)}
+.chips button:hover{color:var(--accent)}
+.aviso{border:1px solid var(--line);background:var(--surface);padding:14px 16px;border-radius:4px;font-size:14px;color:var(--muted)}
+
+/* ---- compositor ---- */
+footer{position:sticky;bottom:0;padding-block:12px 18px;background:var(--ground)}
+.caixa{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);
+  display:flex;align-items:flex-end;gap:8px;padding:8px 8px 8px 16px}
+textarea{flex:1;border:0;background:transparent;color:var(--ink);font:inherit;font-weight:300;
+  font-size:16px;line-height:1.5;resize:none;min-height:44px;max-height:180px;padding:10px 0}
+textarea::placeholder{color:var(--muted)}
+.ico{width:40px;height:40px;padding:0;display:grid;place-items:center;flex:none}
+.ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ico.enviar{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.ico.enviar:hover{color:var(--accent-ink);filter:brightness(1.06)}
+.ico.gravando{background:var(--accent);color:var(--accent-ink);animation:respira 1s ease-in-out infinite}
+.rodape{display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+@media (max-width:560px){.estado{display:none}.titulo p{display:none}.titulo h1{font-size:22px}.vazio h2{font-size:26px}.acoes button{padding:8px 10px}}
+</style>
+
+<div class="app">
+<header>
+  <div class="orb" id="orb" aria-hidden="true">__SIMBOLO__</div>
+  <div class="titulo">
+    <h1>Minerva</h1>
+    <p>EJUP · guardiã da marca e memória institucional</p>
+  </div>
+  <div class="estado" id="estado">pronta</div>
+  <div class="acoes">
+    <button id="voz" aria-pressed="false" title="Ler as respostas em voz alta">Voz</button>
+    <button id="limpar" title="Apagar esta conversa">Nova conversa</button>
+  </div>
+</header>
+
+<main id="conversa" aria-live="polite">
+  <section class="vazio" id="vazio">
+    <h2>O que você precisa decidir hoje?</h2>
+    <p>Sei o charter da marca, quem é quem, o que já foi produzido e as regras do squad. Pergunte, peça uma peça, ou me passe uma decisão para eu bater no checklist.</p>
+    <div class="chips" id="chips">
+      <button type="button">Quem é quem na EJUP?</button>
+      <button type="button">Resume o charter da marca em cinco linhas</button>
+      <button type="button">Que carrosséis já foram produzidos?</button>
+      <button type="button">Esse título passa no checklist: "O segredo para dominar o novo licenciamento em 7 dias"?</button>
+      <button type="button">Quais são as pendências abertas?</button>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <form class="caixa" id="form">
+    <textarea id="entrada" rows="1" placeholder="Fale com a Minerva" aria-label="Sua mensagem"></textarea>
+    <button type="button" class="ico" id="mic" title="Falar" aria-label="Falar">
+      <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>
+    </button>
+    <button type="button" class="ico" id="parar" title="Parar" aria-label="Parar" hidden>
+      <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+    </button>
+    <button type="submit" class="ico enviar" id="enviar" title="Enviar" aria-label="Enviar">
+      <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+    </button>
+  </form>
+  <div class="rodape">
+    <span>Enter envia · Shift+Enter quebra linha</span>
+    <span id="nota">A conversa fica só neste navegador. Cada resposta usa a sua conta Claude.</span>
+  </div>
+</footer>
+</div>
+
+<script>
+const BASE = __KB__;
+const INSTRUCOES = BASE + `
+
+## COMO CONDUZIR ESTA CONVERSA
+Você está numa interface de chat da EJUP. A pessoa do outro lado é da
+equipe (provavelmente Victor, mas não presuma). Responda em português do
+Brasil, em texto corrido, sem markdown pesado: sem cabeçalhos, sem negrito
+decorativo, sem emoji. Listas só quando a lista for a resposta. Nada de
+travessão entre palavras. Nada de "não é X, é Y".`;
+
+const $ = s => document.querySelector(s);
+const conversa = $('#conversa'), vazio = $('#vazio'), entrada = $('#entrada'),
+      orb = $('#orb'), estado = $('#estado'), nota = $('#nota'),
+      btnMic = $('#mic'), btnParar = $('#parar'), btnEnviar = $('#enviar'),
+      btnVoz = $('#voz');
+
+let sample = null, turnos = [], ctl = null, vozLigada = false;
+
+// ---- memória local, só por conveniência ----
+try { turnos = JSON.parse(localStorage.getItem('minerva.turnos') || '[]'); } catch (e) { turnos = []; }
+function guardar(){ try { localStorage.setItem('minerva.turnos', JSON.stringify(turnos)); } catch (e) {} }
+try { vozLigada = localStorage.getItem('minerva.voz') === '1'; } catch (e) {}
+btnVoz.setAttribute('aria-pressed', String(vozLigada));
+
+// ---- render ----
+function bolha(quem, texto){
+  const el = document.createElement('article');
+  el.className = 'msg ' + (quem === 'user' ? 'eu' : 'ela');
+  el.innerHTML = `<div class="quem">${quem === 'user' ? 'Você' : 'Minerva'}</div><div class="txt"></div>`;
+  el.querySelector('.txt').textContent = texto;
+  conversa.appendChild(el);
+  conversa.scrollTop = conversa.scrollHeight;
+  return el;
+}
+function repintar(){
+  conversa.querySelectorAll('.msg').forEach(m => m.remove());
+  vazio.hidden = turnos.length > 0;
+  for (const t of turnos) bolha(t.role, t.content);
+}
+repintar();
+
+function setEstado(txt, modo){
+  estado.textContent = txt;
+  orb.classList.toggle('pensando', modo === 'pensando');
+  orb.classList.toggle('falando', modo === 'falando');
+}
+
+// ---- Claude ----
+(async () => {
+  sample = await window.claude?.use?.('sample') ?? null;
+  if (!sample) {
+    const av = document.createElement('div');
+    av.className = 'aviso';
+    av.textContent = 'A Minerva precisa ser aberta dentro do claude.ai para responder. Aqui a página está em modo de leitura.';
+    conversa.insertBefore(av, conversa.firstChild);
+    btnEnviar.disabled = true; btnMic.disabled = true;
+    setEstado('sem conexão com o Claude');
+  }
+})();
+
+const COPIA = {
+  not_granted: 'Você não autorizou esta página a usar o Claude. Recarregue para decidir de novo.',
+  sampling_disabled: 'O Claude está indisponível para esta conta.',
+  rate_limited: 'Muitas perguntas em pouco tempo. Espere um instante e tente de novo.',
+  session_expired: 'Sua sessão expirou. Entre de novo no claude.ai.',
+  refused: 'A Minerva não pôde responder a isso. Reformule a pergunta.',
+  empty_completion: 'Veio uma resposta vazia. Tente perguntar de outro jeito.',
+  prompt_too_large: 'A conversa ficou longa demais. Comece uma nova conversa.',
+  upstream_error: 'A conexão falhou no meio. Tente de novo.',
+};
+
+function entradaParaClaude(){
+  // instruções sempre na frente; conversa cortada por bytes, nunca as instruções
+  const LIMITE = 58000;
+  let corpo = turnos.slice();
+  const tamanho = xs => new TextEncoder().encode(INSTRUCOES + xs.map(t => t.content).join('')).length;
+  while (corpo.length > 2 && tamanho(corpo) > LIMITE) corpo = corpo.slice(2);
+  return [{ role: 'user', content: INSTRUCOES }, ...corpo];
+}
+
+async function perguntar(texto){
+  texto = texto.trim();
+  if (!texto || !sample || ctl) return;
+  vazio.hidden = true;
+  turnos.push({ role: 'user', content: texto });
+  bolha('user', texto); guardar();
+  entrada.value = ''; ajustarAltura();
+
+  const el = bolha('assistant', 'Pensando');
+  const txt = el.querySelector('.txt'); txt.classList.add('pensando');
+  ctl = new AbortController();
+  btnParar.hidden = false; btnEnviar.disabled = true;
+  setEstado('pensando', 'pensando');
+  window.speechSynthesis?.cancel();
+
+  try {
+    const { text, truncated } = await sample(entradaParaClaude(), {
+      cache: false, signal: ctl.signal, modelTier: 'default',
+      onText: ({ text }) => { txt.classList.remove('pensando'); txt.textContent = text;
+        conversa.scrollTop = conversa.scrollHeight; setEstado('respondendo', 'falando'); },
+    });
+    turnos.push({ role: 'assistant', content: text }); guardar();
+    if (truncated) anotar(el, 'A resposta foi cortada pelo limite. Peça a continuação.');
+    if (vozLigada) falar(text);
+  } catch (e) {
+    txt.classList.remove('pensando');
+    if (e.code === 'cancelled') {
+      if (e.text) { txt.textContent = e.text; turnos.push({ role: 'assistant', content: e.text }); guardar(); }
+      else el.remove();
+    } else {
+      txt.textContent = e.text ?? '';
+      if (!e.text) txt.textContent = COPIA[e.code] ?? COPIA.upstream_error;
+      else anotar(el, COPIA[e.code] ?? COPIA.upstream_error);
+      if (e.text) { turnos.push({ role: 'assistant', content: e.text }); guardar(); }
+      if (['not_granted','sampling_disabled','not_declared','capability_disabled'].includes(e.code)) {
+        btnEnviar.disabled = true; btnMic.disabled = true; sample = null;
+      }
+    }
+  } finally {
+    ctl = null; btnParar.hidden = true;
+    if (sample) btnEnviar.disabled = false;
+    setEstado(sample ? 'pronta' : 'indisponível');
+    conversa.scrollTop = conversa.scrollHeight;
+  }
+}
+function anotar(el, msg){ const n = document.createElement('div'); n.className = 'nota'; n.textContent = msg; el.appendChild(n); }
+
+// ---- compositor ----
+function ajustarAltura(){ entrada.style.height = 'auto'; entrada.style.height = Math.min(entrada.scrollHeight, 180) + 'px'; }
+entrada.addEventListener('input', ajustarAltura);
+entrada.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('#form').requestSubmit(); }
+});
+$('#form').addEventListener('submit', e => { e.preventDefault(); perguntar(entrada.value); });
+btnParar.addEventListener('click', () => ctl?.abort());
+$('#chips').addEventListener('click', e => { if (e.target.tagName === 'BUTTON') perguntar(e.target.textContent); });
+$('#limpar').addEventListener('click', () => {
+  ctl?.abort(); window.speechSynthesis?.cancel();
+  turnos = []; guardar(); repintar(); entrada.focus();
+});
+
+// ---- voz: entrada por reconhecimento, saída por síntese ----
+const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null;
+if (!Rec) { btnMic.hidden = true; }
+btnMic.addEventListener('click', () => {
+  if (rec) { rec.stop(); return; }
+  rec = new Rec(); rec.lang = 'pt-BR'; rec.interimResults = true; rec.continuous = false;
+  let final = '';
+  rec.onresult = ev => {
+    let parcial = '';
+    for (const r of ev.results) (r.isFinal ? (final += r[0].transcript) : (parcial += r[0].transcript));
+    entrada.value = final || parcial; ajustarAltura();
+  };
+  rec.onend = () => { rec = null; btnMic.classList.remove('gravando'); setEstado('pronta');
+    if (final.trim()) perguntar(final); };
+  rec.onerror = () => { rec = null; btnMic.classList.remove('gravando'); setEstado('o microfone não respondeu'); };
+  btnMic.classList.add('gravando'); setEstado('ouvindo'); rec.start();
+});
+
+function vozPt(){
+  const vs = window.speechSynthesis?.getVoices?.() || [];
+  return vs.find(v => /pt[-_]BR/i.test(v.lang) && /female|feminin|Luciana|Francisca|Maria/i.test(v.name))
+      || vs.find(v => /pt[-_]BR/i.test(v.lang)) || vs.find(v => /^pt/i.test(v.lang)) || null;
+}
+function falar(texto){
+  if (!window.speechSynthesis) return;
+  const u = new SpeechSynthesisUtterance(texto.replace(/\s+/g, ' ').slice(0, 1800));
+  u.lang = 'pt-BR'; u.rate = 1.02; u.pitch = 0.95;
+  const v = vozPt(); if (v) u.voice = v;
+  u.onstart = () => setEstado('falando', 'falando');
+  u.onend = () => setEstado('pronta');
+  window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+}
+btnVoz.addEventListener('click', () => {
+  vozLigada = !vozLigada;
+  btnVoz.setAttribute('aria-pressed', String(vozLigada));
+  try { localStorage.setItem('minerva.voz', vozLigada ? '1' : '0'); } catch (e) {}
+  if (!vozLigada) window.speechSynthesis?.cancel();
+  else if (!window.speechSynthesis) { nota.textContent = 'Este navegador não lê em voz alta.'; }
+});
+</script>
