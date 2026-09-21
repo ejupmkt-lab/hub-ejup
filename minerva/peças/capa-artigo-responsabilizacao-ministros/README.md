@@ -30,3 +30,13 @@ borda para quebrar.
 
 A figura é a Justiça, e não um ministro: a manchete fala em
 responsabilização, e um rosto identificável leria como acusação.
+
+## Título final (21/09/2026)
+
+"Até a máfia tem ética", Gilmar Mendes. Frase verificada: dita pelo decano em
+sessão plenária do STF em setembro de 2026, no julgamento sobre a abertura de
+investigação relacionada ao caso Banco Master, dirigida à condução do
+ministro André Mendonça. Fontes: Metrópoles, Terra, Times Brasil/CNBC.
+Entra entre aspas e com atribuição, como citação de registro público.
+Rodapé: "Na sua opinião, os mecanismos atuais de responsabilização dos
+ministros do STF são suficientes?"
