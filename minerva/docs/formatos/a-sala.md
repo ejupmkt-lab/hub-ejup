@@ -106,3 +106,90 @@ real do dispositivo.
   frase, o corte, a cartela do tema. É o melhor gancho que o canal vai ter.
 - **A sala vira patrimônio.** Depois de três edições, o público reconhece o
   lugar antes de saber o assunto. Isso é o que faz formato virar marca.
+
+---
+
+## Cenário montado no estúdio (21/09/2026)
+
+Registro do set já levantado pelo Victor, com o que fica e o que ajusta.
+
+### O que já está certo
+
+- **Fundo caindo para o preto.** A parede morre na sombra e a mesa fica sendo
+  o único plano com informação. É exatamente o efeito que o formato pede.
+- **Cadeira vazia de frente para a câmera.** Mantida. Quem senta nela é quem
+  assiste, e o enquadramento precisa deixar isso legível.
+- **Mesa clara contra ambiente escuro.** Dá a superfície de leitura para o
+  objeto do episódio sem precisar de luz extra nele.
+- **Objeto sobre a mesa.** HD externo e disquete. Leitura imediata de tempo,
+  obsolescência e memória. Serve ao episódio de tecnologia e dever de
+  verificação sem nenhuma legenda explicando.
+
+### Os quatro ajustes
+
+1. **Luminária dentro do quadro.** Hoje a luz dura vem de cima sem fonte
+  visível, e o olho registra como estúdio. Com o pendente baixo aparecendo no
+  topo do enquadramento, a mesma luz passa a ser da sala. É o ajuste que mais
+  muda a peça e custa uma haste e uma lâmpada.
+2. **Cor para o navy.** O grade está puxando ciano esverdeado. Levar a
+  dominante para o azul EJUP `#031c37` nas sombras e segurar a pele neutra.
+  A referência de acerto: o branco da mesa levemente frio, a pele sem verde.
+3. **Vestuário.** O quadro de referência está de camiseta. Na gravação vale a
+  regra do Manual: terno escuro, camisa lisa, sem gravata. A sala é dura, a
+  roupa segura a institucionalidade.
+4. **Mural de cortiça.** Elemento novo, fora da especificação. Ele traz
+  textura boa, e o risco é virar parede de investigação de série policial com
+  fotos pregadas. Duas saídas: tirar do quadro, ou deixar na sombra profunda
+  com nada pregado além de uma folha em branco. Parede sem informação é regra
+  do formato porque o único foco possível tem que ser o rosto.
+
+### Sobre o haze
+
+Se houver máquina no estúdio, meia carga já resolve. O haze existe para o
+feixe do pendente ficar visível no ar. Sem ele a luz dura lê como erro; com
+ele lê como intenção.
+
+---
+
+## Piloto: episódio 1, abertura completa
+
+Objeto sobre a mesa: o HD e o disquete que já estão lá. Tema: verificação,
+IA e responsabilidade profissional pelo que se assina.
+
+**PLANO ÚNICO. Médio fechado, 85 mm, altura do olho, estático.**
+
+Ele entra em quadro, puxa a cadeira, senta. Três segundos de silêncio com a
+sala respirando. Ele olha para a câmera.
+
+> Eu preciso confessar uma coisa.
+
+Pausa. Dois segundos.
+
+> Eu já assinei uma petição que eu não li inteira.
+
+Pausa.
+
+> E se você é advogado há tempo suficiente, você também já.
+
+Ele encosta a mão no HD sobre a mesa.
+
+> A diferença é que antes, quando isso dava errado, a culpa tinha endereço.
+> Era estagiário, era pressa, era prazo. Hoje tem mais um lugar para onde
+> apontar, e esse lugar não assina nada.
+
+> O nome de quem assina continua sendo o seu.
+
+**CORTE SECO. Vinheta, oito segundos. Cartela do tema.**
+
+Depois da vinheta o episódio entra na estrutura de **O Mecanismo**: o que
+aconteceu, qual o mecanismo, o que está em aberto, o que muda na prática.
+
+### Antes de gravar
+
+Dois pontos continuam abertos e precisam de decisão do Victor:
+
+- **Voz do especialista no corpo do episódio.** Professor da casa, convidado
+  do EJUPcast ou o próprio Roberto sustentando sozinho.
+- **Caso-gancho do episódio 1.** Se for o de petição com conteúdo gerado por
+  IA, o gancho é notícia recente e sem parte com qualquer relação com a EJUP,
+  o que dispensa a checagem de conflito de interesse que o formato exige.
