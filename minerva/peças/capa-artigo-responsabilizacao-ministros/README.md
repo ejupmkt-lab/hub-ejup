@@ -20,15 +20,13 @@ julga", e por isso voltou.
 
 ## Versão colagem (`capa-feed-colagem.png`)
 
-No estilo da referência do Aos Fatos: figura recortada em preto e branco de
-alto contraste com grão, fundo em duotone navy posterizado (plenário do STF,
-sem a parede do crucifixo), cabeças da própria estátua espelhadas nas
-bordas, título em faixas brancas empilhadas com Gotham Black em navy e
-bronze, selo "Coluna jurídica" no alto.
+Refeita depois do feedback ("meio quebrado"): a primeira tentativa recortava
+a estátua e a colagem denunciava a borda. Esta usa a fotografia inteira, em
+preto e branco de alto contraste com banho navy e grão fino, e põe a
+gramática da referência por cima: anel dourado ao redor da cabeça da
+Justiça, título em faixas brancas empilhadas (Gotham Black em navy e bronze),
+selo "Coluna jurídica" no alto, rodapé com origem e logo. Sem recorte, sem
+borda para quebrar.
 
-A figura central é a Justiça, e não um ministro: a manchete fala em
+A figura é a Justiça, e não um ministro: a manchete fala em
 responsabilização, e um rosto identificável leria como acusação.
-
-Recorte da estátua: GrabCut (OpenCV) guiado por polígono desenhado à mão,
-em `_build/estatua-recorte.png`. Montagem em `_build/colagem.png`
-(gerado, ignorado pelo git), texto em `_build/template-colagem.html`.

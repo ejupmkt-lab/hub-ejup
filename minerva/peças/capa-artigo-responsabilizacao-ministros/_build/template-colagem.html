@@ -1,22 +1,26 @@
 <!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
 __FONTS__
 *{box-sizing:border-box}body{margin:0;background:#333}
-.capa{position:relative;width:1080px;height:1440px;overflow:hidden;background:#04101c;font-family:'Gotham',system-ui,sans-serif}
+.capa{position:relative;width:1080px;height:1440px;overflow:hidden;background:#031c37;font-family:'Gotham',system-ui,sans-serif}
 .capa>img{position:absolute;inset:0;width:100%;height:100%;display:block}
-.selo{position:absolute;top:64px;left:50%;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:12px}
-.selo .m{width:56px;height:56px;border-radius:50%;background:#031c37;border:2px solid #f0b855;display:grid;place-items:center}
-.selo .m svg{width:34px;height:34px}
-.selo .t{background:#fff;color:#031c37;font-weight:500;font-size:22px;letter-spacing:.14em;text-transform:uppercase;padding:14px 22px;border:2px solid #031c37}
-.titulo{position:absolute;left:0;right:0;bottom:250px;z-index:3;display:flex;flex-direction:column;align-items:center;gap:0}
-.titulo span{display:inline-block;background:#fff;color:#031c37;font-weight:900;font-size:98px;line-height:1.06;letter-spacing:-.03em;padding:6px 30px 12px;border-radius:26px;margin-top:-6px}
+.selo{position:absolute;top:72px;left:80px;z-index:3;display:inline-flex;align-items:center;gap:14px;
+  background:#fff;padding:12px 22px 12px 12px}
+.selo .m{width:38px;height:38px}.selo .m svg{width:100%;height:100%;display:block}
+.selo .t{color:#031c37;font-weight:500;font-size:20px;letter-spacing:.14em;text-transform:uppercase}
+.sombra{position:absolute;left:0;right:0;bottom:0;height:760px;z-index:2;
+  background:linear-gradient(180deg,rgba(3,28,55,0) 0%,rgba(3,28,55,.62) 38%,rgba(3,28,55,.97) 100%)}
+.titulo{position:absolute;left:80px;bottom:262px;z-index:3;display:flex;flex-direction:column;align-items:flex-start}
+.titulo span{display:inline-block;background:#fff;color:#031c37;font-weight:900;font-size:108px;line-height:1;letter-spacing:-.035em;padding:10px 28px 18px;margin-top:-10px}
 .titulo span.g{color:#9b6b26}
-.rodape{position:absolute;left:80px;right:80px;bottom:78px;z-index:3;display:flex;justify-content:space-between;align-items:center}
-.rodape .info{font-weight:500;font-size:17px;letter-spacing:.16em;text-transform:uppercase;color:#f0b855;line-height:1.6}
-.rodape .logo{width:210px}.rodape .logo svg{width:100%;height:auto;display:block}
+.rodape{position:absolute;left:80px;right:80px;bottom:80px;z-index:3;display:flex;justify-content:space-between;align-items:flex-end}
+.rodape .info{font-weight:300;font-size:22px;line-height:1.5;color:#d1d3d4;max-width:640px}
+.rodape .info b{font-weight:500;color:#f0b855;display:block;font-size:16px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:6px}
+.rodape .logo{width:200px}.rodape .logo svg{width:100%;height:auto;display:block}
 </style></head><body>
 <section class="capa">
   <img src="__COLAGEM__" alt="">
   <div class="selo"><div class="m">__SIMBOLO__</div><div class="t">Coluna jurídica</div></div>
+  <div class="sombra"></div>
   <div class="titulo"><span>Quem julga</span><span class="g">um ministro</span><span>do STF?</span></div>
-  <div class="rodape"><div class="info">EJUPcast #018 · Nicácio Carvalho<br>e Eduardo Pacheco · leia no site</div><div class="logo">__LOGO__</div></div>
+  <div class="rodape"><div class="info"><b>A partir do EJUPcast #018</b>Os mecanismos que o ordenamento prevê, quem pode acioná-los e onde cada caminho termina. Leia no site, link na bio.</div><div class="logo">__LOGO__</div></div>
 </section></body></html>
