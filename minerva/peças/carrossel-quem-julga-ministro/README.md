@@ -1,6 +1,6 @@
 # Carrossel — "Quem, de fato, pode julgar um ministro do STF?"
 
-Onze telas 1080×1440 para o feed do Instagram, derivadas da coluna jurídica
+Dezessete telas 1080×1440 para o feed do Instagram, derivadas da coluna jurídica
 da EJUP sobre responsabilização de ministros do Supremo.
 
 **Peça descritiva.** Nenhum ministro é nomeado como investigado, nenhum caso
@@ -17,27 +17,23 @@ A fotografia ocupa os 900 px inferiores do quadro e sobe por trás do texto
 com máscara e gradiente, então não sobra quadro vazio embaixo. Nas telas sem
 fotografia a tipografia cresce até encostar na margem do logo.
 
-## A ponte entre telas
+## A ligação entre telas: a colunata
 
-Um algarismo gigante partido ao meio: a metade esquerda sai pela borda
-direita de uma tela e a metade direita entra pela borda esquerda da
-seguinte. Quem arrasta completa a figura com o próprio dedo. Fica atrás do
-texto e à frente da fotografia, em dourado rebaixado.
+Cada emenda entre duas telas é uma coluna do Palácio do Supremo, desenhada
+em vetor e partida ao meio pela borda: metade fecha uma tela, metade abre a
+seguinte. Arrastar o carrossel é caminhar ao longo da fachada do STF, e a
+capa convida a isso ("Arraste e atravesse a praça"). Nas telas escuras a
+coluna é mármore; nas claras, a mesma coluna aparece em navy, contraluz.
 
-| Par | Ponte |
-|---|---|
-| 2 → 3 | `01`, a primeira competência |
-| 3 → 4 | `02`, a segunda |
-| 4 → 5 | `03`, a terceira |
-| 6 → 7 | a palavra `ÉTICA` |
-| 7 → 8 | a mesma fotografia da colunata, fatiada ao meio |
+## Uma ideia por tela
 
-Duas telas claras quebram o ritmo: a do CNJ e a do choque de princípios.
+Dezessete telas, pouco texto em cada uma. Cada tela fecha deixando a
+seguinte em aberto, e duas delas conversam à distância: a tela 4 mostra a
+tabela de competências com as respostas em branco ("?"), e a tela 16 devolve
+a mesma tabela preenchida.
 
-Cada tela fecha puxando a seguinte. O fecho da 3 anuncia "um julgador que
-não usa toga", o da 4 anuncia "o terceiro nome que todo mundo cita", o da 6
-anuncia que a resposta está sendo escrita em outro texto, e o da 10 anuncia
-a recapitulação. A leitura só fecha na última tela.
+Duas telas claras quebram o ritmo: "E o CNJ?" e o choque de princípios. A
+fotografia da esplanada é uma só, fatiada entre as telas 11 e 12.
 
 ## Como reconstruir
 
