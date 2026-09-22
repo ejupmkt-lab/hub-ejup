@@ -41,6 +41,7 @@ T = [
 
     # ---------------------------------------------------------------- 2
     {"foto": "oab-sede", "ancora": "topo", "max": 800, "base": 116,
+     "sai": ("01", 560, 600),
      "titulo": [("k", "Setembro de 2026: "),
                 ("l", "o tema entra na "),
                 ("g", "pauta institucional da advocacia.")],
@@ -53,16 +54,19 @@ T = [
 
     # ---------------------------------------------------------------- 3
     {"foto": "stf-plenario", "ancora": "topo", "max": 740, "base": 120,
+     "entra": ("01", 560, 600), "sai": ("02", 560, 600),
      "titulo": [("k", "A Constituição divide a competência "),
                 ("l", "conforme "),
                 ("g", "o tipo de infração.")],
      "corpo": ["Em infrações penais comuns, é o próprio Supremo quem julga "
                "seus integrantes, por foro de prerrogativa de função."],
      "fonte": "CF, art. 102, I, “b”",
-     "fecho": "Existe outra via, com outro julgador."},
+     "fecho": "E existe uma segunda via, com um julgador que não usa "
+              "toga."},
 
     # ---------------------------------------------------------------- 4
     {"foto": "senado-plenario", "ancora": "topo", "max": 900, "base": 112,
+     "entra": ("02", 560, 600), "sai": ("03", 560, 600),
      "titulo": [("k", "Em crimes de responsabilidade, "),
                 ("l", "quem julga é o "),
                 ("g", "Senado Federal.")],
@@ -73,11 +77,12 @@ T = [
                  ("Inabilitação por 8 anos", "para o exercício de qualquer "
                   "função pública")],
      "fonte": "CF, art. 52, II · Lei 1.079/1950 · Brossard, O Impeachment",
-     "fecho": "É por isso que boa parte das manifestações institucionais "
-              "recentes se dirige ao Senado."},
+     "fecho": "Falta o terceiro nome que todo mundo cita quando o assunto "
+              "aparece, e que não entra nessa conta."},
 
     # ---------------------------------------------------------------- 5
     {"fundo": "claro", "ancora": "topo", "max": 1150, "base": 168,
+     "entra": ("03", 560, 600),
      "titulo": [("k", "E o CNJ, "),
                 ("l", "que fiscaliza magistrados "),
                 ("g", "em todo o país?")],
@@ -86,11 +91,12 @@ T = [
                "Judiciário e está submetido à própria Corte que deveria "
                "fiscalizar."],
      "fonte": "CF, art. 103-B, § 4º · entendimento consolidado",
-     "fecho": "Essa limitação já apareceu na prática, em uma proposta "
-              "recente."},
+     "fecho": "Em agosto de 2026 essa fronteira apareceu escrita, em uma "
+              "proposta assinada pelo próprio Supremo."},
 
     # ---------------------------------------------------------------- 6
     {"ancora": "topo", "max": 1090, "base": 138,
+     "sai": ("ÉTICA", 230, 660),
      "titulo": [("k", "Agosto de 2026: "),
                 ("l", "uma proposta de "),
                 ("g", "código de ética para o Judiciário.")],
@@ -99,29 +105,30 @@ T = [
      "alcance": [(True, "Magistrados de todo o país", "alcançados"),
                  (False, "Ministros do próprio Supremo", "fora do texto")],
      "fonte": "Proposta apresentada ao CNJ pela presidência do STF",
-     "fecho": "Isso não significa que a Corte esteja sem resposta ao tema."},
+     "fecho": "A Corte já está escrevendo a resposta. Em outro texto."},
 
     # ---------------------------------------------------------------- 7
     {"foto": "colunata-esq", "ancora": "topo", "max": 740, "base": 122,
+     "entra": ("ÉTICA", 230, 660),
      "titulo": [("k", "Um código próprio para os ministros "),
                 ("l", "está "),
                 ("g", "em elaboração.")],
      "corpo": ["Seria a primeira norma desse tipo na história da Corte, com "
                "expectativa de votação ainda em 2026."],
      "fonte": "Relatoria da ministra Cármen Lúcia · votação prevista para 2026",
-     "fecho": "Existe um instrumento mais debatido do que o código de "
-              "ética."},
+     "fecho": "E existe um instrumento que divide muito mais opiniões do "
+              "que qualquer código de ética."},
 
     # ---------------------------------------------------------------- 8
-    {"foto": "colunata-dir", "ancora": "topo", "max": 780, "base": 118,
+    {"foto": "colunata-dir", "ancora": "topo", "max": 930, "base": 110,
      "titulo": [("k", "Afastamento cautelar "),
                 ("l", "é retirada temporária, "),
                 ("g", "sem juízo sobre culpa.")],
-     "corpo": ["A autoridade fica suspensa de suas funções enquanto a "
-               "apuração corre. Para ministros do STF a medida pode passar "
-               "pelo próprio Supremo ou pelo rito de crime de "
-               "responsabilidade no Senado."],
-     "fecho": "É exatamente aqui que o debate se divide."},
+     "corpo": ["A autoridade fica suspensa das funções enquanto a apuração "
+               "corre. Para ministros do Supremo não existe caminho único:"],
+     "efeitos": [("Pelo próprio Supremo", "a Corte decide sobre um dos seus"),
+                 ("Pelo Senado", "no rito de crime de responsabilidade")],
+     "fecho": "Os dois lados desse debate têm razão. É esse o problema."},
 
     # ---------------------------------------------------------------- 9
     {"fundo": "claro", "ancora": "topo", "max": 1150, "base": 158,
@@ -135,8 +142,8 @@ T = [
                 ("Contra · presunção de inocência",
                  "Afastar antes do julgamento antecipa efeitos de sanção "
                  "sobre quem ainda não foi condenado.")],
-     "fecho": "É esse choque que torna o tema juridicamente complexo, além "
-              "de politicamente controverso."},
+     "fecho": "Falta dizer quem, além dos dois lados, tem direito "
+              "garantido de sentar nessa mesa."},
 
     # ---------------------------------------------------------------- 10
     {"foto": "oab-conselho", "ancora": "topo", "max": 760, "base": 118,
@@ -148,8 +155,8 @@ T = [
                "a legitima a propor ação direta de "
                "inconstitucionalidade."],
      "fonte": "Lei 8.906/1994, art. 44, I · CF, art. 103, VII",
-     "fecho": "Entender o desenho institucional é o que permite participar "
-              "do debate com base técnica."},
+     "fecho": "Recapitulando os três endereços, e o que nenhum deles "
+              "resolve sozinho:"},
 
     # ---------------------------------------------------------------- 11
     {"ancora": "topo", "max": 1090, "base": 122,
@@ -191,6 +198,18 @@ def duo(nome: str):
         return None
     return ("data:image/webp;base64,"
             + base64.b64encode(arq.read_bytes()).decode("ascii"))
+
+
+def ponte_html(s: dict, lado: str) -> str:
+    """lado: 'sai' (metade esquerda, encostada na borda direita) ou 'entra'
+    (metade direita, encostada na borda esquerda)."""
+    p = s.get("sai") if lado == "sai" else s.get("entra")
+    if not p:
+        return ""
+    txt, tam, larg = p
+    borda = "right" if lado == "sai" else "left"
+    return (f'<div class="ponte" style="font-size:{tam}px;width:{larg}px;'
+            f'{borda}:-{larg // 2}px">{_html.escape(txt)}</div>')
 
 
 def bloco_html(s: dict) -> str:
@@ -241,7 +260,8 @@ def slide_html(s: dict, i: int, logo: str) -> str:
     if s.get("foto"):
         fundo = f'<div class="foto"><img src="{duo(s["foto"])}" alt=""></div>'
     return (f'<section class="slide {s.get("fundo", "")}" data-i="{i}">'
-            + fundo + bloco_html(s)
+            + fundo + ponte_html(s, 'sai') + ponte_html(s, 'entra')
+            + bloco_html(s)
             + f'<div class="logo"><div>{logo}</div></div></section>')
 
 

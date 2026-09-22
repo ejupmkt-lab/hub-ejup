@@ -17,9 +17,27 @@ A fotografia ocupa os 900 px inferiores do quadro e sobe por trás do texto
 com máscara e gradiente, então não sobra quadro vazio embaixo. Nas telas sem
 fotografia a tipografia cresce até encostar na margem do logo.
 
-Duas telas claras quebram o ritmo (a do CNJ e a do choque de princípios), e
-a colunata das telas 7 e 8 é uma fotografia só, fatiada ao meio: passar o
-dedo percorre a mesma imagem.
+## A ponte entre telas
+
+Um algarismo gigante partido ao meio: a metade esquerda sai pela borda
+direita de uma tela e a metade direita entra pela borda esquerda da
+seguinte. Quem arrasta completa a figura com o próprio dedo. Fica atrás do
+texto e à frente da fotografia, em dourado rebaixado.
+
+| Par | Ponte |
+|---|---|
+| 2 → 3 | `01`, a primeira competência |
+| 3 → 4 | `02`, a segunda |
+| 4 → 5 | `03`, a terceira |
+| 6 → 7 | a palavra `ÉTICA` |
+| 7 → 8 | a mesma fotografia da colunata, fatiada ao meio |
+
+Duas telas claras quebram o ritmo: a do CNJ e a do choque de princípios.
+
+Cada tela fecha puxando a seguinte. O fecho da 3 anuncia "um julgador que
+não usa toga", o da 4 anuncia "o terceiro nome que todo mundo cita", o da 6
+anuncia que a resposta está sendo escrita em outro texto, e o da 10 anuncia
+a recapitulação. A leitura só fecha na última tela.
 
 ## Como reconstruir
 

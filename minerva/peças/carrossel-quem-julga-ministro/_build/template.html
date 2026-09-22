@@ -28,6 +28,17 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;
   background:linear-gradient(180deg,rgba(4,16,28,.52) 0%,rgba(4,16,28,.16) 40%,
              rgba(4,16,28,.42) 74%,rgba(4,16,28,.95) 100%)}
 
+
+/* ===================== A PONTE ENTRE TELAS =====================
+   Um algarismo (ou uma palavra) gigante partido ao meio: a metade esquerda
+   sai pela borda direita de uma tela e a metade direita entra pela borda
+   esquerda da seguinte. Quem arrasta completa a figura com o próprio dedo.
+   Fica atrás do texto e à frente da fotografia, em dourado rebaixado. */
+.ponte{position:absolute;z-index:2;bottom:170px;text-align:center;
+  font-weight:900;line-height:.76;letter-spacing:-.045em;
+  color:rgba(240,184,85,.17);pointer-events:none;white-space:nowrap}
+.claro .ponte{color:rgba(155,107,38,.26)}
+
 /* ===================== blocos gráficos ===================== */
 /* consequências da condenação (tela 4) */
 .efeitos{display:flex;gap:.26em;margin:.34em 0 0}
