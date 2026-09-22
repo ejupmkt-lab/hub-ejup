@@ -17,13 +17,25 @@ A fotografia ocupa os 900 px inferiores do quadro e sobe por trás do texto
 com máscara e gradiente, então não sobra quadro vazio embaixo. Nas telas sem
 fotografia a tipografia cresce até encostar na margem do logo.
 
-## A ligação entre telas: a colunata
+## As emendas (prévia aguardando aprovação do Victor)
 
-Cada emenda entre duas telas é uma coluna do Palácio do Supremo, desenhada
-em vetor e partida ao meio pela borda: metade fecha uma tela, metade abre a
-seguinte. Arrastar o carrossel é caminhar ao longo da fachada do STF, e a
-capa convida a isso ("Arraste e atravesse a praça"). Nas telas escuras a
-coluna é mármore; nas claras, a mesma coluna aparece em navy, contraluz.
+Cada virada de tela tem uma ligação própria, tirada do conteúdo, em escala
+discreta. Nenhum recurso se repete em duas emendas seguidas.
+
+| Emenda | Ligação |
+|---|---|
+| 1 → 2 | a fotografia do STF escorre para a tela seguinte |
+| 2 → 3 | carimbo "Requerimento · Protocolado · Conselho Pleno" |
+| 3 → 4 | a fotografia do edifício escorre |
+| 4 → 5 | janela em arco antecipando o mármore do plenário do STF |
+| 5 → 6 | recorte do art. 52, II, da Constituição |
+| 6 → 7 | a fotografia do Senado escorre |
+| 7 → 8 → 9 | a folha clara é maior que o quadro e invade as vizinhas |
+| 9 → 10 | recorte do art. 103-B, § 4º |
+| 10 → 13 | uma fotografia só da esplanada, da borda da 10 à borda da 13 |
+| 13 → 14 → 15 | a folha clara invade as vizinhas |
+| 15 → 16 | recorte do art. 103, VII |
+| 16 → 17 | janela em arco com a fachada do STF, voltando à capa |
 
 ## Uma ideia por tela
 

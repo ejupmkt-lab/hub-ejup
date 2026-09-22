@@ -17,14 +17,25 @@ MISTURA = 0.5
 FORTE = {"stf-fachada": 0.72, "senado-plenario": 0.88,
          "stf-plenario": 0.95, "colunata": 1.0}
 
+# nome → (arquivo, janela x0,y0,x1,y1, largura, altura, fatias)
+# Fatias maiores que a tela escorrem para a vizinha: o pedaço além de 1080
+# vira o "rabo" que entra pela borda esquerda da tela seguinte.
 USOS = {
-    "stf-fachada": ("stf-fachada.jpg", (0.04, 0.12, 0.96, 0.80), 1080, 900),
-    "oab-sede": ("antigo-stf.jpg", (0.00, 0.08, 1.00, 0.92), 1080, 900),
-    "stf-plenario": ("stf-plenario.jpg", (0.12, 0.00, 0.64, 0.58), 1080, 900),
+    "stf-fachada": ("stf-fachada.jpg", (0.00, 0.12, 1.00, 0.80), 1440, 900,
+                    [("stf-fachada", 0, 1080), ("stf-fachada-rabo", 1080, 1440)]),
+    "oab-sede": ("antigo-stf.jpg", (0.00, 0.08, 1.00, 0.92), 1440, 900,
+                 [("oab-sede", 0, 1080), ("oab-sede-rabo", 1080, 1440)]),
+    "stf-plenario": ("stf-plenario.jpg", (0.12, 0.00, 0.64, 0.58), 1080, 900,
+                     [("stf-plenario", 0, 1080)]),
     "senado-plenario": ("senado-plenario.jpg", (0.00, 0.10, 1.00, 1.00),
-                        1080, 900),
-    "colunata": ("colunata.jpg", (0.00, 0.04, 1.00, 0.72), 2160, 900),
-    "oab-conselho": ("antigo-stf-2.jpg", (0.18, 0.30, 0.82, 0.64), 1080, 900),
+                        1440, 900,
+                        [("senado-plenario", 0, 1080),
+                         ("senado-plenario-rabo", 1080, 1440)]),
+    "colunata": ("colunata.jpg", (0.00, 0.04, 1.00, 0.72), 2880, 900,
+                 [("colunata-cabeca", 0, 360), ("colunata-esq", 360, 1440),
+                  ("colunata-dir", 1440, 2520), ("colunata-rabo", 2520, 2880)]),
+    "oab-conselho": ("antigo-stf-2.jpg", (0.18, 0.30, 0.82, 0.64), 1080, 900,
+                     [("oab-conselho", 0, 1080)]),
 }
 
 
@@ -47,23 +58,17 @@ def recortar(im, jan, w, h):
 
 def main():
     DEST.mkdir(exist_ok=True)
-    for nome, (arq, jan, w, h) in USOS.items():
+    for nome, (arq, jan, w, h, fatias) in USOS.items():
         origem = FOTOS / arq
         if not origem.exists():
             print(f"  (falta {arq})")
             continue
         out = tingir(recortar(Image.open(origem).convert("RGB"), jan, w, h),
                      FORTE.get(nome, MISTURA))
-        if out.width > 1080:
-            for lado, x in (("esq", 0), ("dir", 1080)):
-                saida = DEST / f"{nome}-{lado}.webp"
-                out.crop((x, 0, x + 1080, out.height)).save(
-                    saida, "WEBP", quality=86, method=6)
-                print(f"{saida.name}: {saida.stat().st_size/1024:.0f} KB")
-            continue
-        saida = DEST / f"{nome}.webp"
-        out.save(saida, "WEBP", quality=86, method=6)
-        print(f"{saida.name}: {out.size} ({saida.stat().st_size/1024:.0f} KB)")
+        for fn, x0, x1 in fatias:
+            saida = DEST / f"{fn}.webp"
+            out.crop((x0, 0, x1, h)).save(saida, "WEBP", quality=86, method=6)
+            print(f"{saida.name}: {x1 - x0}x{h} ({saida.stat().st_size/1024:.0f} KB)")
 
 
 if __name__ == "__main__":

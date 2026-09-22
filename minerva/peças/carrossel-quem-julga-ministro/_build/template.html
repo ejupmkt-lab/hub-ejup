@@ -29,15 +29,51 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;
              rgba(4,16,28,.42) 74%,rgba(4,16,28,.95) 100%)}
 
 
-/* ===================== A COLUNATA =====================
-   Cada emenda entre telas é uma coluna do Palácio do Supremo, partida ao
-   meio pela borda. O SVG é o mesmo dos dois lados da emenda e o overflow da
-   tela recorta cada metade, então as duas se encontram exatas quando o dedo
-   arrasta. Fica à frente da fotografia e atrás do texto. */
-.coluna{position:absolute;top:0;z-index:3;width:196px;height:1440px;
-  pointer-events:none;filter:drop-shadow(0 18px 30px rgba(3,14,26,.35))}
-.coluna svg{display:block}
-.claro .coluna{filter:none}
+/* ===================== AS EMENDAS =====================
+   Cada virada de tela tem a sua ligação. As peças que atravessam a borda
+   são o mesmo elemento dos dois lados: centradas na emenda, o overflow da
+   tela recorta cada metade. */
+.x{position:absolute;z-index:4;bottom:112px;pointer-events:none}
+.x.sai{right:0;transform:translateX(50%)}
+.x.entra{left:0;transform:translateX(-50%)}
+
+/* a janela em arco antecipa o lugar da tela seguinte */
+.arco{width:210px;height:290px;border-radius:105px 105px 0 0;overflow:hidden;
+  border:2px solid var(--gold);box-shadow:0 24px 48px rgba(3,14,26,.5)}
+.arco img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* o recorte do artigo, que só termina na tela seguinte */
+.folha{width:340px;padding:24px 28px 26px;background:var(--papel);
+  color:var(--navy);box-shadow:0 24px 48px rgba(3,14,26,.5)}
+.folha .e{margin:0;font-weight:500;font-size:13px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--bronze)}
+.folha .a{margin:6px 0 0;font-weight:900;font-size:26px;letter-spacing:-.02em}
+.folha .t{margin:10px 0 0;font-weight:300;font-size:16px;line-height:1.45;
+  color:var(--graphite)}
+
+/* o carimbo de protocolo */
+.selo{width:190px;height:190px;color:var(--gold);opacity:.85}
+.selo svg{width:100%;height:100%;display:block}
+
+/* a fotografia que escorre para a vizinha */
+.escorre{position:absolute;bottom:0;width:360px;height:900px;z-index:0;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 30%);
+  mask-image:linear-gradient(180deg,transparent 0%,#000 30%)}
+.escorre.e{left:0}
+.escorre.d{right:0}
+.escorre img{display:block;width:100%;height:100%}
+.escorre.e img{-webkit-mask-image:linear-gradient(90deg,#000 15%,transparent 100%);
+  mask-image:linear-gradient(90deg,#000 15%,transparent 100%)}
+.escorre.d img{-webkit-mask-image:linear-gradient(270deg,#000 15%,transparent 100%);
+  mask-image:linear-gradient(270deg,#000 15%,transparent 100%)}
+.escorre::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(4,16,28,.3) 0%,rgba(4,16,28,.95) 100%)}
+
+/* a folha clara é maior que o quadro e invade as vizinhas */
+.papel{position:absolute;top:0;bottom:0;width:84px;z-index:3;
+  background:var(--papel);box-shadow:0 0 44px rgba(3,14,26,.6)}
+.papel.d{right:0}
+.papel.e{left:0}
 
 /* ===================== blocos gráficos ===================== */
 /* consequências da condenação (tela 4) */
@@ -82,9 +118,9 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;
 .recap strong.vazio{font-weight:900;font-size:.46em;line-height:.9;color:var(--gold)}
 
 /* ===================== texto ===================== */
-.bloco{position:absolute;left:124px;right:124px;z-index:5;font-size:100px}
+.bloco{position:absolute;left:96px;right:96px;z-index:5;font-size:100px}
 .topo{top:150px}
-.centro{top:50%;transform:translateY(-56%)}
+.centro{top:50%;transform:translateY(-60%)}
 .titulo{margin:0;font-size:.58em;line-height:1.12;letter-spacing:-.022em}
 .titulo .k{font-weight:900;color:#fff}
 .titulo .l{font-weight:300;color:rgba(255,255,255,.82)}
