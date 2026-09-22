@@ -9,12 +9,10 @@ cautelar.
 Peça descritiva. Nenhum ministro é nomeado como investigado, nenhum caso
 concreto é julgado, nenhum lado do debate público é encampado.
 
-O dispositivo visual é O SELO DE COMPETÊNCIA: um objeto único preso a uma
-haste vertical no alto de cada tela, respondendo passo a passo a pergunta da
-capa. Enquanto a resposta ainda não chegou, a haste fica em prata e o selo
-carrega a própria pergunta. Quando a competência aparece, a haste acende em
-dourado e o selo mostra a base legal. No CNJ a haste volta ao prata, porque
-ali a resposta é de não alcance.
+Sem rótulo no alto: cada tela abre direto no título. A base legal entra como
+linha de fonte, embaixo do corpo, onde ela pertence. A fotografia ocupa a
+metade inferior inteira do quadro e o texto sobe até a margem de topo, para
+não sobrar quadro vazio.
 """
 
 import base64
@@ -34,8 +32,7 @@ FACES = [("Gotham-Light.otf", 300), ("Gotham-Book.otf", 400),
 
 T = [
     # ---------------------------------------------------------------- 1
-    {"foto": "stf-fachada", "ancora": "topo", "max": 640,
-     "selo": ("A pergunta", "Quem julga um ministro do STF?", None, "off"),
+    {"foto": "stf-fachada", "ancora": "topo", "max": 740, "base": 120,
      "titulo": [("k", "Quem, de fato, pode "),
                 ("g", "julgar um ministro do STF?")],
      "corpo": ["A resposta é menos simples do que o debate público costuma "
@@ -43,8 +40,7 @@ T = [
      "pilula": "Arraste: os mecanismos que o ordenamento realmente prevê"},
 
     # ---------------------------------------------------------------- 2
-    {"foto": "oab-sede", "ancora": "topo", "max": 700,
-     "selo": ("A pergunta", "Quem julga um ministro do STF?", None, "off"),
+    {"foto": "oab-sede", "ancora": "topo", "max": 800, "base": 116,
      "titulo": [("k", "Setembro de 2026: "),
                 ("l", "o tema entra na "),
                 ("g", "pauta institucional da advocacia.")],
@@ -56,21 +52,17 @@ T = [
               "técnica que vem primeiro."},
 
     # ---------------------------------------------------------------- 3
-    {"foto": "stf-plenario", "ancora": "topo", "max": 640,
-     "selo": ("Competência 01 de 03", "O próprio Supremo",
-              "Infração penal comum · CF, art. 102, I, “b”", "on"),
+    {"foto": "stf-plenario", "ancora": "topo", "max": 740, "base": 120,
      "titulo": [("k", "A Constituição divide a competência "),
                 ("l", "conforme "),
                 ("g", "o tipo de infração.")],
      "corpo": ["Em infrações penais comuns, é o próprio Supremo quem julga "
                "seus integrantes, por foro de prerrogativa de função."],
+     "fonte": "CF, art. 102, I, “b”",
      "fecho": "Existe outra via, com outro julgador."},
 
     # ---------------------------------------------------------------- 4
-    {"foto": "senado-plenario", "ancora": "topo", "max": 700,
-     "selo": ("Competência 02 de 03", "O Senado Federal",
-              "Crime de responsabilidade · CF, art. 52, II · Lei 1.079/1950",
-              "on"),
+    {"foto": "senado-plenario", "ancora": "topo", "max": 900, "base": 112,
      "titulo": [("k", "Em crimes de responsabilidade, "),
                 ("l", "quem julga é o "),
                 ("g", "Senado Federal.")],
@@ -80,15 +72,12 @@ T = [
                   "trânsito da decisão do Senado"),
                  ("Inabilitação por 8 anos", "para o exercício de qualquer "
                   "função pública")],
-     "fonte": "CF, art. 52, II · Lei 1.079/1950 · doutrina: Paulo Brossard, "
-              "O Impeachment (Saraiva)",
+     "fonte": "CF, art. 52, II · Lei 1.079/1950 · Brossard, O Impeachment",
      "fecho": "É por isso que boa parte das manifestações institucionais "
               "recentes se dirige ao Senado."},
 
     # ---------------------------------------------------------------- 5
-    {"fundo": "claro", "ancora": "topo", "max": 990, "base": 144,
-     "selo": ("Competência 03 de 03", "O CNJ, fora de alcance",
-              "CF, art. 103-B, § 4º · entendimento consolidado", "fora"),
+    {"fundo": "claro", "ancora": "topo", "max": 1150, "base": 168,
      "titulo": [("k", "E o CNJ, "),
                 ("l", "que fiscaliza magistrados "),
                 ("g", "em todo o país?")],
@@ -96,13 +85,12 @@ T = [
                "os ministros do Supremo. Ele integra a estrutura do "
                "Judiciário e está submetido à própria Corte que deveria "
                "fiscalizar."],
+     "fonte": "CF, art. 103-B, § 4º · entendimento consolidado",
      "fecho": "Essa limitação já apareceu na prática, em uma proposta "
               "recente."},
 
     # ---------------------------------------------------------------- 6
-    {"ancora": "topo", "max": 1000, "base": 124,
-     "selo": ("Competência 03 de 03", "O CNJ, fora de alcance",
-              "CF, art. 103-B, § 4º · entendimento consolidado", "fora"),
+    {"ancora": "topo", "max": 1090, "base": 138,
      "titulo": [("k", "Agosto de 2026: "),
                 ("l", "uma proposta de "),
                 ("g", "código de ética para o Judiciário.")],
@@ -110,25 +98,22 @@ T = [
                "declarado da proposta expõe a mesma fronteira:"],
      "alcance": [(True, "Magistrados de todo o país", "alcançados"),
                  (False, "Ministros do próprio Supremo", "fora do texto")],
+     "fonte": "Proposta apresentada ao CNJ pela presidência do STF",
      "fecho": "Isso não significa que a Corte esteja sem resposta ao tema."},
 
     # ---------------------------------------------------------------- 7
-    {"foto": "colunata-esq", "ancora": "topo", "max": 640,
-     "selo": ("Em elaboração", "Código de ética dos ministros",
-              "Relatoria da ministra Cármen Lúcia · votação prevista para "
-              "2026", "on"),
+    {"foto": "colunata-esq", "ancora": "topo", "max": 740, "base": 122,
      "titulo": [("k", "Um código próprio para os ministros "),
                 ("l", "está "),
                 ("g", "em elaboração.")],
      "corpo": ["Seria a primeira norma desse tipo na história da Corte, com "
                "expectativa de votação ainda em 2026."],
+     "fonte": "Relatoria da ministra Cármen Lúcia · votação prevista para 2026",
      "fecho": "Existe um instrumento mais debatido do que o código de "
               "ética."},
 
     # ---------------------------------------------------------------- 8
-    {"foto": "colunata-dir", "ancora": "topo", "max": 680,
-     "selo": ("O instrumento em disputa", "Afastamento cautelar",
-              "Sem caminho único: Supremo ou rito do Senado", "on"),
+    {"foto": "colunata-dir", "ancora": "topo", "max": 780, "base": 118,
      "titulo": [("k", "Afastamento cautelar "),
                 ("l", "é retirada temporária, "),
                 ("g", "sem juízo sobre culpa.")],
@@ -139,9 +124,7 @@ T = [
      "fecho": "É exatamente aqui que o debate se divide."},
 
     # ---------------------------------------------------------------- 9
-    {"fundo": "claro", "ancora": "topo", "max": 1000, "base": 136,
-     "selo": ("O instrumento em disputa", "Afastamento cautelar",
-              "Dois princípios constitucionais em colisão", "on"),
+    {"fundo": "claro", "ancora": "topo", "max": 1150, "base": 158,
      "titulo": [("k", "Dois fundamentos legítimos, "),
                 ("l", "em rota de "),
                 ("g", "colisão.")],
@@ -156,9 +139,7 @@ T = [
               "de politicamente controverso."},
 
     # ---------------------------------------------------------------- 10
-    {"foto": "oab-conselho", "ancora": "topo", "max": 660,
-     "selo": ("Quem tem assento", "A advocacia",
-              "Lei 8.906/1994, art. 44, I · CF, art. 103, VII", "on"),
+    {"foto": "oab-conselho", "ancora": "topo", "max": 760, "base": 118,
      "titulo": [("k", "A OAB tem assento "),
                 ("l", "garantido pela "),
                 ("g", "Constituição.")],
@@ -166,13 +147,12 @@ T = [
                "jurídica do Estado democrático de direito, e a Constituição "
                "a legitima a propor ação direta de "
                "inconstitucionalidade."],
+     "fonte": "Lei 8.906/1994, art. 44, I · CF, art. 103, VII",
      "fecho": "Entender o desenho institucional é o que permite participar "
               "do debate com base técnica."},
 
     # ---------------------------------------------------------------- 11
-    {"ancora": "topo", "max": 1000, "base": 110,
-     "selo": ("O quadro completo", "Três endereços, nenhum centralizado",
-              None, "on"),
+    {"ancora": "topo", "max": 1090, "base": 122,
      "recap": [("Infração penal comum", "o próprio STF"),
                ("Crime de responsabilidade", "o Senado Federal"),
                ("Controle administrativo", "fora do alcance do CNJ")],
@@ -211,16 +191,6 @@ def duo(nome: str):
         return None
     return ("data:image/webp;base64,"
             + base64.b64encode(arq.read_bytes()).decode("ascii"))
-
-
-def selo_html(s: dict) -> str:
-    rot, quem, base, estado = s["selo"]
-    cls = {"on": "selo on", "fora": "selo fora", "off": "selo"}[estado]
-    p = [f'<div class="e">{_html.escape(rot)}</div>',
-         f'<div class="q">{_html.escape(quem)}</div>']
-    if base:
-        p.append(f'<div class="b">{_html.escape(base)}</div>')
-    return f'<div class="{cls}">{"".join(p)}</div>'
 
 
 def bloco_html(s: dict) -> str:
@@ -271,7 +241,7 @@ def slide_html(s: dict, i: int, logo: str) -> str:
     if s.get("foto"):
         fundo = f'<div class="foto"><img src="{duo(s["foto"])}" alt=""></div>'
     return (f'<section class="slide {s.get("fundo", "")}" data-i="{i}">'
-            + fundo + selo_html(s) + bloco_html(s)
+            + fundo + bloco_html(s)
             + f'<div class="logo"><div>{logo}</div></div></section>')
 
 

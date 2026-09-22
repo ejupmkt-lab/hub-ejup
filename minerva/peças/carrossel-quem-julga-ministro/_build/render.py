@@ -14,12 +14,10 @@ MEDIR = """
 () => Array.from(document.querySelectorAll('.slide')).map(s => {
   const r = s.getBoundingClientRect();
   const b = s.querySelector('.bloco').getBoundingClientRect();
-  const sl = s.querySelector('.selo').getBoundingClientRect();
   const l = s.querySelector('.logo').getBoundingClientRect();
   const f = s.querySelector('.foto');
   return { i:+s.dataset.i, escala:+s.dataset.escala,
            w:Math.round(r.width), h:Math.round(r.height),
-           seloFim:Math.round(sl.bottom - r.top),
            topo:Math.round(b.top - r.top), fim:Math.round(b.bottom - r.top),
            fotoTopo: f ? Math.round(f.getBoundingClientRect().top - r.top) : null,
            logoTopo:Math.round(l.top - r.top) };
@@ -55,20 +53,17 @@ def main() -> None:
             n = m["i"] + 1
             if (m["w"], m["h"]) != (1080, 1440):
                 problemas.append(f"tela {n}: {m['w']}×{m['h']} ≠ 1080×1440")
-            if m["topo"] < m["seloFim"] + 20:
-                problemas.append(f"tela {n}: o texto ({m['topo']}) encosta no "
-                                 f"trilho ({m['seloFim']})")
             if m["fim"] > m["logoTopo"] - 20:
                 problemas.append(f"tela {n}: o texto ({m['fim']}) encosta no "
                                  f"logo ({m['logoTopo']})")
-            if m["fotoTopo"] is not None and m["fim"] > m["fotoTopo"] + 120:
+            if m["fotoTopo"] is not None and m["fim"] > m["fotoTopo"] + 340:
                 problemas.append(f"tela {n}: o texto ({m['fim']}) invade a "
                                  f"foto ({m['fotoTopo']})")
             if m["escala"] <= 50:
                 problemas.append(f"tela {n}: texto encolheu ao limite, "
                                  "corte a copy")
-            print(f"tela {n}: escala {m['escala']}px · trilho até "
-                  f"{m['seloFim']} · texto {m['topo']}–{m['fim']} · foto "
+            print(f"tela {n}: escala {m['escala']}px · "
+                  f"texto {m['topo']}–{m['fim']} · foto "
                   f"{m['fotoTopo']} · logo {m['logoTopo']}")
             page.locator(f'.slide[data-i="{m["i"]}"]').screenshot(
                 path=str(prev / f"tela-{n:02d}.png"))

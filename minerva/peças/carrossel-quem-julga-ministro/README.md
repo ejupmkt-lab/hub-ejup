@@ -7,14 +7,15 @@ da EJUP sobre responsabilização de ministros do Supremo.
 concreto é julgado, nenhum lado do debate público é encampado. A peça
 descreve competência, rito e instrumento.
 
-## O dispositivo visual
+## O enquadramento
 
-**O selo de competência.** Um objeto único preso a uma haste vertical no
-alto de cada tela, respondendo passo a passo a pergunta da capa. Enquanto a
-resposta ainda não chegou, a haste fica em prata e o selo carrega a própria
-pergunta. Quando a competência aparece, a haste acende em dourado e o selo
-mostra a base legal. No CNJ a haste volta ao prata, porque ali a resposta é
-de não alcance.
+Sem rótulo no alto: cada tela abre direto no título, na margem de topo. A
+base legal entra como linha de fonte, sob uma hairline dourada, logo abaixo
+do corpo, onde ela pertence.
+
+A fotografia ocupa os 900 px inferiores do quadro e sobe por trás do texto
+com máscara e gradiente, então não sobra quadro vazio embaixo. Nas telas sem
+fotografia a tipografia cresce até encostar na margem do logo.
 
 Duas telas claras quebram o ritmo (a do CNJ e a do choque de princípios), e
 a colunata das telas 7 e 8 é uma fotografia só, fatiada ao meio: passar o
