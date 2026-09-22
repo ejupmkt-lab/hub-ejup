@@ -14,16 +14,17 @@ FOTOS = HERE.parent / "fotos"
 DEST = HERE / "duotone"
 SOMBRA, LUZ = (3, 14, 26), (126, 156, 186)
 MISTURA = 0.5
-FORTE = {"stf-fachada": 0.72, "senado-plenario": 0.88, "stf-plenario": 0.85}
+FORTE = {"stf-fachada": 0.72, "senado-plenario": 0.88,
+         "stf-plenario": 0.95, "colunata": 1.0}
 
 USOS = {
     "stf-fachada": ("stf-fachada.jpg", (0.02, 0.10, 0.98, 0.86), 1080, 680),
     "oab-sede": ("antigo-stf.jpg", (0.00, 0.08, 1.00, 0.92), 1080, 700),
-    "stf-plenario": ("stf-plenario.jpg", (0.00, 0.00, 1.00, 1.00), 1080, 640),
+    "stf-plenario": ("stf-plenario.jpg", (0.12, 0.00, 0.64, 0.58), 1080, 640),
     "senado-plenario": ("senado-plenario.jpg", (0.00, 0.10, 1.00, 1.00),
                         1080, 700),
-    "colunata": ("colunata.jpg", (0.00, 0.10, 1.00, 0.98), 2160, 700),
-    "oab-conselho": ("antigo-stf-2.jpg", (0.00, 0.10, 1.00, 0.88), 1080, 660),
+    "colunata": ("colunata.jpg", (0.00, 0.04, 1.00, 0.72), 2160, 700),
+    "oab-conselho": ("antigo-stf-2.jpg", (0.18, 0.30, 0.82, 0.64), 1080, 660),
 }
 
 
