@@ -105,10 +105,10 @@ def frase(texto, autor, tempo, img, lado):
 
 def telas():
     capa_foto = foto("duo-vertical.webp", (0, .05, 1, .80), 1080)       # 3:4
-    conversa = foto("duo-conversa.webp", (.20, 0.0, .86, .92))         # cartão 460x360
+    conversa = foto("mesa-tres.webp", (.12, .06, .98, .98))            # cartão 460x360: a mesa inteira
     foto_edu = foto("mesa-tres.webp", (.60, .16, 1.0, .69))            # 4:3, Eduardo falando
     foto_nic = foto("duo-conversa.webp", (.20, 0.0, .86, .88))         # 4:3, Nicácio falando
-    mesa = foto("mesa-tres.webp", (.06, .08, .98, .92))                # 16:9 aprox.
+    host = foto("rossana.webp", (.14, 0.0, .86, .78))                  # onde assistir: a host
     return [
         # 1 · capa
         f"""<section class="s papel">
@@ -143,9 +143,9 @@ def telas():
         # 6 · onde assistir
         f"""<section class="s papel">
   {painel(460)}
-  {cartao(mesa, "left:112px;right:112px;top:250px;height:480px")}
+  {cartao(host, "left:112px;right:112px;top:250px;height:480px")}
   <h1 class="cartao-tit" style="top:790px"><span>Episódio completo</span>Assista no YouTube<br>e no Spotify.</h1>
-  <p class="pergunta">E você: usa IA para <em>escrever</em> ou para <em>pensar</em>? Conta nos comentários.</p>
+  <p class="pergunta">Com a Dra. Rossana Fonseca. E você: usa IA para <em>escrever</em> ou para <em>pensar</em>? Conta nos comentários.</p>
   <div class="play" style="top:1230px;left:112px;right:auto">Link na bio <span>&#9654;</span></div>
 </section>""",
     ]
