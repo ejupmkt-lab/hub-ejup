@@ -10,12 +10,11 @@ termina deixando a seguinte em aberto.
 Peça descritiva. Nenhum ministro é nomeado como investigado, nenhum caso
 concreto é julgado, nenhum lado do debate público é encampado.
 
-AS EMENDAS. Cada virada de tela tem uma ligação própria, tirada do
-conteúdo, em escala discreta: a fotografia que escorre para a tela seguinte,
-o carimbo de protocolo do requerimento, a janela em arco que antecipa o
-plenário, o recorte do artigo da Constituição que só termina na tela
-seguinte, e a folha clara que invade as vizinhas antes de ocupar a tela
-inteira. Nenhum recurso se repete em duas emendas seguidas.
+AS EMENDAS. Algumas viradas de tela têm uma ligação própria, tirada do
+conteúdo e sempre com forma definida, para ler como intenção mesmo vista
+uma tela por vez: o carimbo de protocolo do requerimento, a janela em arco
+que antecipa o lugar seguinte e o recorte do artigo da Constituição que só
+termina na tela seguinte. A esplanada das telas 11 e 12 é uma fotografia só.
 """
 
 import base64
@@ -231,19 +230,10 @@ FOLHAS = {
 
 # emenda entre a tela i e a tela i+1 (índices a partir de 0)
 EMENDAS = {
-    0: ("escorre", "stf-fachada-rabo"),
     1: ("selo", "REQUERIMENTO · PROTOCOLADO · CONSELHO PLENO · "),
-    2: ("escorre", "oab-sede-rabo"),
     3: ("arco", "stf-plenario"),
     4: ("folha", "52"),
-    5: ("escorre", "senado-plenario-rabo"),
-    6: ("papel", None),
-    7: ("papel", None),
     8: ("folha", "103b"),
-    9: ("antecipa", "colunata-cabeca"),
-    11: ("escorre", "colunata-rabo"),
-    12: ("papel", None),
-    13: ("papel", None),
     14: ("folha", "103"),
     15: ("arco", "stf-fachada"),
 }

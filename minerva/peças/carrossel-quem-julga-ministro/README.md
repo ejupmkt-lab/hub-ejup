@@ -17,23 +17,20 @@ A fotografia ocupa os 900 px inferiores do quadro e sobe por trás do texto
 com máscara e gradiente, então não sobra quadro vazio embaixo. Nas telas sem
 fotografia a tipografia cresce até encostar na margem do logo.
 
-## As emendas (prévia aguardando aprovação do Victor)
+## As emendas
 
-Cada virada de tela tem uma ligação própria, tirada do conteúdo, em escala
-discreta. Nenhum recurso se repete em duas emendas seguidas.
+Algumas viradas de tela têm uma ligação própria, tirada do conteúdo e sempre
+com forma definida, para ler como intenção mesmo quando a tela é vista
+sozinha. Recursos que parecem corte acidental (faixa de fundo na borda,
+fotografia que some pela lateral) ficaram de fora.
 
 | Emenda | Ligação |
 |---|---|
-| 1 → 2 | a fotografia do STF escorre para a tela seguinte |
 | 2 → 3 | carimbo "Requerimento · Protocolado · Conselho Pleno" |
-| 3 → 4 | a fotografia do edifício escorre |
 | 4 → 5 | janela em arco antecipando o mármore do plenário do STF |
 | 5 → 6 | recorte do art. 52, II, da Constituição |
-| 6 → 7 | a fotografia do Senado escorre |
-| 7 → 8 → 9 | a folha clara é maior que o quadro e invade as vizinhas |
 | 9 → 10 | recorte do art. 103-B, § 4º |
-| 10 → 13 | uma fotografia só da esplanada, da borda da 10 à borda da 13 |
-| 13 → 14 → 15 | a folha clara invade as vizinhas |
+| 11 → 12 | uma fotografia só da esplanada, dividida entre as duas telas |
 | 15 → 16 | recorte do art. 103, VII |
 | 16 → 17 | janela em arco com a fachada do STF, voltando à capa |
 
