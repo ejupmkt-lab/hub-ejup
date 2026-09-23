@@ -1,8 +1,8 @@
 # Carrossel · EJUPcast #018 · Nicácio Carvalho e Eduardo Pacheco
 
-Onze telas 1080×1440. Estrutura adaptada da referência HUMAN Podcast
+Seis telas 1080×1440, como na referência: capa, temas, uma frase de cada convidado, cartão e onde assistir. Estrutura adaptada da referência HUMAN Podcast
 (`referencias/`): capa com número grande e foto, temas em tipografia
-gigante, uma frase por tela, cartão dos convidados, onde assistir. As
+gigante, uma frase de cada convidado, cartão dos convidados, onde assistir. As
 facetas coral da referência viram navy, aço e dourado.
 
 - Texto e timecode de cada fala: `texto-carrossel.md`

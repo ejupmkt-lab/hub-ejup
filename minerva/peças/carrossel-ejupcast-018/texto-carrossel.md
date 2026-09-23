@@ -1,5 +1,9 @@
 # EJUPcast #018 · Texto do carrossel
 
+> **Versão publicada: 6 telas** (capa, temas, frase do Eduardo 22:44, frase do
+> Nicácio 27:19, cartão, onde assistir). As demais frases abaixo ficam como
+> banco para cortes e stories.
+
 **Convidados:** Nicácio Carvalho e Eduardo Pacheco (ex-presidentes da Comissão
 da Jovem Advocacia da OAB/RN) · **Host:** Dra. Rossana Fonseca
 **Fonte:** transcrição do episódio (`transcricao-ep18.pdf`), 01:05:56

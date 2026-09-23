@@ -123,20 +123,10 @@ def telas():
   {SETA}
 </section>""",
         frase("Se a IA faz o meu trabalho por mim, eu mesmo estou me colocando numa posição de <em>ser substituível.</em>",
-              "Eduardo Pacheco", "22:44", img=faixa_duo),
-        frase("Eu não delego a produção de peças para a IA. Eu peço para ela apresentar <em>as objeções à tese</em> que eu vou defender na tribuna.",
-              "Nicácio Carvalho", "09:34", escuro=True, tam=92),
-        frase("A advocacia vai ser espremida em dois polos: a de massa e a estratégica. <em>O meio do caminho vai desaparecer.</em>",
-              "Eduardo Pacheco", "15:43", tam=74, img=faixa_mesa),
-        frase("A IA não é uma inteligência propriamente. É uma grande base de dados que faz a gente <em>pensar que ela está refletindo.</em>",
-              "Nicácio Carvalho", "17:04", escuro=True, tam=94),
-        frase("Um cliente implementou IA num processo comercial que não estava ajustado. <em>A IA potencializou os erros.</em>",
-              "Eduardo Pacheco", "18:59", tam=98),
+              "Eduardo Pacheco", "22:44", img=faixa_duo, tam=84),
         frase("O advogado usa IA para peticionar, o juiz para sentenciar, o outro lado para recorrer. <em>O processo é julgado em cinco segundos.</em>",
-              "Nicácio Carvalho", "27:19", escuro=True, tam=70, img=faixa_duo),
-        frase("Eu não tenho medo de tratar de nenhum tema. Artigo 133: <em>o advogado é indispensável à administração da Justiça.</em>",
-              "Nicácio Carvalho", "42:23", tam=94),
-        # 10 · cartão
+              "Nicácio Carvalho", "27:19", escuro=True, tam=84, img=faixa_mesa),
+        # 5 · cartão
         f"""<section class="s papel">
   <div class="cartao-topo">{facetas(1000, 460)}<div class="cartao-logo">{LOGO_B}<span>/cast</span></div></div>
   <div class="cartao-foto" style="background-image:url({conversa})"></div>
@@ -146,7 +136,7 @@ def telas():
   <p class="bio mini">Os dois presidiram a Comissão da Jovem Advocacia da OAB/RN. Com a Dra. Rossana Fonseca.</p>
   <div class="play">Assistir <span>&#9654;</span></div>
 </section>""",
-        # 11 · onde assistir
+        # 6 · onde assistir
         f"""<section class="s cta">
   {facetas()}
   <div class="cta-foto" style="background-image:url({mesa})"></div>

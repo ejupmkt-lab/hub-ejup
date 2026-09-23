@@ -23,7 +23,7 @@ def main():
             pg.locator(".s").nth(i).screenshot(path=str(TELAS / f"tela-{i + 1:02d}.png"))
         b.close()
     t = sorted(TELAS.glob("tela-*.png"))
-    cols, esc, g = 6, 0.34, 20
+    cols, esc, g = 3, 0.4, 24
     w, h = int(1080 * esc), int(1440 * esc)
     lin = (len(t) + cols - 1) // cols
     f = Image.new("RGB", (cols * w + (cols + 1) * g, lin * h + (lin + 1) * g), (40, 43, 48))
