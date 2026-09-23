@@ -117,16 +117,15 @@ def telas():
 </section>""",
         # 2 · temas
         f"""<section class="s papel">
-  <h1 class="temas">INTELIGÊNCIA<br>ARTIFICIAL<br>ADVOCACIA<br>JOVEM<br>ADVOCACIA<br>OAB<br>SUPREMO</h1>
-  <p class="lateral">EP 018 · NICÁCIO CARVALHO · EDUARDO PACHECO</p>
+  <ul class="temas"><li>Inteligência artificial</li><li>Advocacia</li><li>Jovem advocacia</li><li>OAB</li><li>Supremo</li></ul>
   <div class="arco">{facetas(1080, 420, "claro")}</div>
   <p class="temas-rod">1h06 de conversa. Arraste para o que ficou.</p>
   {SETA}
 </section>""",
         frase("Se a IA faz o meu trabalho por mim, eu mesmo estou me colocando numa posição de <em>ser substituível.</em>",
-              "Eduardo Pacheco", "22:44", img=faixa_duo, tam=80),
+              "Eduardo Pacheco", "22:44", img=faixa_dir, tam=80),
         frase("O advogado usa IA para peticionar, o juiz para sentenciar, o outro lado para recorrer. <em>O processo é julgado em cinco segundos.</em>",
-              "Nicácio Carvalho", "27:19", escuro=True, tam=76, img=faixa_dir),
+              "Nicácio Carvalho", "27:19", escuro=True, tam=76, img=faixa_duo),
         # 5 · cartão
         f"""<section class="s papel">
   <div class="cartao-topo">{facetas(1000, 460)}<div class="cartao-logo">{LOGO_B}<span>/cast</span></div></div>

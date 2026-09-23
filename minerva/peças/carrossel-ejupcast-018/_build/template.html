@@ -16,7 +16,7 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;font-family:'Gotham',sans
 /* capa */
 .capa{background:var(--navy);color:#f3f1ec}
 .capa-foto{position:absolute;right:0;top:230px;width:560px;height:840px;background-size:cover;
-  background-position:55% 20%;z-index:2}
+  background-position:8% 20%;z-index:2}
 .capa-logo{position:absolute;left:64px;top:72px;z-index:3;display:flex;align-items:flex-end;gap:10px}
 .capa-logo svg,.cartao-logo svg{width:190px;height:auto;display:block}
 .capa-logo svg path,.cartao-logo svg path{fill:#fff!important}
@@ -31,12 +31,14 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;font-family:'Gotham',sans
 .capa-simb{position:absolute;left:64px;bottom:72px;z-index:4;width:64px;opacity:.9}
 
 /* temas */
-.temas{position:absolute;left:64px;top:110px;font-weight:500;font-size:104px;line-height:.96;
-  letter-spacing:-.03em;color:var(--navy)}
+.temas{position:absolute;left:64px;right:64px;top:110px;list-style:none;padding:0}
+.temas li{font-weight:500;font-size:70px;line-height:1.05;letter-spacing:-.03em;color:var(--navy);
+  text-transform:uppercase;padding:22px 0;border-bottom:2px solid rgba(3,28,55,.18);white-space:nowrap}
+.temas li:first-child{border-top:2px solid rgba(3,28,55,.18)}
 .lateral{position:absolute;right:40px;top:110px;writing-mode:vertical-rl;font-weight:500;font-size:18px;
   letter-spacing:.2em;color:var(--cinza)}
 .arco{position:absolute;left:0;right:0;bottom:0;height:420px;clip-path:ellipse(75% 100% at 50% 100%)}
-.temas-rod{position:absolute;left:64px;bottom:470px;font-weight:400;font-size:28px;color:var(--grafite)}
+.temas-rod{position:absolute;left:64px;bottom:460px;font-weight:400;font-size:28px;color:var(--grafite)}
 
 /* frases */
 .aspas{position:absolute;left:56px;top:40px;font-weight:900;font-size:240px;line-height:1;color:var(--bronze)}
@@ -54,7 +56,7 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;font-family:'Gotham',sans
 .s:has(.banda) .frase{top:210px}
 .seta{position:absolute;right:64px;bottom:64px;z-index:5;width:120px;height:62px;border:2px solid var(--bronze);
   border-radius:31px;display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--bronze)}
-.tinta .seta,.s:has(.banda) .seta{border-color:var(--ouro);color:var(--ouro);background:rgba(3,28,55,.55)}
+.tinta .seta,.s:has(.banda) .seta,.s:has(.arco) .seta{border-color:var(--ouro);color:var(--ouro);background:rgba(3,28,55,.55)}
 
 /* cartão */
 .cartao-topo{position:absolute;left:40px;right:40px;top:40px;height:460px;border-radius:24px;overflow:hidden}
