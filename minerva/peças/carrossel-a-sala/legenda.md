@@ -4,18 +4,17 @@
 
 ---
 
-Toda confissão começa numa sala escura.
+Todo advogado já fez. Quase nenhum confessa.
 
-A Sala é o novo quadro da EJUP. Uma mesa, duas cadeiras, um objeto que
-carrega o tema e uma frase que abre todo episódio: "eu preciso confessar uma
+A Sala é o novo quadro da EJUP: uma mesa, duas cadeiras, um objeto que
+carrega o tema e uma frase que abre todo episódio. "Eu preciso confessar uma
 coisa."
 
-Depois da confissão, corte seco. E o episódio faz o que a EJUP faz: abre a
-lei, a jurisprudência e a doutrina que respondem à frase, com fonte na tela.
+Depois da confissão, corte seco. E o episódio abre a lei, a jurisprudência e
+a doutrina que respondem à frase, com fonte na tela.
 
-Episódio 01: dever de verificação. Inteligência artificial, documentos que
-ninguém leu inteiro e o nome de quem assina.
+Episódio 01: dever de verificação. Em breve no canal da EJUP.
 
-Em breve no canal da EJUP.
+E a cadeira do outro lado da mesa é a sua. Qual seria a sua confissão?
 
 Alma clássica, repertório contemporâneo.

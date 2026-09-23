@@ -1,31 +1,27 @@
 #!/usr/bin/env python3
-"""Carrossel — "A Sala", o quadro explicado.
+"""Carrossel — "A Sala". Versão modelo para a linha cinematográfica.
 
-Dez telas 1080x1440 que apresentam o formato A Sala como se o carrossel fosse
-um filme: capa com a frase de abertura, planos do set, uma página de roteiro,
-película e créditos.
+Dez telas 1080x1440. Cada tela tem um gancho que só a seguinte resolve, e a
+capa combina gancho visual (a cadeira na frente do título gigante) com
+gancho de texto ("o que todo advogado já fez e ninguém confessa").
 
-Linguagem editorial de cinema: numeração "(000)", títulos grandes em Gotham
-Book com palavras em Book Italic, legendas miúdas nos cantos, imagens fora do
-centro, alternância entre tinta e papel, grão de película em todas as telas.
+Imagens: geradas no Higgsfield (gpt_image_2_5), uma por tela, nenhuma
+repetida. A cadeira da capa foi recortada com o removedor de fundo do
+Higgsfield e sobreposta ao título para dar profundidade.
 
-EXCEÇÃO DOCUMENTADA À SEÇÃO 5 DO CLAUDE.md: nesta série o título sai em
-Gotham Book + Book Italic, e não em Black. Pedido expresso do Victor por uma
-linha "diferentona, cinematográfica, com fontes elegantes". A família segue
-única (Gotham) e a paleta segue a da marca.
-
-Imagens: frames gravados no set da Sala pela própria EJUP.
+Linguagem: numeração "(000)", Gotham Book com palavras em Book Italic no
+corpo narrativo, Gotham Black só no título da capa, microrrótulos nos cantos,
+grão de película. Itálico em dourado sobre escuro e em bronze sobre papel.
 """
 import base64
 import pathlib
-import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 OUT = HERE.parent
 RAIZ = HERE.parents[2]
 FONTS = RAIZ / "skills" / "ejup-design" / "assets" / "fonts"
 LOGOS = RAIZ / "skills" / "ejup-design" / "assets" / "logo"
-REC = HERE / "recortes"
+IMG = HERE / "img"
 
 
 def b64(p, mime):
@@ -34,133 +30,124 @@ def b64(p, mime):
 
 def fontes():
     out = []
-    for nome, peso, estilo in (("Thin", 200, "normal"), ("Light", 300, "normal"),
-                               ("Book", 400, "normal"), ("BookItalic", 400, "italic"),
-                               ("Medium", 500, "normal"), ("Black", 900, "normal")):
-        out.append(f"@font-face{{font-family:'Gotham';font-weight:{peso};"
-                   f"font-style:{estilo};src:url({b64(FONTS / f'Gotham-{nome}.otf', 'font/otf')})"
-                   " format('opentype')}")
+    for nome, peso, estilo in (("Light", 300, "normal"), ("Book", 400, "normal"),
+                               ("BookItalic", 400, "italic"), ("Medium", 500, "normal"),
+                               ("Black", 900, "normal")):
+        out.append(f"@font-face{{font-family:'Gotham';font-weight:{peso};font-style:{estilo};"
+                   f"src:url({b64(FONTS / f'Gotham-{nome}.otf', 'font/otf')}) format('opentype')}}")
     return "\n".join(out)
 
 
-def img(nome):
-    return b64(REC / f"{nome}.jpg", "image/jpeg")
+def g(i):
+    return b64(IMG / f"g{i}.jpg", "image/jpeg")
 
 
 LOGO = (LOGOS / "ejup-horizontal-navy.svg").read_text(encoding="utf-8")
 
 
-def logo(cor):
-    return f'<div class="logo {cor}">{LOGO}</div>'
+def logo(cls):
+    return f'<div class="logo {cls}">{LOGO}</div>'
 
 
-def furos(n=9):
-    return "".join("<i></i>" for _ in range(n))
-
+CANTOS = '<i class="c c1"></i><i class="c c2"></i><i class="c c3"></i><i class="c c4"></i>'
 
 TELAS = [
-    # ---------------------------------------------------------------- 000
-    f'''<section class="s tinta">
-  <div class="cheia" style="background-image:url({img('capa')})"></div>
-  <div class="sombra-baixo"></div>
-  <p class="lab tl">(000)<br>A SALA<br>um quadro da EJUP</p>
-  <p class="lab tr dir">episódio 01<br>em breve</p>
-  <h1 class="disp" style="left:70px;right:70px;bottom:250px">eu preciso <em>confessar</em><br>uma coisa.</h1>
-  <p class="lab bl">arraste para entrar na sala</p>
-  {logo('br')}
+    # ---------------------------------------------------------------- 000 capa
+    f'''<section class="s papel capa">
+  <div class="cheia" style="background-image:url({g(0)})"></div>
+  {CANTOS}
+  <p class="micro" style="left:92px;top:78px">um quadro<br>EJUP Educação<br>Jurídica</p>
+  <p class="micro centro-x" style="top:78px">episódio 01</p>
+  <p class="micro dir" style="right:92px;top:78px">gravado<br>em estúdio</p>
+  <h2 class="gancho">O que todo advogado já fez<br>e <em>ninguém</em> confessa.</h2>
+  <h1 class="titulo">a sala</h1>
+  <img class="cadeira" src="{b64(IMG / 'cadeira.png', 'image/png')}" alt="">
+  <p class="micro" style="left:92px;bottom:84px">(000)<br>arraste</p>
+  <p class="micro centro-x" style="bottom:84px">Natal · RN · 2026</p>
+  <p class="micro dir" style="right:92px;bottom:84px">confissões<br>de quem assina</p>
 </section>''',
 
     # ---------------------------------------------------------------- 001
-    f'''<section class="s papel">
-  <p class="lab tc">(001)<br><br>todo episódio começa<br>no mesmo lugar.</p>
-  <h1 class="disp centro">uma sala <em>escura,</em><br>uma mesa<br>e <em>duas</em> cadeiras.</h1>
-  <p class="leg bc">o cenário não muda. mudam o objeto sobre a mesa e a frase
-  que abre o episódio.</p>
+    f'''<section class="s tinta">
+  <div class="cheia" style="background-image:url({g(1)})"></div>
+  <div class="grad-baixo" style="height:460px"></div>
+  <p class="lab" style="left:64px;top:64px">(001)</p>
+  <h1 class="disp" style="left:64px;right:64px;top:170px;font-size:200px"><em>Até</em><br>agora.</h1>
+  <p class="leg" style="right:64px;bottom:120px;text-align:right">Existe uma sala onde a confissão<br>vem primeiro. E o Direito entra<br>logo depois.</p>
 </section>''',
 
     # ---------------------------------------------------------------- 002
     f'''<section class="s tinta">
-  <div class="quadro" style="left:360px;top:300px;width:720px;height:540px;background-image:url({img('vazia-43')})"></div>
-  <h1 class="disp" style="left:110px;right:40px;top:800px;font-size:106px">a cadeira <em>vazia</em><br>espera quem vai<br><em>confessar.</em></h1>
-  <p class="lab bl">(002)<br>PLANO GERAL<br>int. a sala · noite</p>
-  <p class="leg br dir">do outro lado da mesa fica a câmera.<br>quem senta ali é quem assiste.</p>
+  <div class="cheia" style="background-image:url({g(2)})"></div>
+  <div class="grad-baixo"></div>
+  <p class="lab" style="left:64px;top:64px">(002)<br>INT. A SALA · NOITE</p>
+  <h1 class="disp" style="left:64px;right:64px;bottom:300px">Uma sala.<br>Uma mesa.<br><em>Duas</em> cadeiras.</h1>
+  <p class="leg" style="left:64px;bottom:120px">E uma frase que abre todo episódio.</p>
+  <p class="seta" style="right:64px;bottom:116px">&rarr;</p>
 </section>''',
 
     # ---------------------------------------------------------------- 003
     f'''<section class="s tinta">
-  <h1 class="disp" style="left:70px;right:70px;top:190px">sobre a mesa,<br><em>o tema.</em></h1>
-  <div class="quadro" style="left:0;top:560px;width:1080px;height:452px;background-image:url({img('detalhe')})"></div>
-  <p class="marca" style="left:150px;top:1040px">01 · disco rígido</p>
-  <p class="marca" style="left:700px;top:1040px">02 · disquete</p>
-  <p class="lab bl">(003)<br>PLANO DETALHE<br>episódio 01</p>
-  <p class="leg br dir">em cada episódio, um objeto carrega<br>o assunto. no primeiro, memória e<br>tempo: o que a máquina guarda por nós.</p>
+  <div class="cheia" style="background-image:url({g(3)})"></div>
+  <p class="lab" style="left:64px;top:64px">(003)<br>A FRASE</p>
+  <h1 class="disp centro-y" style="left:64px;right:64px;text-align:center;font-size:132px">Eu preciso<br><em>confessar</em><br>uma coisa.</h1>
+  <p class="leg centro-x" style="bottom:120px;text-align:center;width:640px">Ela nunca muda. A confissão que vem<br>depois dela muda a cada episódio.</p>
 </section>''',
 
     # ---------------------------------------------------------------- 004
-    f'''<section class="s preto">
-  <div class="cheia" style="background-image:url({img('rosto')})"></div>
-  <div class="tarja cima"></div><div class="tarja baixo"></div>
-  <p class="lab tl sobre">(004)</p>
-  <p class="lab tr dir sobre">PLANO FECHADO · 85 MM<br>câmera parada</p>
-  <p class="legenda">Eu preciso confessar uma coisa.</p>
-  <p class="lab bl sobre">00:00:06:12</p>
-  {logo('br sobre')}
+    f'''<section class="s tinta">
+  <div class="cheia" style="background-image:url({g(4)})"></div>
+  <div class="grad-cima"></div>
+  <div class="grad-baixo" style="height:420px"></div>
+  <p class="lab" style="left:64px;top:64px">(004)<br>A CONFISSÃO DO EPISÓDIO 01</p>
+  <h1 class="disp" style="left:64px;right:64px;top:200px;font-size:104px">“Eu já assinei<br>uma petição que<br><em>não li inteira.</em>”</h1>
+  <p class="leg" style="right:64px;bottom:120px;text-align:right">Se você advoga há tempo suficiente,<br>você também já.</p>
 </section>''',
 
     # ---------------------------------------------------------------- 005
     f'''<section class="s papel">
-  <p class="lab tc">(005)<br><br>o que vem depois<br>da frase.</p>
-  <h1 class="disp centro">ninguém<br>confessa<br><em>à toa.</em></h1>
-  <p class="leg bc">cada confissão vira pergunta jurídica: o que aconteceu,
-  qual o mecanismo, o que está em aberto e o que muda na prática.</p>
+  <div class="quadro" style="right:0;top:170px;width:620px;height:500px;background-image:url({g(5)})"></div>
+  <p class="lab" style="left:64px;top:64px">(005)<br>O OUTRO LADO DA MESA</p>
+  <h1 class="disp" style="left:64px;right:64px;top:740px;font-size:112px">Toda confissão<br>tem uma <em>regra</em><br>esperando.</h1>
+  <p class="leg" style="left:64px;bottom:120px">Dever de verificação. Responsabilidade<br>de quem assina. O que a lei diz e o que<br>os tribunais já decidiram.</p>
+  <p class="leg" style="right:64px;bottom:120px;text-align:right">E ela chega<br>sem aviso.</p>
 </section>''',
 
     # ---------------------------------------------------------------- 006
-    f'''<section class="s papel roteiro">
-  <p class="lab tl">(006)<br>ROTEIRO · EPISÓDIO 01</p>
-  <p class="lab tr dir">pág. 1</p>
-  <div class="pagina">
-    <p class="slug">INT. A SALA · NOITE</p>
-    <p class="acao">Ele puxa a cadeira e senta. Três segundos de silêncio. Olha para a câmera.</p>
-    <p class="pers">ELE</p>
-    <p class="fala">Eu preciso confessar uma coisa.</p>
-    <p class="paren">(pausa)</p>
-    <p class="fala">Eu já assinei uma petição que eu não li inteira.</p>
-    <p class="paren">(pausa)</p>
-    <p class="fala">E se você é advogado há tempo suficiente, você também já.</p>
-    <p class="trans">CORTE SECO.</p>
-  </div>
+    f'''<section class="s tinta">
+  <div class="cheia" style="background-image:url({g(6)})"></div>
+  <p class="lab dir" style="right:64px;top:64px">(006)<br>A VIRADA</p>
+  <h1 class="disp" style="right:64px;left:64px;top:190px;text-align:right;font-size:190px">Corte<br><em>seco.</em></h1>
+  <p class="leg" style="left:64px;bottom:120px">Entra a vinheta. O episódio abre a lei,<br>a jurisprudência e a doutrina que<br>respondem à confissão, com fonte na tela.</p>
 </section>''',
 
     # ---------------------------------------------------------------- 007
     f'''<section class="s tinta">
-  <div class="quadro" style="left:0;top:180px;width:640px;height:478px;background-image:url({img('maos-43')})"></div>
-  <h1 class="disp" style="left:70px;right:60px;top:720px">depois da confissão,<br><em>corte seco.</em></h1>
-  <p class="lab tr dir">(007)<br>A VINHETA</p>
-  <p class="leg bl">entra a vinheta, e o episódio abre a lei,<br>a jurisprudência e a doutrina que<br>respondem à frase. com fonte na tela.</p>
+  <div class="cheia" style="background-image:url({g(7)})"></div>
+  <p class="lab" style="left:64px;top:64px">(007)<br>PLANO DETALHE</p>
+  <h1 class="disp" style="left:64px;right:64px;top:170px;font-size:116px">Sobre a mesa,<br><em>o tema.</em></h1>
+  <p class="marca" style="left:150px;top:1150px">01 · disquete</p>
+  <p class="marca" style="left:600px;top:1150px">02 · disco rígido</p>
+  <p class="leg" style="right:64px;bottom:120px;text-align:right">No episódio 01: memória, tempo<br>e o que a máquina guarda por nós.</p>
 </section>''',
 
     # ---------------------------------------------------------------- 008
-    f'''<section class="s preto">
-  <div class="pelicula">
-    <div class="furos e">{furos()}</div><div class="furos d">{furos()}</div>
-    <div class="fr" style="background-image:url({img('simbolo')})"></div>
-    <div class="fr" style="background-image:url({img('fr-maos')})"></div>
-    <div class="fr" style="background-image:url({img('fr-vazia')})"></div>
-  </div>
-  <p class="lab" style="left:560px;top:160px">(008)<br>EPISÓDIO 01</p>
-  <h1 class="disp menor" style="left:560px;right:60px;top:560px">dever de<br><em>verificação.</em></h1>
-  <p class="leg" style="left:560px;right:60px;top:880px">inteligência artificial, documentos
-  que ninguém leu inteiro e o nome de quem assina.</p>
+    f'''<section class="s tinta">
+  <div class="cheia" style="background-image:url({g(8)})"></div>
+  <div class="grad-baixo"></div>
+  <p class="lab" style="left:64px;top:64px">(008)<br>CONTRACAMPO</p>
+  <h1 class="disp" style="left:64px;right:64px;bottom:300px;font-size:112px">E a cadeira<br>do outro lado<br>é <em>a sua.</em></h1>
+  <p class="leg" style="left:64px;bottom:120px">Então responda com sinceridade:</p>
+  <p class="seta" style="right:64px;bottom:116px">&rarr;</p>
 </section>''',
 
-    # ---------------------------------------------------------------- 009
-    f'''<section class="s tinta">
-  <p class="lab tc">(009)</p>
-  <h1 class="disp centro gigante">a <em>sala.</em></h1>
-  <p class="leg bc larga" style="bottom:290px">em breve no canal da EJUP.<br>
-  <span class="ouro">alma clássica, repertório contemporâneo.</span></p>
-  <p class="creditos">um quadro EJUP Educação Jurídica · roteiro, direção e fotografia EJUP</p>
+    # ---------------------------------------------------------------- 009 CTA
+    f'''<section class="s papel">
+  <div class="cheia" style="background-image:url({g(9)})"></div>
+  <p class="lab" style="left:64px;top:64px">(009)</p>
+  <h1 class="disp" style="left:64px;right:64px;top:720px;text-align:center;font-size:118px">Qual seria<br>a <em>sua</em> confissão?</h1>
+  <p class="leg centro-x" style="top:1040px;text-align:center;width:700px">Conta nos comentários.<br>A Sala · episódio 01 em breve no canal da EJUP.</p>
+  <p class="micro centro-x" style="bottom:150px">alma clássica, repertório contemporâneo</p>
   {logo('bc')}
 </section>''',
 ]
