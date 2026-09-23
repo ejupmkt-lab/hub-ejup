@@ -72,18 +72,26 @@ def main():
     img = jpg(f, 92)
     g = grao(540, 960, 22)
 
-    # A1 · papel, refinada
+    # A1 · papel. As três faixas são janelas para a MESMA foto, na mesma escala
+    # e alinhadas entre si: juntas, remontam a cena (rosto, microfone, mão na mesa).
+    E, D = .72, 60                         # escala da foto e deslocamento vertical do bloco
+    L, T = -300, 627 + D                   # onde a foto inteira ficaria na tela
+    def jan(x, y, w, h):
+        y += D
+        return (f'<div class="faixa" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;'
+                f'background-image:url({img});background-size:{2000*E:.0f}px auto;'
+                f'background-position:{L - x}px {T - y}px"></div>')
     a1 = f"""<section class="s claro">
   {ARCOS.format(c="#d1d3d4", o=".42")}
-  <div class="logo" style="top:230px">{LOGO_N}<span>/cast</span></div>
-  <p class="t it" style="left:104px;top:500px;font-size:212px">Direito</p>
-  {faixa(img, 112, 740, 856, 300, (960, 330), .72)}
-  <p class="t bk" style="left:100px;top:1092px;font-size:196px">e</p>
-  {faixa(img, 300, 1108, 668, 170, (1120, 600), .95)}
-  {faixa(img, 112, 1330, 330, 170, MAO_E, .95)}
-  <p class="t it" style="left:474px;top:1320px;font-size:196px">moral</p>
-  {rodape(1580, "")}
-  <p class="lead" style="top:1670px">A primeira lição do curso de Direito, e a que muita gente <em>esqueceu.</em></p>
+  <div class="logo" style="top:{230 + D}px">{LOGO_N}<span>/cast</span></div>
+  <p class="t it" style="left:104px;top:{478 + D}px;font-size:212px">Direito</p>
+  {jan(112, 720, 856, 290)}
+  <p class="t bk" style="left:100px;top:{1016 + D}px;font-size:196px">e</p>
+  {jan(300, 1034, 668, 160)}
+  {jan(112, 1222, 330, 176)}
+  <p class="t it" style="left:474px;top:{1212 + D}px;font-size:196px">moral</p>
+  {rodape(1470 + D, "")}
+  <p class="lead" style="top:{1560 + D}px">A primeira lição do curso de Direito, e a que muita gente <em>esqueceu.</em></p>
   <div class="grao" style="background-image:url({g})"></div>
 </section>"""
 
@@ -91,8 +99,7 @@ def main():
     a2 = a1.replace('class="s claro"', 'class="s escuro"').replace(
         ARCOS.format(c="#d1d3d4", o=".42"), ARCOS.format(c="#304557", o=".35")).replace(
         LOGO_N, LOGO_B).replace(
-        '<p class="t it" style="left:474px;top:1320px;font-size:196px">moral</p>',
-        '<p class="t it ouro" style="left:474px;top:1320px;font-size:196px">moral</p>')
+        'class="t it" style="left:474px', 'class="t it ouro" style="left:474px')
 
     # A3 · conceito: o Direito é o gesto de fora, a moral é o que está dentro
     a3 = f"""<section class="s claro">
