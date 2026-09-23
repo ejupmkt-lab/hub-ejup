@@ -76,7 +76,7 @@ def facetas(w=1080, h=1440, tom="escuro"):
             f'{g}<polygon points="{w*.62},0 {w*.18},{h*.55} {w},{h*.3}" fill="url(#br)"/></svg>')
 
 
-def banda(img, altura=380):
+def banda(img, altura=520):
     return (f'<div class="banda" style="height:{altura}px">'
             f'<div class="banda-foto" style="background-image:url({img})"></div></div>')
 
@@ -97,11 +97,12 @@ def frase(texto, autor, tempo, escuro=False, img=None, tam=78):
 
 def telas():
     capa_foto = foto("duo-vertical.webp", (0, .06, 1, .74), 1080)
-    conversa = foto("duo-conversa.webp", (.12, .12, .92, .88))
-    mesa = foto("mesa-tres.webp", (.1, .12, 1, .9))
+    # recortes pensados para o quadro onde cada foto entra (proporção já certa)
+    conversa = foto("duo-conversa.webp", (.20, 0.0, .86, .92))       # cartão, 460x360 (mesma proporção)
+    faixa_duo = foto("duo-conversa.webp", (.10, .06, .95, .78))      # faixa 1080x520: rostos e mãos
+    faixa_dir = foto("mesa-tres.webp", (.585, .21, 1.0, .61))        # faixa 1080x520: os dois à direita
+    mesa = foto("mesa-tres.webp", (.08, .12, 1, .95))
     rossana = foto("rossana.webp", (.22, .08, .78, .9))
-    faixa_mesa = foto("mesa-tres.webp", (0, .5, 1, .85))
-    faixa_duo = foto("duo-conversa.webp", (0, .2, 1, .62))
     return [
         # 1 · capa
         f"""<section class="s capa">
@@ -123,9 +124,9 @@ def telas():
   {SETA}
 </section>""",
         frase("Se a IA faz o meu trabalho por mim, eu mesmo estou me colocando numa posição de <em>ser substituível.</em>",
-              "Eduardo Pacheco", "22:44", img=faixa_duo, tam=84),
+              "Eduardo Pacheco", "22:44", img=faixa_duo, tam=80),
         frase("O advogado usa IA para peticionar, o juiz para sentenciar, o outro lado para recorrer. <em>O processo é julgado em cinco segundos.</em>",
-              "Nicácio Carvalho", "27:19", escuro=True, tam=84, img=faixa_mesa),
+              "Nicácio Carvalho", "27:19", escuro=True, tam=76, img=faixa_dir),
         # 5 · cartão
         f"""<section class="s papel">
   <div class="cartao-topo">{facetas(1000, 460)}<div class="cartao-logo">{LOGO_B}<span>/cast</span></div></div>

@@ -49,8 +49,9 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;font-family:'Gotham',sans
 .tinta .autor span{color:var(--prata)}
 .banda{position:absolute;left:0;right:0;bottom:0;overflow:hidden}
 .banda-foto{position:absolute;inset:0;background-size:cover;background-position:center}
-.banda-foto::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,28,55,.35),rgba(3,28,55,.1))}
-.s:has(.banda) .autor{top:960px}
+.banda-foto::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,28,55,.25),rgba(3,28,55,0) 40%)}
+.s:has(.banda) .autor{top:830px}
+.s:has(.banda) .frase{top:210px}
 .seta{position:absolute;right:64px;bottom:64px;z-index:5;width:120px;height:62px;border:2px solid var(--bronze);
   border-radius:31px;display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--bronze)}
 .tinta .seta,.s:has(.banda) .seta{border-color:var(--ouro);color:var(--ouro);background:rgba(3,28,55,.55)}
@@ -58,14 +59,14 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;font-family:'Gotham',sans
 /* cartão */
 .cartao-topo{position:absolute;left:40px;right:40px;top:40px;height:460px;border-radius:24px;overflow:hidden}
 .cartao-logo{position:absolute;left:52px;top:48px;display:flex;align-items:flex-end;gap:10px}
-.cartao-foto{position:absolute;left:112px;top:370px;width:380px;height:300px;border-radius:24px;
+.cartao-foto{position:absolute;left:112px;top:330px;width:460px;height:360px;border-radius:24px;
   background-size:cover;background-position:center;box-shadow:0 24px 50px rgba(3,28,55,.35)}
-.cartao-tit{position:absolute;left:112px;top:700px;right:80px;font-weight:900;font-size:64px;line-height:1.02;
+.cartao-tit{position:absolute;left:112px;top:730px;right:80px;font-weight:900;font-size:64px;line-height:1.02;
   letter-spacing:-.03em;color:var(--navy)}
 .cartao-tit span{display:block;font-weight:400;font-size:44px;color:var(--cinza);margin-bottom:10px}
-.bio{position:relative;margin-left:112px;margin-right:100px;font-weight:300;font-size:27px;line-height:1.45;color:var(--grafite)}
+.bio{position:relative;margin-left:112px;margin-right:100px;font-weight:300;font-size:25px;line-height:1.45;color:var(--grafite)}
 .bio b{font-weight:500;color:var(--navy)}
-.bio:first-of-type{margin-top:960px}
+.bio:first-of-type{margin-top:990px}
 .bio+.bio{margin-top:18px}
 .bio.mini{font-size:22px;color:var(--cinza)}
 .play{position:absolute;right:80px;top:440px;background:var(--navy);color:var(--ouro);font-weight:500;
@@ -73,8 +74,8 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;font-family:'Gotham',sans
 
 /* onde assistir */
 .cta{background:var(--navy);color:#f3f1ec}
-.cta-foto{position:absolute;left:0;right:0;bottom:0;height:560px;background-size:cover;background-position:center;
-  -webkit-mask-image:linear-gradient(180deg,transparent,#000 40%);mask-image:linear-gradient(180deg,transparent,#000 40%)}
+.cta-foto{position:absolute;left:0;right:0;bottom:0;height:620px;background-size:cover;background-position:50% 35%;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 18%);mask-image:linear-gradient(180deg,transparent,#000 18%)}
 .cta-tit{position:absolute;left:64px;top:100px;font-weight:300;font-size:120px;line-height:.98;letter-spacing:-.04em;z-index:2}
 .cta-tit em{font-style:italic;font-weight:400;color:var(--ouro)}
 .canais{position:absolute;left:64px;top:560px;z-index:2}
