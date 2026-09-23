@@ -6,7 +6,7 @@ referência (material/referencia-faixas.jpg) para Gotham e a paleta EJUP.
 A1 papel · A2 navy com dourado · A3 conceito (Direito = gesto de fora,
 moral = o que está dentro), com as falas dela.
 """
-import base64, io, pathlib, random
+import base64, io, math, pathlib, random, re
 from PIL import Image, ImageFilter, ImageEnhance
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -47,6 +47,18 @@ LOGO_B = (LOGOS / "ejup-horizontal-white.svg").read_text(encoding="utf-8")
 LOGO_N = (LOGOS / "ejup-horizontal-navy.svg").read_text(encoding="utf-8")
 
 
+def selo_cast(logo, aro, ponto, d=250):
+    """Selo EJUPcast da tela do estúdio: logotipo ejup e /CAST num aro fino com dois pontos."""
+    marca = re.sub(r'viewBox="[^"]*"', 'viewBox="352 690 282 118"', logo, count=1)
+    r = d / 2 - 4
+    pts = "".join(f'<circle cx="{d/2 + r*math.cos(math.radians(a)):.1f}" cy="{d/2 + r*math.sin(math.radians(a)):.1f}" r="4.5" fill="{ponto}"/>'
+                  for a in (-70, 115))
+    return (f'<div class="selo" style="width:{d}px;height:{d}px">'
+            f'<svg class="selo-aro" viewBox="0 0 {d} {d}"><circle cx="{d/2}" cy="{d/2}" r="{r}" fill="none" '
+            f'stroke="{aro}" stroke-width="1.5"/>{pts}</svg>'
+            f'<div class="selo-marca"><div>{marca}<span>/cast</span></div></div></div>')
+
+
 def faixa(img, x, y, w, h, c, esc):
     """Janela arredondada para a foto: o ponto c da foto original fica no centro."""
     bx, by = w / 2 - c[0] * esc, h / 2 - c[1] * esc
@@ -83,7 +95,7 @@ def main():
                 f'background-position:{L - x}px {T - y}px"></div>')
     a1 = f"""<section class="s claro">
   {ARCOS.format(c="#d1d3d4", o=".42")}
-  <div class="logo" style="top:{230 + D}px">{LOGO_N}<span>/cast</span></div>
+  <div class="logo" style="top:{150 + D}px">{selo_cast(LOGO_N, "rgba(3,28,55,.35)", "#9b6b26")}</div>
   <p class="t it" style="left:104px;top:{478 + D}px;font-size:212px">Direito</p>
   {jan(112, 720, 856, 290)}
   <p class="t bk" style="left:100px;top:{1016 + D}px;font-size:196px">e</p>
@@ -98,7 +110,7 @@ def main():
     # A2 · a mesma ideia no escuro, com o dourado
     a2 = a1.replace('class="s claro"', 'class="s escuro"').replace(
         ARCOS.format(c="#d1d3d4", o=".42"), ARCOS.format(c="#304557", o=".35")).replace(
-        LOGO_N, LOGO_B).replace(
+        selo_cast(LOGO_N, "rgba(3,28,55,.35)", "#9b6b26"), selo_cast(LOGO_B, "rgba(209,211,212,.5)", "#f0b855")).replace(
         'class="t it" style="left:474px', 'class="t it ouro" style="left:474px')
 
     # A3 · conceito: o Direito é o gesto de fora, a moral é o que está dentro
@@ -151,6 +163,12 @@ body{{background:#3a3d42;display:flex;gap:28px;padding:28px;font-family:'Gotham'
 .logo span{{font-weight:300;font-size:40px;line-height:1}}
 .claro .logo svg path{{fill:#031c37!important}}
 .escuro .logo svg path{{fill:#fff!important}}
+.selo{{position:relative}}
+.logo .selo-aro{{position:absolute;inset:0;width:100%;height:100%}}
+.selo-marca{{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}}
+.selo-marca>div{{display:flex;align-items:flex-end;gap:5px}}
+.logo .selo-marca svg{{width:112px;height:auto;display:block}}
+.logo .selo-marca span{{font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px;opacity:.8}}
 </style></head><body>
 {a1}
 {a2}
