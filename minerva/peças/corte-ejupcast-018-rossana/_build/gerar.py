@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Capa do corte EJUPcast #18 · Dra. Rossana Fonseca (1080x1920).
 
-Opção A: faixas de foto entre as linhas do título, adaptada da referência
-(material/referencia-faixas.jpg) para Gotham e a paleta EJUP. As três faixas
-são janelas para a mesma foto, alinhadas: juntas, remontam a Rossana.
-Opção B: pegada A Sala, foto em tela cheia, escura, com grão.
+Título: "Direito e moral". Faixas de foto entre as linhas, adaptadas da
+referência (material/referencia-faixas.jpg) para Gotham e a paleta EJUP.
+A1 papel · A2 navy com dourado · A3 conceito (Direito = gesto de fora,
+moral = o que está dentro), com as falas dela.
 """
 import base64, io, pathlib, random
 from PIL import Image, ImageFilter, ImageEnhance
@@ -46,37 +46,69 @@ def grao(w, h, forca=26):
 LOGO_B = (LOGOS / "ejup-horizontal-white.svg").read_text(encoding="utf-8")
 LOGO_N = (LOGOS / "ejup-horizontal-navy.svg").read_text(encoding="utf-8")
 
-# ---- Opção A: a foto escondida atrás das faixas ----
-S = 0.86                      # escala da foto (2000x1125 -> 1720x968)
-IMG_X, IMG_Y = -286, 423      # onde a foto inteira ficaria na tela
-DY = 150                      # desce o bloco inteiro para centrar na tela
-FAIXAS = [                    # left, top, width, height, ponto da foto original no centro, escala
-    (112, 650 + DY, 856, 200, (960, 380), S),     # rosto
-    (790, 890 + DY, 178, 150, (1185, 560), 1.0),  # o microfone
-    (112, 1085 + DY, 420, 150, (1000, 960), 0.9), # as mãos apontando a mesa
-]
-
 
 def faixa(img, x, y, w, h, c, esc):
-    bx, by = x + w / 2 - c[0] * esc - x, y + h / 2 - c[1] * esc - y
+    """Janela arredondada para a foto: o ponto c da foto original fica no centro."""
+    bx, by = w / 2 - c[0] * esc, h / 2 - c[1] * esc
     return (f'<div class="faixa" style="left:{x}px;top:{y}px;width:{w}px;height:{h}px;'
             f'background-image:url({img});background-size:{2000*esc:.0f}px auto;'
             f'background-position:{bx:.0f}px {by:.0f}px"></div>')
 
 
+ROSTO, MIC, MAO_E, MAO_D = (960, 385), (1185, 560), (905, 975), (1500, 900)
+ARCOS = ('<svg class="arcos" viewBox="0 0 1080 1920"><g fill="none" stroke="{c}" stroke-width="70" opacity="{o}">'
+         '<path d="M-200 760 C 200 210, 700 0, 1300 120"/><path d="M-160 2160 C 300 1560, 800 1560, 1300 1310"/></g></svg>')
+
+
+def rodape(top, tom):
+    return (f'<div class="rodape {tom}" style="top:{top}px"><p class="nome">Dra. Rossana Fonseca</p>'
+            f'<p class="ep">EJUPcast #18</p></div>')
+
+
 def main():
     foto = Image.open(FOTO).convert("RGB")
-    foto_a = jpg(ImageEnhance.Color(foto).enhance(.9))
+    # grade única para todas as faixas: um pouco menos saturada, sombras frias
+    f = ImageEnhance.Contrast(ImageEnhance.Color(foto).enhance(.82)).enhance(1.06)
+    img = jpg(f, 92)
+    g = grao(540, 960, 22)
 
-    # Opção B: recorte vertical centrado no rosto, tratado escuro
-    x0 = 610
-    cr = foto.crop((x0, 0, x0 + 633, 1125)).resize((1080, 1920), Image.LANCZOS)
-    cr = cr.filter(ImageFilter.UnsharpMask(radius=2, percent=60, threshold=2))
-    cr = ImageEnhance.Brightness(ImageEnhance.Color(cr).enhance(.78)).enhance(.9)
-    foto_b = jpg(cr, 88)
-    g = grao(540, 960)
+    # A1 · papel, refinada
+    a1 = f"""<section class="s claro">
+  {ARCOS.format(c="#d1d3d4", o=".42")}
+  <div class="logo" style="top:250px">{LOGO_N}<span>/cast</span></div>
+  <p class="t it" style="left:104px;top:520px;font-size:212px">Direito</p>
+  {faixa(img, 112, 780, 856, 230, ROSTO, .9)}
+  <p class="t bk" style="left:100px;top:1052px;font-size:196px">e</p>
+  {faixa(img, 300, 1068, 668, 170, (1120, 600), .95)}
+  {faixa(img, 112, 1290, 330, 170, MAO_E, .95)}
+  <p class="t it" style="left:474px;top:1280px;font-size:196px">moral</p>
+  {rodape(1540, "")}
+  <p class="lead" style="top:1630px">A primeira lição do curso de Direito, e a que muita gente <em>esqueceu.</em></p>
+  <div class="grao" style="background-image:url({g})"></div>
+</section>"""
 
-    fa = "".join(faixa(foto_a, *f) for f in FAIXAS)
+    # A2 · a mesma ideia no escuro, com o dourado
+    a2 = a1.replace('class="s claro"', 'class="s escuro"').replace(
+        ARCOS.format(c="#d1d3d4", o=".42"), ARCOS.format(c="#304557", o=".35")).replace(
+        LOGO_N, LOGO_B).replace(
+        '<p class="t it" style="left:474px;top:1280px;font-size:196px">moral</p>',
+        '<p class="t it ouro" style="left:474px;top:1280px;font-size:196px">moral</p>')
+
+    # A3 · conceito: o Direito é o gesto de fora, a moral é o que está dentro
+    a3 = f"""<section class="s claro">
+  {ARCOS.format(c="#d1d3d4", o=".42")}
+  <div class="logo" style="top:200px">{LOGO_N}<span>/cast</span></div>
+  <p class="t bk" style="left:100px;top:400px;font-size:190px">Direito</p>
+  {faixa(img, 112, 620, 856, 250, MAO_E, 1.0)}
+  <p class="cit" style="top:896px">“algo externo, que você externaliza.”</p>
+  <p class="t it" style="left:104px;top:980px;font-size:190px">e moral</p>
+  {faixa(img, 112, 1200, 856, 250, ROSTO, .95)}
+  <p class="cit" style="top:1476px">“uma coisa que está intrínseca em você.”</p>
+  {rodape(1580, "")}
+  <p class="lead" style="top:1670px;font-size:34px">A primeira lição do curso de Direito, e a que muita gente <em>esqueceu.</em></p>
+  <div class="grao" style="background-image:url({g})"></div>
+</section>"""
+
     html = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
 <title>Capa corte EJUPcast 18</title><style>
 {fontes()}
@@ -85,58 +117,37 @@ def main():
 *{{box-sizing:border-box;margin:0}}
 body{{background:#3a3d42;display:flex;gap:28px;padding:28px;font-family:'Gotham',sans-serif}}
 .s{{position:relative;width:1080px;height:1920px;overflow:hidden;flex:none}}
-/* A */
-.a{{background:var(--papel);color:var(--navy)}}
+.claro{{background:radial-gradient(90% 60% at 50% 40%,#f3f1ec 0%,#ecebe7 60%,#e4e2dd 100%);color:var(--navy)}}
+.escuro{{background:radial-gradient(90% 60% at 30% 20%,#0a2a49 0%,#031c37 45%,#0d131a 100%);color:#fff}}
 .arcos{{position:absolute;inset:0}}
+.grao{{position:absolute;inset:0;background-size:540px 960px;mix-blend-mode:overlay;opacity:.18;pointer-events:none}}
 .faixa{{position:absolute;border-radius:28px;background-repeat:no-repeat;
-  box-shadow:0 18px 40px -22px rgba(3,28,55,.55)}}
+  box-shadow:0 24px 44px -26px rgba(3,28,55,.6),inset 0 0 0 1px rgba(255,255,255,.08)}}
 .t{{position:absolute;line-height:.9;letter-spacing:-.035em;white-space:nowrap}}
 .it{{font-style:italic;font-weight:400}}
 .bk{{font-weight:900}}
-.a .rodape{{position:absolute;left:112px;right:112px;top:1330px;display:flex;justify-content:space-between;
-  align-items:baseline;border-top:1.5px solid rgba(3,28,55,.25);padding-top:26px}}
+.ouro{{color:var(--ouro)}}
+.rodape{{position:absolute;left:112px;right:112px;display:flex;justify-content:space-between;
+  align-items:baseline;border-top:1.5px solid currentColor;padding-top:26px}}
+.claro .rodape{{border-top-color:rgba(3,28,55,.25)}}
+.escuro .rodape{{border-top-color:rgba(209,211,212,.3)}}
 .nome{{font-weight:500;font-size:24px;letter-spacing:.14em;text-transform:uppercase}}
 .ep{{font-weight:300;font-size:24px;color:var(--cinza)}}
-.lead{{position:absolute;left:112px;right:112px;font-weight:300;font-size:40px;line-height:1.3}}
+.escuro .ep{{color:var(--prata)}}
+.lead{{position:absolute;left:112px;right:112px;font-weight:300;font-size:40px;line-height:1.3;color:var(--grafite)}}
+.escuro .lead{{color:var(--prata)}}
 .lead em{{font-style:italic;color:var(--bronze)}}
+.escuro .lead em{{color:var(--ouro)}}
+.cit{{position:absolute;right:112px;font-style:italic;font-weight:400;font-size:30px;color:var(--bronze)}}
 .logo{{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:flex-end;gap:8px}}
 .logo svg{{width:200px;height:auto;display:block}}
 .logo span{{font-weight:300;font-size:40px;line-height:1}}
-.a .logo svg path{{fill:#031c37!important}}
-/* B */
-.b{{background:var(--tinta);color:#fff}}
-.b .foto{{position:absolute;inset:0;background-size:cover;background-position:center}}
-.b .veu{{position:absolute;inset:0;background:
-  linear-gradient(180deg,rgba(13,19,26,.55) 0%,rgba(13,19,26,0) 22%,rgba(13,19,26,0) 42%,rgba(13,19,26,.82) 62%,#0d131a 86%),
-  radial-gradient(120% 80% at 50% 35%,rgba(0,0,0,0) 55%,rgba(0,0,0,.55) 100%)}}
-.b .grao{{position:absolute;inset:0;background-size:540px 960px;mix-blend-mode:overlay;opacity:.32}}
-.b .logo svg path{{fill:#fff!important}}
-.b .nome{{color:var(--prata)}}
-.b .ouro{{color:var(--ouro)}}
+.claro .logo svg path{{fill:#031c37!important}}
+.escuro .logo svg path{{fill:#fff!important}}
 </style></head><body>
-
-<section class="s a">
-  <svg class="arcos" viewBox="0 0 1080 1920"><g fill="none" stroke="#d1d3d4" stroke-width="70" opacity=".45">
-    <path d="M-200 700 C 200 150, 700 -60, 1300 60"/><path d="M-160 2100 C 300 1500, 800 1500, 1300 1250"/></g></svg>
-  <div class="logo" style="top:300px">{LOGO_N}<span>/cast</span></div>
-  <p class="t it" style="left:104px;top:600px;font-size:180px">Deixaram</p>
-  {fa}
-  <p class="t bk" style="left:100px;top:1035px;font-size:168px">o dever</p>
-  <p class="t it" style="left:566px;top:1232px;font-size:180px">ser.</p>
-  <div class="rodape" style="top:1450px"><p class="nome">Dra. Rossana Fonseca</p><p class="ep">EJUPcast #18</p></div>
-  <p class="lead" style="top:1550px;color:#414042">Direito e moral: a primeira lição do curso de Direito, e a que muita gente <em>esqueceu.</em></p>
-</section>
-
-<section class="s b">
-  <div class="foto" style="background-image:url({foto_b})"></div>
-  <div class="veu"></div>
-  <div class="grao" style="background-image:url({g})"></div>
-  <div class="logo" style="top:120px">{LOGO_B}<span>/cast</span></div>
-  <p class="t" style="left:108px;top:1150px;font-size:150px;font-weight:200">Deixaram</p>
-  <p class="t bk" style="left:104px;top:1290px;font-size:150px">o dever <span class="ouro">ser.</span></p>
-  <p class="lead" style="top:1480px;color:#d1d3d4">Direito e moral: a primeira lição do curso de Direito, e a que muita gente <em style="color:#f0b855">esqueceu.</em></p>
-  <p class="nome" style="position:absolute;left:112px;top:1680px">Dra. Rossana Fonseca <span style="font-weight:300;letter-spacing:0;text-transform:none;color:#5f6062">·</span> EJUPcast #18</p>
-</section>
+{a1}
+{a2}
+{a3}
 </body></html>"""
     (OUT / "capa.html").write_text(html, encoding="utf-8")
 
