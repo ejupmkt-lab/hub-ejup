@@ -41,6 +41,10 @@ def g(nome):
 
 LOGO = (LOGOS / "ejup-horizontal-navy.svg").read_text(encoding="utf-8")
 SIMBOLO = b64(LOGOS / "ejup-symbol-navy.svg", "image/svg+xml")
+import json as _json
+_cj = OUT / "fotos" / "CREDITOS.json"
+CREDITOS = _json.loads(_cj.read_text()) if _cj.exists() else {}
+RESERVA = {"toffoli": "cadeira", "mendonca": "reuniao", "moraes": "contrato"}
 CANTOS = '<i class="c c1"></i><i class="c c2"></i><i class="c c3"></i><i class="c c4"></i>'
 
 
@@ -48,14 +52,34 @@ def fonte(txt, lado="left"):
     return f'<p class="fonte-rod" style="{lado}:64px">{txt}</p>'
 
 
-def pessoa(nome, sobrenome, fato, resposta, gancho, img, fontes_txt):
+def foto(nome):
+    arq = HERE / "img" / f"foto-{nome}.jpg"
+    return b64(arq, "image/jpeg") if arq.exists() else None
+
+
+def quadro(nome, estilo, legenda):
+    src = foto(nome)
+    if not src:
+        return ""
+    return (f'<figure class="quadro-foto" style="{estilo}"><img src="{src}" alt="">'
+            f'<figcaption>{legenda}</figcaption></figure>')
+
+
+def pessoa(nome, sobrenome, fato, resposta, gancho, img, fontes_txt, credito):
+    """Tela de um citado: foto real em registro de ato público, nome, fato,
+    resposta. Sem foto disponível, cai na imagem gerada de fundo."""
+    tem_foto = foto(img) is not None
+    fundo = "" if tem_foto else f'<div class="cheia" style="background-image:url({g(RESERVA[img])})"></div>'
+    topo_texto = 860 if tem_foto else 430
+    topo_resp = topo_texto + 30 + (len(fato) // 46 + 1) * 50
     return f"""<section class="s tinta">
-  <div class="cheia" style="background-image:url({g(img)})"></div>
-  <div class="grad-cima" style="height:900px"></div>
+  {fundo}
+  {quadro(img, "right:64px;top:96px;width:470px;height:627px", credito)}
+  <div class="grad-cima" style="height:{'0' if tem_foto else '900'}px"></div>
   <div class="grad-baixo" style="height:420px"></div>
-  <h1 class="disp" style="left:64px;right:64px;top:150px;font-size:124px">{nome}<br><em>{sobrenome}</em></h1>
-  <p class="texto" style="left:64px;right:64px;top:430px">{fato}</p>
-  <p class="resposta" style="left:64px;right:200px;top:{460 + (len(fato) // 46 + 1) * 50 + 20}px">{resposta}</p>
+  <h1 class="disp" style="left:64px;right:64px;top:{'560' if tem_foto else '150'}px;font-size:124px">{nome}<br><em>{sobrenome}</em></h1>
+  <p class="texto" style="left:64px;right:64px;top:{topo_texto}px;font-size:{'32' if tem_foto else '36'}px">{fato}</p>
+  <p class="resposta" style="left:64px;right:160px;top:{topo_resp}px">{resposta}</p>
   <p class="leg" style="right:64px;bottom:150px;text-align:right">{gancho}</p>
   {fonte(fontes_txt)}
 </section>"""
@@ -80,6 +104,7 @@ TELAS = [
   <div class="grad-cima" style="height:760px"></div>
   <div class="grad-baixo" style="height:460px"></div>
   <h1 class="disp" style="left:64px;right:64px;top:150px;font-size:96px">Novembro de 2025.<br>O dono do banco<br>foi <em>preso no<br>aeroporto.</em></h1>
+  {quadro("vorcaro", "right:64px;top:620px;width:330px;height:440px", CREDITOS.get("vorcaro", ""))}
   <p class="leg" style="left:64px;right:64px;bottom:200px;font-size:30px">Segundo a Polícia Federal, Daniel Vorcaro,<br>dono do Banco Master, estava de saída do país.</p>
   <p class="leg" style="right:64px;bottom:150px;text-align:right;color:var(--ouro)">No mesmo dia, o banco dele fechou. &rarr;</p>
   {fonte('Fontes: JOTA · CNN Brasil')}
@@ -141,26 +166,27 @@ TELAS = [
     pessoa("Dias", "Toffoli",
            "Era o relator do caso no Supremo: o ministro que conduz o processo. Em fevereiro de 2026, pediu para sair, depois de reportagens ligarem empresas de familiares dele a fundos investigados.",
            "A relatoria foi sorteada de novo.",
-           "E caiu com outro ministro. &rarr;", "cadeira",
-           "Fontes: imprensa · STF"),
+           "E caiu com outro ministro. &rarr;", "toffoli",
+           "Fontes: imprensa · STF", CREDITOS.get("toffoli", "")),
 
     # 9 · Mendonça
     pessoa("André", "Mendonça",
            "Assumiu o caso e mandou Vorcaro de volta para a prisão em março de 2026. Em setembro, veio à tona: um ano antes de virar relator, ele teve duas horas de reunião com Vorcaro, em São Paulo.",
            "Mendonça confirma o encontro. Diz que foi uma única vez e que decidiu contra o banqueiro.",
-           "O terceiro nome veio no relatório da PF. &rarr;", "reuniao",
-           "Fonte: Agência Pública"),
+           "O terceiro nome veio no relatório da PF. &rarr;", "mendonca",
+           "Fonte: Agência Pública", CREDITOS.get("mendonca", "")),
 
     # 10 · Moraes
     pessoa("Alexandre", "de Moraes",
            "Segundo a PF, o escritório da mulher dele, Viviane Barci de Moraes, tinha um contrato de cerca de R$ 130 milhões com o banco. E no celular de Vorcaro havia mensagens para um contato que a PF identificou como o ministro, uma delas no dia da prisão: “conseguiu ter notícia ou bloquear?”",
            "Moraes nega relação com Vorcaro e diz que não recebeu essas mensagens.",
-           "Dentro do Supremo, o clima esquentou. &rarr;", "contrato",
-           "Fontes: Agência Pública · Metrópoles"),
+           "Dentro do Supremo, o clima esquentou. &rarr;", "moraes",
+           "Fontes: Agência Pública · Metrópoles", CREDITOS.get("moraes", "")),
 
     # 11 · Gilmar
     f"""<section class="s preto">
-  <h1 class="disp centro-y" style="left:64px;right:64px;font-size:150px;line-height:1.02">“Até a <em>máfia</em><br>tem ética.”</h1>
+  {quadro("gilmar", "right:64px;top:96px;width:420px;height:560px", CREDITOS.get("gilmar", ""))}
+  <h1 class="disp" style="left:64px;right:64px;top:{'720' if foto('gilmar') else '520'}px;font-size:150px;line-height:1.02">“Até a <em>máfia</em><br>tem ética.”</h1>
   <p class="leg" style="left:64px;bottom:230px;font-size:30px">Gilmar Mendes, ministro do STF, em sessão da Corte.</p>
   <p class="leg" style="right:64px;bottom:150px;text-align:right;color:var(--ouro)">E o que a lei diz sobre tudo isso? &rarr;</p>
   {fonte('Fontes: Metrópoles · Terra')}
