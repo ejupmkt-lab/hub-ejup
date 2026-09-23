@@ -18,3 +18,12 @@ expressa do Victor.
 
 Tratamento: preto e branco frio, contraste de cópia, grão e vinheta
 (`_build/provas.py`). O rosto não é alterado.
+
+## Textura de dossiê no Higgsfield (23/09/2026)
+
+Aprovado pelo Victor: 4 créditos (gpt_image_2_5, média 2k, 1 crédito cada),
+pedindo rosto idêntico e só textura de cópia impressa. Resultado conferido
+lado a lado com o original: rosto preservado em Toffoli, Moraes e Gilmar
+(`*-ia.png`). A foto do Mendonça foi barrada pelo filtro de conteúdo do
+Higgsfield (falso positivo) e **não foi cobrada**; ela segue com o
+tratamento em código. Gasto real: 3 créditos (413,25 → 410,25).

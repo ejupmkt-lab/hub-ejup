@@ -42,10 +42,28 @@ def copia(im):
     return ImageOps.colorize(g, black=(10, 16, 24), white=(236, 234, 228))
 
 
+def recorte(im):
+    w, h = im.size
+    if w / h > .75:
+        nw = int(h * .75); im = im.crop(((w - nw) // 2, 0, (w - nw) // 2 + nw, h))
+    else:
+        nh = int(w / .75); im = im.crop((0, 0, w, nh))
+    return im.resize((LARG, int(LARG / .75)), Image.LANCZOS)
+
+
 def main():
+    """Quando existe a versão texturizada no Higgsfield (*-ia.png, rosto
+    preservado e conferido), ela entra só com recorte e o mesmo tom frio.
+    Sem ela, o tratamento é todo em código."""
     for nome, arq in FOTOS.items():
-        copia(Image.open(F / arq).convert("RGB")).save(OUT / f"foto-{nome}.jpg", quality=90)
-        print(nome)
+        ia = F / f"{nome}-ia.png"
+        if ia.exists():
+            g = ImageOps.grayscale(recorte(Image.open(ia).convert("RGB")))
+            out = ImageOps.colorize(g, black=(10, 16, 24), white=(236, 234, 228))
+        else:
+            out = copia(Image.open(F / arq).convert("RGB"))
+        out.save(OUT / f"foto-{nome}.jpg", quality=90)
+        print(nome, "higgsfield" if ia.exists() else "código")
 
 
 if __name__ == "__main__":
