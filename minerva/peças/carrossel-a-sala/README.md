@@ -28,7 +28,7 @@ própria em cada tela, nenhuma repetida.
 
 ## Linguagem
 
-- Numeração "(000)" e rótulo de plano em cada tela.
+- Sem numeração nem rótulo de tema no alto das telas: cada uma abre direto na imagem e no título.
 - Narrativa em Gotham Book com palavras em Book Italic (dourado sobre
   escuro, bronze sobre papel). Black só no título da capa.
 - Grão de película em todas as telas, alternância entre tinta e papel.
