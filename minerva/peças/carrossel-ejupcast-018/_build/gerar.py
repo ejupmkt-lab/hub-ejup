@@ -76,60 +76,64 @@ def facetas(w=1080, h=1440, tom="escuro"):
             f'{g}<polygon points="{w*.62},0 {w*.18},{h*.55} {w},{h*.3}" fill="url(#br)"/></svg>')
 
 
-def banda(img, altura=520):
-    return (f'<div class="banda" style="height:{altura}px">'
-            f'<div class="banda-foto" style="background-image:url({img})"></div></div>')
-
-
 SETA = '<div class="seta"><span>&rarr;</span></div>'
 
 
-def frase(texto, autor, tempo, escuro=False, img=None, tam=78):
-    cls = "s tinta" if escuro else "s papel"
-    return f"""<section class="{cls}">
+def painel(altura, extra=""):
+    """O painel navy de cantos arredondados, com facetas e o logo ejup/cast."""
+    return (f'<div class="painel" style="height:{altura}px">{facetas(1000, altura)}'
+            f'<div class="painel-logo">{LOGO_B}<span>/cast</span></div>{extra}</div>')
+
+
+def cartao(img, estilo):
+    return f'<div class="foto-card" style="{estilo};background-image:url({img})"></div>'
+
+
+def frase(texto, autor, tempo, img, lado):
+    """Frase no sistema do cartão: painel no alto, foto em cartão sobreposta,
+    citação e autor alinhados na mesma margem."""
+    x = "left:112px" if lado == "e" else "right:112px"
+    return f"""<section class="s papel">
+  {painel(420)}
+  {cartao(img, x + ";top:250px;width:560px;height:420px")}
   <p class="aspas">“</p>
-  <h1 class="frase" style="font-size:{tam}px">{texto}</h1>
+  <h1 class="frase">{texto}</h1>
   <p class="autor">{autor}<span>{tempo}</span></p>
-  {banda(img) if img else ''}
   {SETA}
 </section>"""
 
 
 def telas():
-    capa_foto = foto("duo-vertical.webp", (0, .06, 1, .74), 1080)
-    # recortes pensados para o quadro onde cada foto entra (proporção já certa)
-    conversa = foto("duo-conversa.webp", (.20, 0.0, .86, .92))       # cartão, 460x360 (mesma proporção)
-    faixa_duo = foto("duo-conversa.webp", (.10, .06, .95, .78))      # faixa 1080x520: rostos e mãos
-    faixa_dir = foto("mesa-tres.webp", (.585, .21, 1.0, .61))        # faixa 1080x520: os dois à direita
-    mesa = foto("mesa-tres.webp", (.08, .12, 1, .95))
-    rossana = foto("rossana.webp", (.22, .08, .78, .9))
+    capa_foto = foto("duo-vertical.webp", (0, .05, 1, .80), 1080)       # 3:4
+    conversa = foto("duo-conversa.webp", (.20, 0.0, .86, .92))         # cartão 460x360
+    foto_edu = foto("mesa-tres.webp", (.60, .16, 1.0, .69))            # 4:3, Eduardo falando
+    foto_nic = foto("duo-conversa.webp", (.20, 0.0, .86, .88))         # 4:3, Nicácio falando
+    mesa = foto("mesa-tres.webp", (.06, .08, .98, .92))                # 16:9 aprox.
     return [
         # 1 · capa
-        f"""<section class="s capa">
-  {facetas()}
-  <div class="capa-foto" style="background-image:url({capa_foto})"></div>
-  <div class="capa-logo">{LOGO_B}<span>/cast</span></div>
-  <p class="ep">EP</p>
-  <p class="numero">018</p>
-  <h1 class="nomes">Nicácio<br>Carvalho<br><em>&amp;</em> Eduardo<br>Pacheco</h1>
-  <p class="capa-gancho">O advogado que<br>a IA não substitui.</p>
-  <img class="capa-simb" src="{SIMB_B}" alt="">
+        f"""<section class="s papel">
+  {painel(760, '<p class="capa-ep">EP</p><p class="capa-num">018</p>')}
+  {cartao(capa_foto, "right:112px;top:200px;width:480px;height:640px")}
+  <h1 class="cartao-tit capa-tit"><span>Episódio #18</span>Nicácio Carvalho<br>e Eduardo Pacheco</h1>
+  <p class="capa-gancho">O advogado que a IA não substitui.</p>
+  {SETA}
 </section>""",
         # 2 · temas
         f"""<section class="s papel">
+  {painel(300)}
+  <p class="rotulo">Nesta conversa</p>
   <ul class="temas"><li>Inteligência artificial</li><li>Advocacia</li><li>Jovem advocacia</li><li>OAB</li><li>Supremo</li></ul>
-  <div class="arco">{facetas(1080, 420, "claro")}</div>
-  <p class="temas-rod">1h06 de conversa. Arraste para o que ficou.</p>
+  <p class="temas-rod">1h06 de conversa com a Dra. Rossana Fonseca.</p>
   {SETA}
 </section>""",
         frase("Se a IA faz o meu trabalho por mim, eu mesmo estou me colocando numa posição de <em>ser substituível.</em>",
-              "Eduardo Pacheco", "22:44", img=faixa_dir, tam=80),
+              "Eduardo Pacheco", "22:44", foto_edu, "e"),
         frase("O advogado usa IA para peticionar, o juiz para sentenciar, o outro lado para recorrer. <em>O processo é julgado em cinco segundos.</em>",
-              "Nicácio Carvalho", "27:19", escuro=True, tam=76, img=faixa_duo),
-        # 5 · cartão
+              "Nicácio Carvalho", "27:19", foto_nic, "d"),
+        # 5 · cartão (o que o Roberto aprovou)
         f"""<section class="s papel">
-  <div class="cartao-topo">{facetas(1000, 460)}<div class="cartao-logo">{LOGO_B}<span>/cast</span></div></div>
-  <div class="cartao-foto" style="background-image:url({conversa})"></div>
+  {painel(460)}
+  {cartao(conversa, "left:112px;top:330px;width:460px;height:360px")}
   <h1 class="cartao-tit"><span>Episódio #18</span>Nicácio Carvalho<br>e Eduardo Pacheco</h1>
   <p class="bio"><b>Nicácio Carvalho</b> é sócio do Carvalho Costa Guerra Sociedade de Advogados, onde lidera a advocacia para empresas: trabalhista, contratos, direito digital, proteção de dados e societário.</p>
   <p class="bio"><b>Eduardo Pacheco</b> é sócio da Souza Pacheco e Oliveira Advocacia, com atuação para empresas nas áreas contratual, trabalhista, tributária e cível.</p>
@@ -137,13 +141,12 @@ def telas():
   <div class="play">Assistir <span>&#9654;</span></div>
 </section>""",
         # 6 · onde assistir
-        f"""<section class="s cta">
-  {facetas()}
-  <div class="cta-foto" style="background-image:url({mesa})"></div>
-  <h1 class="cta-tit">Assista ao<br>episódio<br><em>completo.</em></h1>
-  <div class="canais"><p><small>no</small>YouTube</p><p><small>no</small>Spotify</p><p><small>link</small>na bio</p></div>
-  <p class="pergunta">E você: usa IA para <em>escrever</em><br>ou para <em>pensar</em>?</p>
-  <div class="cta-logo">{LOGO_B}</div>
+        f"""<section class="s papel">
+  {painel(460)}
+  {cartao(mesa, "left:112px;right:112px;top:250px;height:480px")}
+  <h1 class="cartao-tit" style="top:790px"><span>Episódio completo</span>Assista no YouTube<br>e no Spotify.</h1>
+  <p class="pergunta">E você: usa IA para <em>escrever</em> ou para <em>pensar</em>? Conta nos comentários.</p>
+  <div class="play" style="top:1230px;left:112px;right:auto">Link na bio <span>&#9654;</span></div>
 </section>""",
     ]
 
