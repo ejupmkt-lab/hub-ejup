@@ -53,7 +53,6 @@ def pessoa(nome, sobrenome, fato, resposta, gancho, img, fontes_txt):
   <div class="cheia" style="background-image:url({g(img)})"></div>
   <div class="grad-cima" style="height:900px"></div>
   <div class="grad-baixo" style="height:420px"></div>
-  <p class="eyebrow" style="left:64px;top:96px">o caso chegou ao Supremo</p>
   <h1 class="disp" style="left:64px;right:64px;top:150px;font-size:124px">{nome}<br><em>{sobrenome}</em></h1>
   <p class="texto" style="left:64px;right:64px;top:430px">{fato}</p>
   <p class="resposta" style="left:64px;right:200px;top:{460 + (len(fato) // 46 + 1) * 50 + 20}px">{resposta}</p>
@@ -65,14 +64,11 @@ def pessoa(nome, sobrenome, fato, resposta, gancho, img, fontes_txt):
 TELAS = [
     # 1 · capa
     f"""<section class="s papel capa">
-  <div class="cheia" style="background-image:url({g('capa')})"></div>
+  <div class="cheia" style="background:linear-gradient(180deg,#f0eae0 0%,#ece6db 55%,#e6e0d4 100%)"></div>
   {CANTOS}
-  <p class="micro" style="left:92px;top:78px">a sala<br>episódio 01</p>
-  <p class="micro centro-x" style="top:78px">explicado sem juridiquês</p>
-  <p class="micro dir" style="right:92px;top:78px">com<br>Roberto Pivotto</p>
   <h2 class="gancho" style="top:150px;font-size:40px">Um banqueiro preso. 1,6 milhão de pessoas<br>com dinheiro travado. E <em>três ministros</em><br>do Supremo.</h2>
   <h1 class="titulo" style="top:318px;font-size:230px;line-height:.86;white-space:normal">o caso<br>Vorcaro</h1>
-  <img class="cadeira" src="{b64(IMG / 'objetos.png', 'image/png')}" alt="" style="transform-origin:50% 100%;transform:translateY(-60px) scale(.85)">
+  <img class="cadeira" src="{b64(IMG / 'objetos.png', 'image/png')}" alt="" style="transform-origin:50% 100%;transform:translateY(-60px) scale(.85);filter:drop-shadow(0 26px 30px rgba(13,19,26,.28))">
   <p class="micro" style="left:92px;bottom:84px">arraste</p>
   <img class="selo-simbolo" src="{SIMBOLO}" alt="">
   <p class="micro dir" style="right:92px;bottom:84px">nomes, datas<br>e o que a lei diz</p>
@@ -83,8 +79,7 @@ TELAS = [
   <div class="cheia" style="background-image:url({g('aeroporto')})"></div>
   <div class="grad-cima" style="height:760px"></div>
   <div class="grad-baixo" style="height:460px"></div>
-  <p class="eyebrow" style="left:64px;top:96px">18 de novembro de 2025</p>
-  <h1 class="disp" style="left:64px;right:64px;top:150px;font-size:112px">O dono do banco<br>foi <em>preso no<br>aeroporto.</em></h1>
+  <h1 class="disp" style="left:64px;right:64px;top:150px;font-size:96px">Novembro de 2025.<br>O dono do banco<br>foi <em>preso no<br>aeroporto.</em></h1>
   <p class="leg" style="left:64px;right:64px;bottom:200px;font-size:30px">Segundo a Polícia Federal, Daniel Vorcaro,<br>dono do Banco Master, estava de saída do país.</p>
   <p class="leg" style="right:64px;bottom:150px;text-align:right;color:var(--ouro)">No mesmo dia, o banco dele fechou. &rarr;</p>
   {fonte('Fontes: JOTA · CNN Brasil')}
@@ -105,7 +100,6 @@ TELAS = [
     f"""<section class="s tinta">
   <div class="cheia" style="background-image:url({g('cdb')})"></div>
   <div class="grad-baixo" style="height:760px"></div>
-  <p class="eyebrow" style="left:64px;bottom:610px">a isca</p>
   <h1 class="disp" style="left:64px;right:64px;bottom:360px;font-size:112px">Pagar <em>mais que<br>todo mundo.</em></h1>
   <p class="leg" style="left:64px;right:64px;bottom:230px;font-size:30px">O Master vendia CDB rendendo muito acima dos<br>outros bancos. E repetia: tem a garantia do FGC.</p>
   <p class="leg" style="right:64px;bottom:150px;text-align:right;color:var(--ouro)">Só que essa garantia tem teto. &rarr;</p>
@@ -114,7 +108,6 @@ TELAS = [
 
     # 5 · o teto do FGC
     f"""<section class="s papel">
-  <p class="eyebrow escuro" style="left:64px;top:96px">o que é o FGC</p>
   <h1 class="disp" style="left:64px;right:64px;top:150px;font-size:116px">Um seguro<br>que tem <em>teto.</em></h1>
   <p class="texto escuro" style="left:64px;right:64px;top:430px">É um fundo pago pelos próprios bancos para devolver o dinheiro das pessoas quando um banco quebra.</p>
   <div class="numeros" style="top:640px">
@@ -167,7 +160,6 @@ TELAS = [
 
     # 11 · Gilmar
     f"""<section class="s preto">
-  <p class="eyebrow" style="left:64px;top:96px">dentro do próprio Supremo</p>
   <h1 class="disp centro-y" style="left:64px;right:64px;font-size:150px;line-height:1.02">“Até a <em>máfia</em><br>tem ética.”</h1>
   <p class="leg" style="left:64px;bottom:230px;font-size:30px">Gilmar Mendes, ministro do STF, em sessão da Corte.</p>
   <p class="leg" style="right:64px;bottom:150px;text-align:right;color:var(--ouro)">E o que a lei diz sobre tudo isso? &rarr;</p>
@@ -176,7 +168,6 @@ TELAS = [
 
     # 12 · o que a lei diz
     f"""<section class="s papel">
-  <p class="eyebrow escuro" style="left:64px;top:96px">sem juridiquês</p>
   <h1 class="disp" style="left:64px;right:64px;top:150px;font-size:104px">O que a <em>lei</em> diz.</h1>
   <div class="qa" style="top:330px">
     <div><b>Está preso, então é culpado?</b><span>Ainda não. A prisão antes do julgamento serve para proteger a investigação. Culpa, só com sentença.</span></div>
