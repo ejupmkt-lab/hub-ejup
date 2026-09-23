@@ -1,7 +1,7 @@
 # EJUPcast #018 · Texto do carrossel
 
 > **Versão publicada: 6 telas** (capa, temas, frase do Eduardo 22:44, frase do
-> Nicácio 27:19, cartão, onde assistir). As demais frases abaixo ficam como
+> Nicácio 27:19, cartão, onde assistir com o selo EJUPcast). As demais frases abaixo ficam como
 > banco para cortes e stories.
 
 **Convidados:** Nicácio Carvalho e Eduardo Pacheco (ex-presidentes da Comissão

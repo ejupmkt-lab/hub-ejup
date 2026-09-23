@@ -11,7 +11,7 @@ Texto: texto-carrossel.md (falas extraídas da transcrição, com timecode).
 Fotos: frames do episódio (prints/).
 """
 import base64
-import io
+import io, re
 import pathlib
 from PIL import Image
 
@@ -85,6 +85,23 @@ def painel(altura, extra=""):
             f'<div class="painel-logo">{LOGO_B}<span>/cast</span></div>{extra}</div>')
 
 
+# Só o logotipo "ejup", sem o símbolo e sem "Educação Jurídica", como na TV do estúdio.
+MARCA_B = re.sub(r'viewBox="[^"]*"', 'viewBox="352 690 282 118"', LOGO_B, count=1)
+
+
+def selo_cast(d=540):
+    """O selo EJUPcast da tela do estúdio: logotipo e /CAST num círculo fino com dois pontos."""
+    import math
+    r = d / 2 - 6
+    pts = "".join(
+        f'<circle cx="{d/2 + r*math.cos(math.radians(a)):.1f}" cy="{d/2 + r*math.sin(math.radians(a)):.1f}" r="7" fill="#f0b855"/>'
+        for a in (-70, 115))
+    return (f'<div class="selo" style="width:{d}px;height:{d}px">'
+            f'<svg class="selo-aro" viewBox="0 0 {d} {d}"><circle cx="{d/2}" cy="{d/2}" r="{r}" fill="none" '
+            f'stroke="#d1d3d4" stroke-opacity=".55" stroke-width="2"/>{pts}</svg>'
+            f'<div class="selo-marca"><div>{MARCA_B}<span>/cast</span></div></div></div>')
+
+
 def cartao(img, estilo):
     return f'<div class="foto-card" style="{estilo};background-image:url({img})"></div>'
 
@@ -105,10 +122,9 @@ def frase(texto, autor, tempo, img, lado):
 
 def telas():
     capa_foto = foto("duo-vertical.webp", (0, .05, 1, .80), 1080)       # 3:4
-    conversa = foto("mesa-tres.webp", (.12, .06, .98, .98))            # cartão 460x360: a mesa inteira
+    conversa = foto("mesa-tres.webp", (0, .03, 1, .96), 1712)          # cartão 856x440: a mesa inteira
     foto_edu = foto("mesa-tres.webp", (.60, .16, 1.0, .69))            # 4:3, Eduardo falando
     foto_nic = foto("duo-conversa.webp", (.20, 0.0, .86, .88))         # 4:3, Nicácio falando
-    host = foto("rossana.webp", (.14, 0.0, .86, .78))                  # onde assistir: a host
     return [
         # 1 · capa
         f"""<section class="s papel">
@@ -132,21 +148,19 @@ def telas():
               "Nicácio Carvalho", "27:19", foto_nic, "d"),
         # 5 · cartão (o que o Roberto aprovou)
         f"""<section class="s papel">
-  {painel(460)}
-  {cartao(conversa, "left:112px;top:330px;width:460px;height:360px")}
+  {painel(460, '<div class="play" style="top:40px;right:48px">Assistir <span>&#9654;</span></div>')}
+  {cartao(conversa, "left:112px;right:112px;top:230px;height:440px")}
   <h1 class="cartao-tit"><span>Episódio #18</span>Nicácio Carvalho<br>e Eduardo Pacheco</h1>
   <p class="bio"><b>Nicácio Carvalho</b> é sócio do Carvalho Costa Guerra Sociedade de Advogados, onde lidera a advocacia para empresas: trabalhista, contratos, direito digital, proteção de dados e societário.</p>
   <p class="bio"><b>Eduardo Pacheco</b> é sócio da Souza Pacheco e Oliveira Advocacia, com atuação para empresas nas áreas contratual, trabalhista, tributária e cível.</p>
   <p class="bio mini">Os dois presidiram a Comissão da Jovem Advocacia da OAB/RN. Com a Dra. Rossana Fonseca.</p>
-  <div class="play">Assistir <span>&#9654;</span></div>
 </section>""",
         # 6 · onde assistir
         f"""<section class="s papel">
-  {painel(460)}
-  {cartao(host, "left:112px;right:112px;top:250px;height:480px")}
-  <h1 class="cartao-tit" style="top:790px"><span>Episódio completo</span>Assista no YouTube<br>e no Spotify.</h1>
-  <p class="pergunta">Com a Dra. Rossana Fonseca. E você: usa IA para <em>escrever</em> ou para <em>pensar</em>? Conta nos comentários.</p>
-  <div class="play" style="top:1230px;left:112px;right:auto">Link na bio <span>&#9654;</span></div>
+  <div class="painel painel-selo" style="height:740px">{facetas(1000, 740)}{selo_cast()}</div>
+  <h1 class="cartao-tit" style="top:816px"><span>Episódio completo</span>Assista no YouTube<br>e no Spotify.</h1>
+  <p class="pergunta" style="top:1046px">Com a Dra. Rossana Fonseca. E você: usa IA para <em>escrever</em> ou para <em>pensar</em>? Conta nos comentários.</p>
+  <div class="play" style="top:1236px;left:112px;right:auto">Link na bio <span>&#9654;</span></div>
 </section>""",
     ]
 
