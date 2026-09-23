@@ -15,6 +15,6 @@ a doutrina que respondem à frase, com fonte na tela.
 
 Episódio 01: dever de verificação. Em breve no canal da EJUP.
 
-E a cadeira do outro lado da mesa é a sua. Qual seria a sua confissão?
+E a cadeira do lado de cá da mesa é a sua. Qual seria a sua confissão?
 
 Alma clássica, repertório contemporâneo.
