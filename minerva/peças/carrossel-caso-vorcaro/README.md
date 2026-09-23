@@ -12,9 +12,19 @@ cada), a da Sala em qualidade média 2k com a foto real como referência
 (1 crédito) e 1 recorte de fundo para a capa (1 crédito). **Total: 4,25
 créditos.**
 
-Nenhum rosto real. Os nomes ficam no texto, com fonte; as imagens são
-objetos (aeroporto vazio, porta de banco, comprovante, celular, plenário,
-cadeira, xícaras, contrato).
+**Fotos reais dos citados** (Toffoli, Mendonça, Moraes, Gilmar Mendes),
+todas em registro institucional ou de ato público, com crédito no rodapé
+(ver `fotos/CREDITOS.md`). Tratadas em código como **cópia impressa de
+dossiê**: preto e branco frio, grão, borda de papel, clipe ou fita e a
+etiqueta "Anexo 02 a 05" (`_build/provas.py`). O rosto não é alterado, e
+nenhum crédito foi gasto nisso.
+
+O retrato de Daniel Vorcaro ficou de fora: é retrato sem evento
+identificado, e não registro de ato público (item 23). Só entra com
+decisão expressa do Victor.
+
+As imagens geradas cadeira, xícaras e contrato ficam como reserva no
+código (caem de fundo se faltar a foto real).
 
 ## Regras de conteúdo aplicadas
 

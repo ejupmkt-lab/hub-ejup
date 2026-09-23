@@ -57,12 +57,22 @@ def foto(nome):
     return b64(arq, "image/jpeg") if arq.exists() else None
 
 
-def quadro(nome, estilo, legenda):
+ANEXOS = {"vorcaro": "01", "toffoli": "02", "mendonca": "03", "moraes": "04", "gilmar": "05"}
+NOMES = {"vorcaro": "Daniel Vorcaro", "toffoli": "Dias Toffoli", "mendonca": "André Mendonça",
+         "moraes": "Alexandre de Moraes", "gilmar": "Gilmar Mendes"}
+CLIPE = ('<svg class="clipe" viewBox="0 0 46 120"><path d="M14 30 V96 a9 9 0 0 0 18 0 V18 a13 13 0 0 0 -26 0 '
+         'V100 a17 17 0 0 0 34 0 V34" fill="none" stroke="#b9bec4" stroke-width="4" stroke-linecap="round"/></svg>')
+
+
+def quadro(nome, estilo, credito, lado=""):
+    """Foto real como cópia impressa de dossiê: borda de papel, clipe ou
+    fita, etiqueta de anexo e crédito da foto."""
     src = foto(nome)
     if not src:
         return ""
-    return (f'<figure class="quadro-foto" style="{estilo}"><img src="{src}" alt="">'
-            f'<figcaption>{legenda}</figcaption></figure>')
+    preso = CLIPE if ANEXOS[nome] in ("01", "03", "05") else '<i class="fita"></i>'
+    return (f'<figure class="quadro-foto {lado}" style="{estilo}">{preso}<img src="{src}" alt="">'
+            f'<figcaption><span></span><span>Anexo {ANEXOS[nome]}</span></figcaption></figure>')
 
 
 def pessoa(nome, sobrenome, fato, resposta, gancho, img, fontes_txt, credito):
@@ -70,18 +80,18 @@ def pessoa(nome, sobrenome, fato, resposta, gancho, img, fontes_txt, credito):
     resposta. Sem foto disponível, cai na imagem gerada de fundo."""
     tem_foto = foto(img) is not None
     fundo = "" if tem_foto else f'<div class="cheia" style="background-image:url({g(RESERVA[img])})"></div>'
-    topo_texto = 860 if tem_foto else 430
-    topo_resp = topo_texto + 30 + (len(fato) // 46 + 1) * 50
+    topo_texto = 830 if tem_foto else 430
+    topo_resp = topo_texto + 26 + (len(fato) // (56 if tem_foto else 46) + 1) * (45 if tem_foto else 50)
     return f"""<section class="s tinta">
   {fundo}
-  {quadro(img, "right:64px;top:96px;width:470px;height:627px", credito)}
+  {quadro(img, "right:72px;top:96px;width:470px;height:627px", credito)}
   <div class="grad-cima" style="height:{'0' if tem_foto else '900'}px"></div>
   <div class="grad-baixo" style="height:420px"></div>
   <h1 class="disp" style="left:64px;right:64px;top:{'560' if tem_foto else '150'}px;font-size:124px">{nome}<br><em>{sobrenome}</em></h1>
   <p class="texto" style="left:64px;right:64px;top:{topo_texto}px;font-size:{'32' if tem_foto else '36'}px">{fato}</p>
   <p class="resposta" style="left:64px;right:160px;top:{topo_resp}px">{resposta}</p>
-  <p class="leg" style="right:64px;bottom:150px;text-align:right">{gancho}</p>
-  {fonte(fontes_txt)}
+  <p class="leg" style="right:64px;bottom:120px;text-align:right">{gancho}</p>
+  {fonte(fontes_txt + (f" · Foto: {credito}" if tem_foto and credito else ""))}
 </section>"""
 
 
@@ -104,7 +114,6 @@ TELAS = [
   <div class="grad-cima" style="height:760px"></div>
   <div class="grad-baixo" style="height:460px"></div>
   <h1 class="disp" style="left:64px;right:64px;top:150px;font-size:96px">Novembro de 2025.<br>O dono do banco<br>foi <em>preso no<br>aeroporto.</em></h1>
-  {quadro("vorcaro", "right:64px;top:620px;width:330px;height:440px", CREDITOS.get("vorcaro", ""))}
   <p class="leg" style="left:64px;right:64px;bottom:200px;font-size:30px">Segundo a Polícia Federal, Daniel Vorcaro,<br>dono do Banco Master, estava de saída do país.</p>
   <p class="leg" style="right:64px;bottom:150px;text-align:right;color:var(--ouro)">No mesmo dia, o banco dele fechou. &rarr;</p>
   {fonte('Fontes: JOTA · CNN Brasil')}
@@ -185,11 +194,11 @@ TELAS = [
 
     # 11 · Gilmar
     f"""<section class="s preto">
-  {quadro("gilmar", "right:64px;top:96px;width:420px;height:560px", CREDITOS.get("gilmar", ""))}
+  {quadro("gilmar", "right:72px;top:96px;width:420px;height:560px", CREDITOS.get("gilmar", ""), "esq")}
   <h1 class="disp" style="left:64px;right:64px;top:{'720' if foto('gilmar') else '520'}px;font-size:150px;line-height:1.02">“Até a <em>máfia</em><br>tem ética.”</h1>
   <p class="leg" style="left:64px;bottom:230px;font-size:30px">Gilmar Mendes, ministro do STF, em sessão da Corte.</p>
   <p class="leg" style="right:64px;bottom:150px;text-align:right;color:var(--ouro)">E o que a lei diz sobre tudo isso? &rarr;</p>
-  {fonte('Fontes: Metrópoles · Terra')}
+  {fonte('Fontes: Metrópoles · Terra' + (' · Foto: ' + CREDITOS['gilmar'] if foto('gilmar') else ''))}
 </section>""",
 
     # 12 · o que a lei diz
