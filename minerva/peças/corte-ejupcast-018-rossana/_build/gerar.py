@@ -86,7 +86,7 @@ def main():
 
     # A1 · papel. As três faixas são janelas para a MESMA foto, na mesma escala
     # e alinhadas entre si: juntas, remontam a cena (rosto, microfone, mão na mesa).
-    E, D = .72, 60                         # escala da foto e deslocamento vertical do bloco
+    E, D = .72, -109                         # escala da foto e deslocamento vertical do bloco
     L, T = -300, 627 + D                   # onde a foto inteira ficaria na tela
     def jan(x, y, w, h):
         y += D
@@ -95,7 +95,7 @@ def main():
                 f'background-position:{L - x}px {T - y}px"></div>')
     a1 = f"""<section class="s claro">
   {ARCOS.format(c="#d1d3d4", o=".42")}
-  <div class="logo" style="top:{150 + D}px">{selo_cast(LOGO_N, "rgba(3,28,55,.35)", "#9b6b26")}</div>
+  <div class="logo" style="top:100px">{selo_cast(LOGO_N, "rgba(3,28,55,.35)", "#9b6b26", 210)}</div>
   <p class="t it" style="left:104px;top:{478 + D}px;font-size:212px">Direito</p>
   {jan(112, 720, 856, 290)}
   <p class="t bk" style="left:100px;top:{1016 + D}px;font-size:196px">e</p>
@@ -110,7 +110,7 @@ def main():
     # A2 · a mesma ideia no escuro, com o dourado
     a2 = a1.replace('class="s claro"', 'class="s escuro"').replace(
         ARCOS.format(c="#d1d3d4", o=".42"), ARCOS.format(c="#304557", o=".35")).replace(
-        selo_cast(LOGO_N, "rgba(3,28,55,.35)", "#9b6b26"), selo_cast(LOGO_B, "rgba(209,211,212,.5)", "#f0b855")).replace(
+        selo_cast(LOGO_N, "rgba(3,28,55,.35)", "#9b6b26", 210), selo_cast(LOGO_B, "rgba(209,211,212,.5)", "#f0b855", 210)).replace(
         'class="t it" style="left:474px', 'class="t it ouro" style="left:474px')
 
     # A3 · conceito: o Direito é o gesto de fora, a moral é o que está dentro
@@ -167,8 +167,8 @@ body{{background:#3a3d42;display:flex;gap:28px;padding:28px;font-family:'Gotham'
 .logo .selo-aro{{position:absolute;inset:0;width:100%;height:100%}}
 .selo-marca{{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}}
 .selo-marca>div{{display:flex;align-items:flex-end;gap:5px}}
-.logo .selo-marca svg{{width:112px;height:auto;display:block}}
-.logo .selo-marca span{{font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px;opacity:.8}}
+.logo .selo-marca svg{{width:96px;height:auto;display:block}}
+.logo .selo-marca span{{font-weight:500;font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px;opacity:.8}}
 </style></head><body>
 {a1}
 {a2}
