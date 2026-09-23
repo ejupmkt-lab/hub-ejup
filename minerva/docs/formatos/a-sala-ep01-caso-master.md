@@ -1,227 +1,280 @@
-# A Sala · Episódio 01 · O caso Master
+# A Sala · Episódio 01 · O caso Vorcaro
 
 **Apresentação:** Roberto Pivotto
-**Duração-alvo:** 6 a 7 minutos (formato resposta rápida de O Mecanismo)
-**Tese do episódio:** o que um jurista precisa entender sobre CDB, FGC e
-liquidação extrajudicial antes de dizer a alguém que "o dinheiro está seguro".
-**Ângulo:** o mecanismo. Nenhum veredito, nenhum lado político, presunção de
-inocência na gramática ("investigado", "segundo a Polícia Federal").
+**Duração-alvo:** 7 a 8 minutos
+**Público:** qualquer pessoa que ouviu falar do caso, e não só advogados.
+Linguagem de conversa. Todo termo técnico aparece traduzido na mesma frase.
+**Regra de nomes:** todo nome próprio vem com a fonte na tela e com o verbo
+certo: "investigado", "segundo a Polícia Federal", "segundo o relatório",
+"ele nega". Toda acusação citada vem acompanhada da resposta de quem foi
+citado.
 
 ---
 
-## Cenário e objeto sobre a mesa
+## Cenário e objetos sobre a mesa
 
-A Sala como gravada: parede escura, quadro de cortiça laranja com moldura de
-alumínio e o papel com o símbolo da EJUP, mesa clara, cadeira escura, luz dura
-de cima, cor fria. A cadeira de quem assiste fica do lado de cá, fora do
-quadro.
+A Sala como gravada: parede escura, cortiça laranja com o papel do símbolo da
+EJUP, mesa clara, cadeira escura, luz dura de cima, cor fria. A cadeira de
+quem assiste fica do lado de cá.
 
-**Sobre a mesa, a prova do episódio:**
-- um comprovante de aplicação em CDB impresso, com a taxa circulada à caneta;
-- um envelope pardo lacrado, carimbado CONFIDENCIAL;
-- nada com nome real, logotipo de banco ou dado pessoal legível.
+Sobre a mesa:
+- um celular virado para baixo (as mensagens);
+- um envelope pardo lacrado, carimbado CONFIDENCIAL (o relatório da PF);
+- um comprovante de aplicação impresso, com a taxa circulada à caneta (o CDB).
 
-Vestuário: alfaiataria escura, camisa lisa, sem gravata.
+Nada com nome real, logotipo de banco ou dado pessoal legível.
 
 ---
 
-## ABERTURA FRIA · 0:00 a 0:45
+## ABERTURA FRIA · 0:00 a 0:50
 
-*Plano único. Médio fechado, 85 mm, altura do olho, câmera parada. Roberto
-entra, puxa a cadeira, senta. Três segundos de silêncio. Olha para a câmera.*
+*Plano único. Médio fechado, câmera parada. Roberto entra, senta. Três
+segundos de silêncio. Olha para a câmera.*
 
 > **ROBERTO:** Eu preciso confessar uma coisa.
 >
 > *(pausa)*
 >
-> Quando eu via um CDB pagando muito acima do mercado, eu pensava: tem FGC.
-> Então está tudo bem.
+> Quando o caso Vorcaro começou, eu achei que era só mais um banco
+> quebrando.
 >
 > *(pausa)*
 >
-> Um milhão e meio de pessoas pensaram a mesma coisa sobre o mesmo banco.
+> Aí o dono do banco foi preso no aeroporto. Um milhão e seiscentas mil
+> pessoas descobriram que o dinheiro delas estava preso lá dentro. E no
+> meio da investigação começaram a aparecer os nomes de três ministros do
+> Supremo.
 
-*Ele empurra o comprovante de aplicação alguns centímetros na direção da
-câmera, para o lado da cadeira vazia.*
+*Ele vira o celular sobre a mesa, com a tela para baixo ainda. Não mostra
+nada.*
 
-> **ROBERTO:** A pergunta que ninguém fez foi: garantido até onde?
+> **ROBERTO:** Eu vou te contar essa história do jeito mais simples que ela
+> pode ser contada. Com nome, com data e com o que a lei diz.
 
 **CORTE SECO. Vinheta, 8 segundos.**
 
-> **Nota de montagem:** a frase completa termina no mesmo plano. O número de
-> credores só entra se a fonte confirmar na data da gravação (ver tabela de
-> fontes). Se houver divergência, trocar por "muita gente".
+---
+
+## PARTE 1 · QUEM É QUEM · 0:58 a 2:00
+
+*Cartelas com foto de arquivo só de ato público (ver notas), nome, papel no
+caso e fonte.*
+
+> **ROBERTO:** Primeiro, os personagens.
+>
+> **Daniel Vorcaro.** Dono do Banco Master, um banco médio que cresceu
+> muito rápido. Hoje está preso, investigado pela Polícia Federal. Ainda
+> não foi julgado.
+>
+> **O Banco Central.** É o órgão que fiscaliza os bancos. Em novembro de
+> 2025, ele fechou o Master e assumiu o controle do que sobrou. O nome
+> técnico disso é liquidação extrajudicial. Pensa numa intervenção: sai o
+> dono, entra um liquidante nomeado pelo governo para pagar quem der para
+> pagar.
+>
+> **A Polícia Federal.** Chamou a operação de Compliance Zero. No mesmo dia
+> em que o banco foi fechado, prendeu Vorcaro no aeroporto de Guarulhos.
+> Segundo a PF, ele estava de saída do país.
+>
+> **E um milhão e seiscentas mil pessoas** com dinheiro aplicado no banco.
+
+*CARTELA · 18.11.2025 · Banco Central fecha o Master · PF prende Vorcaro em
+Guarulhos. Fontes: JOTA, CNN Brasil.*
 
 ---
 
-## ATO 1 · O QUE ACONTECEU · 0:53 a 2:00
+## PARTE 2 · A ISCA · 2:00 a 3:20
 
-*Plano médio. Cartelas gráficas entram sobre a imagem, sempre com fonte e
-data no rodapé da tela.*
+*Roberto pega o comprovante de aplicação.*
 
-> **ROBERTO:** Novembro de 2025. O Banco Central decreta a liquidação
-> extrajudicial do Banco Master. No mesmo dia, a Polícia Federal prende o
-> controlador do banco no aeroporto de Guarulhos, na operação que ela chamou
-> de Compliance Zero.
-
-*CARTELA 1 · 18.11.2025 · Liquidação extrajudicial decretada pelo Banco
-Central · Operação Compliance Zero da PF. Fonte: Banco Central; JOTA.*
-
-> **ROBERTO:** Segundo a investigação, o banco crescia captando dinheiro em
-> CDB com rendimento muito acima da média. E vendia esse rendimento
-> apoiado em um argumento: o investimento tinha a garantia do FGC.
+> **ROBERTO:** Como um banco médio junta tanto dinheiro? Com uma isca que
+> funciona com quase todo mundo.
 >
-> A liquidação acionou o Fundo Garantidor de Créditos no maior volume da
-> história dele.
+> O Master vendia CDB pagando muito mais do que os outros bancos pagavam.
+> CDB é simples: você empresta dinheiro para o banco e ele te devolve com
+> juros. E o argumento de venda era sempre o mesmo: pode aplicar, tem a
+> garantia do FGC.
+>
+> O FGC é um fundo que os próprios bancos bancam para devolver o dinheiro
+> das pessoas quando um banco quebra. Funciona como um seguro. Só que é um
+> seguro com limite.
 
-*CARTELA 2 · O maior acionamento da história do FGC. Fonte: CNN Brasil;
+*CARTELA · O seguro tem teto · até R$ 250 mil por pessoa, por banco (bancos
+do mesmo grupo contam como um só) · no máximo R$ 1 milhão a cada 4 anos,
+somando tudo. Fonte: regras do FGC.*
+
+> **ROBERTO:** Quem tinha até duzentos e cinquenta mil recebe de volta. Quem
+> tinha mais do que isso entrou na fila. A fila de quem só recebe se sobrar
+> dinheiro do banco.
+>
+> E para onde ia o dinheiro captado? Segundo a investigação, boa parte foi
+> para fundos ligados ao próprio banco, cheios de papéis de empresas em
+> crise.
+>
+> O resultado foi o maior resgate da história do FGC.
+
+*CARTELA · O maior acionamento da história do FGC. Fontes: CNN Brasil,
 Transparência Internacional Brasil.*
 
-> **ROBERTO:** Em março de 2026, a Segunda Turma do Supremo manteve a prisão
-> preventiva do controlador. Ele segue investigado, e ninguém foi condenado
-> até aqui. Daqui para frente, eu falo do mecanismo. O veredito cabe ao
-> Judiciário.
+---
 
-*CARTELA 3 · 13.03.2026 · STF, Segunda Turma, mantém a preventiva. Fonte:
-CNN Brasil; STF.*
+## PARTE 3 · QUANDO O CASO CHEGOU AO SUPREMO · 3:20 a 5:40
+
+*Roberto pousa a mão sobre o envelope lacrado.*
+
+> **ROBERTO:** Até aqui, seria um caso de banco. Ele virou outra coisa
+> quando chegou ao Supremo Tribunal Federal. E aqui entram três nomes.
+
+**Dias Toffoli.**
+
+> **ROBERTO:** O primeiro relator do caso no Supremo foi o ministro Dias
+> Toffoli. Relator é o ministro que conduz o processo. Em fevereiro de 2026,
+> ele pediu para sair. Isso aconteceu depois de reportagens ligarem empresas
+> de familiares dele a fundos investigados, e de a PF encontrar referências
+> ao nome dele no celular de Vorcaro.
+
+*CARTELA · 12.02.2026 · Toffoli deixa a relatoria. Fonte: imprensa;
+confirmar no portal do STF.*
+
+**André Mendonça.**
+
+> **ROBERTO:** O caso foi sorteado para o ministro André Mendonça. Em março
+> de 2026, Vorcaro, que tinha sido solto, voltou para a prisão. Segundo a
+> decisão, o grupo ligado a ele mantinha uma estrutura para vigiar e
+> intimidar desafetos, e tinha acesso a informações sigilosas da
+> investigação. A Segunda Turma do Supremo confirmou a prisão.
+>
+> Só que em setembro veio à tona uma reunião. Em março de 2025, antes de
+> virar relator, Mendonça se encontrou com Vorcaro por duas horas, em São
+> Paulo, no instituto que o próprio ministro fundou.
+>
+> Mendonça confirma o encontro. Diz que foi uma única vez, para tratar de
+> outro processo, e que decidiu contra o que Vorcaro queria.
+
+*CARTELA · 14.03.2025 · Reunião no Instituto Iter · Mendonça confirma e
+diz que foi uma única vez. Fonte: Agência Pública.*
+
+**Alexandre de Moraes.**
+
+> **ROBERTO:** O terceiro nome veio no relatório da Polícia Federal
+> divulgado em setembro de 2026.
+>
+> Segundo esse relatório, o escritório de advocacia de Viviane Barci de
+> Moraes, mulher do ministro Alexandre de Moraes, tinha um contrato com o
+> Banco Master de cerca de cento e trinta milhões de reais em três anos.
+> E no celular de Vorcaro, a PF encontrou mensagens enviadas a um contato
+> que ela identificou como o ministro. Uma delas é do dia da prisão:
+> "conseguiu ter notícia ou bloquear?".
+>
+> Moraes nega qualquer relação com Vorcaro e diz que não recebeu essas
+> mensagens. As respostas do outro lado nunca foram encontradas.
+
+*CARTELA · Relatório da PF, set. 2026 · contrato de cerca de R$ 130 mi ·
+mensagens atribuídas pela PF · Moraes nega. Fontes: Agência Pública,
+Metrópoles.*
+
+> **ROBERTO:** No meio disso, dentro do próprio Supremo, o ministro Gilmar
+> Mendes disse numa sessão uma frase que resume o clima: "até a máfia tem
+> ética".
+
+*CARTELA · "Até a máfia tem ética" · Gilmar Mendes, em sessão do STF.
+Fontes: Metrópoles, Terra.*
 
 ---
 
-## ATO 2 · O MECANISMO · 2:00 a 4:00
+## PARTE 4 · O QUE A LEI DIZ, SEM JURIDIQUÊS · 5:40 a 7:10
 
-*Roberto pega o comprovante e o segura na altura do peito. Plano mais
-fechado.*
+*Roberto afasta o envelope. Fala mais baixo.*
 
-> **ROBERTO:** Três peças explicam esse caso inteiro. Nenhuma delas é
-> segredo. Todas estão na lei ou no regulamento.
+> **ROBERTO:** Três perguntas que todo mundo está fazendo. E o que a lei
+> responde.
 
-**Peça 1 · O CDB.**
+**1. Se ele está preso, ele é culpado?**
 
-> **ROBERTO:** CDB é dívida do banco com você. Você empresta, o banco devolve
-> com juros. O risco é o do banco. Quando alguém paga muito acima do que o
-> resto do mercado paga pelo mesmo papel, a primeira pergunta de quem estudou
-> Direito é: por que ele precisa tanto do meu dinheiro?
+> **ROBERTO:** Ainda não. Existe prisão antes do julgamento. Ela serve para
+> proteger a investigação. Culpa, só depois da sentença.
 
-**Peça 2 · O FGC.**
+**2. Um juiz que conhece uma das partes pode julgar o caso?**
 
-*CARTELA 4 · FGC · até R$ 250 mil por CPF ou CNPJ, por instituição ou
-conglomerado · teto global de R$ 1 milhão a cada quatro anos · cobre
-principal e rendimentos até a liquidação. Fonte: regulamento do FGC.*
+*CARTELA · Código de Processo Penal · art. 252: juiz não atua em processo
+em que o cônjuge atuou como advogado · art. 254: juiz se afasta se for
+amigo íntimo ou inimigo de uma das partes.*
 
-> **ROBERTO:** O FGC é um seguro com limite, e o limite tem três camadas. Duzentos
-> e cinquenta mil por pessoa em cada instituição. Instituições do mesmo
-> conglomerado contam como uma só. E existe um teto de um milhão a cada
-> quatro anos, somando tudo. Quem tinha mais do que isso num banco só ficou
-> na fila da liquidação, com todos os outros credores.
+> **ROBERTO:** A lei tem duas regras para isso. O juiz não pode atuar num
+> processo em que o marido ou a mulher dele trabalhou como advogado. E deve
+> sair do caso se for amigo íntimo ou inimigo de uma das partes. Se alguma
+> dessas regras se aplica a alguém nesse caso, quem vai decidir é o próprio
+> Supremo. E é exatamente por isso que esse caso incomoda tanto.
 
-**Peça 3 · A liquidação extrajudicial.**
+**3. Quem julga um ministro do Supremo?**
 
-*CARTELA 5 · Lei 6.024/1974 · art. 18: suspende ações e execuções contra a
-instituição · art. 36: administradores ficam com os bens indisponíveis.*
-
-> **ROBERTO:** Liquidação extrajudicial é o Banco Central tirando o banco das
-> mãos de quem o administrava. A lei que regula isso é de 1974. Ela suspende
-> as ações e execuções contra a instituição e deixa indisponíveis os bens de
-> quem a administrava. É o Estado congelando a cena antes de alguém mexer
-> nas provas.
-
-*Ele toca o envelope lacrado, sem abrir.*
-
-> **ROBERTO:** E existe a camada penal. A lei dos crimes contra o sistema
-> financeiro prevê, entre outros, o crime de gestão fraudulenta. É um dos
-> crimes que a Polícia Federal investiga nesse caso. Investiga. Quem decide
-> se houve crime é o Judiciário, no processo.
-
-*CARTELA 6 · Lei 7.492/1986, art. 4º · gestão fraudulenta de instituição
-financeira. Fonte: Planalto.*
+> **ROBERTO:** Crime comum de ministro, o próprio Supremo julga. Crime de
+> responsabilidade, quem julga é o Senado. A gente fez um carrossel inteiro
+> sobre isso. Está no perfil da EJUP.
 
 ---
 
-## ATO 3 · O QUE ESTÁ EM ABERTO · 4:00 a 5:00
+## FECHO · 7:10 a 7:40
 
-> **ROBERTO:** Muita coisa ainda não tem resposta. Se houve crime, e de quem.
-> Quanto os credores acima do limite vão recuperar na liquidação, e em quanto
-> tempo. E quem, ao longo da cadeia, tinha o dever de desconfiar: quem
-> fiscalizou, quem distribuiu, quem recomendou.
+*Volta ao plano da abertura. Mesma luz.*
+
+> **ROBERTO:** Eu confessei que achava que era só mais um banco quebrando.
 >
-> Essa última pergunta é a que interessa a quem está sentado aí.
-
-*Ele olha para a cadeira do lado de cá.*
-
-> **Nota:** o episódio não entra nas disputas entre ministros do STF em torno
-> do caso. É ruído político para este formato, e o episódio envelhece mal com
-> ele. Se um desdobramento processual novo mudar o mecanismo (denúncia
-> recebida, sentença, decisão sobre a liquidação), ele entra no Ato 1 com
-> data e fonte.
-
----
-
-## ATO 4 · O QUE MUDA NA PRÁTICA · 5:00 a 6:15
-
-> **ROBERTO:** Recomendar investimento cabe a outro profissional. Mas cliente
-> pergunta. Pergunta para quem ele confia. E a resposta
-> "tem FGC, fica tranquilo" virou uma frase perigosa.
->
-> Quando a pergunta chegar, três perguntas de volta:
->
-> Quanto você tem nessa instituição, somando todos os produtos do mesmo
-> grupo?
->
-> Quanto você já recebeu do FGC nos últimos quatro anos?
->
-> E por que esse papel paga tanto mais do que os outros?
-
-*CARTELA 7 · As três perguntas, uma por linha, sobre fundo tinta.*
-
-> **ROBERTO:** Nenhuma delas exige saber o futuro do banco. Todas exigem ter
-> lido a regra antes de repetir o argumento de venda.
-
----
-
-## FECHO · 6:15 a 6:45
-
-*Volta ao plano da abertura. Mesma luz, mesma distância.*
-
-> **ROBERTO:** Eu confessei que pensava "tem FGC, então está tudo bem".
->
-> O FGC continua existindo. O que mudou foi o que eu faço antes de falar
-> essa frase.
+> Um banco quebrando é um problema do dinheiro. Esse caso virou uma
+> pergunta sobre confiança.
 >
 > *(pausa)*
 >
-> E você, qual frase repetiu sem ter lido a regra?
+> Quem deve julgar, quando todo mundo conhece todo mundo?
+>
+> Me responde aí embaixo.
 
-*Três segundos em silêncio. Corte para a cartela final: A SALA · EJUP ·
-alma clássica, repertório contemporâneo.*
+*Três segundos em silêncio. Cartela final: A SALA · EJUP.*
 
 ---
 
 ## Tabela de fontes (item 20 do checklist)
 
-Conferir de novo no dia da gravação: o caso está em andamento.
+O caso está em andamento. **Reconferir tudo no dia da gravação.**
 
-| Afirmação no roteiro | Fonte |
+| Afirmação | Fonte |
 |---|---|
-| Liquidação extrajudicial do Banco Master e prisão do controlador em 18/11/2025, operação Compliance Zero | [JOTA](https://www.jota.info/tributos-e-empresas/mercado/banco-central-decreta-liquidacao-do-banco-master-e-pf-prende-daniel-vorcaro-dono-do-banco) · [CNN Brasil](https://www.cnnbrasil.com.br/economia/money/macroeconomia/vorcaro-preso-relembre-crise-que-levou-a-liquidacao-do-banco-master/) |
-| Captação por CDB com rendimento acima da média | [Wikipédia, com referências](https://pt.wikipedia.org/wiki/Esc%C3%A2ndalo_do_Banco_Master) · confirmar na fonte primária citada lá |
-| Maior acionamento da história do FGC; cerca de 1,6 milhão de credores | [CNN Brasil](https://www.cnnbrasil.com.br/economia/money/macroeconomia/caso-master-relembre-a-liquidacao-do-banco-que-envolve-bc-stf-e-tcu/) · [Transparência Internacional Brasil](https://transparenciainternacional.org.br/posts/o-caso-master/). **Os valores divergem entre fontes (R$ 41 bi e R$ 52 bi): o roteiro não cita valor.** |
-| STF, Segunda Turma, manteve a preventiva em 13/03/2026 | [CNN Brasil](https://www.cnnbrasil.com.br/economia/money/macroeconomia/caso-master-relembre-a-liquidacao-do-banco-que-envolve-bc-stf-e-tcu/) · confirmar no portal do STF |
-| Limites do FGC: R$ 250 mil por CPF/CNPJ por instituição ou conglomerado, teto de R$ 1 milhão a cada 4 anos | [InfoMoney](https://www.infomoney.com.br/minhas-financas/qual-e-o-valor-maximo-garantido-pelo-fgc-veja-as-regras/) · regulamento do FGC (fgc.org.br) |
-| Efeitos da liquidação extrajudicial | Lei 6.024/1974, arts. 18 e 36 |
-| Gestão fraudulenta | Lei 7.492/1986, art. 4º |
+| Liquidação do Master e prisão de Vorcaro em Guarulhos, 18/11/2025, operação Compliance Zero | [JOTA](https://www.jota.info/tributos-e-empresas/mercado/banco-central-decreta-liquidacao-do-banco-master-e-pf-prende-daniel-vorcaro-dono-do-banco) · [CNN Brasil](https://www.cnnbrasil.com.br/economia/money/macroeconomia/vorcaro-preso-relembre-crise-que-levou-a-liquidacao-do-banco-master/) |
+| Cerca de 1,6 milhão de credores; maior acionamento do FGC | [CNN Brasil](https://www.cnnbrasil.com.br/economia/money/macroeconomia/caso-master-relembre-a-liquidacao-do-banco-que-envolve-bc-stf-e-tcu/) · [Transparência Internacional Brasil](https://transparenciainternacional.org.br/posts/o-caso-master/) |
+| CDB acima do mercado; recursos em fundos com papéis de empresas em crise | [Wikipédia, com referências](https://pt.wikipedia.org/wiki/Esc%C3%A2ndalo_do_Banco_Master) |
+| Regras do FGC | [InfoMoney](https://www.infomoney.com.br/minhas-financas/qual-e-o-valor-maximo-garantido-pelo-fgc-veja-as-regras/) · regulamento em fgc.org.br |
+| Toffoli deixa a relatoria em 12/02/2026; sorteio de Mendonça | [Wikipédia, Caso Master no STF](https://pt.wikipedia.org/wiki/Caso_Master_no_Supremo_Tribunal_Federal) · confirmar no portal do STF |
+| Nova prisão em março de 2026, estrutura para vigiar e intimidar desafetos, referendo da Segunda Turma | [Wikipédia, Caso Master no STF](https://pt.wikipedia.org/wiki/Caso_Master_no_Supremo_Tribunal_Federal) · [CNN Brasil](https://www.cnnbrasil.com.br/economia/money/macroeconomia/caso-master-relembre-a-liquidacao-do-banco-que-envolve-bc-stf-e-tcu/) |
+| Reunião Mendonça e Vorcaro em 14/03/2025, Instituto Iter; resposta de Mendonça | [Agência Pública](https://apublica.org/2026/09/analise-as-revelacoes-sobre-master-vorcaro-moraes-e-mendonca/) |
+| Contrato do escritório de Viviane Barci de Moraes; mensagens atribuídas pela PF; negativa de Moraes | [Agência Pública](https://apublica.org/2026/09/analise-as-revelacoes-sobre-master-vorcaro-moraes-e-mendonca/) · [Metrópoles](https://www.metropoles.com/brasil/10-meses-apos-liquidacao-master-faz-stf-entrar-em-guerra-e-afeta-eleicao) |
+| "Até a máfia tem ética", Gilmar Mendes | Metrópoles, Terra (verificado na capa da coluna jurídica) |
+| Impedimento e suspeição | Código de Processo Penal, arts. 252 e 254 |
+| Competência para julgar ministro do STF | CF, art. 102, I, "b" · CF, art. 52, II |
+
+**Divergências entre fontes, resolvidas no texto:** o valor do contrato
+aparece como R$ 129 mi e R$ 131 mi (o roteiro diz "cerca de R$ 130 milhões");
+a nova prisão aparece como decretada em 4/3 e mantida em 13/3 ou referendada
+em 20/3 (o roteiro diz "março de 2026"); o valor pago pelo FGC aparece como
+R$ 41 bi e R$ 52 bi (o roteiro não cita valor).
+
+---
 
 ## Antes de gravar
 
-1. **Conflito de interesse (regra dura do formato).** Confirmar por escrito
-   que a EJUP, os sócios, professores e clientes não têm relação com as
-   partes do caso. Sem essa confirmação, o episódio não vai ao ar.
-2. **A confissão precisa ser verdadeira para o Roberto.** Se ele nunca
-   pensou "tem FGC, está tudo bem", trocar por uma frase que seja dele. Duas
-   alternativas: "Eu já recomendei um investimento que eu não sabia explicar"
-   ou "Eu já repeti um argumento de venda como se fosse regra".
-3. **Item 21 (duas categorias de fonte).** O roteiro está apoiado em fonte
-   primária e em imprensa. Falta a terceira voz: um professor ou
-   especialista em direito bancário, em 20 segundos no Ato 2. Se não houver
-   gravação, uma citação doutrinária lida na tela.
-4. **Revisão jurídica** do texto final antes da narração.
-5. **Gate do Roberto Pivotto** para publicar.
+1. **Risco jurídico e de reputação.** O episódio cita três ministros do STF
+   e a mulher de um deles. Cada citação está presa a uma fonte e vem com a
+   resposta de quem foi citado. Mesmo assim, é obrigatória uma **revisão
+   jurídica do texto final** antes da gravação, e o **aval expresso do
+   Roberto Pivotto**, que é quem aparece falando.
+2. **Conflito de interesse.** Confirmar por escrito que a EJUP, os sócios,
+   professores e clientes não têm relação com nenhuma das pessoas citadas.
+3. **Imagem de pessoa real (item 23).** Foto de Vorcaro e dos ministros só
+   em registro jornalístico de ato público (sessão, audiência), com crédito,
+   e sem montagem que sugira culpa (nada de foto lado a lado com o banco,
+   por exemplo).
+4. **Item 21 (duas categorias de fonte).** Imprensa, fonte oficial e lei já
+   estão. Falta a voz de um especialista, que pode ser um professor da EJUP
+   em 20 segundos na Parte 4.
+5. **A confissão precisa ser verdadeira para o Roberto.** "Achei que era só
+   mais um banco quebrando" é a proposta. Se não for verdade para ele, a
+   gente troca.
