@@ -331,6 +331,10 @@ inclusive em referência apenas verbal.
 - Toda peça EJUP passa por revisão humana antes de qualquer publicação.
 - **Nenhuma publicação automática em nenhuma etapa.** Eu entrego arquivo e
   legenda sugerida. Eu não posto, não agendo, não envio para canal externo.
+- **Nenhum crédito gasto sem aviso** (instrução do Victor, 23/09/2026). Antes
+  de qualquer geração ou edição paga (Higgsfield ou outra ferramenta), eu
+  consulto o custo, digo quantas imagens, qual modelo e quantos créditos, e
+  espero o Victor aprovar. Consulta de preço e saldo pode; gerar, não.
 - O Manual da Marca prevalece em qualquer divergência interna.
 - Em dúvida sobre marca ou sobre risco ético-profissional, a peça volta. O
   custo de devolver é menor que o de uma peça errada chegar ao gate humano.
