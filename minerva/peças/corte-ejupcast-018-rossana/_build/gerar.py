@@ -75,15 +75,15 @@ def main():
     # A1 · papel, refinada
     a1 = f"""<section class="s claro">
   {ARCOS.format(c="#d1d3d4", o=".42")}
-  <div class="logo" style="top:250px">{LOGO_N}<span>/cast</span></div>
-  <p class="t it" style="left:104px;top:520px;font-size:212px">Direito</p>
-  {faixa(img, 112, 780, 856, 230, ROSTO, .9)}
-  <p class="t bk" style="left:100px;top:1052px;font-size:196px">e</p>
-  {faixa(img, 300, 1068, 668, 170, (1120, 600), .95)}
-  {faixa(img, 112, 1290, 330, 170, MAO_E, .95)}
-  <p class="t it" style="left:474px;top:1280px;font-size:196px">moral</p>
-  {rodape(1540, "")}
-  <p class="lead" style="top:1630px">A primeira lição do curso de Direito, e a que muita gente <em>esqueceu.</em></p>
+  <div class="logo" style="top:230px">{LOGO_N}<span>/cast</span></div>
+  <p class="t it" style="left:104px;top:500px;font-size:212px">Direito</p>
+  {faixa(img, 112, 740, 856, 300, (960, 330), .72)}
+  <p class="t bk" style="left:100px;top:1092px;font-size:196px">e</p>
+  {faixa(img, 300, 1108, 668, 170, (1120, 600), .95)}
+  {faixa(img, 112, 1330, 330, 170, MAO_E, .95)}
+  <p class="t it" style="left:474px;top:1320px;font-size:196px">moral</p>
+  {rodape(1580, "")}
+  <p class="lead" style="top:1670px">A primeira lição do curso de Direito, e a que muita gente <em>esqueceu.</em></p>
   <div class="grao" style="background-image:url({g})"></div>
 </section>"""
 
@@ -91,8 +91,8 @@ def main():
     a2 = a1.replace('class="s claro"', 'class="s escuro"').replace(
         ARCOS.format(c="#d1d3d4", o=".42"), ARCOS.format(c="#304557", o=".35")).replace(
         LOGO_N, LOGO_B).replace(
-        '<p class="t it" style="left:474px;top:1280px;font-size:196px">moral</p>',
-        '<p class="t it ouro" style="left:474px;top:1280px;font-size:196px">moral</p>')
+        '<p class="t it" style="left:474px;top:1320px;font-size:196px">moral</p>',
+        '<p class="t it ouro" style="left:474px;top:1320px;font-size:196px">moral</p>')
 
     # A3 · conceito: o Direito é o gesto de fora, a moral é o que está dentro
     a3 = f"""<section class="s claro">
