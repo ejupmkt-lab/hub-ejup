@@ -61,10 +61,14 @@ vaga ou de clickbait que engana.
 **Como aplicar:** o texto completo da thumbnail segue sempre o formato
 **Título | Convidado(s) | EJUPcast #NN**, com o número do episódio, e o
 conjunto inteiro (título + nome + selo do episódio) precisa caber em até
-100 caracteres, contando os separadores " | ". Quando o nome do convidado é
-longo (nome completo de magistrado, professor, etc.), o título precisa ser
-mais curto para sobrar espaço. Com mais de um convidado, listar todos
-separados por "e", como no exemplo do episódio #018.
+100 caracteres, contando os separadores " | ". Com mais de um convidado,
+listar todos separados por "e", como no exemplo do episódio #018.
+
+**Nome do convidado (ajuste de 25/09/2026):** usar o nome curto ou como a
+pessoa é chamada no dia a dia (ex.: "Marco Bruno"), não o nome completo
+formal (ex.: "Marco Bruno de Miranda Clementino"), mesmo quando o convidado
+tem título de magistrado, professor etc. Isso sobra mais espaço para o
+título dentro do limite de 100 caracteres.
 
 ### 3. Descrição do episódio para o YouTube
 _Ainda não recebido._
