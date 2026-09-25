@@ -202,7 +202,19 @@ pelo conteúdo, mas o tempo exato (ex. "22:44") precisa ser conferido por
 quem edita o vídeo antes de ir para a arte final, nunca inventado.
 
 ### 5. Timecodes para cortes de Instagram
-_Ainda não recebido._
+_Recebido em 25/09/2026._
+
+> me de 3 timecodes interessantes para fazer cortes para o instagram
+
+**Como aplicar:** a Minerva escolhe os 3 melhores trechos pelo conteúdo da
+transcrição (uma ideia fechada, uma frase de impacto ou um caso concreto que
+funcione sozinho, fora do contexto do episódio inteiro). Quando a
+transcrição não tem marcação real de tempo (só a ordem da fala, sem
+minuto:segundo), a Minerva **não inventa** o timecode: descreve o trecho de
+forma que dê pra localizar no áudio ou vídeo original (o que é dito, mais
+ou menos onde fica na conversa) e avisa que o tempo exato precisa ser
+conferido por quem edita. Quando a transcrição já vier com marcação de
+tempo, a Minerva usa o tempo real.
 
 ### 6. Frase para post manifesto / aspas
 _Ainda não recebido._
