@@ -217,10 +217,48 @@ conferido por quem edita. Quando a transcrição já vier com marcação de
 tempo, a Minerva usa o tempo real.
 
 ### 6. Frase para post manifesto / aspas
-_Ainda não recebido._
+_Recebido em 25/09/2026, junto com o item 7 (ver abaixo)._
+
+> Quero fazer um post manifesto/aspas de alguma fala de Marco Bruno no
+> podcast. Citação de destaque de Marco Bruno, peça de identidade, alinhada
+> ao Manifesto EJUP. Use a transcrição completa do podcast que já te mandei.
+
+**Como aplicar:** a citação escolhida precisa ecoar diretamente alguma linha
+do banco vivo do manifesto (`CLAUDE.md`, seção 4) ou do núcleo estratégico
+(tradição, inovação, profundidade, autoridade silenciosa), não só ser uma
+frase bonita solta. Sempre citação literal ou próxima do literal da
+transcrição (limpando só vícios de fala tipo "é, é, é"), nunca reescrita a
+ponto de mudar o sentido. Fonte: o próprio episódio do EJUPcast, com o nome
+completo do convidado e, quando existir, o número do episódio.
 
 ### 7. Legenda explicativa da frase
-_Ainda não recebido._
+_Recebido em 25/09/2026, no mesmo pedido do item 6._
+
+> Me dê a legenda para o post também, use uma linguagem formal, mas fácil de
+> entender. Não coloque travessão entre palavras no texto e não aborde a
+> figura de "não é sobre isso, é sobre aquilo", comum entre textos criados
+> por IA. Contextualize a fala e o porquê dela. Coloque um CTA no final, no
+> canto inferior da tela, para convidar o público a assistir o episódio, que
+> tem o link na bio.
+
+**Como aplicar:** a legenda segue a estrutura já usada nas peças de
+identidade da EJUP (ver `peças/post-manifesto-mandela/README.md`, seção
+"Legenda sugerida"):
+
+1. **Contexto.** Quem é o convidado e em que momento da conversa ele disse
+   aquilo, sem elogio vazio.
+2. **A frase entre aspas**, com atribuição.
+3. **Por que importa para a EJUP.** Como essa fala conecta com o que a marca
+   defende (núcleo estratégico, manifesto).
+4. **Fechamento.** Uma linha curta que reforça o propósito editorial.
+5. **CTA.** Convite para assistir ao episódio completo, com "o link está na
+   bio".
+
+**Dois CTAs diferentes, não um só:** o texto que aparece **na própria arte**
+(canto inferior da tela, curto, tipo "Assista ao episódio completo. Link na
+bio.") é separado da **legenda do post** (o texto que acompanha a
+publicação, mais longo, com o contexto e o fechamento). O CTA da legenda
+pode ser mais desenvolvido que o da arte.
 
 ### 8. Curadoria de leitura de domingo
 _Ainda não recebido._
