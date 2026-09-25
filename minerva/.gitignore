@@ -13,3 +13,4 @@ peças/perfil-roberto-repertorio/telas/
 .env
 peças/capa-artigo-responsabilizacao-ministros/_build/foto.webp
 peças/capa-artigo-responsabilizacao-ministros/_build/colagem.png
+__pycache__/
