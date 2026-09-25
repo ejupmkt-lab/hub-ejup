@@ -49,6 +49,23 @@ body{background:#5b6169; display:flex; flex-wrap:wrap; gap:32px; padding:32px;
 .passos span:last-child{text-align:right}
 .passos span.aqui{ color:var(--gold); }
 
+/* escala com extremos: o 0 e o 1 nas pontas do trilho (De Zero a Um) */
+.story.sem-cab{ padding-top:230px; } /* abaixo da barra de perfil do Instagram */
+.escala.extremos{ display:flex; align-items:flex-start; gap:30px; }
+.escala.extremos .meio{ flex:1; position:relative; padding-top:38px; }
+.escala.extremos .ponta{ font-weight:900; font-size:80px; line-height:1;
+  letter-spacing:-.02em; color:rgba(255,255,255,.3); }
+.escala.extremos .ponta.aqui{ color:var(--gold); }
+.marcas{ position:relative; height:24px; margin-top:26px; }
+.marcas span{ position:absolute; top:0; transform:translateX(-50%); white-space:nowrap;
+  font-weight:500; font-size:20px; letter-spacing:.14em; color:rgba(255,255,255,.34); }
+.marcas span:first-child{ transform:none; }
+.marcas span:last-child{ transform:translateX(-100%); }
+.marcas span.aqui{ color:var(--gold); }
+.ficha .serie-ficha{ font-weight:500; font-size:.2em; letter-spacing:.2em;
+  color:var(--silver); opacity:.8; margin-bottom:.5em; }
+.capa.quadrada{ width:400px; height:400px; }
+
 /* ---------- conteúdo ----------
    Os corpos são em `em` sobre .conteudo de propósito: o ajuste automático
    mexe num número só e a proporção entre título, texto e ficha não muda. */
@@ -113,7 +130,8 @@ document.querySelectorAll('.story').forEach(st => {
   const logo = st.querySelector('.logo');
   const limite = () =>
     alvo.getBoundingClientRect().bottom < logo.getBoundingClientRect().top - 48;
-  let k = 100;
+  let k = +(st.dataset.teto || 100);
+  alvo.style.fontSize = k + 'px';
   while (k > 60 && !limite()) { k -= 2; alvo.style.fontSize = k + 'px'; }
   st.dataset.escala = k;
 });
