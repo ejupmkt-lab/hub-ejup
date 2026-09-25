@@ -261,7 +261,29 @@ publicação, mais longo, com o contexto e o fechamento). O CTA da legenda
 pode ser mais desenvolvido que o da arte.
 
 ### 8. Curadoria de leitura de domingo
-_Ainda não recebido._
+_Recebido em 25/09/2026._
+
+> procure um livro para a curadoria de leitura de domingo, se conseguir, que
+> faça sentido da EJUP divulgar
+
+**Como aplicar:** essa curadoria é a série "A Estante EJUP"
+(`peças/a-estante-ejup/`, ver README da série). Duas linhas possíveis de
+escolha, e a Minerva oferece as duas quando fizer sentido:
+
+1. **Ligado ao episódio da semana.** Um livro com origem rastreável direto no
+   briefing ou na transcrição (o convidado escreveu, coordenou, citou ou
+   recomendou). É a escolha mais segura no critério de fidelidade factual
+   (itens 20 e 21), porque a fonte já está dada.
+2. **Na linha da série já publicada.** As duas edições anteriores ("Utopia
+   para Realistas", de Rutger Bregman, e "De Zero a Um", de Peter Thiel) são
+   livros de ideias, fora do Direito estrito, que conversam com formação
+   estratégica, repertório contemporâneo e visão de futuro. Um livro nessa
+   linha não depende do episódio da semana.
+
+Cada indicação precisa da ficha do livro (autor, editora, ano), de uma linha
+que explique por que faz sentido a EJUP divulgar aquele título e, se for
+seguir pra peça de fato (4 stories, 1080×1920), a imagem da capa vem do
+Victor. Esta sessão não baixa imagem da internet.
 
 ### 9. Ideias de tema para artigo
 _Ainda não recebido._
