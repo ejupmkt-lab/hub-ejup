@@ -139,7 +139,36 @@ com Correia Júnior e Thiago Correia)._
    "🌐 www.ejup.com.br · 📸 @ejup.oficial · 🎧 EJUPcast no Spotify".
 
 ### 4. Carrossel de divulgação do podcast
-_Ainda não recebido._
+_Recebido em 25/09/2026._
+
+> Preciso de um carrossel para a divulgação do episódio, crie o prompt para
+> esse carrossel com 1 ideia por tela, use uma linguagem formal, mas fácil
+> de entender. Não coloque travessão entre palavras no texto e não aborde a
+> figura de "não é sobre isso, é sobre aquilo", comum entre textos criados
+> por IA.
+>
+> Siga a referência: https://www.instagram.com/p/Dai2bi-iXH2/?img_index=1
+> (perfil human___podcast, carrossel de divulgação de podcast, abertura com
+> pergunta ou frase provocativa, peça gráfica, não fotográfica)
+
+**Como aplicar:**
+
+- **Uma ideia por tela.** Cada tela carrega só um fato, uma frase ou uma
+  pergunta. Nunca acumular dois raciocínios na mesma tela.
+- **Linguagem formal e fácil de entender.** Sem jargão técnico
+  desnecessário, sem gíria, mas também sem explicar o óbvio.
+- **Sem travessão entre palavras** e **sem a figura "não é X, é Y"** (regras
+  já valem para toda a EJUP, reforçadas aqui).
+- **Estrutura de referência** (formato "carrossel de divulgação de
+  podcast"): capa com pergunta ou frase provocativa ligada ao tema central
+  do episódio, telas seguintes com uma ideia ou fato de cada vez sobre o
+  convidado e a conversa, tela final com CTA para assistir ou ouvir o
+  episódio completo.
+- **Limitação registrada:** o Instagram bloqueia a leitura das telas
+  internas de um carrossel por fora do app. A Minerva usa a legenda e a
+  estrutura descrita, mas para bater exatamente com o layout visual da
+  referência (posição do texto, tipografia, se é foto ou peça gráfica), o
+  Victor precisa mandar prints das telas.
 
 ### 5. Timecodes para cortes de Instagram
 _Ainda não recebido._
