@@ -170,6 +170,37 @@ _Recebido em 25/09/2026._
   referência (posição do texto, tipografia, se é foto ou peça gráfica), o
   Victor precisa mandar prints das telas.
 
+**Estrutura confirmada por print (25/09/2026), a partir do próprio
+carrossel do EJUPcast #018 no sistema do cartão já aprovado pelo Roberto.
+Esta é a referência definitiva para "carrossel de divulgação do podcast",
+sempre 6 telas:**
+
+1. **Capa.** Número do episódio ("EP 018"), foto do(s) convidado(s) em
+   cartão arredondado sobreposto ao painel navy. Abaixo: "Episódio #NN" em
+   cinza, nome do(s) convidado(s) em título navy, uma frase de efeito curta
+   em dourado (a tese ou o paradoxo central do episódio, não um resumo).
+2. **Nesta conversa.** Lista de 4 a 5 temas da conversa, um por linha,
+   separados por linha fina, em negrito. Abaixo, a duração da conversa e o
+   nome de quem entrevista ("1h06 de conversa com a Dra. Rossana Fonseca").
+3. **Citação forte 1.** Foto do convidado que disse a frase, ícone de aspas,
+   citação com a parte mais forte em itálico, atribuição embaixo (nome em
+   negrito + tempo do corte, ex. "Eduardo Pacheco 22:44").
+4. **Citação forte 2.** Mesmo formato da tela 3, com outra citação e outro
+   convidado (ou o mesmo, se for só um).
+5. **Biografia.** Foto maior, mais de um convidado ou ambiente. "Episódio
+   #NN", nome do(s) convidado(s), parágrafo curto de biografia por
+   convidado (nome em negrito, cargo, especialidade), fechando com "Com a
+   Dra. Rossana Fonseca" (ou quem entrevistou).
+6. **CTA final.** Selo circular "ejup /cast" centralizado em fundo navy.
+   "Episódio completo", chamada "Assista no YouTube e no Spotify.", uma
+   frase curta de contexto com uma pergunta de engajamento para os
+   comentários, botão "Link na bio".
+
+**Timecodes das citações:** a transcrição normalmente não tem marcação de
+tempo real, só a ordem da fala. A Minerva escolhe as citações mais fortes
+pelo conteúdo, mas o tempo exato (ex. "22:44") precisa ser conferido por
+quem edita o vídeo antes de ir para a arte final, nunca inventado.
+
 ### 5. Timecodes para cortes de Instagram
 _Ainda não recebido._
 
