@@ -1,9 +1,10 @@
 # Post manifesto / aspas · Nelson Mandela
 
-Post único, 1080×1440, fundo navy com as facetas do sistema do cartão
-(EJUPcast #018, aprovado pelo Roberto). Frase em Gotham Light branca, destaque
-em Black dourado (dourado sobre navy, 9,5:1). Sem foto de Mandela: evita
-sugestão de endosso (checklist, item 23) e dispensa crédito do Higgsfield.
+Post único, 1080×1440, no mesmo estilo da citação do EJUPcast
+(`peças/citacao-ejupcast/`): fundo claro, símbolo em prata no canto, frase em
+Gotham Light navy com destaque em Bold, régua e rótulo em bronze. O gerador
+reaproveita o template daquela peça e troca só o conteúdo e a linha de origem.
+Sem foto de Mandela, para não sugerir endosso (checklist, item 23).
 
 ## Arquivos
 - `post-mandela.png` · a arte
