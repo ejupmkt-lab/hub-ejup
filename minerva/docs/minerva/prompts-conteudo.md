@@ -33,7 +33,22 @@ em caso de conflito com a lei da marca, o `CLAUDE.md` prevalece.
 _Ainda não recebido._
 
 ### 2. Ideias de thumbnail
-_Ainda não recebido._
+_Recebido em 25/09/2026._
+
+> Preciso de uma thumbnail chamativa que faça o público querer ver o
+> episódio, algo clickbait, mas sem apelar. Quero que as thumbnails tenham
+> uma ideia completa, tipo "os bastidores da defesa criminal", entende? que
+> seja algo chamativo, e que ajude a prever o conteúdo do vídeo, acho que
+> isso faz com que o público fique mais interessado. Não quero títulos
+> cortados, como palavras chaves, como "IA, formação e tribunais".
+
+**Como aplicar:** o título da thumbnail é sempre uma ideia completa, uma
+frase ou promessa de conteúdo, nunca uma lista de palavras-chave soltas. Tem
+que gerar curiosidade real (gancho forte) e, ao mesmo tempo, entregar de
+verdade o que o título promete, sem inventar ou exagerar o que está no
+episódio. Cada título nasce de um fato concreto e verificável da conversa
+(um caso, um número, uma frase dita pelo convidado), nunca de uma promessa
+vaga ou de clickbait que engana.
 
 ### 3. Descrição do episódio para o YouTube
 _Ainda não recebido._
