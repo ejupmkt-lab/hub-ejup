@@ -70,6 +70,16 @@ formal (ex.: "Marco Bruno de Miranda Clementino"), mesmo quando o convidado
 tem título de magistrado, professor etc. Isso sobra mais espaço para o
 título dentro do limite de 100 caracteres.
 
+**Dois textos diferentes, não um só (ajuste de 25/09/2026):** o formato
+"Título | Convidado | EJUPcast #NN", até 100 caracteres, é o **título do
+vídeo no YouTube** (campo de metadado, aparece como texto normal embaixo do
+player). O texto que vai **escrito na arte da thumbnail** é só a frase
+central, bem mais curta (na prática, uns 40 a 45 caracteres), pra caber
+grande e legível na capa. O nome do convidado e o selo do episódio aparecem
+na arte como elementos visuais à parte (nome embaixo do título, selo do
+episódio no canto), no sistema do cartão já aprovado, não colados na mesma
+frase com " | ".
+
 ### 3. Descrição do episódio para o YouTube
 _Ainda não recebido._
 
