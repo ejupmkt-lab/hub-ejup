@@ -401,3 +401,11 @@ www.jota.info
 **Enquanto não liberar:** subir o arquivo no repositório funciona e já foi
 usado duas vezes (foto do Leonardo, foto do Tribos). É o caminho de contorno
 oficial desta operação.
+
+## 18. Sessão de 17 a 25/09/2026
+
+Registrada em `docs/minerva/continuidade-2026-09-25.md`: regras de trabalho com o
+Victor (crédito do Higgsfield só com aviso, sem rótulo no alto, sem colagem),
+retorno do Roberto (aprovou o sistema do cartão do EJUPcast #018), peças novas
+(STF, A Sala, caso Vorcaro, EJUPcast #018, capa do corte da Rossana), a vinheta e
+o logo de A Sala, o padrão de edição do EJUPcast e as pendências.
