@@ -81,7 +81,62 @@ episódio no canto), no sistema do cartão já aprovado, não colados na mesma
 frase com " | ".
 
 ### 3. Descrição do episódio para o YouTube
-_Ainda não recebido._
+_Recebido em 25/09/2026, como print de uma descrição já publicada (episódio
+com Correia Júnior e Thiago Correia)._
+
+**Modelo de referência (transcrito do print):**
+
+> 352 visualizações · Estreou em 8 de jul. de 2026
+>
+> Quem defende melhor: quem estudou o crime nos livros, ou quem já recebeu a
+> ocorrência no balcão da delegacia?
+>
+> Correia Júnior passou 22 anos na Polícia Civil, de delegado substituto a
+> delegado-geral, e leciona Direito Penal há mais de 20 anos. Hoje, advoga
+> na defesa criminal ao lado do filho, Thiago Correia, que escolheu ser
+> advogado desde o primeiro dia da faculdade. Pai e filho, sócios no mesmo
+> escritório.
+>
+> Nesta conversa com Rossana Fonseca e Roberto Pivotto, os dois defendem uma
+> tese que incomoda: "melhor defende quem sabe acusar". E vão a fundo em
+> pontos que raramente são ditos com essa clareza: que o delegado é o
+> primeiro garantidor da Constituição; por que gravar a conversa entre
+> advogado e cliente é, para eles, "absolutamente inconstitucional"; como
+> jovens advogados são cooptados para "levar recado" dentro de presídios; e
+> até onde a delação premiada ainda é, de fato, premiada.
+>
+> Se a conversa agregou à sua atuação, compartilhe com quem precisa ouvir
+> isso. Inscreva-se no canal e ative o sino para acompanhar os próximos
+> episódios do EJUPcast.
+>
+> Gostou do conteúdo?
+> Deixe seu LIKE, INSCREVA-SE no canal e ative o sininho! Compartilhe este
+> episódio estratégico com seus sócios e colegas de profissão!
+>
+> Instagram dos Convidados: @thiagocorreia.adv e @correiajr
+> 🌐 www.ejup.com.br · 📸 @ejup.oficial · 🎧 EJUPcast no Spotify
+
+**Como aplicar:** a descrição sempre segue essa ordem fixa:
+
+1. **Gancho.** Uma pergunta ou provocação de abertura, ligada ao tema
+   central do episódio, sem "—" (travessão).
+2. **Quem é o convidado.** Um parágrafo de apresentação, trajetória e
+   credenciais, sem elogio vazio, só fatos verificáveis do briefing ou da
+   transcrição.
+3. **A conversa.** Quem participa da entrevista pela EJUP (nem sempre é
+   Rossana e Roberto juntos, confirmar por episódio), a tese central entre
+   aspas, e uma lista de pontos fortes abordados, cada um separado por
+   ponto e vírgula, terminando com "e".
+4. **CTA de inscrição.** Texto fixo: "Se a conversa agregou à sua atuação,
+   compartilhe com quem precisa ouvir isso. Inscreva-se no canal e ative o
+   sino para acompanhar os próximos episódios do EJUPcast."
+5. **CTA de engajamento.** Mesma ideia do modelo, mas **sem caixa alta
+   gritada e sem excesso de exclamação** (regra da marca): "Gostou do
+   conteúdo? Deixe seu like, inscreva-se no canal e ative o sininho.
+   Compartilhe este episódio com seus sócios e colegas de profissão."
+6. **Rodapé fixo.** Instagram do(s) convidado(s) (nunca inventar o handle,
+   perguntar se não estiver confirmado) e depois:
+   "🌐 www.ejup.com.br · 📸 @ejup.oficial · 🎧 EJUPcast no Spotify".
 
 ### 4. Carrossel de divulgação do podcast
 _Ainda não recebido._
