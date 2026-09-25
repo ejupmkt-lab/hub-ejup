@@ -50,6 +50,22 @@ episódio. Cada título nasce de um fato concreto e verificável da conversa
 (um caso, um número, uma frase dita pelo convidado), nunca de uma promessa
 vaga ou de clickbait que engana.
 
+**Formato completo do texto da thumbnail (recebido em 25/09/2026):**
+
+> depois do título, tb é escrito o nome do convidado e ejupcast 18, ent tudo
+> precisa encaixar em até 100 caracteres
+> tipo assim:
+> Decisões por IA, Tribunais e Rumos da Advocacia | Nicácio Carvalho e
+> Eduardo Pacheco | EJUPcast #018
+
+**Como aplicar:** o texto completo da thumbnail segue sempre o formato
+**Título | Convidado(s) | EJUPcast #NN**, com o número do episódio, e o
+conjunto inteiro (título + nome + selo do episódio) precisa caber em até
+100 caracteres, contando os separadores " | ". Quando o nome do convidado é
+longo (nome completo de magistrado, professor, etc.), o título precisa ser
+mais curto para sobrar espaço. Com mais de um convidado, listar todos
+separados por "e", como no exemplo do episódio #018.
+
 ### 3. Descrição do episódio para o YouTube
 _Ainda não recebido._
 
