@@ -285,5 +285,35 @@ que explique por que faz sentido a EJUP divulgar aquele título e, se for
 seguir pra peça de fato (4 stories, 1080×1920), a imagem da capa vem do
 Victor. Esta sessão não baixa imagem da internet.
 
+**Roteiro dos 4 stories (recebido em 25/09/2026, print do briefing original
+de "De Zero a Um"):** a Minerva escreve o texto de cada story nessa mesma
+estrutura fixa, para qualquer livro da série:
+
+1. **Story 1, Abertura.** Uma pergunta desconfortável ligada ao argumento do
+   livro. O nome do livro e de quem organizou ou escreveu. Instrução para
+   avançar.
+2. **Story 2, A ideia central.** O argumento do livro, em duas frases
+   curtas e diretas.
+3. **Story 3, Por que isso importa para o Direito e para a EJUP.** A ponte
+   entre o argumento do livro e o que a EJUP defende.
+4. **Story 4, Fechamento.** Uma síntese, uma pergunta para engajamento (algo
+   que convide a pessoa a responder no direct) e a assinatura "EJUP. Alma
+   clássica, repertório contemporâneo."
+
+**Correções já aplicadas na edição "De Zero a Um" e válidas para todas as
+próximas (ver `peças/a-estante-ejup/de-zero-a-um/README.md`):**
+- Sem emoji. O 👉 do briefing original virou a seta da pílula de chamada, que
+  já é elemento visual da série, não texto.
+- "Arrasta para o lado" virou "Avance".
+- Qualquer frase na figura "não é X, e sim Y" (ou variantes como "não basta
+  X, é preciso Y") vira afirmativa direta.
+- Nunca colocar a EJUP contra a advocacia tradicional ou o ensino formal
+  (regra de posicionamento do `CLAUDE.md`, seção 1: a EJUP é ponte, não
+  ruptura). Uma frase como "abandonar o caminho já pavimentado" precisa virar
+  algo como "reconhecer o caminho já pavimentado e ter o critério de
+  construir o trecho que falta".
+- **O fio que costura os 4 stories nasce do argumento do próprio livro**,
+  nunca de um conceito genérico. Cada edição tem o seu.
+
 ### 9. Ideias de tema para artigo
 _Ainda não recebido._
