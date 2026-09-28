@@ -406,3 +406,20 @@ cuidado que a peça já aplica nos slides (ver
 os itens do "Antes do gate humano" daquele README (revisão jurídica,
 confirmação de ausência de conflito de interesse, reconferir os fatos na
 data da publicação). A legenda pronta não substitui essa checagem.
+
+## Regra geral de CTA (recebida em 28/09/2026)
+
+> como mudo esse CTA para as pessoas seguirem e acompanharem o insta e os
+> próximos eps. tá meio estranho esse "siga para acompanhar"
+
+**Como aplicar, em qualquer peça:** "siga para acompanhar" repete a mesma
+ideia duas vezes sem acrescentar nada, é o tipo de redundância que soa
+robótica. O CTA de seguir o perfil sempre vem com o motivo específico
+embutido, não com "acompanhar" solto:
+
+- "Siga a EJUP para não perder o episódio completo e os próximos capítulos
+  de [nome do quadro ou série]."
+- "Siga o perfil e acompanhe o episódio completo e as próximas edições de
+  [nome do quadro ou série]."
+
+Vale para qualquer CTA de "seguir" em qualquer peça, não só para A Sala.
