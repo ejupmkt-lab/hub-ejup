@@ -43,3 +43,75 @@ disfarça. Para impressão maior que 10×15, gerar as cenas em 2k.
 ## Antes de gravar
 Continuam valendo as pendências do episódio: revisão jurídica, conflito de
 interesse e reconferência dos fatos na data da gravação.
+
+---
+
+# Kit A4 para plano aberto (substitui as provas 10×15 no mural)
+
+As provas 10×15 somem num plano aberto. O kit `kit-a4/` (14 folhas A4, 300
+dpi) e `a-sala-ep01-kit-A4.pdf` seguem o roteiro na ordem em que as coisas
+aparecem, com foto de contraste alto e recorte fechado e cartões com um dado
+grande só (3 a 5 cm de altura).
+
+    python3 _build/kit.py && python3 _build/render_kit.py
+
+| Anexo | Folha | Momento do roteiro |
+|---|---|---|
+| 01 | Daniel Vorcaro (silhueta + nome) | Parte 1 · quem é quem |
+| 02 | Banco Central (foto da sede) | Parte 1 |
+| 03 | Guarulhos · 18.11.2025 (reconstituição) | Parte 1 |
+| 04 | 1,6 milhão | Parte 1 |
+| 05 | Comprovante de aplicação · 140% do CDI circulado | Parte 2 · Roberto pega o comprovante |
+| 06 | R$ 250 mil · o seguro tem teto | Parte 2 · cartela do FGC |
+| 07 a 10 | Toffoli, Mendonça, Moraes, Gilmar | Parte 3 |
+| 11 | 14.03.2025 · reunião | Parte 3 · Mendonça |
+| 12 | R$ 130 mi · contrato, segundo a PF | Parte 3 · Moraes |
+| 13 | "Até a máfia tem ética." | Parte 3 · Gilmar |
+| 14 | CPP, arts. 252 e 254, trechos marcados | Parte 4 |
+
+Vorcaro entra como silhueta: a única foto dele disponível é retrato sem ato
+público (item 23). O comprovante não tem nome de banco nem logotipo, como
+pede o roteiro. "Até 140% do CDI": Seu Dinheiro, Investidor10, Times
+Brasil/CNBC. Foto do Banco Central: Jonas Pereira/Agência Senado, CC BY 2.0.
+A foto do Mendonça é pequena (593 px): em A4 fica macia; serve em plano
+aberto, não em close.
+
+---
+
+# Compilado de provas (versão final para o set)
+
+`compilado/anexo-01..15.png` e `a-sala-ep01-compilado-A4.pdf`: 15 provas em
+A4, 300 dpi, todas como **fotografia antiga de arquivo** (mesmo
+envelhecimento das provas 10×15), na ordem do roteiro. Substitui o kit A4
+em estilo carrossel.
+
+    python3 _build/compilado.py
+
+| Anexo | Prova | Parte |
+|---|---|---|
+| 01 | Ficha de Daniel Vorcaro, sem foto (silhueta) | 1 |
+| 02 | Banco Central, sede (foto real, Agência Senado, CC BY 2.0) | 1 |
+| 03 | Avião no portão · Guarulhos (ilustrativa) | 1 |
+| 04 | Comprovante de aplicação · 140% do CDI circulado | 2 |
+| 05 | Regras do FGC · R$ 250 mil marcado | 2 |
+| 06, 07 | Toffoli, Mendonça | 3 |
+| 08 | Sala de reunião · 14.03.2025 (ilustrativa) | 3 |
+| 09 | Moraes | 3 |
+| 10 | Contrato tarjado · R$ 130 mi à caneta | 3 |
+| 11 | Mensagens extraídas · a frase citada, resto tarjado | 3 |
+| 12 | Relatório de investigação tarjado · SIGILOSO | 3 |
+| 13 | Gilmar Mendes | 3 |
+| 14 | Plenário do STF (foto real, Yuri Ikeda, CC BY-SA 4.0) | 3 |
+| 15 | CPP, arts. 252 e 254 marcados | 4 |
+
+Documentos são cenográficos (dizem isso na borda): sem logotipo nem brasão
+de órgão real, dados sigilosos tarjados, só a informação que o roteiro cita
+aparece legível. Fotos de lugar trocadas por imagens claras e de assunto
+único, para ler em plano aberto.
+
+## Versão horizontal
+`python3 _build/compilado.py --horizontal` gera `compilado-horizontal/` e
+`a-sala-ep01-compilado-A4-horizontal.pdf` (A4 paisagem, 300 dpi). Documentos
+em duas colunas (`_build/documentos-h.html`): contexto à esquerda, a prova
+grande à direita. Nos retratos, a foto entra inteira no centro e as laterais
+são a própria foto ampliada e desfocada, para a cabeça não ser cortada.
