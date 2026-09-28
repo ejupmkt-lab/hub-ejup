@@ -345,6 +345,14 @@ Como a arte é só a capa do artigo (sem texto extra na imagem), a legenda
 carrega sozinha todo o resumo e o contexto, então pode ser um pouco mais
 longa que a legenda de um post com texto na própria arte.
 
+**Variante: carrossel de dados do artigo (recebido em 28/09/2026).** Quando
+o artigo vira um carrossel com vários slides de dados e citações (não só uma
+capa), a mesma estrutura de legenda vale, mas o passo 2 ("o que o artigo
+explica") vira um resumo dos pontos mais fortes que já estão nos slides
+(cada estatística, cada base legal), não uma repetição de cada tela. A
+legenda funciona como a porta de entrada, o carrossel entrega o
+detalhamento.
+
 ### 11. Legenda para carrossel de teaser de "A Sala"
 _Recebido em 28/09/2026._
 
