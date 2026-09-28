@@ -448,3 +448,11 @@ deixar com menos jeito de IA."
 
 Essa checagem de fluidez entra em toda legenda a partir de agora, antes de
 entregar.
+
+**Cuidado adicional (28/09/2026):** ao tentar deixar o texto mais fluido, o
+pronome pode perder o substantivo a que se refere. "E você, já teve a sua?"
+depois de um parágrafo que citava "a confissão" duas frases antes ficou
+ambíguo (a sua o quê?). Sempre que uma frase mais solta usar pronome ("a
+sua", "isso", "ela"), o substantivo precisa estar na mesma frase ou na
+imediatamente anterior, nunca a dois parágrafos de distância. Versão
+corrigida desse caso: "Qual seria a sua confissão? Deixa nos comentários."
