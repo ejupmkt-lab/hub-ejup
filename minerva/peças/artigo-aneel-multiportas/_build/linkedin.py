@@ -36,61 +36,65 @@ T = [
     {"fundo": "escuro", "foto": "01-capa", "portas": TODAS,
      "titulo": [("k", "O setor elétrico tem "), ("g", "quatro portas "),
                 ("l", "para um mesmo conflito.")],
-     "corpo": ["Ouvidoria, mediação administrativa, arbitragem e Judiciário. "
+     "corpo": ["Ouvidoria Setorial e mediação administrativa, na ANEEL. "
+               "Arbitragem, no ambiente da CCEE. E o processo judicial. "
                "Conhecer cada via, e a base legal que a sustenta, integra a "
                "atuação de quem advoga no setor."],
      "pilula": "Arraste e conheça cada uma"},
 
     {"fundo": "claro", "portas": set(),
-     "titulo": [("k", "A via administrativa "), ("l", "nasce com a "),
-                ("g", "própria ANEEL.")],
-     "corpo": ["A <b>Lei nº 9.427/1996</b>, que criou a Agência, atribui a ela "
-               "dirimir as divergências entre os agentes do setor e entre eles "
-               "e os consumidores."],
+     "titulo": [("k", "Cada porta "), ("l", "tem a sua "), ("g", "base legal.")],
+     "corpo": ["A <b>Lei nº 9.427/1996</b> atribui à ANEEL dirimir, no âmbito "
+               "administrativo, as divergências entre os agentes do setor e "
+               "entre eles e os consumidores. A arbitragem ocorre em outro "
+               "ambiente: o da CCEE."],
      "lista": [("Lei nº 13.848/2019", "Art. 22: a ouvidoria das agências reguladoras."),
+               ("Lei nº 13.140/2015", "Conceito e regras gerais da mediação."),
                ("Lei nº 10.848/2004", "Art. 4º, §5º: a arbitragem na comercialização."),
-               ("REN ANEEL nº 957/2021", "As câmaras arbitrais credenciadas."),
-               ("REN ANEEL nº 1.061/2023", "Cria a SMA, que conduz a mediação.")]},
+               ("REH ANEEL nº 3.173/2023", "Homologa a Convenção Arbitral vigente da CCEE."),
+               ("REN ANEEL nº 1.061/2023", "Reorganiza a SMA, que conduz a mediação.")]},
 
     {"fundo": "escuro", "foto": "03-ouvidoria", "portas": {0},
-     "titulo": [("k", "200 mil reclamações por ano "), ("l", "chegam à ANEEL pela "),
+     "titulo": [("k", "Cerca de 200 mil reclamações por ano "), ("l", "pela "),
                 ("g", "Ouvidoria Setorial.")],
-     "corpo": ["É a porta do consumidor que não resolveu o problema com a "
-               "distribuidora. Cada registro segue para a concessionária "
-               "responder, e o conjunto <b>alimenta a fiscalização</b> e as "
-               "novas regras do setor."]},
+     "corpo": ["É a porta de entrada do consumidor. Primeiro ele procura a "
+               "distribuidora e a ouvidoria dela; persistindo o problema, "
+               "recorre aos canais setoriais da ANEEL. Os registros também "
+               "<b>alimentam a fiscalização</b> e as novas regras do setor."]},
 
     {"fundo": "claro", "portas": {1},
      "titulo": [("k", "O mediador facilita o diálogo. "), ("g", "O acordo é das partes.")],
-     "corpo": ["Conduzida pela própria Agência, a mediação administrativa trata "
-               "conflitos técnicos e regulatórios com quem conhece o setor."],
+     "corpo": ["Conduzida pela SMA, a mediação administrativa segue a Lei nº "
+               "13.140/2015: um terceiro imparcial, sem poder decisório, "
+               "trata conflitos técnicos e regulatórios com quem conhece o setor."],
      "cartoes": [("2018 a 2023", "36 mediações conduzidas", False),
                  ("prazo médio", "383 dias até a conclusão", True)],
-     "fecho": "Volume pequeno diante das 200 mil reclamações: a porta existe e "
-              "ainda é <b>pouco usada</b>."},
+     "fecho": "Cada número retrata só a sua porta: reclamações, mediações e "
+              "ações são <b>métricas diferentes</b>."},
 
     {"fundo": "escuro", "foto": "05-arbitragem", "portas": {2},
-     "titulo": [("k", "Na comercialização, "), ("l", "os agentes escolhem "),
+     "titulo": [("k", "Na CCEE, "), ("l", "os agentes escolhem "),
                 ("g", "a câmara arbitral.")],
-     "corpo": ["A <b>REN ANEEL nº 957/2021</b> abriu as disputas no âmbito da "
-               "CCEE a qualquer câmara credenciada. Antes, uma única câmara "
-               "concentrava esses casos.",
-               "Em certos contratos, arbitragem e processo judicial convivem, "
-               "conforme os critérios de matéria e valor definidos entre as partes."]},
+     "corpo": ["A <b>REN ANEEL nº 957/2021</b> permitiu eleger qualquer câmara "
+               "credenciada. Antes, uma única câmara concentrava esses casos.",
+               "Conflito sujeito à Convenção Arbitral segue a via arbitral, "
+               "salvo as hipóteses que admitem o Judiciário. Quem julga é o "
+               "tribunal arbitral, e não a ANEEL."]},
 
     {"fundo": "claro", "portas": {3},
      "titulo": [("k", "25 mil ações "), ("l", "no setor elétrico em 2021, "),
                 ("g", "o pico da série.")],
      "cartoes": [("2021", "25 mil ações judiciais", True),
                  ("apagão no Amapá", "cerca de 4 mil delas", False)],
-     "fecho": "A via judicial segue aberta a qualquer parte. As outras portas "
+     "fecho": "A via judicial segue aberta. As outras portas "
               "<b>ampliam o repertório</b> de quem conduz o conflito."},
 
     {"fundo": "escuro", "foto": "07-fecho", "portas": TODAS,
      "titulo": [("k", "Escolher a porta certa "), ("g", "integra a estratégia "),
                 ("l", "do caso.")],
      "corpo": ["Assessorar um consumidor diante da distribuidora ou orientar um "
-               "agente numa controvérsia contratual começa pela via adequada."],
+               "agente numa controvérsia contratual ou regulatória começa pela "
+               "via adequada."],
      "pilula": "Leia o artigo completo no site da EJUP"},
 ]
 

@@ -101,8 +101,8 @@ SETA_CTA = ('<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#031c
 def cabecalho(cta=True):
     return f"""<div class="texto">
     <span class="tag">EJUP · Artigo</span>
-    <h1 class="titulo">O sistema multiportas<br><span class="g">da ANEEL</span></h1>
-    <p class="sub">O que é e como funciona a mediação de conflitos no setor elétrico.</p>
+    <h1 class="titulo">O sistema multiportas<br><span class="g">do setor elétrico</span></h1>
+    <p class="sub">Mediação na ANEEL e arbitragem na CCEE: como funciona cada porta.</p>
     <div class="meta"><span class="item">{ICONE_COLUNA}Coluna jurídica</span><i class="sep"></i>
       <span class="item">{ICONE_TEMA}Direito da energia</span></div>
     <p class="autoria">Equipe EJUP</p>

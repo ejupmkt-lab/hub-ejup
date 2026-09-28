@@ -34,7 +34,8 @@ obrigatório).
 
 ## Fontes (itens 20 e 21)
 - Leis e resoluções citadas (fonte primária): Lei nº 9.427/1996, Lei nº
-  13.848/2019, Lei nº 10.848/2004, REN ANEEL nº 957/2021 e nº 1.061/2023
+  13.848/2019, Lei nº 13.140/2015, Lei nº 10.848/2004, Lei nº 15.269/2025,
+  REH ANEEL nº 3.173/2023, REN ANEEL nº 957/2021 e nº 1.061/2023
   (https://www2.aneel.gov.br/cedoc/ren20231061.html).
 - Números (200 mil reclamações/ano; 36 mediações entre 2018 e 2023, prazo
   médio de 383 dias; pico de 25 mil ações em 2021, cerca de 4 mil do apagão
@@ -47,11 +48,11 @@ obrigatório).
 - SMA, página oficial da ANEEL:
   https://www.gov.br/aneel/pt-br/composicao/relacoes-com-a-sociedade/superintendencia-de-mediacao-administrativa-e-das-relacoes-de-consumo
 
-## Legenda sugerida (LinkedIn)
-O mesmo conflito no setor elétrico pode seguir por quatro caminhos: a Ouvidoria Setorial da ANEEL, a mediação administrativa, a arbitragem em câmaras credenciadas junto à CCEE e o processo judicial.
+## Legenda sugerida (LinkedIn) · texto revisado do artigo
+O mesmo conflito no setor elétrico pode seguir por quatro caminhos: a Ouvidoria Setorial e a mediação administrativa, conduzidas pela ANEEL, a arbitragem no ambiente da CCEE e o processo judicial.
 
-Os números mostram como o sistema é usado. A Ouvidoria recebe cerca de 200 mil reclamações por ano. Entre 2018 e 2023, foram 36 mediações administrativas, com prazo médio de 383 dias. Em 2021, a judicialização chegou a 25 mil ações.
+Cada porta tem sua base legal e seu volume próprio. A Ouvidoria Setorial recebia cerca de 200 mil reclamações por ano. Entre 2018 e 2023, foram 36 mediações administrativas, com prazo médio de 383 dias. Em 2021, a judicialização chegou a 25 mil ações. São métricas diferentes, e cada uma retrata só a sua via.
 
-No novo artigo da coluna jurídica da EJUP, explicamos a base legal de cada porta, o papel da Superintendência de Mediação Administrativa e das Relações de Consumo (SMA) e o que muda para quem assessora consumidores, geradoras, distribuidoras e comercializadoras.
+No novo artigo da coluna jurídica da EJUP, explicamos a base legal de cada porta, o papel da Superintendência de Mediação Administrativa e das Relações de Consumo (SMA), a Convenção Arbitral da CCEE e o que isso muda para quem assessora consumidores, geradoras, distribuidoras e comercializadoras.
 
 O artigo completo está no site da EJUP.
