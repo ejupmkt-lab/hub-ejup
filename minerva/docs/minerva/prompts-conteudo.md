@@ -317,3 +317,30 @@ próximas (ver `peças/a-estante-ejup/de-zero-a-um/README.md`):**
 
 ### 9. Ideias de tema para artigo
 _Ainda não recebido._
+
+### 10. Legenda para divulgar artigo publicado
+_Recebido em 28/09/2026, item novo, fora da lista original de nove._
+
+> Preciso de uma legenda para o Instagram da EJUP para divulgar o artigo que
+> foi publicado, a arte do post será apenas a capa do artigo. Use uma
+> linguagem formal, mas fácil de entender. Não coloque travessão entre
+> palavras no texto e não aborde a figura de "não é sobre isso, é sobre
+> aquilo", comum entre textos criados por IA. Coloque um CTA no final para
+> convidar o público a ler o artigo, que tem o link na bio.
+
+**Como aplicar:** a Minerva lê o artigo completo (PDF ou texto que o Victor
+manda) antes de escrever, nunca chuta o conteúdo pelo título. A legenda
+segue essa estrutura:
+
+1. **Gancho.** Uma pergunta ou constatação ligada ao problema central do
+   artigo, sem travessão.
+2. **O que o artigo explica.** Um ou dois parágrafos com a tese central e os
+   fatos mais fortes (número, base legal, mecanismo), sempre fiéis ao texto
+   do artigo, sem simplificar a ponto de distorcer (checklist, item 22).
+3. **Por que importa.** Para quem esse conteúdo é relevante na prática.
+4. **CTA final.** Convite direto para ler o artigo completo, com "o link
+   está na bio".
+
+Como a arte é só a capa do artigo (sem texto extra na imagem), a legenda
+carrega sozinha todo o resumo e o contexto, então pode ser um pouco mais
+longa que a legenda de um post com texto na própria arte.
