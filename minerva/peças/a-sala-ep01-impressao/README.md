@@ -1,8 +1,15 @@
 # A Sala · episódio 01 (caso Vorcaro) · provas impressas
 
-Doze fotografias de prova para sair da pasta durante a gravação, na
-identidade do carrossel "O caso Vorcaro": cópia de dossiê, borda de papel
-fotográfico e etiqueta "Anexo" com título e legenda.
+Doze fotografias de prova para sair da pasta durante a gravação, como cópias
+antigas de arquivo: preto e branco frio, preto lavado, grão, exposição
+irregular, manchas de umidade, poeira, riscos, uma dobra, orelha num canto e
+borda fina de papel gasta (`_build/envelhecer.py`, semente fixa por foto).
+Sem sépia, que o mapa imagético veta. Na frente, só uma etiqueta de papel
+"Anexo NN" colada no canto; crédito ou aviso de reconstituição em letra
+miúda na borda.
+
+Nas fotos dos ministros a dobra e os riscos ficam fora da faixa central: o
+desgaste nunca passa pelo rosto de pessoa real.
 
 - `png/`: cada prova em **10×15 cm, 300 dpi** (1181×1772), o formato padrão
   de laboratório fotográfico. Pedir papel **fosco**, que não reflete a luz do set.
