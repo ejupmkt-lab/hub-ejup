@@ -1,6 +1,16 @@
-# Artigo "O sistema multiportas da ANEEL" · capa, story e carrossel do LinkedIn
+# Artigo "Mediação na ANEEL e arbitragem na CCEE: o sistema multiportas do setor elétrico" · capa, story e carrossel do LinkedIn
 
 `python3 _build/gerar.py && python3 _build/render.py`
+
+## Texto atualizado (29/09/2026)
+
+As artes foram regeradas com o texto revisado de `artigo.md`: título "O
+sistema multiportas do setor elétrico" com o subtítulo "Mediação na ANEEL
+e arbitragem na CCEE"; a ouvidoria das telas é sempre a Setorial; base
+legal com a Lei nº 13.140/2015 e a REH ANEEL nº 3.173/2023; a REN
+1.061/2023 como reorganização da SMA; os números tratados como métricas
+diferentes, sem comparação entre eles; e a tela da arbitragem diz que quem
+julga é o tribunal arbitral, e não a ANEEL. Elementos visuais inalterados.
 
 | arquivo | tamanho | uso |
 |---|---|---|
@@ -34,9 +44,10 @@ obrigatório).
 
 ## Fontes (itens 20 e 21)
 - Leis e resoluções citadas (fonte primária): Lei nº 9.427/1996, Lei nº
-  13.848/2019, Lei nº 13.140/2015, Lei nº 10.848/2004, Lei nº 15.269/2025,
-  REH ANEEL nº 3.173/2023, REN ANEEL nº 957/2021 e nº 1.061/2023
-  (https://www2.aneel.gov.br/cedoc/ren20231061.html).
+  10.848/2004, Lei nº 13.140/2015, Lei nº 13.848/2019, Lei nº 15.269/2025
+  (denominação atual da CCEE), REN ANEEL nº 957/2021 e nº 1.061/2023
+  (https://www2.aneel.gov.br/cedoc/ren20231061.html), Resolução
+  Homologatória ANEEL nº 3.173/2023 e a Convenção Arbitral vigente da CCEE.
 - Números (200 mil reclamações/ano; 36 mediações entre 2018 e 2023, prazo
   médio de 383 dias; pico de 25 mil ações em 2021, cerca de 4 mil do apagão
   no Amapá): painel do V Congresso Internacional CBMA, Migalhas, coluna

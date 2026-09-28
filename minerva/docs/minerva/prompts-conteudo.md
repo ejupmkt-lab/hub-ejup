@@ -406,3 +406,53 @@ cuidado que a peça já aplica nos slides (ver
 os itens do "Antes do gate humano" daquele README (revisão jurídica,
 confirmação de ausência de conflito de interesse, reconferir os fatos na
 data da publicação). A legenda pronta não substitui essa checagem.
+
+## Regra geral de CTA (recebida em 28/09/2026)
+
+> como mudo esse CTA para as pessoas seguirem e acompanharem o insta e os
+> próximos eps. tá meio estranho esse "siga para acompanhar"
+
+**Como aplicar, em qualquer peça:** "siga para acompanhar" repete a mesma
+ideia duas vezes sem acrescentar nada, é o tipo de redundância que soa
+robótica. O CTA de seguir o perfil sempre vem com o motivo específico
+embutido, não com "acompanhar" solto:
+
+- "Siga a EJUP para não perder o episódio completo e os próximos capítulos
+  de [nome do quadro ou série]."
+- "Siga o perfil e acompanhe o episódio completo e as próximas edições de
+  [nome do quadro ou série]."
+
+Vale para qualquer CTA de "seguir" em qualquer peça, não só para A Sala.
+
+## Regra geral de fluidez do texto (feedback do Roberto Pivotto, 28/09/2026)
+
+O Roberto, gate humano de publicação, reprovou uma legenda com o comentário:
+"Achei com muita cara de IA, vê se consegue melhorar um pouco a fluidez e
+deixar com menos jeito de IA."
+
+**O que causa essa cara de IA, e como evitar:**
+- **Parágrafos com o mesmo formato e o mesmo tamanho**, cada um abrindo com
+  uma frase declarativa curta e fechando limpo. Varia o comprimento das
+  frases dentro do mesmo parágrafo.
+- **Listas disfarçadas de prosa** ("Uma mesa, duas cadeiras e uma frase que
+  abre cada episódio"). Prefere a frase correndo mais solta, com vírgula e
+  conectivo, ao invés de três itens enfileirados.
+- **Pergunta de CTA em duas frases separadas e simétricas** ("Você também já
+  teve a sua. Conta pra gente nos comentários: qual seria a sua confissão?").
+  Uma pergunta direta e mais coloquial funciona melhor ("E você, já teve a
+  sua? Deixa nos comentários.").
+- Uma palavra do dia a dia no lugar certo ("chato de admitir" em vez de
+  "poucos admitem em voz alta") ajuda a quebrar o tom de texto institucional
+  demais, sem virar gíria nem perder o formal e fácil de entender que o
+  Victor pediu.
+
+Essa checagem de fluidez entra em toda legenda a partir de agora, antes de
+entregar.
+
+**Cuidado adicional (28/09/2026):** ao tentar deixar o texto mais fluido, o
+pronome pode perder o substantivo a que se refere. "E você, já teve a sua?"
+depois de um parágrafo que citava "a confissão" duas frases antes ficou
+ambíguo (a sua o quê?). Sempre que uma frase mais solta usar pronome ("a
+sua", "isso", "ela"), o substantivo precisa estar na mesma frase ou na
+imediatamente anterior, nunca a dois parágrafos de distância. Versão
+corrigida desse caso: "Qual seria a sua confissão? Deixa nos comentários."
