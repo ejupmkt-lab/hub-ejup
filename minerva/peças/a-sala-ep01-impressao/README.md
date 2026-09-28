@@ -75,3 +75,36 @@ pede o roteiro. "Até 140% do CDI": Seu Dinheiro, Investidor10, Times
 Brasil/CNBC. Foto do Banco Central: Jonas Pereira/Agência Senado, CC BY 2.0.
 A foto do Mendonça é pequena (593 px): em A4 fica macia; serve em plano
 aberto, não em close.
+
+---
+
+# Compilado de provas (versão final para o set)
+
+`compilado/anexo-01..15.png` e `a-sala-ep01-compilado-A4.pdf`: 15 provas em
+A4, 300 dpi, todas como **fotografia antiga de arquivo** (mesmo
+envelhecimento das provas 10×15), na ordem do roteiro. Substitui o kit A4
+em estilo carrossel.
+
+    python3 _build/compilado.py
+
+| Anexo | Prova | Parte |
+|---|---|---|
+| 01 | Ficha de Daniel Vorcaro, sem foto (silhueta) | 1 |
+| 02 | Banco Central, sede (foto real, Agência Senado, CC BY 2.0) | 1 |
+| 03 | Avião no portão · Guarulhos (ilustrativa) | 1 |
+| 04 | Comprovante de aplicação · 140% do CDI circulado | 2 |
+| 05 | Regras do FGC · R$ 250 mil marcado | 2 |
+| 06, 07 | Toffoli, Mendonça | 3 |
+| 08 | Sala de reunião · 14.03.2025 (ilustrativa) | 3 |
+| 09 | Moraes | 3 |
+| 10 | Contrato tarjado · R$ 130 mi à caneta | 3 |
+| 11 | Mensagens extraídas · a frase citada, resto tarjado | 3 |
+| 12 | Relatório de investigação tarjado · SIGILOSO | 3 |
+| 13 | Gilmar Mendes | 3 |
+| 14 | Plenário do STF (foto real, Yuri Ikeda, CC BY-SA 4.0) | 3 |
+| 15 | CPP, arts. 252 e 254 marcados | 4 |
+
+Documentos são cenográficos (dizem isso na borda): sem logotipo nem brasão
+de órgão real, dados sigilosos tarjados, só a informação que o roteiro cita
+aparece legível. Fotos de lugar trocadas por imagens claras e de assunto
+único, para ler em plano aberto.
