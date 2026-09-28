@@ -379,3 +379,30 @@ segue:
 
 Sem travessão, sem a figura "não é X, é Y", linguagem formal e fácil de
 entender, valem sempre.
+
+### 12. Legenda para carrossel de caso real (tema de episódio de A Sala)
+_Recebido em 28/09/2026._
+
+> legenda para esse carrossel do tema do primeiro ep. de A Sala, no final
+> fale algo como "aguarde tal coisa"
+> (print do carrossel "O caso Vorcaro", 13 telas)
+
+**Como aplicar:** quando o carrossel envolve um caso real em andamento, com
+pessoas identificadas (inclusive autoridades), a legenda segue o mesmo
+cuidado que a peça já aplica nos slides (ver
+`peças/carrossel-caso-vorcaro/README.md`, "Regras de conteúdo aplicadas"):
+
+- Nome próprio só com o verbo certo ("segundo a Polícia Federal",
+  "investigado"), nunca afirmando como fato o que é apuração em andamento.
+- Toda acusação ou menção citada junto com a resposta de quem foi citado,
+  quando ela existir.
+- Deixar explícito quando alguém citado não é investigado por crime naquele
+  caso, para não sugerir culpa por associação.
+- Fechar com uma chamada para o episódio completo, no estilo "Aguarde. O
+  episódio completo estreia em breve, no quadro A Sala, no canal da EJUP",
+  sem data que ainda não esteja confirmada.
+
+**Lembrete permanente:** peça com caso real em andamento não vai ao ar sem
+os itens do "Antes do gate humano" daquele README (revisão jurídica,
+confirmação de ausência de conflito de interesse, reconferir os fatos na
+data da publicação). A legenda pronta não substitui essa checagem.
