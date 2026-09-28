@@ -2,6 +2,33 @@
 
 `python3 _build/gerar.py && python3 _build/render.py`
 
+## ⚠ Correção pendente (28/09/2026)
+
+O texto do artigo foi revisado a partir de um documento de orientações
+editoriais do board (precisão jurídico-regulatória e SEO/GEO). A versão
+corrigida está em `artigo.md`, nesta pasta. Mudou o suficiente para exigir
+atualização nas artes já geradas:
+
+- **Título novo:** "Mediação na ANEEL e arbitragem na CCEE: como funciona o
+  sistema multiportas do setor elétrico" (a capa, o story, o feed e o
+  carrossel do LinkedIn ainda usam o título antigo, "O sistema multiportas
+  da ANEEL").
+- **CCEE:** denominação atual é "Câmara de Comercialização de Energia",
+  não mais "... de Energia Elétrica" (Lei nº 15.269/2025).
+- **Ouvidoria:** o artigo agora distingue Ouvidoria institucional da
+  Ouvidoria Setorial; qualquer tela que mencione ouvidoria precisa refletir
+  essa distinção.
+- **FAQ:** duas perguntas novas ("Qual a diferença entre a Ouvidoria
+  institucional e a Setorial?" e "A ANEEL julga a arbitragem da CCEE?") e
+  duas reformuladas (ver `artigo.md`).
+- **Dados estatísticos:** cada número agora vem com o período de
+  referência na mesma frase, e um aviso de que reclamações, mediações e
+  ações judiciais são métricas diferentes, não comparáveis diretamente.
+
+Antes de publicar em qualquer canal, `_build/gerar.py` e `_build/linkedin.py`
+precisam ser atualizados com o texto de `artigo.md`, e as artes,
+regeradas.
+
 | arquivo | tamanho | uso |
 |---|---|---|
 | `capa-site-1600x900.png` | 1600×900 | coluna jurídica do site (o site mostra só os 512 px de cima; o render reprova se passar) |
@@ -34,8 +61,10 @@ obrigatório).
 
 ## Fontes (itens 20 e 21)
 - Leis e resoluções citadas (fonte primária): Lei nº 9.427/1996, Lei nº
-  13.848/2019, Lei nº 10.848/2004, REN ANEEL nº 957/2021 e nº 1.061/2023
-  (https://www2.aneel.gov.br/cedoc/ren20231061.html).
+  10.848/2004, Lei nº 13.140/2015, Lei nº 13.848/2019, Lei nº 15.269/2025
+  (denominação atual da CCEE), REN ANEEL nº 957/2021 e nº 1.061/2023
+  (https://www2.aneel.gov.br/cedoc/ren20231061.html), Resolução
+  Homologatória ANEEL nº 3.173/2023 e a Convenção Arbitral vigente da CCEE.
 - Números (200 mil reclamações/ano; 36 mediações entre 2018 e 2023, prazo
   médio de 383 dias; pico de 25 mil ações em 2021, cerca de 4 mil do apagão
   no Amapá): painel do V Congresso Internacional CBMA, Migalhas, coluna
