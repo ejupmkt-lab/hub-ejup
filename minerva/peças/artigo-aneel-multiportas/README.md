@@ -22,14 +22,15 @@ próprio argumento do artigo. No carrossel cada tela acende a porta de que
 fala; capa e fecho acendem todas; a tela da base legal deixa todas apagadas.
 Zero crédito do Higgsfield.
 
-## Fotos do carrossel
-Uma por tela, sem repetir assunto: torres (capa), Congresso Nacional (base
-legal), medidores (Ouvidoria), mesa de reunião (mediação), Itaipu
-(comercialização), colunas de fórum (Judiciário), corredor de arcos (fecho).
-Cor natural, em **sobreposição** (overlay) sobre base grafite, e só abaixo
-da faixa das portas, que fica limpa. Véu mais denso (`forte=True`) onde a
-foto tem textura atrás do corpo de texto. Créditos em `fotos/CREDITOS.md`;
-duas são CC BY e pedem crédito na legenda.
+## Carrossel do LinkedIn
+`_build/linkedin.py`, no sistema do carrossel de poder de polícia ambiental
+(`skills/ejup-design/CARROSSEL.md`): telas escuras com foto em duotone na
+metade de cima e texto no terço inferior, alternando com telas de papel com
+lista e cartões em bronze e um arco vazado sangrando pela direita. Título de
+pesos mistos, corpo justificado. O fio entre as telas são as quatro portas,
+pequenas, acima de cada título, em área limpa: cada tela acende a sua.
+Fotos e créditos em `fotos/CREDITOS.md` (todas Pexels, sem crédito
+obrigatório).
 
 ## Fontes (itens 20 e 21)
 - Leis e resoluções citadas (fonte primária): Lei nº 9.427/1996, Lei nº
@@ -54,5 +55,3 @@ Os números mostram como o sistema é usado. A Ouvidoria recebe cerca de 200 mil
 No novo artigo da coluna jurídica da EJUP, explicamos a base legal de cada porta, o papel da Superintendência de Mediação Administrativa e das Relações de Consumo (SMA) e o que muda para quem assessora consumidores, geradoras, distribuidoras e comercializadoras.
 
 O artigo completo está no site da EJUP.
-
-Fotos: Rodolfo Stuckert e Carlosbenitez26 (CC BY 3.0), via Wikimedia Commons; demais, Pexels. Imagens tratadas pela EJUP.

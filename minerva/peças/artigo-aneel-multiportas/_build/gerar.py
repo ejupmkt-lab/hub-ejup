@@ -129,58 +129,7 @@ def vertical(ident, largura_portas):
 </div>"""
 
 
-# ------------------------------------------------------------------ carrossel LinkedIn
-def tela(acesas, miolo, fecho=False, foto=None, foco=0.5, focoy=0.5, gama=1.0, opac=1, forte=False):
-    """A foto fica abaixo das portas: a máscara deixa a faixa delas limpa."""
-    img = fundo(foto, foco, gama, focoy) if foto else ""
-    camada = ('<div class="base"></div>'
-              f'<div class="fundo" style="background-image:url({img});opacity:{opac}"></div>'
-              f'<div class="veu{" forte" if forte else ""}"></div>') if img else ""
-    return (f'<div class="peca li{" fecho" if fecho else ""}">' + camada +
-            f'<div class="arte">{portas(acesas, 856, prop=1.15)}</div>'
-            f'<div class="miolo">{miolo}</div>'
-            f'<img class="logo" src="{LOGO}" alt="EJUP"></div>')
-
-
-def carrossel():
-    return [
-        tela(TODAS, """
-  <h1 class="titulo">O setor elétrico tem <span class="g">quatro portas</span> para um mesmo conflito.</h1>
-  <p class="sub">O sistema multiportas da ANEEL: o que é e como funciona a mediação de conflitos no setor elétrico.</p>
-  <p class="seta">Coluna jurídica EJUP <b>&rarr;</b></p>""", foto="01-capa"),
-        tela(set(), """
-  <h1 class="titulo t2">A via administrativa nasce com a <span class="g">própria ANEEL</span>.</h1>
-  <p class="corpo">A Lei nº 9.427/1996, que criou a Agência, atribui a ela dirimir as divergências entre os agentes do setor e entre eles e os consumidores.</p>
-  <ul class="normas">
-    <li><b>Lei nº 13.848/2019</b><span>art. 22 · a ouvidoria das agências</span></li>
-    <li><b>Lei nº 10.848/2004</b><span>art. 4º, §5º · arbitragem na comercialização</span></li>
-    <li><b>REN ANEEL nº 957/2021</b><span>câmaras arbitrais credenciadas</span></li>
-    <li><b>REN ANEEL nº 1.061/2023</b><span>cria a SMA, que conduz a mediação</span></li>
-  </ul>""", foto="02-base", focoy=0.75, forte=True),
-        tela({0}, """
-  <p class="numero">200 mil</p>
-  <p class="num-leg">reclamações por ano chegam à ANEEL pela Ouvidoria Setorial.</p>
-  <p class="corpo">É a porta do consumidor que não resolveu o problema com a distribuidora. Cada registro segue para a concessionária responder, e o conjunto alimenta a fiscalização e as novas regras do setor.</p>""", foto="03-ouvidoria", forte=True),
-        tela({1}, """
-  <h1 class="titulo t2">O mediador facilita o diálogo. <span class="g">O acordo é das partes.</span></h1>
-  <div class="dados">
-    <div><p class="numero n2">36</p><p class="num-leg">mediações conduzidas entre 2018 e 2023</p></div>
-    <div><p class="numero n2">383</p><p class="num-leg">dias de prazo médio até a conclusão</p></div>
-  </div>
-  <p class="corpo">Conduzida pela própria Agência, trata conflitos técnicos e regulatórios com quem conhece o setor.</p>""", foto="04-mediacao"),
-        tela({2}, """
-  <h1 class="titulo t2">Na comercialização, <span class="g">os agentes escolhem a câmara arbitral.</span></h1>
-  <p class="corpo">A REN ANEEL nº 957/2021 abriu as disputas no âmbito da CCEE a qualquer câmara credenciada. Antes, uma única câmara concentrava esses casos.</p>
-  <p class="corpo">Em certos contratos, arbitragem e processo judicial convivem, conforme os critérios de matéria e valor definidos entre as partes.</p>""", foto="05-arbitragem", foco=0.7, forte=True),
-        tela({3}, """
-  <p class="numero">25 mil</p>
-  <p class="num-leg">ações judiciais no setor elétrico em 2021, o pico da série.</p>
-  <p class="corpo">Cerca de 4 mil vieram do apagão no Amapá. A via judicial segue aberta a qualquer parte; as outras portas ampliam o repertório de quem conduz o conflito.</p>""", foto="06-judiciario", focoy=0.6),
-        tela(TODAS, """
-  <h1 class="titulo t2">Escolher a porta certa <span class="g">integra a estratégia</span> do caso.</h1>
-  <p class="corpo">Assessorar um consumidor diante da distribuidora ou orientar um agente numa controvérsia contratual começa pela via adequada.</p>
-  <div class="pilula"><i>&rarr;</i><span>Leia o artigo completo no site da EJUP</span></div>""", fecho=True, foto="07-fecho"),
-    ]
+# O carrossel do LinkedIn mora em linkedin.py.
 
 
 CSS = """
@@ -298,7 +247,7 @@ body{background:#10151b;display:flex;flex-wrap:wrap;gap:28px;padding:28px;align-
 
 
 def main():
-    pecas = [capa_site(), vertical("story", 904), vertical("feed", 780)] + carrossel()
+    pecas = [capa_site(), vertical("story", 904), vertical("feed", 780)]
     html = (f'<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
             f'<title>Artigo ANEEL multiportas</title><style>{fontes()}{CSS}</style></head>'
             f'<body>{"".join(pecas)}</body></html>')

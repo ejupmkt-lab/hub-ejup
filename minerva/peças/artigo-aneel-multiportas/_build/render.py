@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exporta capa do site, story, telas do LinkedIn (PNG) e o PDF do carrossel."""
+"""Rode antes gerar.py e linkedin.py. Exporta capa do site, story, telas do LinkedIn (PNG) e o PDF do carrossel."""
 import pathlib
 from PIL import Image
 from playwright.sync_api import sync_playwright
@@ -25,7 +25,14 @@ def main():
         pg.locator("#site").screenshot(path=str(OUT / "capa-site-1600x900.png"))
         pg.locator("#story").screenshot(path=str(OUT / "story-1080x1920.png"))
         pg.locator("#feed").screenshot(path=str(OUT / "feed-1080x1440.png"))
-        telas = pg.locator(".li")
+        # carrossel do LinkedIn: sistema do carrossel de poder de polícia (linkedin.py)
+        for v in (OUT / "linkedin").glob("tela-*.png"):
+            v.unlink()
+        pg.goto((OUT / "linkedin.html").as_uri())
+        pg.wait_for_timeout(900)
+        escalas = pg.evaluate("() => [...document.querySelectorAll('.slide')].map(s => +s.dataset.escala)")
+        print("escala do texto por tela:", escalas)
+        telas = pg.locator(".slide")
         for i in range(telas.count()):
             telas.nth(i).screenshot(path=str(OUT / "linkedin" / f"tela-{i + 1:02d}.png"))
         b.close()
