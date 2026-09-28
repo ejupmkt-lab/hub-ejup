@@ -15,6 +15,16 @@ próprio argumento do artigo. No carrossel cada tela acende a porta de que
 fala; capa e fecho acendem todas; a tela da base legal deixa todas apagadas.
 Zero crédito do Higgsfield.
 
+## Fotos do carrossel
+Cada tela tem a sua (nenhuma se repete), ligada ao que a tela diz: torres
+na capa, Congresso Nacional na base legal, medidores na Ouvidoria, mesa de
+reunião na mediação, Itaipu na comercialização, a linha Tucuruí–Macapá no
+Judiciário (o apagão do Amapá), torres ao entardecer no fecho. Duotone da
+paleta, na metade de cima da tela, dissolvida no navy onde o texto mora.
+Ajustes por foto (`opac`, `gama`, `topo`) em `_build/gerar.py`. Créditos e
+licenças em `fotos/CREDITOS.md`; três delas são CC BY e pedem crédito na
+legenda.
+
 ## Pendente
 - Autor do artigo: o PDF não traz. Se houver, entra na capa do site
   (linha de assinatura, como na do poder de polícia) e na legenda.
@@ -42,3 +52,5 @@ Os números mostram como o sistema é usado. A Ouvidoria recebe cerca de 200 mil
 No novo artigo da coluna jurídica da EJUP, explicamos a base legal de cada porta, o papel da Superintendência de Mediação Administrativa e das Relações de Consumo (SMA) e o que muda para quem assessora consumidores, geradoras, distribuidoras e comercializadoras.
 
 O artigo completo está no site da EJUP.
+
+Fotos: Rodolfo Stuckert (CC BY 3.0), Carlosbenitez26 (CC BY 3.0) e PAC (CC BY 2.0), via Wikimedia Commons; demais, Pexels. Imagens tratadas pela EJUP.
