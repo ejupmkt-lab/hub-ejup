@@ -20,16 +20,17 @@ def _camada(tam):
     return Image.new("L", tam, 0)
 
 
-def envelhecer(im, w, h, semente, borda=34, centro=(.5, .4), rosto=False):
+def envelhecer(im, w, h, semente, borda=34, centro=(.5, .4), rosto=False,
+               preto=40, branco=212, vinheta=.58, grao=.13, macio=.7):
     """rosto=True (foto de pessoa real): dobra e riscos ficam fora da faixa
     central, para o desgaste nunca passar pelo rosto."""
     rnd = random.Random(semente)
     pw, ph = w - 2 * borda, h - 2 * borda
     g = ImageOps.grayscale(ImageOps.fit(im.convert("RGB"), (pw, ph), Image.LANCZOS, centering=centro))
     g = ImageOps.autocontrast(g, cutoff=(1, 1))
-    g = g.point(lambda v: int(40 + v * (212 - 40) / 255))          # preto lavado
-    g = g.filter(ImageFilter.GaussianBlur(.7))                         # foco macio de cópia
-    g = Image.blend(g, Image.effect_noise(g.size, 64).filter(ImageFilter.GaussianBlur(.9)), .13)
+    g = g.point(lambda v: int(preto + v * (branco - preto) / 255))    # preto lavado
+    g = g.filter(ImageFilter.GaussianBlur(macio))                      # foco macio de cópia
+    g = Image.blend(g, Image.effect_noise(g.size, 64).filter(ImageFilter.GaussianBlur(.9)), grao)
 
     # exposição irregular: um lado mais lavado que o outro
     grad = Image.linear_gradient("L").rotate(rnd.choice([0, 90, 180, 270])).resize(g.size, Image.BILINEAR)
@@ -37,7 +38,7 @@ def envelhecer(im, w, h, semente, borda=34, centro=(.5, .4), rosto=False):
     # vinheta
     m = _camada(g.size)
     ImageDraw.Draw(m).ellipse((-pw * .3, -ph * .25, pw * 1.3, ph * 1.2), fill=255)
-    g = Image.composite(g, ImageEnhance.Brightness(g).enhance(.58), m.filter(ImageFilter.GaussianBlur(170)))
+    g = Image.composite(g, ImageEnhance.Brightness(g).enhance(vinheta), m.filter(ImageFilter.GaussianBlur(170)))
 
     # manchas de umidade: halos claros com borda levemente mais escura
     for _ in range(rnd.randint(2, 3)):
