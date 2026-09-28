@@ -16,14 +16,13 @@ fala; capa e fecho acendem todas; a tela da base legal deixa todas apagadas.
 Zero crédito do Higgsfield.
 
 ## Fotos do carrossel
-Cada tela tem a sua (nenhuma se repete), ligada ao que a tela diz: torres
-na capa, Congresso Nacional na base legal, medidores na Ouvidoria, mesa de
-reunião na mediação, Itaipu na comercialização, a linha Tucuruí–Macapá no
-Judiciário (o apagão do Amapá), torres ao entardecer no fecho. Duotone da
-paleta, na metade de cima da tela, dissolvida no navy onde o texto mora.
-Ajustes por foto (`opac`, `gama`, `topo`) em `_build/gerar.py`. Créditos e
-licenças em `fotos/CREDITOS.md`; três delas são CC BY e pedem crédito na
-legenda.
+Uma por tela, sem repetir assunto: torres (capa), Congresso Nacional (base
+legal), medidores (Ouvidoria), mesa de reunião (mediação), Itaipu
+(comercialização), colunas de fórum (Judiciário), corredor de arcos (fecho).
+Cor natural, em **sobreposição** (overlay) sobre base grafite, e só abaixo
+da faixa das portas, que fica limpa. Véu mais denso (`forte=True`) onde a
+foto tem textura atrás do corpo de texto. Créditos em `fotos/CREDITOS.md`;
+duas são CC BY e pedem crédito na legenda.
 
 ## Pendente
 - Autor do artigo: o PDF não traz. Se houver, entra na capa do site
@@ -53,4 +52,4 @@ No novo artigo da coluna jurídica da EJUP, explicamos a base legal de cada port
 
 O artigo completo está no site da EJUP.
 
-Fotos: Rodolfo Stuckert (CC BY 3.0), Carlosbenitez26 (CC BY 3.0) e PAC (CC BY 2.0), via Wikimedia Commons; demais, Pexels. Imagens tratadas pela EJUP.
+Fotos: Rodolfo Stuckert e Carlosbenitez26 (CC BY 3.0), via Wikimedia Commons; demais, Pexels. Imagens tratadas pela EJUP.

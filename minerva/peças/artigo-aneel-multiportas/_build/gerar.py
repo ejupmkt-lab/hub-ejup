@@ -39,19 +39,18 @@ LOGO = b64(LOGOS / "ejup-horizontal-white.svg", "image/svg+xml")
 FOTOS = OUT / "fotos"
 
 
-def fundo(nome, foco=0.5, gama=0.8):
-    """Foto do carrossel em duotone da paleta (tinta nas sombras, prata nas
-    luzes), recortada em 1080x820: a foto ocupa a parte de cima da tela e se dissolve no navy, onde o texto mora. foco: posição horizontal do recorte."""
+def fundo(nome, foco=0.5, gama=1.0, focoy=0.5):
+    """Foto do carrossel em cor natural, recortada em 1080x1350. Entra em
+    modo sobreposição (overlay) sobre o fundo, abaixo das portas."""
     arq = FOTOS / f"{nome}.jpg"
     try:
-        im = Image.open(arq).convert("L")
+        im = Image.open(arq).convert("RGB")
     except (FileNotFoundError, OSError):
         print(f"aviso: {arq.name} ausente ou inválida, tela sem foto")
         return ""
-    im = ImageOps.autocontrast(im, cutoff=2)
-    im = im.point(lambda v: int(255 * (v / 255) ** gama))   # abre as sombras das fotos noturnas
-    im = ImageOps.fit(im, (1080, 820), Image.LANCZOS, centering=(foco, 0.5))
-    im = ImageOps.colorize(im, black="#0d131a", mid="#304557", white="#d1d3d4")
+    im = ImageOps.fit(im, (1080, 1350), Image.LANCZOS, centering=(foco, focoy))
+    if gama != 1.0:
+        im = im.point(lambda v: int(255 * (v / 255) ** gama))
     buf = io.BytesIO(); im.save(buf, "JPEG", quality=84)
     return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
 
@@ -112,16 +111,12 @@ def story():
 
 
 # ------------------------------------------------------------------ carrossel LinkedIn
-def tela(acesas, miolo, fecho=False, foto=None, foco=0.5, gama=0.8, opac=.85, topo=0):
-    """opac e topo ajustam cada foto: menos presença quando a textura briga
-    com os rótulos das portas; topo desce a foto quando o assunto dela cai
-    atrás dos rótulos."""
-    img = fundo(foto, foco, gama) if foto else ""
-    mascara = ("" if not topo else
-               ";-webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 22%,#000 55%,transparent 100%)"
-               ";mask-image:linear-gradient(180deg,transparent 0%,#000 22%,#000 55%,transparent 100%)")
-    camada = (f'<div class="fundo" style="background-image:url({img});opacity:{opac};top:{topo}px{mascara}"></div>'
-              '<div class="veu"></div>') if img else ""
+def tela(acesas, miolo, fecho=False, foto=None, foco=0.5, focoy=0.5, gama=1.0, opac=1, forte=False):
+    """A foto fica abaixo das portas: a máscara deixa a faixa delas limpa."""
+    img = fundo(foto, foco, gama, focoy) if foto else ""
+    camada = ('<div class="base"></div>'
+              f'<div class="fundo" style="background-image:url({img});opacity:{opac}"></div>'
+              f'<div class="veu{" forte" if forte else ""}"></div>') if img else ""
     return (f'<div class="peca li{" fecho" if fecho else ""}">' + camada +
             f'<div class="arte">{portas(acesas, 856, prop=1.15)}</div>'
             f'<div class="miolo">{miolo}</div>'
@@ -133,7 +128,7 @@ def carrossel():
         tela(TODAS, """
   <h1 class="titulo">O setor elétrico tem <span class="g">quatro portas</span> para um mesmo conflito.</h1>
   <p class="sub">O sistema multiportas da ANEEL: o que é e como funciona a mediação de conflitos no setor elétrico.</p>
-  <p class="seta">Coluna jurídica EJUP <b>&rarr;</b></p>""", foto="01-capa", foco=0.5),
+  <p class="seta">Coluna jurídica EJUP <b>&rarr;</b></p>""", foto="01-capa"),
         tela(set(), """
   <h1 class="titulo t2">A via administrativa nasce com a <span class="g">própria ANEEL</span>.</h1>
   <p class="corpo">A Lei nº 9.427/1996, que criou a Agência, atribui a ela dirimir as divergências entre os agentes do setor e entre eles e os consumidores.</p>
@@ -142,30 +137,30 @@ def carrossel():
     <li><b>Lei nº 10.848/2004</b><span>art. 4º, §5º · arbitragem na comercialização</span></li>
     <li><b>REN ANEEL nº 957/2021</b><span>câmaras arbitrais credenciadas</span></li>
     <li><b>REN ANEEL nº 1.061/2023</b><span>cria a SMA, que conduz a mediação</span></li>
-  </ul>""", foto="02-base", foco=0.42, gama=0.6, opac=1),
+  </ul>""", foto="02-base", focoy=0.75, forte=True),
         tela({0}, """
   <p class="numero">200 mil</p>
   <p class="num-leg">reclamações por ano chegam à ANEEL pela Ouvidoria Setorial.</p>
-  <p class="corpo">É a porta do consumidor que não resolveu o problema com a distribuidora. Cada registro segue para a concessionária responder, e o conjunto alimenta a fiscalização e as novas regras do setor.</p>""", foto="03-ouvidoria", foco=0.5, opac=.5),
+  <p class="corpo">É a porta do consumidor que não resolveu o problema com a distribuidora. Cada registro segue para a concessionária responder, e o conjunto alimenta a fiscalização e as novas regras do setor.</p>""", foto="03-ouvidoria", forte=True),
         tela({1}, """
   <h1 class="titulo t2">O mediador facilita o diálogo. <span class="g">O acordo é das partes.</span></h1>
   <div class="dados">
     <div><p class="numero n2">36</p><p class="num-leg">mediações conduzidas entre 2018 e 2023</p></div>
     <div><p class="numero n2">383</p><p class="num-leg">dias de prazo médio até a conclusão</p></div>
   </div>
-  <p class="corpo">Conduzida pela própria Agência, trata conflitos técnicos e regulatórios com quem conhece o setor.</p>""", foto="04-mediacao", foco=0.35),
+  <p class="corpo">Conduzida pela própria Agência, trata conflitos técnicos e regulatórios com quem conhece o setor.</p>""", foto="04-mediacao"),
         tela({2}, """
   <h1 class="titulo t2">Na comercialização, <span class="g">os agentes escolhem a câmara arbitral.</span></h1>
   <p class="corpo">A REN ANEEL nº 957/2021 abriu as disputas no âmbito da CCEE a qualquer câmara credenciada. Antes, uma única câmara concentrava esses casos.</p>
-  <p class="corpo">Em certos contratos, arbitragem e processo judicial convivem, conforme os critérios de matéria e valor definidos entre as partes.</p>""", foto="05-arbitragem", foco=0.7, gama=0.7, topo=100),
+  <p class="corpo">Em certos contratos, arbitragem e processo judicial convivem, conforme os critérios de matéria e valor definidos entre as partes.</p>""", foto="05-arbitragem", foco=0.7, forte=True),
         tela({3}, """
   <p class="numero">25 mil</p>
   <p class="num-leg">ações judiciais no setor elétrico em 2021, o pico da série.</p>
-  <p class="corpo">Cerca de 4 mil vieram do apagão no Amapá. A via judicial segue aberta a qualquer parte; as outras portas ampliam o repertório de quem conduz o conflito.</p>""", foto="06-judiciario", foco=0.5),
+  <p class="corpo">Cerca de 4 mil vieram do apagão no Amapá. A via judicial segue aberta a qualquer parte; as outras portas ampliam o repertório de quem conduz o conflito.</p>""", foto="06-judiciario", focoy=0.6),
         tela(TODAS, """
   <h1 class="titulo t2">Escolher a porta certa <span class="g">integra a estratégia</span> do caso.</h1>
   <p class="corpo">Assessorar um consumidor diante da distribuidora ou orientar um agente numa controvérsia contratual começa pela via adequada.</p>
-  <div class="pilula"><i>&rarr;</i><span>Leia o artigo completo no site da EJUP</span></div>""", fecho=True, foto="07-fecho", foco=0.3),
+  <div class="pilula"><i>&rarr;</i><span>Leia o artigo completo no site da EJUP</span></div>""", fecho=True, foto="07-fecho"),
     ]
 
 
@@ -215,10 +210,18 @@ body{background:#10151b;display:flex;flex-wrap:wrap;gap:28px;padding:28px;align-
 .story .logo{left:50%;transform:translateX(-50%);bottom:170px;height:62px}
 
 /* LinkedIn 1080x1350 */
-.li .fundo{position:absolute;left:0;right:0;top:0;height:820px;background-size:cover;background-position:center;opacity:.85;
-  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%)}
-.li .veu{position:absolute;inset:0;background:
-  linear-gradient(180deg,rgba(6,20,36,.28) 0%,rgba(6,20,36,.4) 30%,rgba(4,13,24,.82) 50%,rgba(4,13,24,.9) 100%)}
+/* base neutra (grafite e cinza da paleta) sob a foto: em sobreposição, a foto
+   guarda a cor natural em vez de tingir de azul */
+.li .base{position:absolute;inset:0;background:linear-gradient(180deg,#414042 0%,#5f6062 60%,#414042 100%);
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,transparent 27%,#000 45%,#000 100%);
+  mask-image:linear-gradient(180deg,transparent 0%,transparent 27%,#000 45%,#000 100%)}
+.li .fundo{position:absolute;inset:0;background-size:cover;background-position:center;mix-blend-mode:overlay;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,transparent 27%,#000 45%,#000 100%);
+  mask-image:linear-gradient(180deg,transparent 0%,transparent 27%,#000 45%,#000 100%)}
+.li .veu{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(4,13,24,0) 28%,rgba(4,13,24,.45) 44%,rgba(4,13,24,.6) 70%,rgba(4,13,24,.72) 100%)}
+/* foto com muita textura atrás do corpo de texto: véu mais denso */
+.li .veu.forte{background:linear-gradient(180deg,rgba(4,13,24,0) 28%,rgba(4,13,24,.6) 44%,rgba(4,13,24,.78) 62%,rgba(4,13,24,.85) 100%)}
 .li .arte,.li .miolo,.li .logo{position:relative;z-index:2}
 .li .logo{position:absolute}
 .li{width:1080px;height:1350px;padding:96px 112px 0;display:flex;flex-direction:column}
