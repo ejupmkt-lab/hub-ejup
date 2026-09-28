@@ -5,8 +5,15 @@
 | arquivo | tamanho | uso |
 |---|---|---|
 | `capa-site-1600x900.png` | 1600×900 | coluna jurídica do site (o site mostra só os 512 px de cima; o render reprova se passar) |
-| `story-1080x1920.png` | 1080×1920 | divulgação no Instagram |
+| `story-1080x1920.png` | 1080×1920 | divulgação nos stories |
+| `feed-1080x1440.png` | 1080×1440 | a mesma arte do story, no formato do feed |
 | `linkedin/tela-01..07.png` e `carrossel-linkedin.pdf` | 1080×1350 | carrossel do LinkedIn (sobe como documento PDF) |
+
+## Capa do site, story e feed
+Seguem a capa já publicada da investigação defensiva: pílula, título com o
+trecho dourado em Light, subtítulo, ícones da coluna jurídica e do tema
+(raio, "Direito da energia"), autoria "Equipe EJUP" e, nos verticais, o
+botão "Ler o artigo". Sem foto de autor: o lugar dela é das portas.
 
 ## O recurso visual
 As quatro portas do sistema (Ouvidoria, Mediação, Arbitragem, Judiciário)
@@ -23,10 +30,6 @@ Cor natural, em **sobreposição** (overlay) sobre base grafite, e só abaixo
 da faixa das portas, que fica limpa. Véu mais denso (`forte=True`) onde a
 foto tem textura atrás do corpo de texto. Créditos em `fotos/CREDITOS.md`;
 duas são CC BY e pedem crédito na legenda.
-
-## Pendente
-- Autor do artigo: o PDF não traz. Se houver, entra na capa do site
-  (linha de assinatura, como na do poder de polícia) e na legenda.
 
 ## Fontes (itens 20 e 21)
 - Leis e resoluções citadas (fonte primária): Lei nº 9.427/1996, Lei nº

@@ -85,27 +85,46 @@ def portas(acesas, largura, rotulos=True, prop=1.9):
             f'style="height:auto">{"".join(partes)}</svg>')
 
 
-# ------------------------------------------------------------------ capa do site
-def capa_site():
-    return f"""<div class="peca site" id="site">
-  <div class="texto">
+# ------------------------------------------------------------------ cabeçalho do artigo
+# Mesma gramática da capa já publicada (investigação defensiva): pílula,
+# título com o trecho dourado em Light, subtítulo, linha de ícones (coluna e
+# tema), autoria e botão. A foto dos autores dá lugar às portas.
+ICONE_COLUNA = ('<svg viewBox="0 0 24 24" fill="none" stroke="#f0b855" stroke-width="1.8" '
+                'stroke-linecap="round"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h5"/></svg>')
+ICONE_TEMA = ('<svg viewBox="0 0 24 24" fill="none" stroke="#f0b855" stroke-width="1.8" '
+              'stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>')
+SETA_CTA = ('<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#031c37"/>'
+            '<path d="M8 12h8M13 8l4 4-4 4" fill="none" stroke="#f0b855" stroke-width="2.2" '
+            'stroke-linecap="round" stroke-linejoin="round"/></svg>')
+
+
+def cabecalho(cta=True):
+    return f"""<div class="texto">
     <span class="tag">EJUP · Artigo</span>
     <h1 class="titulo">O sistema multiportas<br><span class="g">da ANEEL</span></h1>
     <p class="sub">O que é e como funciona a mediação de conflitos no setor elétrico.</p>
-    <p class="meta">Coluna jurídica <i></i> Direito da energia</p>
-  </div>
+    <div class="meta"><span class="item">{ICONE_COLUNA}Coluna jurídica</span><i class="sep"></i>
+      <span class="item">{ICONE_TEMA}Direito da energia</span></div>
+    <p class="autoria">Equipe EJUP</p>
+    {f'<span class="cta">Ler o artigo {SETA_CTA}</span>' if cta else ''}
+  </div>"""
+
+
+# ------------------------------------------------------------------ capa do site
+def capa_site():
+    return f"""<div class="peca site" id="site">
+  {cabecalho(cta=False)}
   <div class="arte">{portas(TODAS, 520)}</div>
   <img class="logo" src="{LOGO}" alt="EJUP">
 </div>"""
 
 
-# ------------------------------------------------------------------ story
-def story():
-    return f"""<div class="peca story" id="story">
-  <h1 class="titulo">O setor elétrico tem <span class="g">quatro portas</span> para um mesmo conflito.</h1>
-  <div class="arte">{portas(TODAS, 904)}</div>
-  <p class="sub">Novo artigo na coluna jurídica: o sistema multiportas da ANEEL, da Ouvidoria à arbitragem.</p>
-  <div class="pilula"><i>&rarr;</i><span>Leia o artigo completo no site da EJUP</span></div>
+# ------------------------------------------------------------------ story e feed
+def vertical(ident, largura_portas):
+    return f"""<div class="peca vert {ident}" id="{ident}">
+  <div class="halo"></div>
+  {cabecalho()}
+  <div class="arte">{portas(TODAS, largura_portas)}</div>
   <img class="logo" src="{LOGO}" alt="EJUP">
 </div>"""
 
@@ -186,28 +205,58 @@ body{background:#10151b;display:flex;flex-wrap:wrap;gap:28px;padding:28px;align-
 .pilula i{font-style:normal;color:var(--gold)}
 .pilula span{font-weight:500}
 
+/* cabeçalho comum (capa do site, story, feed) */
+.texto{z-index:2}
+.tag{display:inline-block;border-radius:999px;border:1.5px solid rgba(240,184,85,.7);background:rgba(240,184,85,.06);
+  color:var(--gold);font-weight:500;letter-spacing:.18em;text-transform:uppercase}
+.texto .titulo .g{font-weight:300;letter-spacing:-.01em}
+.meta{display:flex;align-items:center;color:rgba(209,211,212,.85)}
+.meta .item{display:flex;align-items:center;gap:.55em}
+.meta .item svg{width:1.05em;height:1.05em;flex:none}
+.meta .sep{width:1px;height:1.2em;background:rgba(209,211,212,.3);margin:0 1.3em}
+.autoria{font-weight:500;color:#fff}
+.cta{display:inline-flex;align-items:center;gap:22px;padding:0 40px;border-radius:999px;
+  background:linear-gradient(90deg,#c99a48 0%,var(--gold) 45%,#c99a48 100%);color:var(--navy);
+  font-weight:700;letter-spacing:.14em;text-transform:uppercase;box-shadow:0 14px 40px rgba(240,184,85,.22)}
+.halo{position:absolute;border-radius:50%;pointer-events:none;filter:blur(10px);
+  background:radial-gradient(circle,rgba(240,184,85,.22) 0%,rgba(155,107,38,.1) 45%,rgba(240,184,85,0) 70%)}
+
 /* capa do site 1600x900: o site mostra só os 512 px de cima */
 .site{width:1600px;height:900px;border-radius:28px}
-.site .texto{position:absolute;left:96px;top:64px;width:860px}
-.site .tag{display:inline-block;padding:11px 24px;border-radius:999px;border:1.5px solid rgba(240,184,85,.7);
-  background:rgba(240,184,85,.06);color:var(--gold);font-weight:500;font-size:15px;letter-spacing:.18em;
-  text-transform:uppercase;margin-bottom:32px}
-.site .titulo{font-size:66px}
-.site .titulo .g{font-weight:300;letter-spacing:-.01em}
-.site .sub{font-size:25px;margin-top:26px;max-width:720px}
-.site .meta{display:flex;align-items:center;gap:18px;margin-top:34px;font-size:19px;color:rgba(209,211,212,.85)}
-.site .meta i{width:1px;height:22px;background:rgba(209,211,212,.3)}
+.site .texto{position:absolute;left:96px;top:56px;width:860px}
+.site .tag{padding:11px 24px;font-size:15px;margin-bottom:28px}
+.site .titulo{font-size:64px}
+.site .sub{font-size:24px;margin-top:22px;max-width:720px}
+.site .meta{font-size:19px;margin-top:28px}
+.site .autoria{font-size:19px;margin-top:16px}
 .site .arte{position:absolute;left:1000px;top:70px}
 .site .logo{left:96px;bottom:56px;height:30px}
 
-/* story 1080x1920 */
-.story{width:1080px;height:1920px;padding:250px 88px 0}
-.story .titulo{font-size:92px}
-.story .arte{margin-top:90px}
-.story .sub{font-size:36px;margin-top:80px}
-.story .pilula{margin-top:60px;padding:32px 44px}
-.story .pilula i{font-size:38px}.story .pilula span{font-size:33px}
-.story .logo{left:50%;transform:translateX(-50%);bottom:170px;height:62px}
+/* story 1080x1920 e feed 1080x1440: mesmo cabeçalho, portas embaixo */
+.vert .texto{position:absolute;left:88px;right:88px}
+.vert .tag{padding:13px 28px;font-size:19px;margin-bottom:36px}
+.vert .titulo{font-size:92px}
+.vert .sub{font-size:33px;margin-top:28px}
+.vert .meta{font-size:25px;margin-top:36px}
+.vert .autoria{font-size:25px;margin-top:20px}
+.vert .cta{height:80px;font-size:21px;margin-top:48px}
+.vert .cta svg{width:28px;height:28px}
+.vert .arte{position:absolute;left:50%;transform:translateX(-50%)}
+.vert .logo{left:50%;transform:translateX(-50%)}
+.story{width:1080px;height:1920px}
+.story .texto{top:230px}
+.story .arte{top:1130px}
+.story .halo{left:90px;top:1000px;width:900px;height:640px}
+.story .logo{bottom:150px;height:56px}
+.feed{width:1080px;height:1440px}
+.feed .texto{top:96px}
+.feed .titulo{font-size:84px}
+.feed .sub{font-size:30px;margin-top:22px}
+.feed .meta{margin-top:28px}
+.feed .cta{margin-top:36px;height:72px}
+.feed .arte{top:800px}
+.feed .halo{left:150px;top:720px;width:780px;height:560px}
+.feed .logo{bottom:56px;height:40px}
 
 /* LinkedIn 1080x1350 */
 /* base neutra (grafite e cinza da paleta) sob a foto: em sobreposição, a foto
@@ -249,7 +298,7 @@ body{background:#10151b;display:flex;flex-wrap:wrap;gap:28px;padding:28px;align-
 
 
 def main():
-    pecas = [capa_site(), story()] + carrossel()
+    pecas = [capa_site(), vertical("story", 904), vertical("feed", 780)] + carrossel()
     html = (f'<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
             f'<title>Artigo ANEEL multiportas</title><style>{fontes()}{CSS}</style></head>'
             f'<body>{"".join(pecas)}</body></html>')

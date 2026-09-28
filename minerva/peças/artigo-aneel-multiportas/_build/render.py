@@ -24,6 +24,7 @@ def main():
             raise SystemExit("capa do site passa da faixa exibida")
         pg.locator("#site").screenshot(path=str(OUT / "capa-site-1600x900.png"))
         pg.locator("#story").screenshot(path=str(OUT / "story-1080x1920.png"))
+        pg.locator("#feed").screenshot(path=str(OUT / "feed-1080x1440.png"))
         telas = pg.locator(".li")
         for i in range(telas.count()):
             telas.nth(i).screenshot(path=str(OUT / "linkedin" / f"tela-{i + 1:02d}.png"))
