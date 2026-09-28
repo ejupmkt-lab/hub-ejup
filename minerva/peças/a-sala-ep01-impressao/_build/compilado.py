@@ -12,6 +12,7 @@ Documentos sem logotipo nem brasão de órgão real; dados sigilosos tarjados.
 
     python3 _build/compilado.py
 """
+import argparse
 import base64
 import pathlib
 
@@ -53,6 +54,9 @@ def fonte(n, tam):
     return ImageFont.truetype(str(FONTS / f"Gotham-{n}.otf"), tam)
 
 
+HORIZ = False
+
+
 def render_docs():
     d = HERE / "docs"; d.mkdir(exist_ok=True)
     faces = "\n".join(
@@ -60,11 +64,11 @@ def render_docs():
         f"{base64.b64encode((FONTS / f'Gotham-{n}.otf').read_bytes()).decode()}) format('opentype')}}"
         for n, w, st in (("Book", 400, "normal"), ("BookItalic", 400, "italic"), ("Medium", 500, "normal"),
                          ("Bold", 700, "normal"), ("Black", 900, "normal")))
-    html = (HERE / "documentos.html").read_text(encoding="utf-8").replace("__FONTES__", faces)
+    html = (HERE / ("documentos-h.html" if HORIZ else "documentos.html")).read_text(encoding="utf-8").replace("__FONTES__", faces)
     tmp = HERE / "docs" / "_docs.html"; tmp.write_text(html, encoding="utf-8")
     with sync_playwright() as p:
         b = p.chromium.launch(executable_path="/opt/pw-browsers/chromium")
-        pg = b.new_page(viewport={"width": 1700, "height": 2400}); pg.goto(tmp.as_uri()); pg.wait_for_timeout(800)
+        pg = b.new_page(viewport={"width": 2400, "height": 2400}); pg.goto(tmp.as_uri()); pg.wait_for_timeout(800)
         for i in DOCS:
             pg.locator(f"#{i}").screenshot(path=str(d / f"{i}.png"))
         b.close()
@@ -77,10 +81,31 @@ def fonte_img(tipo, src):
     if tipo == "rosto":
         ia = VORC / f"{src}-ia.png"
         im = Image.open(ia if ia.exists() else next(VORC.glob(f"{src}.*")))
+        if HORIZ:
+            im = alargar(im.convert("RGB"), W / H)
+            return im, (.5, .5), {"rosto": True}
         return im, (.5, .3), {"rosto": True}
     im = Image.open(src).convert("RGB")
     im = ImageEnhance.Contrast(ImageOps.autocontrast(im, cutoff=1)).enhance(1.15)
     return im, (.5, .5), {}
+
+
+def alargar(im, razao):
+    """Retrato vertical numa folha horizontal sem cortar a cabeça: a foto
+    inteira no centro, e as laterais preenchidas com a própria foto ampliada
+    e desfocada, que o envelhecimento funde no fundo."""
+    from PIL import ImageFilter
+    h = im.height; w = int(h * razao)
+    fundo = ImageOps.fit(im, (w, h), Image.LANCZOS).filter(ImageFilter.GaussianBlur(45))
+    fundo = ImageEnhance.Brightness(fundo).enhance(.8)
+    x = (w - im.width) // 2
+    m = Image.new("L", im.size, 255); dm = ImageDraw.Draw(m)
+    borda = int(im.width * .12)
+    for k in range(borda):
+        v = int(255 * k / borda)
+        dm.line((k, 0, k, im.height), fill=v); dm.line((im.width - 1 - k, 0, im.width - 1 - k, im.height), fill=v)
+    fundo.paste(im, (x, 0), m)
+    return fundo
 
 
 def prova(i, n, tipo, src, legenda, cred):
@@ -113,8 +138,13 @@ def prova(i, n, tipo, src, legenda, cred):
 
 
 def main():
+    global W, H, HORIZ
+    ap = argparse.ArgumentParser(); ap.add_argument("--horizontal", action="store_true")
+    HORIZ = ap.parse_args().horizontal
+    if HORIZ:
+        W, H = 3508, 2480
     render_docs()
-    d = OUT / "compilado"; d.mkdir(exist_ok=True)
+    d = OUT / ("compilado-horizontal" if HORIZ else "compilado"); d.mkdir(exist_ok=True)
     for v in d.glob("*.png"):
         v.unlink()
     pags = []
@@ -124,8 +154,9 @@ def main():
         folha.save(d / nome, dpi=(300, 300))
         base = Image.new("RGB", (W, H), "white"); base.paste(folha, mask=folha.split()[-1]); pags.append(base)
         print(nome, p[3])
-    pags[0].save(OUT / "a-sala-ep01-compilado-A4.pdf", save_all=True, append_images=pags[1:], resolution=300)
-    print(f"{len(pags)} provas + a-sala-ep01-compilado-A4.pdf")
+    pdf = OUT / ("a-sala-ep01-compilado-A4-horizontal.pdf" if HORIZ else "a-sala-ep01-compilado-A4.pdf")
+    pags[0].save(pdf, save_all=True, append_images=pags[1:], resolution=300)
+    print(f"{len(pags)} provas + {pdf.name}")
 
 
 if __name__ == "__main__":

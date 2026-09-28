@@ -108,3 +108,10 @@ Documentos são cenográficos (dizem isso na borda): sem logotipo nem brasão
 de órgão real, dados sigilosos tarjados, só a informação que o roteiro cita
 aparece legível. Fotos de lugar trocadas por imagens claras e de assunto
 único, para ler em plano aberto.
+
+## Versão horizontal
+`python3 _build/compilado.py --horizontal` gera `compilado-horizontal/` e
+`a-sala-ep01-compilado-A4-horizontal.pdf` (A4 paisagem, 300 dpi). Documentos
+em duas colunas (`_build/documentos-h.html`): contexto à esquerda, a prova
+grande à direita. Nos retratos, a foto entra inteira no centro e as laterais
+são a própria foto ampliada e desfocada, para a cabeça não ser cortada.
