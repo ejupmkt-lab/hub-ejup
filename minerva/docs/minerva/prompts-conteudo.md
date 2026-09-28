@@ -344,3 +344,30 @@ segue essa estrutura:
 Como a arte é só a capa do artigo (sem texto extra na imagem), a legenda
 carrega sozinha todo o resumo e o contexto, então pode ser um pouco mais
 longa que a legenda de um post com texto na própria arte.
+
+### 11. Legenda para carrossel de teaser de "A Sala"
+_Recebido em 28/09/2026._
+
+> legenda para esse carrossel
+> (print do carrossel de lançamento do quadro A Sala, episódio 01, 10 telas)
+
+**Como aplicar:** "A Sala" é um quadro novo, com abertura sempre igual
+(sala escura, mesa, duas cadeiras, a frase "Eu preciso confessar uma
+coisa"), documentado em `docs/formatos/a-sala.md`. Cada episódio tem uma
+confissão diferente que abre um tema jurídico (ver a tabela de confissões
+naquele arquivo). A legenda desse tipo de carrossel de lançamento ou teaser
+segue:
+
+1. **Gancho.** O conceito do quadro em uma ou duas frases, sem entregar o
+   episódio.
+2. **O que é "A Sala".** Uma linha curta explicando o formato (a mesa, as
+   duas cadeiras, a frase de abertura).
+3. **A confissão do episódio**, só se ela já estiver visível na arte do
+   carrossel (não adianta esconder na legenda o que a peça já mostra).
+4. **CTA de engajamento.** Convite para responder nos comentários, no
+   espírito do quadro (a pessoa também confessando algo).
+5. **Anúncio.** "Em breve, no canal da EJUP" (ou a data, quando já estiver
+   definida).
+
+Sem travessão, sem a figura "não é X, é Y", linguagem formal e fácil de
+entender, valem sempre.
