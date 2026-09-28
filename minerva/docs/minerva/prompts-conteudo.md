@@ -423,3 +423,28 @@ embutido, não com "acompanhar" solto:
   [nome do quadro ou série]."
 
 Vale para qualquer CTA de "seguir" em qualquer peça, não só para A Sala.
+
+## Regra geral de fluidez do texto (feedback do Roberto Pivotto, 28/09/2026)
+
+O Roberto, gate humano de publicação, reprovou uma legenda com o comentário:
+"Achei com muita cara de IA, vê se consegue melhorar um pouco a fluidez e
+deixar com menos jeito de IA."
+
+**O que causa essa cara de IA, e como evitar:**
+- **Parágrafos com o mesmo formato e o mesmo tamanho**, cada um abrindo com
+  uma frase declarativa curta e fechando limpo. Varia o comprimento das
+  frases dentro do mesmo parágrafo.
+- **Listas disfarçadas de prosa** ("Uma mesa, duas cadeiras e uma frase que
+  abre cada episódio"). Prefere a frase correndo mais solta, com vírgula e
+  conectivo, ao invés de três itens enfileirados.
+- **Pergunta de CTA em duas frases separadas e simétricas** ("Você também já
+  teve a sua. Conta pra gente nos comentários: qual seria a sua confissão?").
+  Uma pergunta direta e mais coloquial funciona melhor ("E você, já teve a
+  sua? Deixa nos comentários.").
+- Uma palavra do dia a dia no lugar certo ("chato de admitir" em vez de
+  "poucos admitem em voz alta") ajuda a quebrar o tom de texto institucional
+  demais, sem virar gíria nem perder o formal e fácil de entender que o
+  Victor pediu.
+
+Essa checagem de fluidez entra em toda legenda a partir de agora, antes de
+entregar.
