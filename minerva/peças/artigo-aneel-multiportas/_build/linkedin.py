@@ -25,6 +25,8 @@ RAIZ = HERE.parents[2]
 FONTS = RAIZ / "skills" / "ejup-design" / "assets" / "fonts"
 LOGOS = RAIZ / "skills" / "ejup-design" / "assets" / "logo"
 FOTOS = OUT / "fotos"
+from figuras import ESTILO, figura, pasta_saida
+DEST = pasta_saida(OUT)
 
 PORTAS = ["Ouvidoria", "Mediação", "Arbitragem", "Judiciário"]
 TODAS = {0, 1, 2, 3}
@@ -121,6 +123,8 @@ def duo(nome):
 
 
 def portas_mini(acesas, claro):
+    if ESTILO != "portas":
+        return figura(acesas, claro=claro, mini=True, classe="portas-mini")
     luz, apagada = ("#9b6b26", "rgba(65,64,66,.35)") if claro else ("#f0b855", "rgba(209,211,212,.45)")
     fundo_on = "rgba(155,107,38,.14)" if claro else "rgba(240,184,85,.18)"
     n, gap = 4, 0.3
@@ -170,7 +174,8 @@ def main():
                       f'<div class="logo"><div>{logo}</div></div></section>')
     html = (HERE / "template-linkedin.html").read_text(encoding="utf-8")
     html = html.replace("__FONT_FACES__", fontes()).replace("__SLIDES__", "\n".join(slides))
-    (OUT / "linkedin.html").write_text(html, encoding="utf-8")
+    DEST.mkdir(exist_ok=True)
+    (DEST / "linkedin.html").write_text(html, encoding="utf-8")
     print(f"gerado: linkedin.html ({len(slides)} telas)")
 
 

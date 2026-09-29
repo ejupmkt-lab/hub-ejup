@@ -37,6 +37,8 @@ def fontes():
 
 LOGO = b64(LOGOS / "ejup-horizontal-white.svg", "image/svg+xml")
 FOTOS = OUT / "fotos"
+from figuras import ESTILO, figura, pasta_saida
+DEST = pasta_saida(OUT)
 
 
 def fundo(nome, foco=0.5, gama=1.0, focoy=0.5):
@@ -56,6 +58,8 @@ def fundo(nome, foco=0.5, gama=1.0, focoy=0.5):
 
 
 def portas(acesas, largura, rotulos=True, prop=1.9):
+    if ESTILO != "portas":
+        return figura(acesas, largura=largura, classe="portas")
     """Quatro arcos lado a lado. As acesas ganham luz dourada por dentro."""
     n, gap = 4, 0.16
     w = 100 / (n + (n - 1) * gap)          # largura de cada porta, em unidades de 100
@@ -251,7 +255,8 @@ def main():
     html = (f'<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
             f'<title>Artigo ANEEL multiportas</title><style>{fontes()}{CSS}</style></head>'
             f'<body>{"".join(pecas)}</body></html>')
-    (OUT / "pecas.html").write_text(html, encoding="utf-8")
+    DEST.mkdir(exist_ok=True)
+    (DEST / "pecas.html").write_text(html, encoding="utf-8")
     print(f"gerado: pecas.html ({len(pecas)} peças)")
 
 

@@ -4,7 +4,10 @@ import pathlib
 from PIL import Image
 from playwright.sync_api import sync_playwright
 
-OUT = pathlib.Path(__file__).resolve().parent.parent
+import sys
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from figuras import pasta_saida
+OUT = pasta_saida(pathlib.Path(__file__).resolve().parent.parent)
 CORTE_SITE = 512  # o site só mostra a faixa de cima da capa
 
 

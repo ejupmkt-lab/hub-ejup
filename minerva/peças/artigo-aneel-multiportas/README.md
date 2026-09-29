@@ -67,3 +67,26 @@ Cada porta tem sua base legal e seu volume próprio. A Ouvidoria Setorial recebi
 No novo artigo da coluna jurídica da EJUP, explicamos a base legal de cada porta, o papel da Superintendência de Mediação Administrativa e das Relações de Consumo (SMA), a Convenção Arbitral da CCEE e o que isso muda para quem assessora consumidores, geradoras, distribuidoras e comercializadoras.
 
 O artigo completo está no site da EJUP.
+
+## Duas versões alternativas (29/09/2026, após o cliente achar os arcos infantilizados)
+
+Mesmo texto, mesma diagramação, mesmas fotos; muda só a figura que costura
+as peças (`_build/figuras.py`). Gerar:
+
+    ESTILO=portico python3 _build/gerar.py && ESTILO=portico python3 _build/linkedin.py && ESTILO=portico python3 _build/render.py
+    ESTILO=fios    python3 _build/gerar.py && ESTILO=fios    python3 _build/linkedin.py && ESTILO=fios    python3 _build/render.py
+
+- **`versao-portico/` (versão A, portas redesenhadas):** fachada clássica
+  em traço fino, sem preenchimento chapado nem arco de desenho infantil.
+  Arquitrave em duas linhas com numeral romano no friso, batente duplo,
+  portas fechadas com almofadas em traço. A porta ativa aparece
+  entreaberta: fresta de luz dourada e o reflexo no piso.
+- **`versao-fios/` (versão B, tema elétrico):** diagrama unifilar, a
+  linguagem de projeto elétrico. Um barramento e quatro alimentadores, cada
+  um com disjuntor e terminal. Os condutores são desenhados como cabo
+  isolado (capa escura e alma de cobre). No circuito ativo o disjuntor está
+  fechado e a alma conduz em dourado; nos outros, disjuntor aberto e fio
+  apagado.
+
+Sem `ESTILO`, os scripts continuam gerando a versão original com os arcos,
+na raiz da pasta.
