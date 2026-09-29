@@ -21,7 +21,7 @@ def pb(nome, larg=1600):
     buf = io.BytesIO(); im.save(buf, "JPEG", quality=90)
     return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
 
-black = base64.b64encode((FON / "Gotham-Black.otf").read_bytes()).decode()
+black = base64.b64encode((HERE / "fontes" / "SpecialElite-Regular.ttf").read_bytes()).decode()   # máquina de escrever (Apache 2.0)
 
 GRAO = """<svg class="grao" xmlns="http://www.w3.org/2000/svg"><filter id="g"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="3" seed="4"/>
 <feColorMatrix values="0 0 0 0 .35  0 0 0 0 .3  0 0 0 0 .22  0 0 0 .22 0"/></filter><rect width="100%" height="100%" filter="url(#g)"/></svg>"""
@@ -59,21 +59,21 @@ PECAS = {
  "15-tarjas": papel(148, 105, f'<p class="rot">FOLHA 5/7 · {T(10)}</p><span class="linha" style="width:96%"></span><span class="linha" style="width:88%"></span><p class="txt">Segundo o relatório, {T(22)} e {T(14)}.</p><span class="linha" style="width:92%"></span><span class="linha" style="width:70%"></span><span class="linha" style="width:84%"></span>'),
 }
 
-CSS = f"""@font-face{{font-family:GB;font-weight:900;src:url(data:font/otf;base64,{black})}}
+CSS = f"""@font-face{{font-family:SE;src:url(data:font/ttf;base64,{black})}}
 *{{margin:0;box-sizing:border-box}} body{{background:#555;padding:10mm;display:flex;flex-wrap:wrap;gap:10mm}}
 .peca{{position:relative;overflow:hidden;flex:none}}
 .grao{{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;mix-blend-mode:multiply}}
-.papel{{background:radial-gradient(120% 120% at 40% 35%,#f4efe4 0%,#ebe4d4 70%,#ddd3bf 100%);color:#1b1b1b;font-family:'Liberation Mono',monospace}}
+.papel{{background:radial-gradient(120% 120% at 40% 35%,#f4efe4 0%,#ebe4d4 70%,#ddd3bf 100%);color:#1b1b1b;font-family:SE,'Liberation Mono',monospace}}
 .papel .in{{position:absolute;inset:0;padding:8mm 9mm}}
 .topo{{display:flex;justify-content:space-between;font-size:7.5pt;letter-spacing:.14em;border-bottom:.5pt solid #1b1b1b;padding-bottom:2mm}}
-.data{{font-family:GB;font-size:26pt;letter-spacing:-.01em;margin-top:5mm}}
-.tit{{font-weight:700;font-size:12pt;margin-top:1mm;text-transform:uppercase;letter-spacing:.04em}}
+.data{{font-family:SE;font-weight:400;font-size:26pt;letter-spacing:-.01em;margin-top:5mm}}
+.tit{{font-weight:400;font-size:12pt;margin-top:1mm;text-transform:uppercase;letter-spacing:.04em}}
 .txt{{font-size:10pt;line-height:1.45;margin-top:2.5mm}}
 .pautas{{position:absolute;left:9mm;right:9mm;bottom:8mm;height:10mm;background:repeating-linear-gradient(transparent 0 4.6mm,#9b6b26 4.6mm 4.8mm);opacity:.45}}
-.rot{{font-size:8pt;letter-spacing:.16em;font-weight:700}}
-.big{{font-family:GB;font-size:48pt;line-height:.95;letter-spacing:-.02em;margin:14mm 0 6mm}}
-.art{{font-family:GB;font-size:15pt;margin-top:5mm}}
-.q{{font-family:GB;font-size:24pt;line-height:1.1;letter-spacing:-.01em;margin-top:18mm;text-align:center}}
+.rot{{font-size:8.5pt;letter-spacing:.16em}}
+.big{{font-family:SE;font-weight:400;font-size:48pt;line-height:.95;letter-spacing:-.02em;margin:14mm 0 6mm}}
+.art{{font-family:SE;font-weight:400;font-size:15pt;margin-top:5mm}}
+.q{{font-family:SE;font-weight:400;font-size:24pt;line-height:1.1;letter-spacing:-.01em;margin-top:18mm;text-align:center}}
 .cupom{{margin-top:6mm;font-size:9pt;line-height:2}}
 .circ{{position:relative}} .circ:after{{content:"";position:absolute;left:-2mm;right:4mm;top:-1mm;bottom:-1mm;border:.6mm solid #c1272d;border-radius:50%;transform:rotate(-3deg)}}
 .rodape{{position:absolute;bottom:8mm;left:9mm;font-size:6.5pt;color:#666}}
@@ -81,7 +81,7 @@ CSS = f"""@font-face{{font-family:GB;font-weight:900;src:url(data:font/otf;base6
 .linha{{display:block;height:3.4mm;background:#111;margin:3mm 0}}
 .foto{{background:#f3f0e8;padding:5mm 5mm 13mm}}
 .foto .img{{position:absolute;left:5mm;right:5mm;top:5mm;bottom:13mm;background-size:cover;background-position:center}}
-.foto .leg{{position:absolute;left:6mm;bottom:4mm;font-family:'Liberation Mono',monospace;font-size:8pt;color:#333}}
+.foto .leg{{position:absolute;left:6mm;bottom:4mm;font-family:SE,'Liberation Mono',monospace;font-size:8pt;color:#333}}
 """
 
 with sync_playwright() as p:

@@ -3,17 +3,19 @@
 A4 para impressão. Conteúdo tirado do roteiro (docs/formatos/a-sala-ep01-caso-master.md),
 só com fatos que têm fonte. As tarjas cobrem referências internas e fontes, nunca a
 resposta de quem foi citado. Cabeçalho da própria EJUP, sem imitar órgão público."""
-import pathlib
+import base64, pathlib
 from playwright.sync_api import sync_playwright
 OUT = pathlib.Path(__file__).resolve().parent.parent
+SE = base64.b64encode((pathlib.Path(__file__).resolve().parent / "fontes" / "SpecialElite-Regular.ttf").read_bytes()).decode()
 
 T = lambda n: f'<span class="t" style="width:{n}ch"></span>'   # tarja com largura em caracteres
 
 HTML = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
+@font-face {{ font-family: SE; src: url(data:font/ttf;base64,{SE}) }}
 @page {{ size: A4; margin: 0 }}
 * {{ box-sizing: border-box; margin: 0 }}
 body {{ width: 210mm; height: 297mm; background: #fbfaf7; color: #1b1b1b;
-  font-family: 'Liberation Mono', 'Courier New', monospace; font-size: 9.6pt; line-height: 1.45;
+  font-family: SE, 'Liberation Mono', monospace; font-size: 9.6pt; line-height: 1.45;
   padding: 16mm 18mm 22mm 20mm; position: relative }}
 .topo {{ display: flex; justify-content: space-between; border-bottom: 1.2pt solid #1b1b1b; padding-bottom: 3mm; font-size: 9pt; letter-spacing: .08em }}
 .topo b {{ font-weight: 700 }}
