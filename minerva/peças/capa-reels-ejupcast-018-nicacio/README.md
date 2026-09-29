@@ -16,8 +16,8 @@ Foto: frame limpo do episódio, sem a legenda queimada do reels
   **Jost ExtraLight** caixa alta, linha de baixo em **Lora Italic**, ambas em
   creme **#F7EFD8** (Google Fonts, SIL OFL; arquivos em `_build/`). Exceção
   pedida pelo Victor à família Gotham e à paleta, só nas capas de reels.
-- Título sem ponto final, em proporção próxima à da referência (cerca de 70%
-  da largura, no terço de baixo da grade).
+- Título sem ponto final, grande como na referência: "Supremo" ocupa
+  cerca de 88% da largura, no terço de baixo da grade.
 - Foto: frame do próprio reels (0:58), Nicácio de boca fechada, num
   intervalo sem legenda; descido 80 px com a cortina estendida no topo para
   a cabeça caber inteira no recorte 3:4. Marca d'água do rodapé removida por

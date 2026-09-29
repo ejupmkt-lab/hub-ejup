@@ -58,9 +58,9 @@ body{background:#000}
 .capa>img{position:absolute;inset:0;width:100%;height:100%}
 .veu{position:absolute;inset:0;background:
   linear-gradient(180deg,rgba(4,13,24,.2) 0%,rgba(4,13,24,0) 30%,rgba(4,13,24,.1) 50%,rgba(4,13,24,.5) 70%,rgba(4,13,24,.8) 100%)}
-.titulo{position:absolute;left:0;right:0;top:1250px;text-align:center;color:#f7efd8;text-shadow:0 4px 30px rgba(0,0,0,.35)}
-.titulo .a{display:block;font-family:'Jost',sans-serif;font-weight:200;font-size:86px;letter-spacing:.01em;line-height:1}
-.titulo .b{display:block;font-family:'Lora',serif;font-weight:400;font-style:italic;font-size:176px;letter-spacing:-.01em;line-height:.98}
+.titulo{position:absolute;left:0;right:0;top:1170px;text-align:center;color:#f7efd8;text-shadow:0 4px 30px rgba(0,0,0,.35)}
+.titulo .a{display:block;font-family:'Jost',sans-serif;font-weight:200;font-size:112px;letter-spacing:0;line-height:1}
+.titulo .b{display:block;font-family:'Lora',serif;font-weight:400;font-style:italic;font-size:250px;letter-spacing:-.015em;line-height:.92}
 </style></head><body><div class="capa" id="capa">
 <img src="__FOTO__" alt="">
 <div class="veu"></div>
