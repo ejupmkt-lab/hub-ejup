@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """Capa de reels · corte do EJUPcast #018 com Nicácio Carvalho.
 
+Versão 2 (referência do Victor, 29/09): foto sangrada e título em duas linhas,
+Gotham Thin em caixa alta e Gotham Book Italic grande. O tema vem do corte:
+a instabilidade das decisões do STF minando a confiança na Corte.
+
+Versão 1 (logo ejup/CAST e aro), substituída:
+
 Segue a capa já usada no feed do #018 (referência do Victor): foto sangrada,
 logotipo "ejup ▶ /CAST" no centro, "EPISÓDIO #018" espaçado embaixo e um aro
 fino com dois pontos dourados envolvendo o convidado. 1080×1920; o bloco
@@ -37,37 +43,30 @@ def foto():
     return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
+TITULO = ("A CONFIANÇA NO", "Supremo.")
+
 HTML = """<!doctype html><html><head><meta charset="utf-8"><style>
-@font-face{font-family:'Gotham';font-weight:300;src:url(data:font/otf;base64,__L__)}
-@font-face{font-family:'Gotham';font-weight:500;src:url(data:font/otf;base64,__M__)}
+@font-face{font-family:'Gotham';font-weight:200;src:url(data:font/otf;base64,__T__)}
+@font-face{font-family:'Gotham';font-weight:400;font-style:italic;src:url(data:font/otf;base64,__I__)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#000}
 .capa{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:'Gotham'}
 .capa>img{position:absolute;inset:0;width:100%;height:100%}
 .veu{position:absolute;inset:0;background:
-  linear-gradient(180deg,rgba(4,13,24,.25) 0%,rgba(4,13,24,0) 30%,rgba(4,13,24,.15) 48%,rgba(4,13,24,.55) 70%,rgba(4,13,24,.85) 100%)}
-.aro{position:absolute;left:0;top:0;width:1080px;height:1920px}
-.marca{position:absolute;left:0;right:0;top:1120px;display:flex;align-items:center;justify-content:center;gap:10px}
-.marca svg{height:150px;width:auto;display:block;filter:drop-shadow(0 4px 18px rgba(0,0,0,.45))}
-.marca .play{width:0;height:0;border-left:44px solid #f0b855;border-top:27px solid transparent;border-bottom:27px solid transparent;margin:26px 14px 0 4px}
-.marca .cast{font-weight:300;font-size:66px;letter-spacing:.06em;color:#fff;margin-top:34px;text-shadow:0 4px 18px rgba(0,0,0,.45)}
-.ep{position:absolute;left:0;right:0;top:1330px;text-align:center;font-weight:500;font-size:40px;letter-spacing:.42em;color:#fff;padding-left:.42em;text-shadow:0 3px 14px rgba(0,0,0,.5)}
+  linear-gradient(180deg,rgba(4,13,24,.2) 0%,rgba(4,13,24,0) 30%,rgba(4,13,24,.1) 50%,rgba(4,13,24,.5) 70%,rgba(4,13,24,.8) 100%)}
+.titulo{position:absolute;left:0;right:0;top:1130px;text-align:center;color:#fff;text-shadow:0 4px 30px rgba(0,0,0,.45)}
+.titulo .a{display:block;font-weight:200;font-size:92px;letter-spacing:.02em;line-height:1}
+.titulo .b{display:block;font-weight:400;font-style:italic;font-size:200px;letter-spacing:-.02em;line-height:1.02}
 </style></head><body><div class="capa" id="capa">
 <img src="__FOTO__" alt="">
 <div class="veu"></div>
-<svg class="aro" viewBox="0 0 1080 1920">
-  <path d="M 212 1500 A 470 470 0 1 1 640 470" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="3"/>
-  <circle cx="640" cy="470" r="13" fill="#f0b855"/>
-  <circle cx="212" cy="1500" r="13" fill="#f0b855"/>
-</svg>
-<div class="marca">__MARCA__<i class="play"></i><span class="cast">/CAST</span></div>
-<p class="ep">EPISÓDIO #018</p>
+<h1 class="titulo"><span class="a">__A__</span><span class="b">__B__</span></h1>
 </div></body></html>"""
 
 
 def main():
-    html = (HTML.replace("__L__", b64(FONTS / "Gotham-Light.otf")).replace("__M__", b64(FONTS / "Gotham-Medium.otf"))
-            .replace("__FOTO__", foto()).replace("__MARCA__", MARCA))
+    html = (HTML.replace("__T__", b64(FONTS / "Gotham-Thin.otf")).replace("__I__", b64(FONTS / "Gotham-BookItalic.otf"))
+            .replace("__FOTO__", foto()).replace("__A__", TITULO[0]).replace("__B__", TITULO[1]))
     (OUT / "capa.html").write_text(html, encoding="utf-8")
     with sync_playwright() as p:
         b = p.chromium.launch(executable_path="/opt/pw-browsers/chromium")
