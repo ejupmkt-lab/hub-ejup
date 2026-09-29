@@ -30,7 +30,7 @@ FONTS = RAIZ / "skills" / "ejup-design" / "assets" / "fonts"
 LOGO_B = (RAIZ / "skills" / "ejup-design" / "assets" / "logo" / "ejup-horizontal-white.svg").read_text(encoding="utf-8")
 # só a palavra "ejup", como no selo do estúdio
 MARCA = re.sub(r'viewBox="[^"]*"', 'viewBox="352 690 282 118"', LOGO_B, count=1)
-# frame do próprio reels (16 s), boca fechada, entre duas legendas; a marca
+# frame do próprio reels (0:58 → 0:59), descido 80 px com a cortina estendida no topo, boca fechada, entre duas legendas; a marca
 # d'água do rodapé foi removida por inpainting (OpenCV)
 FOTO = HERE / "frame-reels.png"
 
@@ -47,7 +47,7 @@ def foto():
     return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
-TITULO = ("A CONFIANÇA NO", "Supremo.")
+TITULO = ("A CONFIANÇA NO", "Supremo")
 
 HTML = """<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face{font-family:'Jost';font-weight:200;src:url(data:font/woff2;base64,__T__) format('woff2')}
@@ -58,9 +58,9 @@ body{background:#000}
 .capa>img{position:absolute;inset:0;width:100%;height:100%}
 .veu{position:absolute;inset:0;background:
   linear-gradient(180deg,rgba(4,13,24,.2) 0%,rgba(4,13,24,0) 30%,rgba(4,13,24,.1) 50%,rgba(4,13,24,.5) 70%,rgba(4,13,24,.8) 100%)}
-.titulo{position:absolute;left:0;right:0;top:1100px;text-align:center;color:#f7efd8;text-shadow:0 4px 30px rgba(0,0,0,.35)}
-.titulo .a{display:block;font-family:'Jost',sans-serif;font-weight:200;font-size:118px;letter-spacing:.01em;line-height:1}
-.titulo .b{display:block;font-family:'Lora',serif;font-weight:400;font-style:italic;font-size:220px;letter-spacing:-.01em;line-height:.95}
+.titulo{position:absolute;left:0;right:0;top:1250px;text-align:center;color:#f7efd8;text-shadow:0 4px 30px rgba(0,0,0,.35)}
+.titulo .a{display:block;font-family:'Jost',sans-serif;font-weight:200;font-size:86px;letter-spacing:.01em;line-height:1}
+.titulo .b{display:block;font-family:'Lora',serif;font-weight:400;font-style:italic;font-size:176px;letter-spacing:-.01em;line-height:.98}
 </style></head><body><div class="capa" id="capa">
 <img src="__FOTO__" alt="">
 <div class="veu"></div>
