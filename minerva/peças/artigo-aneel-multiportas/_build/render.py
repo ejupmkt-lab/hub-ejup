@@ -28,6 +28,7 @@ def main():
         pg.locator("#site").screenshot(path=str(OUT / "capa-site-1600x900.png"))
         pg.locator("#story").screenshot(path=str(OUT / "story-1080x1920.png"))
         pg.locator("#feed").screenshot(path=str(OUT / "feed-1080x1440.png"))
+        pg.locator("#post").screenshot(path=str(OUT / "post-1080x1350.png"))
         # carrossel do LinkedIn: sistema do carrossel de poder de polícia (linkedin.py)
         for v in (OUT / "linkedin").glob("tela-*.png"):
             v.unlink()

@@ -212,6 +212,17 @@ body{background:#10151b;display:flex;flex-wrap:wrap;gap:28px;padding:28px;align-
 .feed .arte{top:800px}
 .feed .halo{left:150px;top:720px;width:780px;height:560px}
 .feed .logo{bottom:56px;height:40px}
+/* post de divulgação 1080x1350 (4:5) */
+.post{width:1080px;height:1350px}
+.post .texto{top:88px}
+.post .titulo{font-size:82px}
+.post .sub{font-size:30px;margin-top:20px}
+.post .meta{margin-top:26px}
+.post .autoria{margin-top:16px}
+.post .cta{margin-top:32px;height:70px}
+.post .arte{top:770px}
+.post .halo{left:150px;top:680px;width:780px;height:520px}
+.post .logo{bottom:52px;height:38px}
 
 /* LinkedIn 1080x1350 */
 /* base neutra (grafite e cinza da paleta) sob a foto: em sobreposição, a foto
@@ -253,7 +264,7 @@ body{background:#10151b;display:flex;flex-wrap:wrap;gap:28px;padding:28px;align-
 
 
 def main():
-    pecas = [capa_site(), vertical("story", 904), vertical("feed", 780)]
+    pecas = [capa_site(), vertical("story", 904), vertical("feed", 780), vertical("post", 880)]
     html = (f'<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
             f'<title>Artigo ANEEL multiportas</title><style>{fontes()}{CSS}</style></head>'
             f'<body class="{ESTILO}">{"".join(pecas)}</body></html>')
