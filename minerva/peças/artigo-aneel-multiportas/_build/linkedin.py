@@ -113,8 +113,15 @@ def fontes():
                         ("Bold", 700), ("Black", 900)))
 
 
+# recorte prévio (fração x0, y0, x1, y1) quando o assunto da foto cairia sob o fade
+RECORTE = {"03-ouvidoria": (0.0, 0.34, 1.0, 1.0)}
+
+
 def duo(nome):
     im = Image.open(FOTOS / f"{nome}.jpg").convert("RGB")
+    if nome in RECORTE:
+        x0, y0, x1, y1 = RECORTE[nome]
+        im = im.crop((int(im.width * x0), int(im.height * y0), int(im.width * x1), int(im.height * y1)))
     cinza = ImageOps.autocontrast(ImageOps.grayscale(im), cutoff=(1, 3))
     im = ImageOps.colorize(cinza, black=SOMBRA, white=LUZ)
     im = ImageOps.fit(im, (1080, 1350), Image.LANCZOS, centering=(0.5, 0.35))
