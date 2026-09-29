@@ -1,33 +1,16 @@
-# Artigo "O sistema multiportas da ANEEL" · capa, story e carrossel do LinkedIn
+# Artigo "Mediação na ANEEL e arbitragem na CCEE: o sistema multiportas do setor elétrico" · capa, story e carrossel do LinkedIn
 
 `python3 _build/gerar.py && python3 _build/render.py`
 
-## ⚠ Correção pendente (28/09/2026)
+## Texto atualizado (29/09/2026)
 
-O texto do artigo foi revisado a partir de um documento de orientações
-editoriais do board (precisão jurídico-regulatória e SEO/GEO). A versão
-corrigida está em `artigo.md`, nesta pasta. Mudou o suficiente para exigir
-atualização nas artes já geradas:
-
-- **Título novo:** "Mediação na ANEEL e arbitragem na CCEE: como funciona o
-  sistema multiportas do setor elétrico" (a capa, o story, o feed e o
-  carrossel do LinkedIn ainda usam o título antigo, "O sistema multiportas
-  da ANEEL").
-- **CCEE:** denominação atual é "Câmara de Comercialização de Energia",
-  não mais "... de Energia Elétrica" (Lei nº 15.269/2025).
-- **Ouvidoria:** o artigo agora distingue Ouvidoria institucional da
-  Ouvidoria Setorial; qualquer tela que mencione ouvidoria precisa refletir
-  essa distinção.
-- **FAQ:** duas perguntas novas ("Qual a diferença entre a Ouvidoria
-  institucional e a Setorial?" e "A ANEEL julga a arbitragem da CCEE?") e
-  duas reformuladas (ver `artigo.md`).
-- **Dados estatísticos:** cada número agora vem com o período de
-  referência na mesma frase, e um aviso de que reclamações, mediações e
-  ações judiciais são métricas diferentes, não comparáveis diretamente.
-
-Antes de publicar em qualquer canal, `_build/gerar.py` e `_build/linkedin.py`
-precisam ser atualizados com o texto de `artigo.md`, e as artes,
-regeradas.
+As artes foram regeradas com o texto revisado de `artigo.md`: título "O
+sistema multiportas do setor elétrico" com o subtítulo "Mediação na ANEEL
+e arbitragem na CCEE"; a ouvidoria das telas é sempre a Setorial; base
+legal com a Lei nº 13.140/2015 e a REH ANEEL nº 3.173/2023; a REN
+1.061/2023 como reorganização da SMA; os números tratados como métricas
+diferentes, sem comparação entre eles; e a tela da arbitragem diz que quem
+julga é o tribunal arbitral, e não a ANEEL. Elementos visuais inalterados.
 
 | arquivo | tamanho | uso |
 |---|---|---|
@@ -76,11 +59,34 @@ obrigatório).
 - SMA, página oficial da ANEEL:
   https://www.gov.br/aneel/pt-br/composicao/relacoes-com-a-sociedade/superintendencia-de-mediacao-administrativa-e-das-relacoes-de-consumo
 
-## Legenda sugerida (LinkedIn)
-O mesmo conflito no setor elétrico pode seguir por quatro caminhos: a Ouvidoria Setorial da ANEEL, a mediação administrativa, a arbitragem em câmaras credenciadas junto à CCEE e o processo judicial.
+## Legenda sugerida (LinkedIn) · texto revisado do artigo
+O mesmo conflito no setor elétrico pode seguir por quatro caminhos: a Ouvidoria Setorial e a mediação administrativa, conduzidas pela ANEEL, a arbitragem no ambiente da CCEE e o processo judicial.
 
-Os números mostram como o sistema é usado. A Ouvidoria recebe cerca de 200 mil reclamações por ano. Entre 2018 e 2023, foram 36 mediações administrativas, com prazo médio de 383 dias. Em 2021, a judicialização chegou a 25 mil ações.
+Cada porta tem sua base legal e seu volume próprio. A Ouvidoria Setorial recebia cerca de 200 mil reclamações por ano. Entre 2018 e 2023, foram 36 mediações administrativas, com prazo médio de 383 dias. Em 2021, a judicialização chegou a 25 mil ações. São métricas diferentes, e cada uma retrata só a sua via.
 
-No novo artigo da coluna jurídica da EJUP, explicamos a base legal de cada porta, o papel da Superintendência de Mediação Administrativa e das Relações de Consumo (SMA) e o que muda para quem assessora consumidores, geradoras, distribuidoras e comercializadoras.
+No novo artigo da coluna jurídica da EJUP, explicamos a base legal de cada porta, o papel da Superintendência de Mediação Administrativa e das Relações de Consumo (SMA), a Convenção Arbitral da CCEE e o que isso muda para quem assessora consumidores, geradoras, distribuidoras e comercializadoras.
 
 O artigo completo está no site da EJUP.
+
+## Duas versões alternativas (29/09/2026, após o cliente achar os arcos infantilizados)
+
+Mesmo texto, mesma diagramação, mesmas fotos; muda só a figura que costura
+as peças (`_build/figuras.py`). Gerar:
+
+    ESTILO=portico python3 _build/gerar.py && ESTILO=portico python3 _build/linkedin.py && ESTILO=portico python3 _build/render.py
+    ESTILO=fios    python3 _build/gerar.py && ESTILO=fios    python3 _build/linkedin.py && ESTILO=fios    python3 _build/render.py
+
+- **`versao-portico/` (versão A, portas redesenhadas):** fachada clássica
+  em traço fino, sem preenchimento chapado nem arco de desenho infantil.
+  Arquitrave em duas linhas com numeral romano no friso, batente duplo,
+  portas fechadas com almofadas em traço. A porta ativa aparece
+  entreaberta: fresta de luz dourada e o reflexo no piso.
+- **`versao-fios/` (versão B, tema elétrico):** diagrama unifilar, a
+  linguagem de projeto elétrico. Um barramento e quatro alimentadores, cada
+  um com disjuntor e terminal. Os condutores são desenhados como cabo
+  isolado (capa escura e alma de cobre). No circuito ativo o disjuntor está
+  fechado e a alma conduz em dourado; nos outros, disjuntor aberto e fio
+  apagado.
+
+Sem `ESTILO`, os scripts continuam gerando a versão original com os arcos,
+na raiz da pasta.

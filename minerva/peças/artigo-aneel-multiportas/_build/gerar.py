@@ -37,6 +37,8 @@ def fontes():
 
 LOGO = b64(LOGOS / "ejup-horizontal-white.svg", "image/svg+xml")
 FOTOS = OUT / "fotos"
+from figuras import ESTILO, figura, pasta_saida
+DEST = pasta_saida(OUT)
 
 
 def fundo(nome, foco=0.5, gama=1.0, focoy=0.5):
@@ -56,6 +58,8 @@ def fundo(nome, foco=0.5, gama=1.0, focoy=0.5):
 
 
 def portas(acesas, largura, rotulos=True, prop=1.9):
+    if ESTILO != "portas":
+        return figura(acesas, largura=largura, classe="portas")
     """Quatro arcos lado a lado. As acesas ganham luz dourada por dentro."""
     n, gap = 4, 0.16
     w = 100 / (n + (n - 1) * gap)          # largura de cada porta, em unidades de 100
@@ -101,8 +105,8 @@ SETA_CTA = ('<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#031c
 def cabecalho(cta=True):
     return f"""<div class="texto">
     <span class="tag">EJUP · Artigo</span>
-    <h1 class="titulo">O sistema multiportas<br><span class="g">da ANEEL</span></h1>
-    <p class="sub">O que é e como funciona a mediação de conflitos no setor elétrico.</p>
+    <h1 class="titulo">O sistema multiportas<br><span class="g">do setor elétrico</span></h1>
+    <p class="sub">Mediação na ANEEL e arbitragem na CCEE: como funciona cada porta.</p>
     <div class="meta"><span class="item">{ICONE_COLUNA}Coluna jurídica</span><i class="sep"></i>
       <span class="item">{ICONE_TEMA}Direito da energia</span></div>
     <p class="autoria">Equipe EJUP</p>
@@ -251,7 +255,8 @@ def main():
     html = (f'<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
             f'<title>Artigo ANEEL multiportas</title><style>{fontes()}{CSS}</style></head>'
             f'<body>{"".join(pecas)}</body></html>')
-    (OUT / "pecas.html").write_text(html, encoding="utf-8")
+    DEST.mkdir(exist_ok=True)
+    (DEST / "pecas.html").write_text(html, encoding="utf-8")
     print(f"gerado: pecas.html ({len(pecas)} peças)")
 
 
