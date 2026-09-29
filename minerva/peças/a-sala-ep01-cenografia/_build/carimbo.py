@@ -28,7 +28,7 @@ def etiqueta(w, h, i):
   <g filter="url(#gasto{i})" fill="none" stroke="#ece8df">
     <rect x="{s + ins}" y="{s + ins}" width="{w - 2 * ins}" height="{h - 2 * ins}" stroke-width="{h * 0.035:.2f}"/>
     <rect x="{s + ins * 1.9}" y="{s + ins * 1.9}" width="{w - 3.8 * ins}" height="{h - 3.8 * ins}" stroke-width="{h * 0.012:.2f}"/>
-    <text x="{W / 2}" y="{H / 2 + fs * 0.36}" text-anchor="middle" fill="#ece8df" stroke="none"
+    <text x="{W / 2}" y="{H / 2 + fs * 0.36}" text-anchor="middle" fill="#c1272d" stroke="none"
       font-family="GB" font-weight="900" font-size="{fs:.2f}" letter-spacing="{fs * 0.08:.2f}"
       textLength="{w - 6.2 * ins:.2f}" lengthAdjust="spacingAndGlyphs">CONFIDENCIAL</text>
   </g>
