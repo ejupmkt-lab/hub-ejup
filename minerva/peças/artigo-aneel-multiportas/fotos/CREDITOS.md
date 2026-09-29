@@ -8,6 +8,6 @@ Pexels: uso livre, sem atribuição obrigatória).
 | arquivo | tela | foto | autor | origem |
 |---|---|---|---|---|
 | 01-capa.jpg | 1 · capa | Torres de alta tensão ao entardecer | Ntate Mohlala Sir | https://www.pexels.com/photo/high-voltage-transmission-towers-at-sunset-36566099/ |
-| 03-ouvidoria.jpg | 3 · Ouvidoria | Medidores de energia em parede | Pexels | https://www.pexels.com/photo/eight-electrical-metric-meters-942316/ |
+| 03-ouvidoria.jpg | 3 · Ouvidoria | Lâmpada de filamento sobre fundo preto | Pexels | https://www.pexels.com/photo/light-bulb-on-black-background-16654997/ |
 | 05-arbitragem.jpg | 5 · Arbitragem | Barragem com vertedouro aberto | Frans van Heerden | https://www.pexels.com/photo/scenic-photo-of-water-dam-during-daytime-2699258/ |
 | 07-fecho.jpg | 7 · fecho | Porta em arco de fachada clássica | Pexels | https://www.pexels.com/photo/arched-doors-to-building-20051559/ |

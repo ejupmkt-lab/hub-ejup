@@ -113,8 +113,15 @@ def fontes():
                         ("Bold", 700), ("Black", 900)))
 
 
+# recorte prévio (fração x0, y0, x1, y1) quando o assunto da foto cairia sob o fade
+RECORTE = {"03-ouvidoria": (0.0, 0.34, 1.0, 1.0)}
+
+
 def duo(nome):
     im = Image.open(FOTOS / f"{nome}.jpg").convert("RGB")
+    if nome in RECORTE:
+        x0, y0, x1, y1 = RECORTE[nome]
+        im = im.crop((int(im.width * x0), int(im.height * y0), int(im.width * x1), int(im.height * y1)))
     cinza = ImageOps.autocontrast(ImageOps.grayscale(im), cutoff=(1, 3))
     im = ImageOps.colorize(cinza, black=SOMBRA, white=LUZ)
     im = ImageOps.fit(im, (1080, 1350), Image.LANCZOS, centering=(0.5, 0.35))
@@ -159,8 +166,15 @@ def bloco(s):
         p.append(f'<p class="fecho">{s["fecho"]}</p>')
     if s.get("pilula"):
         p.append(f'<div class="pilula"><i>&rarr;</i><span>{_html.escape(s["pilula"])}</span></div>')
-    ancora = "meio" if claro else "abaixo"
+    ancora = "meio" if (claro or not s.get("foto")) else "abaixo"
     return f'<div class="bloco {ancora}">' + "".join(p) + "</div>"
+
+
+# Roberto Pivotto (29/09/2026): "ou imagem ou a ilustração". Na versão das
+# linhas de transmissão a ilustração é a imagem; as telas escuras ficam sem foto.
+if ESTILO == "linhas":
+    for _t in T:
+        _t.pop("foto", None)
 
 
 def main():

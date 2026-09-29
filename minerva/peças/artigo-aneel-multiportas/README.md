@@ -90,3 +90,18 @@ as peças (`_build/figuras.py`). Gerar:
 
 Sem `ESTILO`, os scripts continuam gerando a versão original com os arcos,
 na raiz da pasta.
+
+## Versão C · linhas de transmissão (`versao-linhas/`, 29/09/2026)
+Pedido do Victor depois das versões A e B: o sistema de uma grande
+hidrelétrica. Uma barragem de gravidade em corte (reservatório, condutos
+forçados, casa de força) alimenta o pórtico de saída de uma subestação; de lá
+a energia segue por três torres treliçadas até o pórtico de chegada, em
+quatro condutores com catenária. Cada condutor é uma porta. O ativo conduz
+em dourado, com brilho; os outros ficam em traço apagado.
+
+    ESTILO=linhas python3 _build/gerar.py && ESTILO=linhas python3 _build/linkedin.py && ESTILO=linhas python3 _build/render.py
+
+**Sem fotos no carrossel da versão C (29/09/2026).** Retorno do Roberto:
+gostou da lógica das linhas, mas a imagem por trás polui; "ou imagem ou a
+ilustração". Na versão `linhas` as telas escuras ficaram só com a
+ilustração sobre o navy, com o conteúdo centrado na tela.
