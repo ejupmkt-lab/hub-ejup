@@ -30,7 +30,46 @@ em caso de conflito com a lei da marca, o `CLAUDE.md` prevalece.
 ## Itens
 
 ### 1. Legenda do teaser de revelação de convidado
-_Ainda não recebido._
+_Recebido em 29/09/2026, com o teaser em vídeo do #19 e um post de referência._
+
+> preciso de uma legenda para esse teaser, quando for teaser, comece sempre
+> com uma frase que dê a entender que estamos revelando o convidado, salve
+> essa informação
+
+**Regra fixa:** toda legenda de teaser abre com uma frase que revela o
+convidado, no molde do post do episódio 17 (perfil @ejup.oficial, 2 de
+setembro): "Zeca Melo é o convidado do episódio 17 do EJUPcast!"
+
+**Modelo de referência (transcrito do print):**
+
+> Zeca Melo é o convidado do episódio 17 do EJUPcast!
+>
+> No episódio 17, recebemos Zeca Melo, superintendente do SEBRAE no Rio
+> Grande do Norte, para uma conversa que atravessa décadas de experiência
+> com pequenos negócios, gestão pública e o papel do empreendedorismo no
+> fortalecimento da economia potiguar.
+>
+> Ao lado de Leonardo Pivotto e Rossana Fonseca, Zeca reconstrói histórias
+> reais de empresas que começaram pequenas e hoje são referência no Estado,
+> explica como o SEBRAE atua desde o primeiro atendimento até os grandes
+> projetos regionais e traz um ponto essencial para quem atua na advocacia:
+> o advogado também é um empreendedor e precisa de apoio para administrar
+> seu escritório, não apenas do conhecimento técnico aprendido na faculdade.
+>
+> Uma conversa sobre propósito, competência e sobre reconhecer o valor
+> daquilo que o Rio Grande do Norte tem para oferecer.
+>
+> O episódio completo estreia amanhã, no site da EJUP.
+>
+> Link na bio.
+
+**Como aplicar:** (1) frase de revelação; (2) parágrafo de apresentação do
+convidado com cargo e tema da conversa; (3) "Ao lado de [quem entrevista]",
+os pontos fortes da conversa, só com o que foi dito no episódio; (4) uma
+frase de fecho; (5) quando e onde estreia (confirmar com o Victor, nunca
+supor a data); (6) "Link na bio." Vale a régua de fluidez e a regra de
+CTA deste arquivo. O modelo tem um "!" só, na frase de revelação, e é o
+único permitido.
 
 ### 2. Ideias de thumbnail
 _Recebido em 25/09/2026._
