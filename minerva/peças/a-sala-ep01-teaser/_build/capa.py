@@ -32,24 +32,29 @@ HTML = f"""<html><head><meta charset="utf-8"><style>
 @font-face{{font-family:G;font-weight:900;src:url(data:font/otf;base64,{f('Black')})}}
 *{{margin:0;box-sizing:border-box}}
 body{{width:1080px;height:1920px;background:#07090c;position:relative;overflow:hidden;font-family:G;color:#fff}}
-.foto{{position:absolute;left:0;top:0;width:1080px;height:1240px;background:url({b64img(sala)}) center/cover}}
+.foto{{position:absolute;left:0;top:-10px;width:1080px;height:1400px;background:url({b64img(sala)}) center/cover}}
 .veu{{position:absolute;inset:0;background:
-  linear-gradient(180deg,rgba(7,9,12,.9) 0%,rgba(7,9,12,0) 9%,rgba(7,9,12,0) 44%,rgba(7,9,12,.8) 56%,#07090c 64%),
+  linear-gradient(180deg,rgba(7,9,12,.7) 0%,rgba(7,9,12,0) 8%,rgba(7,9,12,0) 42%,rgba(7,9,12,.5) 55%,rgba(7,9,12,.9) 66%,#07090c 74%),
   radial-gradient(90% 60% at 50% 38%,rgba(0,0,0,0) 50%,rgba(0,0,0,.5) 100%)}}
 .grao{{position:absolute;inset:0;opacity:.28;mix-blend-mode:overlay}}
 .logo{{height:92px;display:block}}
-.frase{{position:absolute;left:96px;right:96px;top:1190px}}
-.frase p{{font-size:92px;line-height:1.02;letter-spacing:-.025em}}
+.scrim{{position:absolute;left:-100px;right:-100px;top:800px;height:600px;background:radial-gradient(50% 50% at 50% 50%,rgba(7,9,12,.88) 0%,rgba(7,9,12,.7) 45%,rgba(7,9,12,0) 100%)}}
+.bloco{{position:absolute;left:70px;right:70px;top:890px;display:flex;flex-direction:column;align-items:center;gap:44px;text-align:center}}
+.logo{{width:620px;display:block;filter:drop-shadow(0 6px 30px rgba(0,0,0,.6))}}
+.fr{{font-size:64px;line-height:1.08;letter-spacing:-.02em;max-width:880px;text-wrap:balance}}
 .l{{font-weight:300}} .b{{font-weight:900}} .o{{color:#f0b855}}
-.rod{{position:absolute;left:96px;right:96px;top:1510px;display:flex;justify-content:space-between;align-items:center;
-  border-top:1.5px solid rgba(209,211,212,.35);padding-top:26px}}
-.rod span{{font-weight:500;font-size:24px;letter-spacing:.14em;text-transform:uppercase;color:#d1d3d4}}
-.rod .em{{color:#f0b855}} .dir{{display:flex;flex-direction:column;align-items:flex-end;gap:12px}}
+.ep{{display:flex;gap:20px;font-weight:500;font-size:24px;letter-spacing:.14em;text-transform:uppercase;color:#d1d3d4;
+  border-top:1.5px solid rgba(209,211,212,.35);padding-top:30px;margin-top:-6px}}
+.ep .em{{color:#f0b855}}
 </style></head><body>
 <div class="foto"></div><div class="veu"></div>
 <svg class="grao" width="1080" height="1920"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
-<div class="frase"><p><span class="l">Eu preciso</span><br><span class="b">confessar uma <span class="o">coisa.</span></span></p></div>
-<div class="rod"><img class="logo" src="{LOGO}"><div class="dir"><span>Episódio 01</span><span class="em">Em breve</span></div></div>
+<div class="scrim"></div>
+<div class="bloco">
+  <img class="logo" src="{LOGO}">
+  <p class="fr"><span class="l">Eu preciso</span> <span class="b">confessar uma <span class="o">coisa.</span></span></p>
+  <p class="ep"><span>Episódio 01</span><span>·</span><span class="em">Em breve</span></p>
+</div>
 </body></html>"""
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path="/opt/pw-browsers/chromium")
