@@ -2,7 +2,8 @@
 """Capa de reels · corte do EJUPcast #018 com Nicácio Carvalho.
 
 Versão 2 (referência do Victor, 29/09): foto sangrada e título em duas linhas,
-Gotham Thin em caixa alta e Gotham Book Italic grande. O tema vem do corte:
+Gotham Thin em caixa alta e Playfair Display Italic grande, a fonte da
+referência (pedido do Victor; exceção à família única da marca, só nesta série). O tema vem do corte:
 a instabilidade das decisões do STF minando a confiança na Corte.
 
 Versão 1 (logo ejup/CAST e aro), substituída:
@@ -47,7 +48,7 @@ TITULO = ("A CONFIANÇA NO", "Supremo.")
 
 HTML = """<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face{font-family:'Gotham';font-weight:200;src:url(data:font/otf;base64,__T__)}
-@font-face{font-family:'Gotham';font-weight:400;font-style:italic;src:url(data:font/otf;base64,__I__)}
+@font-face{font-family:'Playfair';font-weight:400;font-style:italic;src:url(data:font/woff2;base64,__I__) format('woff2')}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#000}
 .capa{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:'Gotham'}
@@ -56,7 +57,7 @@ body{background:#000}
   linear-gradient(180deg,rgba(4,13,24,.2) 0%,rgba(4,13,24,0) 30%,rgba(4,13,24,.1) 50%,rgba(4,13,24,.5) 70%,rgba(4,13,24,.8) 100%)}
 .titulo{position:absolute;left:0;right:0;top:1130px;text-align:center;color:#fff;text-shadow:0 4px 30px rgba(0,0,0,.45)}
 .titulo .a{display:block;font-weight:200;font-size:92px;letter-spacing:.02em;line-height:1}
-.titulo .b{display:block;font-weight:400;font-style:italic;font-size:200px;letter-spacing:-.02em;line-height:1.02}
+.titulo .b{display:block;font-family:'Playfair',serif;font-weight:400;font-style:italic;font-size:210px;letter-spacing:-.01em;line-height:1}
 </style></head><body><div class="capa" id="capa">
 <img src="__FOTO__" alt="">
 <div class="veu"></div>
@@ -65,7 +66,7 @@ body{background:#000}
 
 
 def main():
-    html = (HTML.replace("__T__", b64(FONTS / "Gotham-Thin.otf")).replace("__I__", b64(FONTS / "Gotham-BookItalic.otf"))
+    html = (HTML.replace("__T__", b64(FONTS / "Gotham-Thin.otf")).replace("__I__", b64(HERE / "playfair-italic.woff2"))
             .replace("__FOTO__", foto()).replace("__A__", TITULO[0]).replace("__B__", TITULO[1]))
     (OUT / "capa.html").write_text(html, encoding="utf-8")
     with sync_playwright() as p:

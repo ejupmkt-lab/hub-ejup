@@ -9,3 +9,5 @@ Foto: frame limpo do episódio, sem a legenda queimada do reels
 (`peças/carrossel-ejupcast-018/prints/duo-conversa.webp`), recortado no Nicácio.
 
     python3 _build/gerar.py
+
+Fonte do título: Playfair Display Italic (Google Fonts, SIL OFL), a da referência, a pedido do Victor. Exceção pontual à família única Gotham.
