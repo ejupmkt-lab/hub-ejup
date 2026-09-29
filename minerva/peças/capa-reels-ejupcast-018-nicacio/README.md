@@ -10,4 +10,12 @@ Foto: frame limpo do episódio, sem a legenda queimada do reels
 
     python3 _build/gerar.py
 
-Fonte do título: Playfair Display Italic (Google Fonts, SIL OFL), a da referência, a pedido do Victor. Exceção pontual à família única Gotham.
+
+## Versão atual (29/09/2026)
+- Tipografia e cor iguais às da referência "Os três pilares": linha de cima em
+  **Jost ExtraLight** caixa alta, linha de baixo em **Lora Italic**, ambas em
+  creme **#F7EFD8** (Google Fonts, SIL OFL; arquivos em `_build/`). Exceção
+  pedida pelo Victor à família Gotham e à paleta, só nas capas de reels.
+- Foto: frame do próprio reels (0:16), Nicácio de boca fechada, olhando ao
+  lado, num intervalo sem legenda. A marca d'água do rodapé foi removida por
+  inpainting (`_build/frame-reels.png`).

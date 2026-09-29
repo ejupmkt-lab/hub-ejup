@@ -2,8 +2,9 @@
 """Capa de reels · corte do EJUPcast #018 com Nicácio Carvalho.
 
 Versão 2 (referência do Victor, 29/09): foto sangrada e título em duas linhas,
-Gotham Thin em caixa alta e Playfair Display Italic grande, a fonte da
-referência (pedido do Victor; exceção à família única da marca, só nesta série). O tema vem do corte:
+Jost ExtraLight em caixa alta e Lora Italic grande, em creme #F7EFD8: a
+combinação da referência, a pedido do Victor (exceção à família e à paleta
+da marca, só nesta série de capas de reels). O tema vem do corte:
 a instabilidade das decisões do STF minando a confiança na Corte.
 
 Versão 1 (logo ejup/CAST e aro), substituída:
@@ -29,7 +30,9 @@ FONTS = RAIZ / "skills" / "ejup-design" / "assets" / "fonts"
 LOGO_B = (RAIZ / "skills" / "ejup-design" / "assets" / "logo" / "ejup-horizontal-white.svg").read_text(encoding="utf-8")
 # só a palavra "ejup", como no selo do estúdio
 MARCA = re.sub(r'viewBox="[^"]*"', 'viewBox="352 690 282 118"', LOGO_B, count=1)
-FOTO = RAIZ / "peças" / "carrossel-ejupcast-018" / "prints" / "duo-conversa.webp"
+# frame do próprio reels (16 s), boca fechada, entre duas legendas; a marca
+# d'água do rodapé foi removida por inpainting (OpenCV)
+FOTO = HERE / "frame-reels.png"
 
 
 def b64(p):
@@ -37,7 +40,7 @@ def b64(p):
 
 
 def foto():
-    im = Image.open(FOTO).convert("RGB").crop((1000, 0, 1633, 1125))
+    im = Image.open(FOTO).convert("RGB")
     im = im.resize((1080, 1920), Image.LANCZOS)
     im = ImageEnhance.Contrast(im).enhance(1.05)
     buf = io.BytesIO(); im.save(buf, "JPEG", quality=92)
@@ -47,17 +50,17 @@ def foto():
 TITULO = ("A CONFIANÇA NO", "Supremo.")
 
 HTML = """<!doctype html><html><head><meta charset="utf-8"><style>
-@font-face{font-family:'Gotham';font-weight:200;src:url(data:font/otf;base64,__T__)}
-@font-face{font-family:'Playfair';font-weight:400;font-style:italic;src:url(data:font/woff2;base64,__I__) format('woff2')}
+@font-face{font-family:'Jost';font-weight:200;src:url(data:font/woff2;base64,__T__) format('woff2')}
+@font-face{font-family:'Lora';font-weight:400;font-style:italic;src:url(data:font/woff2;base64,__I__) format('woff2')}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#000}
 .capa{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:'Gotham'}
 .capa>img{position:absolute;inset:0;width:100%;height:100%}
 .veu{position:absolute;inset:0;background:
   linear-gradient(180deg,rgba(4,13,24,.2) 0%,rgba(4,13,24,0) 30%,rgba(4,13,24,.1) 50%,rgba(4,13,24,.5) 70%,rgba(4,13,24,.8) 100%)}
-.titulo{position:absolute;left:0;right:0;top:1130px;text-align:center;color:#fff;text-shadow:0 4px 30px rgba(0,0,0,.45)}
-.titulo .a{display:block;font-weight:200;font-size:92px;letter-spacing:.02em;line-height:1}
-.titulo .b{display:block;font-family:'Playfair',serif;font-weight:400;font-style:italic;font-size:210px;letter-spacing:-.01em;line-height:1}
+.titulo{position:absolute;left:0;right:0;top:1100px;text-align:center;color:#f7efd8;text-shadow:0 4px 30px rgba(0,0,0,.35)}
+.titulo .a{display:block;font-family:'Jost',sans-serif;font-weight:200;font-size:118px;letter-spacing:.01em;line-height:1}
+.titulo .b{display:block;font-family:'Lora',serif;font-weight:400;font-style:italic;font-size:220px;letter-spacing:-.01em;line-height:.95}
 </style></head><body><div class="capa" id="capa">
 <img src="__FOTO__" alt="">
 <div class="veu"></div>
@@ -66,7 +69,7 @@ body{background:#000}
 
 
 def main():
-    html = (HTML.replace("__T__", b64(FONTS / "Gotham-Thin.otf")).replace("__I__", b64(HERE / "playfair-italic.woff2"))
+    html = (HTML.replace("__T__", b64(HERE / "jost-200.woff2")).replace("__I__", b64(HERE / "lora-italic.woff2"))
             .replace("__FOTO__", foto()).replace("__A__", TITULO[0]).replace("__B__", TITULO[1]))
     (OUT / "capa.html").write_text(html, encoding="utf-8")
     with sync_playwright() as p:
