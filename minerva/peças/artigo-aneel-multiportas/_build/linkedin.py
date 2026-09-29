@@ -166,8 +166,15 @@ def bloco(s):
         p.append(f'<p class="fecho">{s["fecho"]}</p>')
     if s.get("pilula"):
         p.append(f'<div class="pilula"><i>&rarr;</i><span>{_html.escape(s["pilula"])}</span></div>')
-    ancora = "meio" if claro else "abaixo"
+    ancora = "meio" if (claro or not s.get("foto")) else "abaixo"
     return f'<div class="bloco {ancora}">' + "".join(p) + "</div>"
+
+
+# Roberto Pivotto (29/09/2026): "ou imagem ou a ilustração". Na versão das
+# linhas de transmissão a ilustração é a imagem; as telas escuras ficam sem foto.
+if ESTILO == "linhas":
+    for _t in T:
+        _t.pop("foto", None)
 
 
 def main():

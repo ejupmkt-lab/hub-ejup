@@ -100,3 +100,8 @@ quatro condutores com catenária. Cada condutor é uma porta. O ativo conduz
 em dourado, com brilho; os outros ficam em traço apagado.
 
     ESTILO=linhas python3 _build/gerar.py && ESTILO=linhas python3 _build/linkedin.py && ESTILO=linhas python3 _build/render.py
+
+**Sem fotos no carrossel da versão C (29/09/2026).** Retorno do Roberto:
+gostou da lógica das linhas, mas a imagem por trás polui; "ou imagem ou a
+ilustração". Na versão `linhas` as telas escuras ficaram só com a
+ilustração sobre o navy, com o conteúdo centrado na tela.
