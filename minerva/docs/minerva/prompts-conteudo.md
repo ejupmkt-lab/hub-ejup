@@ -353,6 +353,15 @@ explica") vira um resumo dos pontos mais fortes que já estão nos slides
 legenda funciona como a porta de entrada, o carrossel entrega o
 detalhamento.
 
+**Ligação com episódio anterior (pedido do Roberto, 29/09/2026).** A legenda
+de artigo pode apontar para um episódio do EJUPcast que tocou o mesmo
+assunto. Só se cita o que foi de fato dito no episódio (conferir na
+transcrição, nunca pelo título), com número do episódio e nome e cargo do
+convidado. Se a ligação for só temática, dizer isso ao Victor e não afirmar
+que o episódio tratou do tema do artigo. Exemplo: artigo da ANEEL ligado ao
+EJUPcast #011 (Caio Cavalcanti, CEO e fundador da EVEX), pela abertura do
+mercado de energia e pela literacia energética do consumidor.
+
 ### 11. Legenda para carrossel de teaser de "A Sala"
 _Recebido em 28/09/2026._
 
