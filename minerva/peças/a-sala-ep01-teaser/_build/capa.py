@@ -37,7 +37,6 @@ body{{width:1080px;height:1920px;background:#07090c;position:relative;overflow:h
   linear-gradient(180deg,rgba(7,9,12,.7) 0%,rgba(7,9,12,0) 8%,rgba(7,9,12,0) 42%,rgba(7,9,12,.5) 55%,rgba(7,9,12,.9) 66%,#07090c 74%),
   radial-gradient(90% 60% at 50% 38%,rgba(0,0,0,0) 50%,rgba(0,0,0,.5) 100%)}}
 .grao{{position:absolute;inset:0;opacity:.28;mix-blend-mode:overlay}}
-.logo{{height:92px;display:block}}
 .scrim{{position:absolute;left:-100px;right:-100px;top:800px;height:600px;background:radial-gradient(50% 50% at 50% 50%,rgba(7,9,12,.88) 0%,rgba(7,9,12,.7) 45%,rgba(7,9,12,0) 100%)}}
 .bloco{{position:absolute;left:70px;right:70px;top:890px;display:flex;flex-direction:column;align-items:center;gap:44px;text-align:center}}
 .logo{{width:620px;display:block;filter:drop-shadow(0 6px 30px rgba(0,0,0,.6))}}

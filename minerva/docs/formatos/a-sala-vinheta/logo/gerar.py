@@ -16,12 +16,11 @@ FONTES = ff("Thin", 200) + ff("Light", 300) + ff("Medium", 500) + ff("Black", 90
 A = """<svg viewBox="0 0 900 360" width="900" height="360">
   <defs><mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="900" height="360">
     <rect width="900" height="360" fill="#fff"/>
-    <text x="450" y="212" text-anchor="middle" font-family="G" font-weight="300" font-size="92" letter-spacing="38"
-      fill="#000" stroke="#000" stroke-width="34" stroke-linejoin="round">A SALA</text></mask></defs>
+    <rect x="150" y="126" width="600" height="112" fill="#000"/></mask></defs>
   <rect x="40" y="40" width="820" height="280" fill="none" stroke="#d1d3d4" stroke-width="2"/>
   <g mask="url(#m)"><line x1="70" y1="292" x2="830" y2="68" stroke="#f0b855" stroke-width="2"/></g>
   <circle cx="70" cy="292" r="7" fill="#f0b855"/><circle cx="830" cy="68" r="7" fill="#f0b855"/>
-  <text x="450" y="212" text-anchor="middle" font-family="G" font-weight="300" font-size="92" letter-spacing="38" fill="#fff">A SALA</text>
+  <text x="469" y="212" text-anchor="middle" font-family="G" font-weight="300" font-size="92" letter-spacing="38" fill="#fff">A SALA</text>
 </svg>"""
 
 # B · a sala em perspectiva: parede do fundo + quatro arestas, nome no fundo
