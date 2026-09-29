@@ -145,7 +145,64 @@ ZERO_A_UM = {
     ],
 }
 
-EDICOES = {e["pasta"]: e for e in (TRIBOS, ZERO_A_UM)}
+# Projeto Amaro: a escala é a trajetória do nome de Amaro Cavalcanti, de 1849
+# (nascimento, Caicó/RN) até hoje: construir, esquecer, resgatar, citar.
+PROJETO_AMARO = {
+    "pasta": "projeto-amaro",
+    "escala": ["CONSTRUIR", "ESQUECER", "RESGATAR", "CITAR"],
+    "extremos": ("1849", "HOJE"),
+    "cabecalho": False,
+    "teto": 124,
+    "titulo": "Projeto Amaro",
+    "autor": "EDITORA NOESES",
+    "sobre": "Um resgate histórico da vida e da obra de Amaro Cavalcanti.",
+    "stories": [
+        {
+            "titulo": ("Todo jurista pisa num chão construído por alguém. "
+                       "<b>Você sabe o nome de quem construiu o seu?</b>"),
+            "corpo": ["A indicação de leitura de hoje é <b>“Projeto Amaro”</b>, "
+                      "coordenado por Marco Bruno Miranda Clementino, pelo ministro "
+                      "Marcelo Navarro Ribeiro Dantas, pelo desembargador federal "
+                      "Edilson Pereira Nobre Júnior e pelo advogado Robson Maia Lins."],
+            "livro": True,
+            "pilula": "Avance e entenda por que este livro conversa com o "
+                      "que discutimos aqui",
+        },
+        {
+            "titulo": ("Amaro Cavalcanti ajudou a construir o Direito brasileiro. "
+                       "<b>Seu nome quase desapareceu dele.</b>"),
+            "corpo": [
+                "Foi ministro do Supremo Tribunal Federal, um dos precursores do "
+                "Direito Tributário e Financeiro no Brasil e o fundador e primeiro "
+                "presidente da Sociedade Brasileira de Direito Internacional.",
+                "Mesmo assim, ficou quase fora da história que <b>ajudou a escrever</b>.",
+            ],
+        },
+        {
+            "titulo": ("A tradição jurídica existe porque alguém, um dia, "
+                       "<b>teve a coragem de pensar diferente.</b>"),
+            "corpo": [
+                "Aqui na EJUP, é essa a lógica que buscamos aplicar.",
+                "Resgatar Amaro Cavalcanti é reconhecer que repertório "
+                "contemporâneo também se constrói olhando para quem veio antes, "
+                "<b>com o mesmo rigor</b> que se olha para o que vem depois.",
+            ],
+        },
+        {
+            "titulo": ("O recado do episódio: <b>cite Amaro Cavalcanti "
+                       "nas suas petições.</b>"),
+            "corpo": [
+                "No episódio que inspirou esta indicação, o convidado foi direto.",
+                "Aqui na EJUP, é esse tipo de resgate que buscamos inspirar.",
+            ],
+            "pergunta": "Que jurista, professor ou obra esquecida deveria estar "
+                        "mais presente na sua área? Conta pra gente no direct.",
+            "slogan": "Alma clássica, repertório contemporâneo.",
+        },
+    ],
+}
+
+EDICOES = {e["pasta"]: e for e in (TRIBOS, ZERO_A_UM, PROJETO_AMARO)}
 
 
 def fontes() -> str:
@@ -201,7 +258,8 @@ def escala_html(i: int, escala: list, extremos=None) -> str:
         f'style="left:{j / (n - 1) * 100:.2f}%">{p}</span>'
         for j, p in enumerate(escala))
     ini, fim = extremos
-    return ('<div class="escala extremos">'
+    longa = " longa" if max(len(ini), len(fim)) > 1 else ""
+    return (f'<div class="escala extremos{longa}">'
             f'<b class="ponta {"aqui" if i == 0 else ""}">{ini}</b>'
             '<div class="meio"><div class="trilho">'
             f'<div class="feito" style="width:{pos:.2f}%"></div>'
