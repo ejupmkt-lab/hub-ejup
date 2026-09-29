@@ -30,7 +30,7 @@ FONTS = RAIZ / "skills" / "ejup-design" / "assets" / "fonts"
 LOGO_B = (RAIZ / "skills" / "ejup-design" / "assets" / "logo" / "ejup-horizontal-white.svg").read_text(encoding="utf-8")
 # só a palavra "ejup", como no selo do estúdio
 MARCA = re.sub(r'viewBox="[^"]*"', 'viewBox="352 690 282 118"', LOGO_B, count=1)
-# frame do próprio reels (0:55), gesto de reflexão, boca fechada; legenda e marca d'água removidas; descido 80 px, boca fechada, entre duas legendas; a marca
+# frame do episódio enviado pelo Victor (plano aberto da mesa), recortado no Nicácio ouvindo, boca fechada
 # d'água do rodapé foi removida por inpainting (OpenCV)
 FOTO = HERE / "frame-reels.png"
 

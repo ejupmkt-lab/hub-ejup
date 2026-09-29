@@ -18,6 +18,5 @@ Foto: frame limpo do episódio, sem a legenda queimada do reels
   pedida pelo Victor à família Gotham e à paleta, só nas capas de reels.
 - Título sem ponto final, grande como na referência: "Supremo" ocupa
   cerca de 88% da largura, no terço de baixo da grade.
-- Foto: frame do próprio reels (0:55), Nicácio com a mão no queixo, gesto de
-  reflexão, boca fechada. Legenda queimada e marca d'água removidas
-  (`_build/frame-reels.png`); descido 80 px com a cortina estendida no topo.
+- Foto: frame do plano aberto da mesa enviado pelo Victor (episódio, 2000 px),
+  recortado no Nicácio em perfil, ouvindo, boca fechada (`_build/frame-reels.png`).
