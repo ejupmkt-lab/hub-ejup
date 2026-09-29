@@ -118,7 +118,7 @@ def cabecalho(cta=True):
 def capa_site():
     return f"""<div class="peca site" id="site">
   {cabecalho(cta=False)}
-  <div class="arte">{portas(TODAS, 520)}</div>
+  <div class="arte">{portas(TODAS, 590 if ESTILO == "linhas" else 520)}</div>
   <img class="logo" src="{LOGO}" alt="EJUP">
 </div>"""
 
@@ -183,6 +183,7 @@ body{background:#10151b;display:flex;flex-wrap:wrap;gap:28px;padding:28px;align-
 .site .meta{font-size:19px;margin-top:28px}
 .site .autoria{font-size:19px;margin-top:16px}
 .site .arte{position:absolute;left:1000px;top:70px}
+.linhas .site .arte{left:950px;top:90px}
 .site .logo{left:96px;bottom:56px;height:30px}
 
 /* story 1080x1920 e feed 1080x1440: mesmo cabeçalho, portas embaixo */
@@ -254,7 +255,7 @@ def main():
     pecas = [capa_site(), vertical("story", 904), vertical("feed", 780)]
     html = (f'<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
             f'<title>Artigo ANEEL multiportas</title><style>{fontes()}{CSS}</style></head>'
-            f'<body>{"".join(pecas)}</body></html>')
+            f'<body class="{ESTILO}">{"".join(pecas)}</body></html>')
     DEST.mkdir(exist_ok=True)
     (DEST / "pecas.html").write_text(html, encoding="utf-8")
     print(f"gerado: pecas.html ({len(pecas)} peças)")
