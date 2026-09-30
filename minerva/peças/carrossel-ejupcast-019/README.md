@@ -15,11 +15,11 @@ estrutura fixa de `docs/minerva/prompts-conteudo.md`.
   o que um comediante disse a formandos de Harvard, contado por ele, e no
   original é "geração de vocês". Entrou uma fala dele, do trecho sobre
   doutrina: "A gente tem doutrina de excelente qualidade e tem doutrina
-  banalizada." (uma versão intermediária com "A nossa matéria-prima é justiça
-  e segurança jurídica" foi descartada a pedido). Conferir o tempo do corte (`TEMPO_2`) com quem edita.
-- **Citação 1 trocada (30/09/2026)**, a pedido: "Se tudo fosse perfeito, nós
-  éramos robôs." (transcrição: "porque se tudo fosse perfeito, nós éramos
-  robôs"). Conferir `TEMPO_1` com quem edita.
+  banalizada." Conferir o tempo do corte (`TEMPO_2`) com quem edita.
+- **Citação 1 trocada (30/09/2026)**, a pedido: "A nossa matéria-prima é
+  justiça e segurança jurídica." (transcrição: "Acho que é simples, a nossa
+  matéria-prima é justiça e segurança jurídica"). Conferir `TEMPO_1` com quem
+  edita.
 
 ## Biografia: o que mudou e por quê (itens 20 e 21)
 - Nome: "Marco Bruno **Miranda** Clementino", como nas fontes oficiais (o
