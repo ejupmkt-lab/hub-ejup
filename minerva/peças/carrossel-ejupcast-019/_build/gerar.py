@@ -153,10 +153,10 @@ DURACAO = "[duração]"  # ex. "1h06"; o colchete sinaliza que falta
 
 
 def telas():
-    capa_foto = foto("capa", rotulo="FOTO · MARCO BRUNO (3:4)")
-    foto_f1 = foto("frase-1", rotulo="FOTO · MARCO BRUNO FALANDO")
-    foto_f2 = foto("frase-2", rotulo="FOTO · OUTRO PLANO DELE")
-    conversa = foto("conversa", largura=1712, rotulo="FOTO · MESA, ELE E A DRA. ROSSANA")
+    capa_foto = foto("capa", (0.395, 0.09, 0.735, 0.895), 1080, rotulo="FOTO · MARCO BRUNO (3:4)")
+    foto_f1 = foto("frase-1", (0.335, 0.107, 0.71, 0.607), rotulo="FOTO · MARCO BRUNO FALANDO")
+    foto_f2 = foto("frase-2", (0.675, 0.20, 0.975, 0.60), rotulo="FOTO · OUTRO PLANO DELE")
+    conversa = foto("conversa", (0.0, 0.035, 1.0, 0.95), largura=1712, rotulo="FOTO · MESA, ELE E A DRA. ROSSANA")
     return [
         # 1 · capa
         f"""<section class="s papel">
@@ -171,7 +171,7 @@ def telas():
   {painel(300)}
   <p class="rotulo">Nesta conversa</p>
   <ul class="temas"><li>Inovação judicial</li><li>Doutrina e jurisprudência</li><li>Prevenção de litígios</li><li>Inteligência artificial</li><li>Berkeley</li></ul>
-  <p class="temas-rod">__DURACAO__ de conversa com a Dra. Rossana Fonseca.</p>
+  <p class="temas-rod">Uma conversa com a Dra. Rossana Fonseca.</p>
   {SETA}
 </section>""",
         frase("A gente vai perceber que a verdadeira perfeição <em>é imperfeita.</em>",
