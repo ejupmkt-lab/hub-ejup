@@ -89,6 +89,16 @@ episódio. Cada título nasce de um fato concreto e verificável da conversa
 (um caso, um número, uma frase dita pelo convidado), nunca de uma promessa
 vaga ou de clickbait que engana.
 
+**Conferir o verbo contra a transcrição (erro de 30/09/2026):** o gancho
+"evitou uma dívida de 250 milhões sem julgar um processo" estava errado. Na
+fala do Marco Bruno, o débito do município de Natal "recebeu um desconto de
+mais de duzentos e cinquenta milhões de reais da União", num processo de
+governança judicial (o processo da Urbana) que envolveu Justiça Federal,
+do Trabalho e Estadual, MPs e procuradorias. Não houve "dívida evitada" e o
+processo existiu. Antes de fechar qualquer título ou legenda com número,
+reler o trecho e usar o verbo que a pessoa usou (desconto, acordo,
+redução), sem inflar.
+
 **Formato completo do texto da thumbnail (recebido em 25/09/2026):**
 
 > depois do título, tb é escrito o nome do convidado e ejupcast 18, ent tudo
