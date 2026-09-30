@@ -10,8 +10,12 @@ estrutura fixa de `docs/minerva/prompts-conteudo.md`.
   Frames do próprio episódio. Sem elas, os cartões saem sinalizados.
 - **Tempos dos cortes** das duas citações (`TEMPO_1`, `TEMPO_2`) e **duração**
   do episódio (`DURACAO`), conferidos por quem edita. Nunca inventados.
-- **Citação 2** conferida no vídeo: "destruir a inteligência artificial,
-  porque criar é que é a parte bacana" soa como erro de transcrição.
+- **Citação 2 trocada (30/09/2026).** A frase "A missão da nossa geração é
+  destruir a inteligência artificial..." estava atribuída a ele por engano: é
+  o que um comediante disse a formandos de Harvard, contado por ele, e no
+  original é "geração de vocês". Entrou uma fala dele, do trecho sobre
+  doutrina: "A gente tem doutrina de excelente qualidade e tem doutrina
+  banalizada." Conferir o tempo do corte (`TEMPO_2`) com quem edita.
 
 ## Biografia: o que mudou e por quê (itens 20 e 21)
 - Nome: "Marco Bruno **Miranda** Clementino", como nas fontes oficiais (o
