@@ -171,7 +171,7 @@ def telas():
   {painel(300)}
   <p class="rotulo">Nesta conversa</p>
   <ul class="temas"><li>Inovação judicial</li><li>Doutrina e jurisprudência</li><li>Prevenção de litígios</li><li>Inteligência artificial</li><li>Berkeley</li></ul>
-  <p class="temas-rod">__DURACAO__ de conversa com a Dra. Rossana Fonseca.</p>
+  <p class="temas-rod">Uma conversa com a Dra. Rossana Fonseca.</p>
   {SETA}
 </section>""",
         frase("A gente vai perceber que a verdadeira perfeição <em>é imperfeita.</em>",
