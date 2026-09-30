@@ -66,7 +66,6 @@ TELAS = [
   <div class="cheia" style="background-image:url({g('capa')})"></div>
   {CANTOS}
   <p class="micro" style="left:92px;top:78px">um quadro<br>EJUP Educação<br>Jurídica</p>
-  <p class="micro centro-x" style="top:78px">episódio 01</p>
   <p class="micro dir" style="right:92px;top:78px">gravado<br>em estúdio</p>
   <h2 class="gancho">O que todo advogado já fez<br>e <em>ninguém</em> confessa.</h2>
   <h1 class="titulo">a sala</h1>
