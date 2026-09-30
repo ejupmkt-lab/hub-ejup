@@ -1,0 +1,1013 @@
+<title>Plataforma EJUP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,200;0,300;0,400;0,500;0,700;0,900;1,300&display=swap">
+<style>
+/* Layout: site em seções que alternam claro e escuro (como uma escola que abre e fecha salas),
+   objetos 3D de matéria no lugar de ilustração; painel do aluno em shell escuro com barra lateral.
+   Paleta fechada do MIV: 8 cores + preto e branco. Tons intermediários só por opacidade da prata. */
+:root{
+  --ink:#0d131a; --navy:#031c37; --grafite:#414042; --steel:#304557; --cinza:#5f6062;
+  --prata:#d1d3d4; --bronze:#9b6b26; --ouro:#f0b855; --branco:#ffffff;
+  --prata-08:rgba(209,211,212,.08); --prata-14:rgba(209,211,212,.14); --prata-24:rgba(209,211,212,.24);
+  --prata-40:rgba(209,211,212,.4); --prata-60:rgba(209,211,212,.6); --prata-80:rgba(209,211,212,.8);
+  --navy-06:rgba(3,28,55,.06); --navy-12:rgba(3,28,55,.12); --navy-60:rgba(3,28,55,.6);
+  --sombra:0 24px 60px -24px rgba(3,28,55,.35), 0 2px 6px rgba(3,28,55,.08);
+  --display:"Gotham","Montserrat",system-ui,sans-serif;
+  --texto:"Gotham","Montserrat",system-ui,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{background:var(--branco);color:var(--grafite);font-family:var(--texto);font-weight:300;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--bronze);outline-offset:3px;border-radius:4px}
+.escuro :focus-visible,.app :focus-visible{outline-color:var(--ouro)}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+p{margin:0}
+.eyebrow{font:500 12px/1 var(--texto);letter-spacing:.14em;text-transform:uppercase;color:var(--bronze)}
+.escuro .eyebrow,.app .eyebrow{color:var(--ouro)}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:clamp(16px,4vw,40px)}
+.conf{display:inline-flex;align-items:center;gap:6px;font:500 10px/1 var(--texto);letter-spacing:.12em;text-transform:uppercase;
+  border:1px dashed currentColor;border-radius:999px;padding:5px 9px;opacity:.75;vertical-align:middle;max-width:100%;line-height:1.3}
+
+/* Barra do protótipo */
+.proto{position:sticky;top:env(safe-area-inset-top,0px);z-index:60;background:var(--ink);color:var(--prata);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px clamp(16px,4vw,40px);font-size:12px}
+.proto b{font-weight:500;color:var(--branco);letter-spacing:.14em;text-transform:uppercase;font-size:11px}
+.proto nav{display:flex;gap:4px;background:var(--prata-08);border-radius:999px;padding:3px}
+.proto nav button{border:0;background:none;color:var(--prata);font:500 12px/1 var(--texto);padding:8px 14px;border-radius:999px;transition:background .2s var(--ease),color .2s}
+.proto nav button[aria-current="page"]{background:var(--ouro);color:var(--ink)}
+@media (max-width:560px){.proto>span{display:none}.proto{justify-content:center}}
+
+.view{display:none}
+.view.ativa{display:block}
+
+/* ---------- SITE ---------- */
+.topo{position:absolute;left:0;right:0;z-index:20;padding-top:18px}
+.topo .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.topo .logo img{height:26px;width:auto}
+.menu{display:flex;gap:2px;background:rgba(255,255,255,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--navy-12);border-radius:999px;padding:4px}
+.menu a{text-decoration:none;font:500 11px/1 var(--texto);letter-spacing:.12em;text-transform:uppercase;color:var(--navy);padding:10px 14px;border-radius:999px;transition:background .2s}
+.menu a:hover{background:var(--navy-06)}
+.acoes{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:10px;border:1px solid transparent;border-radius:999px;padding:14px 22px;
+  font:500 14px/1 var(--texto);text-decoration:none;transition:transform .2s var(--ease),background .2s,box-shadow .2s;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn svg{width:14px;height:14px}
+.btn-navy{background:var(--navy);color:var(--branco);box-shadow:var(--sombra)}
+.btn-linha{background:rgba(255,255,255,.6);color:var(--navy);border-color:var(--navy-12)}
+.btn-ouro{background:var(--ouro);color:var(--ink)}
+.btn-linha-escuro{color:var(--branco);border-color:var(--prata-40);background:transparent}
+.btn-sm{padding:10px 16px;font-size:12px}
+@media (max-width:980px){.menu{display:none}}
+@media (max-width:480px){.acoes .btn-linha{display:none}}
+
+.hero{position:relative;overflow:hidden;background:var(--branco);padding-block:150px 40px;text-align:center}
+.hero-fundo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  -webkit-mask-image:linear-gradient(to bottom,#000 72%,transparent);mask-image:linear-gradient(to bottom,#000 72%,transparent);
+  transform-origin:50% 40%;animation:respira 18s var(--ease) infinite alternate}
+@keyframes respira{from{transform:scale(1)}to{transform:scale(1.045)}}
+.hero .wrap{position:relative;display:grid;justify-items:center;gap:26px}
+.hero h1{font-weight:900;font-size:clamp(44px,7.4vw,96px);line-height:1.02;letter-spacing:-.035em;color:var(--navy)}
+.hero h1 span{display:block;font-weight:300;letter-spacing:-.03em;color:var(--steel)}
+.hero .lead{max-width:34ch;font-size:clamp(16px,1.6vw,19px);color:var(--grafite)}
+.hero .ctas{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.stats{position:relative;margin-top:88px;display:flex;justify-content:center;gap:clamp(18px,4vw,56px);flex-wrap:wrap;
+  font:500 11px/1.4 var(--texto);letter-spacing:.14em;text-transform:uppercase;color:var(--cinza)}
+.stats b{color:var(--navy);font-weight:700}
+.sobe{animation:sobe .9s var(--ease) both}
+.sobe:nth-child(2){animation-delay:.09s}.sobe:nth-child(3){animation-delay:.18s}.sobe:nth-child(4){animation-delay:.27s}
+@keyframes sobe{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+.manifesto{position:relative;background:var(--ink);color:var(--branco);overflow:hidden}
+.manifesto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:70% 50%}
+.manifesto .wrap{position:relative;min-height:clamp(460px,52vw,640px);display:grid;align-content:center;gap:28px;padding-block:80px}
+.manifesto p.linha{font:300 clamp(26px,3.6vw,46px)/1.18 var(--display);letter-spacing:-.02em;max-width:20ch;color:var(--prata)}
+.manifesto p.linha strong{font-weight:900;color:var(--branco)}
+.manifesto .assina{font:500 12px/1 var(--texto);letter-spacing:.14em;text-transform:uppercase;color:var(--ouro)}
+
+.secao{padding-block:clamp(72px,10vw,128px)}
+.cab{display:grid;gap:18px;max-width:760px}
+.cab.centro{margin-inline:auto;text-align:center;justify-items:center}
+.cab h2{font-weight:900;font-size:clamp(34px,5vw,60px);line-height:1.04;letter-spacing:-.03em;color:var(--navy)}
+.cab h2 span{font-weight:300;color:var(--cinza)}
+.cab p{max-width:58ch;color:var(--cinza)}
+.escuro{background:var(--ink);color:var(--prata)}
+.escuro .cab h2{color:var(--branco)}
+.escuro .cab h2 span{color:var(--prata-60)}
+.escuro .cab p{color:var(--prata-80)}
+
+.trilhas{margin-top:56px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.trilha{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:4/3;max-width:100%;isolation:isolate;box-shadow:var(--sombra)}
+.trilha img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease)}
+.trilha:hover img{transform:scale(1.04)}
+.trilha .rot{position:absolute;left:0;right:0;bottom:0;padding:22px 24px;display:grid;gap:6px;
+  background:linear-gradient(to top,rgba(13,19,26,.82),rgba(13,19,26,0));color:var(--branco)}
+.trilha.clara .rot{background:linear-gradient(to top,rgba(255,255,255,.92),rgba(255,255,255,0));color:var(--navy)}
+.trilha .rot small{font:500 11px/1 var(--texto);letter-spacing:.14em;text-transform:uppercase;color:var(--ouro)}
+.trilha.clara .rot small{color:var(--bronze)}
+.trilha .rot h3{font-weight:700;font-size:clamp(20px,2.2vw,26px);letter-spacing:-.015em;line-height:1.15}
+.trilha .rot p{font-size:14px;opacity:.85;max-width:44ch}
+@media (max-width:720px){.trilhas{grid-template-columns:1fr}}
+
+.pratica-topo{display:flex;justify-content:space-between;align-items:end;gap:32px;flex-wrap:wrap}
+.pratica-topo p{max-width:36ch;color:var(--cinza)}
+.perfis{margin-top:48px;border-top:1px solid var(--prata)}
+.perfil{display:grid;grid-template-columns:1.1fr 1.3fr auto;gap:24px;align-items:center;padding-block:26px;border-bottom:1px solid var(--prata);transition:background .3s}
+.perfil:hover{background:var(--prata-14)}
+.perfil h3{font-weight:500;font-size:clamp(20px,2vw,26px);letter-spacing:-.015em;color:var(--navy)}
+.perfil h3+p{font-size:14px;color:var(--cinza)}
+.perfil>p{font-size:15px;color:var(--grafite);max-width:52ch}
+.comeca{display:grid;justify-items:end;gap:6px;text-align:right}
+.comeca span{font-size:13px;border:1px solid var(--prata);border-radius:999px;padding:8px 14px;color:var(--cinza);white-space:nowrap}
+.comeca span b{color:var(--navy);font-weight:500}
+@media (max-width:820px){.perfil{grid-template-columns:1fr}.comeca{justify-items:start;text-align:left}}
+.pratica-fecho{margin-top:48px;display:grid;justify-items:center;gap:18px;text-align:center}
+.pratica-fecho p{font:400 clamp(18px,2vw,22px)/1.4 var(--display);color:var(--navy);max-width:40ch}
+
+.faixa{margin-top:0;border-radius:12px;background:linear-gradient(120deg,var(--navy),var(--steel));color:var(--prata);
+  padding:clamp(28px,4vw,48px);display:grid;grid-template-columns:1.1fr 1.4fr 1.6fr;gap:32px;align-items:center;box-shadow:var(--sombra)}
+.faixa .num{font:900 clamp(44px,6vw,76px)/1 var(--display);letter-spacing:-.04em;color:var(--branco)}
+.faixa h3{font-weight:400;font-size:20px;color:var(--branco);line-height:1.3}
+.faixa .mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.faixa .mini b{display:block;font:300 30px/1 var(--display);color:var(--branco)}
+.faixa .mini small{font:500 10px/1.3 var(--texto);letter-spacing:.14em;text-transform:uppercase}
+@media (max-width:900px){.faixa{grid-template-columns:1fr}}
+
+.dentro{margin-top:56px;display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
+.cartao{background:var(--branco);border:1px solid var(--prata);border-radius:12px;overflow:hidden;display:grid;align-content:start}
+.cartao .corpo{padding:24px;display:grid;gap:8px}
+.cartao h3{font-weight:500;font-size:22px;letter-spacing:-.01em;color:var(--navy)}
+.cartao p{font-size:14px;color:var(--cinza)}
+.cartao .tags{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--cinza);margin-top:8px}
+.tela{background:var(--ink);padding:18px;display:grid;grid-template-columns:120px 1fr;gap:14px;min-height:280px}
+.tela .lado{display:grid;align-content:start;gap:8px}
+.tela .lado i{display:block;height:8px;border-radius:2px;background:var(--prata-14)}
+.tela .lado i.on{background:var(--ouro);width:70%}
+.tela .lado img{height:14px;width:auto;margin-bottom:10px}
+.tela .area{display:grid;gap:12px;grid-template-rows:auto 1fr}
+.tela .blocao{border-radius:8px;min-height:130px;background:url(img/coluna.webp) 50% 40%/cover;position:relative;overflow:hidden}
+.tela .blocao::after{content:"Continue: Módulo 2 · Aula 3";position:absolute;left:12px;bottom:10px;font:500 11px/1 var(--texto);color:var(--branco)}
+.tela .linha{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:64px}
+.tela .linha i{display:block;background:var(--ouro);border-radius:2px;opacity:.9}
+.minerva-demo{background:var(--navy);padding:22px;display:grid;gap:12px;min-height:280px;align-content:end}
+.bolha{background:var(--prata-08);border:1px solid var(--prata-14);color:var(--prata);border-radius:12px 12px 12px 4px;padding:12px 14px;font-size:13px;max-width:92%}
+.bolha.eu{justify-self:end;background:var(--ouro);color:var(--ink);border-color:transparent;border-radius:12px 12px 4px 12px}
+.recursos{margin-top:16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.recurso{background:var(--branco);border:1px solid var(--prata);border-radius:12px;padding:24px;display:grid;gap:8px;align-content:start}
+.recurso svg{width:34px;height:34px;padding:8px;border:1px solid var(--prata);border-radius:8px;color:var(--navy)}
+.recurso h3{font-weight:500;font-size:18px;color:var(--navy);margin-top:10px}
+.recurso p{font-size:14px;color:var(--cinza)}
+@media (max-width:900px){.dentro{grid-template-columns:1fr}.recursos{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.recursos{grid-template-columns:1fr}.tela{grid-template-columns:1fr}.tela .lado{display:none}}
+.bg-prata{background:linear-gradient(var(--prata-24),var(--prata-24)),var(--branco)}
+
+.prof-topo{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap}
+.setas{display:flex;gap:8px}
+.setas button{width:44px;height:44px;border-radius:50%;border:1px solid var(--prata);background:var(--branco);color:var(--navy);display:grid;place-items:center}
+.setas svg{width:16px;height:16px}
+.carrossel{margin-top:48px;display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;scrollbar-width:none}
+.carrossel::-webkit-scrollbar{display:none}
+.prof{flex:0 0 clamp(200px,20vw,240px);height:380px;border-radius:12px;scroll-snap-align:start;position:relative;overflow:hidden;
+  background:radial-gradient(ellipse 60% 45% at 50% 38%,rgba(209,211,212,.35),transparent 70%),linear-gradient(160deg,var(--grafite),var(--ink));
+  color:var(--branco);transition:flex-basis .5s var(--ease)}
+.prof:first-child{flex-basis:clamp(260px,28vw,340px)}
+.prof .sil{position:absolute;left:50%;top:22%;transform:translateX(-50%);width:44%;opacity:.28}
+.prof .info{position:absolute;left:20px;right:20px;bottom:20px;display:grid;gap:6px}
+.prof .info small{font:500 10px/1 var(--texto);letter-spacing:.14em;color:var(--prata-60)}
+.prof .info b{font:500 18px/1.2 var(--display)}
+.prof .info span{font-size:12px;color:var(--prata-80)}
+
+.planos{margin-top:56px;display:grid;grid-template-columns:1fr 1.05fr;gap:16px}
+.itens{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-content:start}
+.item{border:1px solid var(--prata-14);background:var(--prata-08);border-radius:12px;padding:22px;display:grid;gap:6px;align-content:start}
+.item.largo{grid-column:1/-1}
+.item h3{font-weight:500;font-size:18px;color:var(--branco)}
+.item p{font-size:14px;color:var(--prata-80)}
+.preco{border:1px solid var(--prata-24);border-radius:12px;overflow:hidden;background:var(--navy);display:grid;box-shadow:0 30px 80px -30px rgba(240,184,85,.18)}
+.preco .selo-ouro{aspect-ratio:16/8;display:grid;place-items:center;background:radial-gradient(ellipse 50% 60% at 50% 50%,rgba(240,184,85,.16),transparent 70%),var(--ink)}
+.preco .selo-ouro img{width:22%;min-width:84px}
+.preco .corpo{padding:28px;display:grid;justify-items:center;gap:14px;text-align:center}
+.preco .nome{font:900 28px/1.1 var(--display);color:var(--branco);letter-spacing:-.02em}
+.preco .valor{font:300 clamp(34px,4vw,48px)/1 var(--display);color:var(--branco);letter-spacing:-.02em}
+.preco .chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.preco .chips span{font-size:11px;border:1px solid var(--prata-24);border-radius:999px;padding:5px 10px;color:var(--prata)}
+.preco small{font-size:12px;color:var(--prata-60)}
+@media (max-width:900px){.planos{grid-template-columns:1fr}}
+@media (max-width:480px){.itens{grid-template-columns:1fr}}
+
+.faq{display:grid;grid-template-columns:1fr 1.6fr;gap:40px;align-items:start}
+.faq details{border-bottom:1px solid var(--prata);padding-block:20px}
+.faq details:first-child{border-top:1px solid var(--prata)}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:16px;font:400 18px/1.35 var(--display);color:var(--navy)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-weight:300;font-size:22px;line-height:1;color:var(--bronze);transition:transform .3s var(--ease)}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{margin-top:12px;color:var(--cinza);max-width:60ch;font-size:15px}
+@media (max-width:820px){.faq{grid-template-columns:1fr}}
+
+.bento{margin-top:48px;display:grid;grid-template-columns:1.1fr 1fr 1fr;grid-template-rows:auto auto;gap:14px}
+.bloco{position:relative;border-radius:12px;overflow:hidden;background:var(--ink);color:var(--branco);padding:24px;display:grid;align-content:end;gap:8px;min-height:220px;isolation:isolate}
+.bloco>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;opacity:.85}
+.bloco::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(to top,rgba(13,19,26,.9),rgba(13,19,26,.1))}
+.bloco small{font:500 11px/1 var(--texto);letter-spacing:.14em;text-transform:uppercase;color:var(--ouro)}
+.bloco h3{font-weight:700;font-size:26px;letter-spacing:-.015em}
+.bloco p{font-size:14px;color:var(--prata);max-width:40ch}
+.bloco.cast{grid-row:span 2;background:var(--navy);min-height:460px}
+.bloco.cast .selo{position:absolute;top:24px;left:24px;display:flex;align-items:center;gap:10px;font:500 13px/1 var(--texto);letter-spacing:.1em}
+.bloco.cast .selo img{height:18px}
+.bloco.cast .onda{position:absolute;left:24px;right:24px;top:84px;height:110px;display:flex;align-items:center;gap:4px}
+.bloco.cast .onda i{flex:1;border-radius:2px;background:var(--ouro);opacity:.8}
+.bloco.codigo{background:var(--steel)}
+.bloco.codigo .cod{position:absolute;top:22px;right:24px;font:200 64px/1 var(--display);color:var(--prata-24);letter-spacing:-.04em}
+.bloco.coluna-j{grid-column:span 2;background:var(--branco);color:var(--navy);border:1px solid var(--prata);min-height:0}
+.bloco.coluna-j::before{display:none}
+.bloco.coluna-j small{color:var(--bronze)}
+.bloco.coluna-j p{color:var(--cinza)}
+.bloco .play{justify-self:start;margin-top:8px}
+@media (max-width:900px){.bento{grid-template-columns:1fr 1fr}.bloco.cast{grid-row:auto;grid-column:1/-1;min-height:300px}.bloco.coluna-j{grid-column:1/-1}}
+@media (max-width:560px){.bento{grid-template-columns:1fr}}
+
+.fecho{position:relative;background:var(--ink);color:var(--prata);overflow:hidden}
+.fecho{background:radial-gradient(ellipse 70% 60% at 85% 0%,rgba(48,69,87,.7),transparent 70%),radial-gradient(ellipse 50% 40% at 10% 100%,rgba(3,28,55,.9),transparent 70%),var(--ink)}
+.fecho .fecho-in{position:relative;padding-block:clamp(90px,12vw,150px) 48px;display:grid;gap:64px}
+.fecho h2{font-weight:900;font-size:clamp(40px,6.4vw,84px);line-height:1.02;letter-spacing:-.035em;color:var(--branco)}
+.fecho h2 span{display:block;font-weight:300;color:var(--prata-60)}
+.fecho .cta{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.fecho .cta p{max-width:36ch;font-size:15px}
+.rodape{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:32px;border-top:1px solid var(--prata-14);padding-top:40px;font-size:14px}
+.rodape h4{margin:0 0 14px;font:500 11px/1 var(--texto);letter-spacing:.14em;text-transform:uppercase;color:var(--prata-60)}
+.rodape ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.rodape a{text-decoration:none;color:var(--prata)}
+.rodape a:hover{color:var(--ouro)}
+.rodape .contato{display:grid;gap:6px;color:var(--prata-80);user-select:text}
+.marcao{padding-block:24px 8px}
+.marcao img{width:100%;height:auto;opacity:.95}
+.baixo{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid var(--prata-14);padding-block:20px 28px;font-size:12px;color:var(--prata-60)}
+@media (max-width:820px){.rodape{grid-template-columns:1fr 1fr}}
+
+/* ---------- FORMAÇÃO ---------- */
+.f-hero{position:relative;background:var(--ink);color:var(--prata);overflow:hidden}
+.f-hero .f-in{position:relative;padding-block:112px 72px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(24px,5vw,64px);align-items:center}
+.f-hero .f-txt{display:grid;gap:24px;min-width:0}
+.f-hero figure{margin:0;border-radius:12px;overflow:hidden;box-shadow:0 40px 90px -40px rgba(0,0,0,.8);border:1px solid var(--prata-14)}
+.f-hero figure img{width:100%;aspect-ratio:4/5;object-fit:cover}
+.f-hero h1{font-weight:900;font-size:clamp(38px,5.6vw,72px);line-height:1.03;letter-spacing:-.03em;color:var(--branco);max-width:13ch}
+.f-hero .lead{max-width:44ch;font-size:18px;color:var(--prata)}
+.f-meta{display:flex;gap:28px;flex-wrap:wrap;margin-top:12px;font-size:14px}
+.f-meta div{display:grid;gap:6px}
+.f-meta small{font:500 10px/1 var(--texto);letter-spacing:.14em;text-transform:uppercase;color:var(--prata-60)}
+.f-meta b{font-weight:500;color:var(--branco)}
+.f-topo{position:absolute;top:0;left:0;right:0;z-index:5;padding-top:22px}
+.f-topo .wrap{display:flex;justify-content:space-between;align-items:center;padding-block:0}
+.f-topo img{height:24px}
+.f-topo a{font-size:13px;text-decoration:none;color:var(--prata)}
+@media (max-width:760px){.f-hero .f-in{grid-template-columns:1fr}.f-hero figure img{aspect-ratio:16/10}}
+
+.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,6vw,96px);align-items:start}
+.f-grid .cab{position:sticky;top:90px}
+.lista-check{display:grid;gap:0;border-top:1px solid var(--prata)}
+.lista-check>div{display:grid;grid-template-columns:28px 1fr;gap:14px;padding-block:20px;border-bottom:1px solid var(--prata)}
+.lista-check svg{width:18px;height:18px;color:var(--bronze);margin-top:4px}
+.lista-check b{display:block;font-weight:500;color:var(--navy);font-size:17px;margin-bottom:4px}
+.lista-check p{font-size:15px;color:var(--cinza)}
+@media (max-width:860px){.f-grid{grid-template-columns:1fr}.f-grid .cab{position:static}}
+
+.modulos{margin-top:48px;display:grid;gap:12px}
+.modulo{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;padding:22px 24px;border:1px solid var(--prata-14);border-radius:12px;background:var(--prata-08)}
+.modulo .n{font:200 40px/1 var(--display);color:var(--ouro);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.modulo h3{font-weight:500;font-size:19px;color:var(--branco)}
+.modulo p{font-size:14px;color:var(--prata-80)}
+.modulo span{font-size:13px;color:var(--prata-60);white-space:nowrap}
+@media (max-width:600px){.modulo{grid-template-columns:auto 1fr}.modulo span{grid-column:2}}
+
+.metodo{margin-top:56px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:1px solid var(--navy)}
+.metodo div{padding:24px 20px 0 0;display:grid;gap:10px;align-content:start}
+.metodo small{font:500 11px/1 var(--texto);letter-spacing:.14em;text-transform:uppercase;color:var(--bronze)}
+.metodo h3{font-weight:700;font-size:20px;color:var(--navy);letter-spacing:-.01em}
+.metodo p{font-size:14px;color:var(--cinza)}
+@media (max-width:860px){.metodo{grid-template-columns:1fr 1fr;gap:24px}}
+@media (max-width:480px){.metodo{grid-template-columns:1fr}}
+
+.f-cta{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:center;background:var(--navy);border-radius:12px;padding:clamp(28px,4vw,56px);color:var(--prata);box-shadow:var(--sombra)}
+.f-cta h2{font-weight:900;font-size:clamp(28px,3.6vw,44px);line-height:1.05;color:var(--branco);letter-spacing:-.025em}
+.f-cta .dir{display:grid;gap:14px;justify-items:start}
+@media (max-width:820px){.f-cta{grid-template-columns:1fr}}
+
+/* ---------- PAINEL ---------- */
+.app{--lado:236px;background:var(--ink);color:var(--prata);min-height:100vh;display:grid;grid-template-columns:var(--lado) minmax(0,1fr)}
+.lat{position:sticky;top:44px;height:calc(100vh - 44px);border-right:1px solid var(--prata-08);padding:28px 16px;display:flex;flex-direction:column;gap:28px}
+.lat .logo{height:22px;width:auto;margin-left:10px}
+.lat nav{display:grid;gap:2px}
+.lat nav button{display:flex;align-items:center;gap:12px;border:0;background:none;color:var(--prata-80);font:400 14px/1 var(--texto);padding:11px 12px;border-radius:8px;text-align:left;position:relative;transition:background .2s,color .2s}
+.lat nav button svg{width:18px;height:18px;flex:none}
+.lat nav button:hover{background:var(--prata-08);color:var(--branco)}
+.lat nav button[aria-current="page"]{background:var(--prata-08);color:var(--branco)}
+.lat nav button[aria-current="page"]::before{content:"";position:absolute;left:-16px;top:8px;bottom:8px;width:2px;background:var(--ouro);border-radius:2px}
+.lat .pe{margin-top:auto;display:grid;gap:10px;font:500 10px/1.5 var(--texto);letter-spacing:.14em;text-transform:uppercase;color:var(--prata-40)}
+.lat .pe i{display:block;width:28px;height:1px;background:var(--prata-24)}
+.main{padding:32px clamp(16px,3vw,40px) 64px;display:grid;gap:20px;align-content:start;min-width:0}
+.aviso{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--prata-60)}
+.p-topo{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.p-topo .ola{font:300 15px/1.4 var(--texto);color:var(--prata-80)}
+.p-topo .ola b{color:var(--branco);font-weight:500}
+.foco-btn{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--prata-24);background:transparent;color:var(--branco);border-radius:999px;padding:10px 16px;font:500 13px/1 var(--texto);transition:border-color .2s,background .2s}
+.foco-btn:hover{border-color:var(--ouro)}
+.foco-btn svg{width:16px;height:16px;color:var(--ouro)}
+.pgrid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,1fr);gap:20px}
+.pcol{display:grid;gap:20px;align-content:start;min-width:0}
+.painel{background:rgba(209,211,212,.04);border:1px solid var(--prata-08);border-radius:12px;padding:24px;min-width:0}
+.painel h2{font:500 17px/1.3 var(--display);color:var(--branco);letter-spacing:-.005em}
+.painel .sub{font-size:12px;color:var(--prata-60)}
+.hoje{display:grid;grid-template-columns:auto 1fr;gap:clamp(20px,4vw,48px);align-items:center;padding-block:8px}
+.anel{position:relative;width:176px;height:176px}
+.anel svg{width:100%;height:100%;transform:rotate(-90deg)}
+.anel .t{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.anel .t b{font:300 54px/1 var(--display);color:var(--branco);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.anel .t small{font-size:12px;color:var(--prata-60)}
+.anel circle{transition:stroke-dashoffset 1s var(--ease)}
+.hoje h1{font-weight:300;font-size:clamp(36px,4.6vw,60px);line-height:1.04;letter-spacing:-.035em;color:var(--branco)}
+.hoje h1 b{font-weight:900}
+.hoje p{margin-top:12px;color:var(--prata-80);max-width:42ch;font-size:15px}
+@media (max-width:640px){.hoje{grid-template-columns:1fr}.anel{width:140px;height:140px}.anel .t b{font-size:42px}}
+.continua{position:relative;border-radius:12px;overflow:hidden;min-height:250px;display:grid;align-content:end;padding:28px;isolation:isolate;border:1px solid var(--prata-08)}
+.continua img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:85% 50%;z-index:-2}
+.continua::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(13,19,26,.94) 30%,rgba(13,19,26,.2))}
+.continua h3{font-weight:500;font-size:clamp(22px,2.4vw,28px);color:var(--branco);max-width:20ch;line-height:1.2;margin-block:10px 6px}
+.continua p{font-size:14px;color:var(--prata-80);max-width:40ch}
+.continua .row{display:flex;gap:14px;align-items:center;margin-top:18px;flex-wrap:wrap}
+.barra{height:4px;border-radius:2px;background:var(--prata-14);overflow:hidden;width:180px}
+.barra i{display:block;height:100%;background:var(--ouro);border-radius:2px}
+.semana{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;align-items:end;height:150px;margin-top:20px}
+.dia{display:grid;grid-template-rows:1fr auto;gap:8px;height:100%;text-align:center;font-size:11px;color:var(--prata-60)}
+.dia .col{position:relative;background:var(--prata-08);border-radius:4px;overflow:hidden}
+.dia .col .plan{position:absolute;left:0;right:0;bottom:0;border-top:1px dashed var(--prata-40)}
+.dia .col .feito{position:absolute;left:0;right:0;bottom:0;background:var(--ouro);border-radius:4px 4px 0 0;transition:height .8s var(--ease)}
+.dia.hj{color:var(--ouro);font-weight:500}
+.legenda{display:flex;gap:16px;margin-top:14px;font-size:11px;color:var(--prata-60)}
+.legenda i{display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--ouro);vertical-align:-1px;margin-right:6px}
+.legenda i.p{background:none;border-top:1px dashed var(--prata-40);height:0;width:14px;vertical-align:3px}
+.min-card{background:linear-gradient(160deg,var(--navy),rgba(3,28,55,.4));border-color:var(--prata-14)}
+.min-card .quem{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.min-card .quem img{width:34px;height:34px;padding:7px;border:1px solid var(--prata-24);border-radius:50%}
+.min-card .fala{font:300 17px/1.5 var(--display);color:var(--branco)}
+.min-card .fala b{font-weight:500;color:var(--ouro)}
+.min-card .opts{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.chip{border:1px solid var(--prata-24);background:transparent;color:var(--prata);border-radius:999px;padding:8px 13px;font:400 12px/1 var(--texto);transition:border-color .2s,color .2s,background .2s}
+.chip:hover{border-color:var(--ouro);color:var(--branco)}
+.plano-ctrl{display:grid;gap:18px;margin-top:18px}
+.plano-ctrl label{display:flex;justify-content:space-between;font-size:13px;color:var(--prata-80)}
+.plano-ctrl label b{color:var(--branco);font-weight:500;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--ouro)}
+.dias{display:flex;gap:6px;flex-wrap:wrap}
+.dias button{width:38px;height:38px;border-radius:50%;border:1px solid var(--prata-24);background:transparent;color:var(--prata-80);font:500 12px/1 var(--texto)}
+.dias button[aria-pressed="true"]{background:var(--ouro);border-color:var(--ouro);color:var(--ink)}
+.previsao{border-top:1px solid var(--prata-08);padding-top:14px;font-size:13px;color:var(--prata-80)}
+.previsao b{color:var(--branco);font-weight:500}
+.revisoes{display:grid;gap:2px;margin-top:14px}
+.rev{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--prata-08);font-size:14px;color:var(--prata)}
+.rev input{width:18px;height:18px;accent-color:var(--ouro)}
+.rev span{font-size:11px;color:var(--prata-60);white-space:nowrap}
+.rev.ok{color:var(--prata-40);text-decoration:line-through}
+.estrats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
+.estrat{border:1px solid var(--prata-08);border-radius:12px;padding:18px;display:grid;gap:8px;align-content:start;background:rgba(209,211,212,.03);transition:border-color .3s}
+.estrat:hover{border-color:var(--prata-24)}
+.estrat small{font:500 10px/1 var(--texto);letter-spacing:.14em;text-transform:uppercase;color:var(--ouro)}
+.estrat b{font-weight:500;color:var(--branco);font-size:15px}
+.estrat p{font-size:13px;color:var(--prata-60)}
+@media (max-width:1100px){.estrats{grid-template-columns:1fr 1fr}}
+.jornada{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:24px;position:relative}
+.jornada::before{content:"";position:absolute;left:10px;right:10px;top:10px;height:1px;background:var(--prata-24)}
+.jornada .m{position:relative;display:grid;gap:6px;padding-right:12px}
+.jornada .m i{width:21px;height:21px;border-radius:50%;border:1px solid var(--prata-40);background:var(--ink)}
+.jornada .m.ok i{background:var(--ouro);border-color:var(--ouro)}
+.jornada .m.at i{border:2px solid var(--ouro);box-shadow:0 0 0 5px rgba(240,184,85,.14)}
+.jornada .m b{font-weight:500;font-size:13px;color:var(--branco);margin-top:8px}
+.jornada .m span{font-size:12px;color:var(--prata-60)}
+.percurso{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.percurso div{display:grid;gap:4px}
+.percurso b{font:300 30px/1 var(--display);color:var(--branco);font-variant-numeric:tabular-nums}
+.percurso small{font-size:11px;color:var(--prata-60)}
+@media (max-width:1100px){.pgrid{grid-template-columns:1fr}}
+@media (max-width:820px){
+  .app{grid-template-columns:1fr}
+  .lat{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;z-index:40;flex-direction:row;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));
+    background:rgba(13,19,26,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-right:0;border-top:1px solid var(--prata-08)}
+  .lat .logo,.lat .pe{display:none}
+  .lat nav{grid-auto-flow:column;grid-auto-columns:1fr;width:100%}
+  .lat nav button{flex-direction:column;gap:5px;font-size:10px;padding:8px 2px;justify-content:center}
+  .lat nav button[aria-current="page"]::before{left:30%;right:30%;top:-6px;bottom:auto;width:auto;height:2px}
+  .lat nav .x{display:none}
+  .main{padding-bottom:110px}
+  .jornada{grid-template-columns:1fr 1fr;gap:18px}.jornada::before{display:none}
+}
+@media (max-width:480px){.estrats{grid-template-columns:1fr}.percurso b{font-size:24px}}
+
+/* Modo foco */
+.foco{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 50% 30%,var(--navy),var(--ink) 70%);color:var(--prata);
+  display:grid;place-items:center;padding:24px;padding-top:calc(24px + env(safe-area-inset-top,0px))}
+.foco .caixa{width:min(560px,100%);display:grid;gap:26px;justify-items:center;text-align:center}
+.foco .rel{font:200 clamp(72px,16vw,132px)/1 var(--display);letter-spacing:-.05em;color:var(--branco);font-variant-numeric:tabular-nums}
+.foco .dur{display:flex;gap:6px}
+.foco .dur button{border:1px solid var(--prata-24);background:none;color:var(--prata);border-radius:999px;padding:8px 14px;font-size:12px}
+.foco .dur button[aria-pressed="true"]{border-color:var(--ouro);color:var(--ouro)}
+.foco textarea{width:100%;min-height:110px;resize:vertical;background:var(--prata-08);border:1px solid var(--prata-14);border-radius:12px;color:var(--branco);
+  font:300 15px/1.6 var(--texto);padding:14px 16px}
+.foco textarea::placeholder{color:var(--prata-40)}
+.foco .bts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.foco .fechar{position:absolute;top:calc(20px + env(safe-area-inset-top,0px));right:20px;border:0;background:none;color:var(--prata-60);font-size:13px}
+.toast{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:120;background:var(--branco);color:var(--navy);
+  border-radius:999px;padding:12px 20px;font:500 13px/1 var(--texto);box-shadow:var(--sombra)}
+@media (max-width:820px){.toast{bottom:calc(92px + env(safe-area-inset-bottom,0px))}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+
+<div class="proto">
+  <span><b>Protótipo</b> · conceito da nova plataforma EJUP · textos e números marcados “a confirmar” aguardam dado real</span>
+  <nav aria-label="Telas do protótipo">
+    <button type="button" data-ir="site" id="t-site">Site</button>
+    <button type="button" data-ir="formacao" id="t-formacao">Formação</button>
+    <button type="button" data-ir="painel" id="t-painel">Painel do aluno</button>
+  </nav>
+</div>
+
+<!-- ======================= SITE ======================= -->
+<main class="view" id="v-site">
+  <header class="topo">
+    <div class="wrap">
+      <a class="logo" href="#site" aria-label="EJUP, início"><img src="img/ejup-horizontal-navy.svg" alt="EJUP Educação Jurídica"></a>
+      <nav class="menu" aria-label="Principal">
+        <a href="#escola" data-ancora>A escola</a><a href="#trilhas" data-ancora>Trilhas</a><a href="#por-dentro" data-ancora>Por dentro</a>
+        <a href="#professores" data-ancora>Professores</a><a href="#planos" data-ancora>Planos</a><a href="#conteudos" data-ancora>Conteúdos</a>
+      </nav>
+      <div class="acoes">
+        <button type="button" class="btn btn-linha btn-sm" data-ir="painel">Entrar</button>
+        <a class="btn btn-navy btn-sm" href="#planos" data-ancora>Fazer parte</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero" id="escola">
+    <img class="hero-fundo" src="img/hero.webp" alt="" aria-hidden="true">
+    <div class="wrap">
+      <span class="eyebrow sobe">EJUP Educação Jurídica</span>
+      <h1 class="sobe">Alma clássica, <span>repertório contemporâneo.</span></h1>
+      <p class="lead sobe">Formações, aulas ao vivo e um plano de estudo que acompanha você. Uma escola de negócios e Direito para quem trata a formação como percurso.</p>
+      <div class="ctas sobe">
+        <a class="btn btn-navy" href="#planos" data-ancora>Conhecer o Acesso EJUP <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l8 8M12 5v7H5"/></svg></a>
+        <a class="btn btn-linha" href="#trilhas" data-ancora>Ver as trilhas <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3v10M4 9l4 4 4-4"/></svg></a>
+      </div>
+    </div>
+    <div class="stats">
+      <span><b>— alunos</b> <span class="conf">a confirmar</span></span>
+      <span><b>— aulas</b> <span class="conf">a confirmar</span></span>
+      <span><b>Natal/RN</b> e todo o Brasil</span>
+    </div>
+  </section>
+
+  <section class="manifesto">
+    <img src="img/pedra-chave.webp" alt="" aria-hidden="true">
+    <div class="wrap">
+      <p class="linha">O Direito está sendo empurrado para a pressa. <strong>E toda pressa, no Direito, cobra um preço.</strong></p>
+      <p class="linha">A EJUP existe para ocupar o espaço <strong>que a pressa abandonou.</strong></p>
+      <span class="assina">Formamos intérpretes do seu tempo</span>
+    </div>
+  </section>
+
+  <section class="secao" id="trilhas">
+    <div class="wrap">
+      <div class="cab centro">
+        <span class="eyebrow">Um único acesso</span>
+        <h2>Quatro trilhas, <span>uma formação inteira.</span></h2>
+        <p>O Acesso EJUP abre a escola toda: formações, aulas ao vivo, replays, o plano de estudo com a Minerva e a comunidade de juristas que estudam junto.</p>
+        <span class="conf">nome do acesso a confirmar</span>
+      </div>
+      <div class="trilhas">
+        <article class="trilha"><img src="img/livros.webp" alt="Pilha de livros esculpida em vidro, com luz dourada nas bordas">
+          <div class="rot"><small>Trilha</small><h3>IA, Direito e ética profissional</h3><p>Uso responsável da tecnologia por juristas. A formação como antídoto à preguiça intelectual.</p></div></article>
+        <article class="trilha"><img src="img/coluna.webp" alt="Fragmento de coluna clássica em mármore sobre fundo azul">
+          <div class="rot"><small>Trilha</small><h3>Constitucional e processual contemporâneo</h3><p>STF, STJ, Reforma Tributária e Marco Civil, lidos com rigor e sem viés partidário.</p></div></article>
+        <article class="trilha clara"><img src="img/arco.webp" alt="Arco clássico em latão escovado sobre fundo prata">
+          <div class="rot"><small>Formação</small><h3>Lei Geral do Licenciamento Ambiental</h3><p>A nova lei geral lida com método: texto, interpretação e aplicação.</p></div></article>
+        <article class="trilha"><img src="img/cavalo.webp" alt="Cavalo de xadrez em bronze facetado sobre fundo aço">
+          <div class="rot"><small>Trilha</small><h3>Formação estratégica do jurista</h3><p>Repertório, doutrina contemporânea e a passagem de operador a estrategista.</p></div></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao bg-prata">
+    <div class="wrap">
+      <div class="pratica-topo">
+        <div class="cab">
+          <span class="eyebrow">Na prática</span>
+          <h2>Cada jurista chega por um caminho.</h2>
+        </div>
+        <p>O ponto de partida é a sua prática de hoje. A Minerva monta o plano a partir dele.</p>
+      </div>
+      <div class="perfis">
+        <div class="perfil"><div><h3>Advocacia</h3><p>Você defende teses todos os dias.</p></div>
+          <p>Aprofunde a leitura dos tribunais superiores e transforme jurisprudência em estratégia de caso.</p>
+          <div class="comeca"><span>Começa por <b>Constitucional e processual</b></span></div></div>
+        <div class="perfil"><div><h3>Magistério e pesquisa</h3><p>Você forma outros juristas.</p></div>
+          <p>Atualize o repertório com doutrina contemporânea e leve a tecnologia para a sala de aula com critério.</p>
+          <div class="comeca"><span>Começa por <b>IA, Direito e ética</b></span></div></div>
+        <div class="perfil"><div><h3>Gestão jurídica</h3><p>Você conduz um escritório ou um departamento.</p></div>
+          <p>Organize decisões, equipe e tecnologia com a mesma densidade que exige das peças.</p>
+          <div class="comeca"><span>Começa por <b>Formação estratégica</b></span></div></div>
+        <div class="perfil"><div><h3>Carreira em formação</h3><p>Você ainda está consolidando a base.</p></div>
+          <p>Construa um percurso de estudo com método, ritmo e régua alta desde o início.</p>
+          <div class="comeca"><span>Começa por <b>Formação estratégica</b></span></div></div>
+      </div>
+      <div class="pratica-fecho">
+        <p>As trilhas se cruzam. Juntas, formam um percurso: compreender, interpretar, aplicar, liderar.</p>
+        <a class="btn btn-navy" href="#planos" data-ancora>Conhecer o Acesso EJUP</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao" id="por-dentro">
+    <div class="wrap">
+      <div class="faixa">
+        <div><span class="eyebrow" style="color:var(--ouro)">Comunidade EJUP</span><div class="num">—</div><span class="conf" style="color:var(--prata)">a confirmar</span></div>
+        <div><h3>juristas já estudam com a EJUP</h3><p style="margin-top:8px;font-size:14px">Advogados, professores, pesquisadores e gestores que tratam o estudo como percurso.</p></div>
+        <div class="mini"><div><b>—</b><small>Avaliação média</small></div><div><b>—</b><small>Aulas</small></div><div><b>—</b><small>Recomendam</small></div></div>
+      </div>
+
+      <div class="cab centro" style="margin-top:clamp(72px,9vw,120px)">
+        <span class="eyebrow">Por dentro do Acesso</span>
+        <h2>A formação continua depois da aula.</h2>
+      </div>
+      <div class="dentro">
+        <article class="cartao">
+          <div class="tela" aria-hidden="true">
+            <div class="lado"><img src="img/ejup-horizontal-white.svg" alt=""><i class="on"></i><i></i><i></i><i></i><i></i></div>
+            <div class="area"><div class="blocao"></div>
+              <div class="linha"><i style="height:60%"></i><i style="height:75%"></i><i style="height:90%"></i><i style="height:55%"></i><i style="height:30%"></i><i style="height:12%"></i><i style="height:8%"></i></div></div>
+          </div>
+          <div class="corpo"><span class="eyebrow">Painel do aluno</span><h3>Seu estudo, organizado.</h3>
+            <p>Horas da semana, próxima aula, revisões do dia e o seu percurso em uma tela. Você abre e sabe o que fazer.</p>
+            <div class="tags"><span>Plano semanal</span><span>Modo foco</span><span>Revisão espaçada</span></div>
+            <button type="button" class="btn btn-navy btn-sm" data-ir="painel" style="justify-self:start;margin-top:10px">Abrir o painel</button></div>
+        </article>
+        <article class="cartao">
+          <div class="minerva-demo" aria-hidden="true">
+            <div class="bolha eu">Tenho 4 horas por semana. Por onde começo?</div>
+            <div class="bolha">Seu plano: segunda, quarta e quinta, 80 minutos cada, às 20h. Começamos pelo Módulo 1 e a primeira revisão cai no sábado.</div>
+          </div>
+          <div class="corpo"><span class="eyebrow">Minerva</span><h3>Sua orientadora de estudo.</h3>
+            <p>Monta o plano a partir do seu tempo, lembra a revisão e sugere a próxima leitura. A tecnologia organiza; o pensamento continua seu.</p>
+            <div class="tags"><span>Plano de estudo</span><span>Revisão</span><span>Leitura sugerida</span></div></div>
+        </article>
+      </div>
+      <div class="recursos">
+        <div class="recurso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 5.5C5.5 4 9 4 12 6c3-2 6.5-2 9-.5V19c-2.5-1.5-6-1.5-9 .5-3-2-6.5-2-9-.5z"/><path d="M12 6v13.5"/></svg>
+          <h3>Formações</h3><p>Percurso completo, do fundamento à aplicação, com professores que atuam no que ensinam.</p></div>
+        <div class="recurso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="3"/><path d="M6.3 6.3a8 8 0 0 0 0 11.4M17.7 6.3a8 8 0 0 1 0 11.4"/></svg>
+          <h3>Aulas ao vivo</h3><p>Encontros para acompanhar o que acabou de mudar e discutir com quem estuda o tema.</p></div>
+        <div class="recurso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>
+          <h3>EJUPcast e O Código</h3><p>Conversas longas e a leitura semanal de tecnologia e Direito, ligadas às trilhas.</p></div>
+        <div class="recurso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h4"/></svg>
+          <h3>Anotações</h3><p>O que você escreve durante a aula fica guardado junto do trecho, pronto para a revisão.</p></div>
+        <div class="recurso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 18l5-6 4 3 7-9"/><path d="M15 6h5v5"/></svg>
+          <h3>Percurso</h3><p>Horas acumuladas, módulos concluídos e marcos da sua formação. Sem pontos, sem ranking.</p></div>
+        <div class="recurso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="9" r="5"/><path d="M9 13.5L8 21l4-2 4 2-1-7.5"/></svg>
+          <h3>Certificados</h3><p>Um por formação concluída, com a carga horária cumprida registrada.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao bg-prata" id="professores">
+    <div class="wrap">
+      <div class="prof-topo">
+        <div class="cab"><span class="eyebrow">Professores</span><h2>Aprenda com quem <span>pratica o que ensina.</span></h2></div>
+        <div style="display:grid;gap:14px;justify-items:end">
+          <span class="conf" style="color:var(--cinza)">fotos e bios após autorização de imagem</span>
+          <div class="setas"><button type="button" aria-label="Anterior" data-car="-1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg></button>
+            <button type="button" aria-label="Próximo" data-car="1"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg></button></div>
+        </div>
+      </div>
+      <div class="carrossel" id="carrossel"></div>
+    </div>
+  </section>
+
+  <section class="secao escuro" id="planos">
+    <div class="wrap">
+      <div class="cab centro"><span class="eyebrow">Acesso EJUP</span><h2>Um acesso, <span>a escola inteira.</span></h2></div>
+      <div class="planos">
+        <div class="itens">
+          <div class="item largo"><h3>Todas as trilhas</h3><p>Formações completas das quatro trilhas, com novos módulos conforme a pauta da escola.</p></div>
+          <div class="item"><h3>Aulas ao vivo</h3><p>Encontros periódicos e replays.</p></div>
+          <div class="item"><h3>Certificados</h3><p>Um por formação concluída.</p></div>
+          <div class="item largo"><h3>Minerva</h3><p>Plano de estudo semanal, lembretes de revisão e sugestões de leitura a partir do seu tempo.</p></div>
+          <div class="item"><h3>Comunidade</h3><p>Juristas que estudam junto.</p></div>
+          <div class="item"><h3>Eventos presenciais</h3><p>Condições para alunos.</p></div>
+        </div>
+        <div class="preco">
+          <div class="selo-ouro"><img src="img/ejup-symbol-gold.svg" alt="Símbolo EJUP em dourado"></div>
+          <div class="corpo">
+            <span class="nome">Acesso EJUP</span>
+            <span class="valor">R$ —</span>
+            <span class="conf" style="color:var(--prata)">valor e condições a confirmar</span>
+            <div class="chips"><span>4 trilhas</span><span>Aulas ao vivo</span><span>Minerva</span><span>Certificados</span></div>
+            <a class="btn btn-ouro" href="#planos" data-ancora>Quero fazer parte</a>
+            <small>Acesso por 12 meses · garantia e parcelamento a confirmar</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao">
+    <div class="wrap faq">
+      <div class="cab"><span class="eyebrow">Antes de entrar</span><h2>Perguntas frequentes</h2>
+        <p>Ficou alguma dúvida? Fale com a equipe: <span style="user-select:all;color:var(--navy)">contato@ejup.com.br</span></p></div>
+      <div>
+        <details><summary>Para quem é o Acesso EJUP?</summary><p>Para advogados, professores, pesquisadores e profissionais do Direito que tratam o aprendizado como percurso cumulativo, e para quem está em formação e quer esse padrão desde cedo.</p></details>
+        <details><summary>O acesso inclui todas as formações?</summary><p>Inclui as formações das quatro trilhas e as aulas ao vivo durante a vigência. Condições específicas de formações avulsas e eventos presenciais serão detalhadas aqui.</p></details>
+        <details><summary>Como a Minerva organiza meu estudo?</summary><p>Você informa quantas horas tem por semana e em quais dias estuda. A Minerva distribui as aulas, agenda as revisões e ajusta o plano quando a semana foge do previsto.</p></details>
+        <details><summary>Tem certificado?</summary><p>Sim, um por formação concluída, com a carga horária registrada.</p></details>
+        <details><summary>Posso cancelar?</summary><p>Política de cancelamento e garantia a confirmar.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao bg-prata" id="conteudos">
+    <div class="wrap">
+      <div class="cab centro"><span class="eyebrow">Conteúdo aberto</span><h2>Formatos diferentes, <span>a mesma densidade.</span></h2></div>
+      <div class="bento">
+        <article class="bloco cast">
+          <div class="selo"><img src="img/ejup-symbol-white.svg" alt="">EJUPCAST</div>
+          <div class="onda" aria-hidden="true" id="onda"></div>
+          <small>Podcast</small><h3>EJUPcast</h3>
+          <p>Conversas longas com juristas, apresentadas pela Dra. Rossana Fonseca. No episódio #18, Nicácio Carvalho e Eduardo Pacheco.</p>
+          <a class="btn btn-ouro btn-sm play" href="#conteudos" data-ancora><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 3l9 5-9 5z"/></svg>Ouvir episódios</a>
+        </article>
+        <article class="bloco codigo"><span class="cod" aria-hidden="true">§</span>
+          <small>Semanal</small><h3>O Código</h3><p>Tecnologia e Direito, lidos toda semana com critério.</p></article>
+        <article class="bloco"><img src="img/sala-q7.webp" alt="Sala escura com mural de provas e uma pasta sobre a mesa">
+          <small>Novo quadro</small><h3>A Sala</h3><p>Grandes casos, reconstruídos peça por peça. Episódio 01 em breve.</p></article>
+        <article class="bloco coluna-j">
+          <small>Leitura</small><h3>Coluna jurídica</h3><p>Análises no site da EJUP, escritas pelos professores e convidados da escola.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="fecho">
+    <div class="wrap fecho-in">
+      <div class="cta">
+        <h2>Estude com tempo. <span>Pratique com critério.</span></h2>
+      </div>
+      <div class="cta"><a class="btn btn-ouro" href="#planos" data-ancora>Quero meu acesso <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        <p>Se isso parece exigente demais, a EJUP não é para você.</p></div>
+      <div class="rodape">
+        <div class="contato"><h4>EJUP Educação Jurídica</h4><span>Rua da Saudade, 1028, Lagoa Nova</span><span>Natal/RN</span><span>85 9 9271.4050</span><span>contato@ejup.com.br</span></div>
+        <div><h4>Escola</h4><ul><li><a href="#trilhas" data-ancora>Trilhas</a></li><li><a href="#" data-ir="formacao">Formações</a></li><li><a href="#planos" data-ancora>Acesso EJUP</a></li><li><a href="#professores" data-ancora>Professores</a></li></ul></div>
+        <div><h4>Conteúdo</h4><ul><li><a href="#conteudos" data-ancora>EJUPcast</a></li><li><a href="#conteudos" data-ancora>O Código</a></li><li><a href="#conteudos" data-ancora>A Sala</a></li><li><a href="#conteudos" data-ancora>Coluna jurídica</a></li></ul></div>
+        <div><h4>Aluno</h4><ul><li><a href="#" data-ir="painel">Entrar</a></li><li><a href="#" data-ir="painel">Meu plano</a></li><li><a href="#" data-ir="painel">Certificados</a></li></ul></div>
+      </div>
+      <div class="marcao"><img src="img/ejup-horizontal-white.svg" alt="EJUP Educação Jurídica"></div>
+    </div>
+    <div class="wrap baixo"><span>© 2026 EJUP Educação Jurídica</span><span>Privacidade · Termos de uso</span></div>
+  </section>
+</main>
+
+<!-- ======================= FORMAÇÃO ======================= -->
+<main class="view" id="v-formacao">
+  <section class="f-hero">
+    <div class="f-topo"><div class="wrap"><img src="img/ejup-horizontal-white.svg" alt="EJUP"><a href="#" data-ir="site">← Voltar ao site</a></div></div>
+    <div class="wrap f-in"><div class="f-txt">
+      <span class="eyebrow">Formação · Trilha de licenciamento</span>
+      <h1>Lei Geral do Licenciamento Ambiental</h1>
+      <p class="lead">A lei geral reorganiza o licenciamento ambiental no país. A formação percorre o texto com método: leitura, interpretação e aplicação à prática.</p>
+      <div class="f-meta">
+        <div><small>Carga horária</small><b>— <span class="conf">a confirmar</span></b></div>
+        <div><small>Formato</small><b>Aulas gravadas e ao vivo</b></div>
+        <div><small>Professores</small><b>— <span class="conf">a confirmar</span></b></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+        <a class="btn btn-ouro" href="#investimento" data-ancora>Quero me inscrever</a>
+        <button type="button" class="btn btn-linha-escuro" data-ir="painel">Ver como é por dentro</button>
+      </div>
+    </div>
+    <figure><img src="img/arco.webp" alt="Arco clássico em latão escovado"></figure>
+    </div>
+  </section>
+
+  <section class="secao">
+    <div class="wrap f-grid">
+      <div class="cab"><span class="eyebrow">Para quem é</span><h2>Para quem precisa aplicar a lei nova <span>com segurança.</span></h2>
+        <p>Advogados, consultores, gestores públicos e profissionais que atuam com licenciamento e querem ler a lei com a profundidade que a matéria exige.</p></div>
+      <div class="lista-check">
+        <div><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3 3 7-7"/></svg><div><b>Leitura do texto legal</b><p>O que mudou, artigo por artigo, com o contexto de cada escolha do legislador.</p></div></div>
+        <div><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3 3 7-7"/></svg><div><b>Interpretação</b><p>Doutrina e primeiras decisões lidas em conjunto, com as divergências preservadas.</p></div></div>
+        <div><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3 3 7-7"/></svg><div><b>Aplicação</b><p>Casos concretos resolvidos em aula, do pedido de licença ao controle.</p></div></div>
+        <div><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3 3 7-7"/></svg><div><b>Plano com a Minerva</b><p>Um cronograma ajustado ao seu tempo, com revisões marcadas.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao escuro">
+    <div class="wrap">
+      <div class="cab"><span class="eyebrow">Estrutura</span><h2>Módulos <span>da formação</span></h2>
+        <span class="conf" style="color:var(--prata)">estrutura ilustrativa · grade real a confirmar com o professor</span></div>
+      <div class="modulos">
+        <div class="modulo"><span class="n">01</span><div><h3>Fundamentos e marco legal</h3><p>O lugar da lei geral no sistema de proteção ambiental.</p></div><span>— aulas</span></div>
+        <div class="modulo"><span class="n">02</span><div><h3>Modalidades e procedimento</h3><p>Rito, etapas e atores do licenciamento.</p></div><span>— aulas</span></div>
+        <div class="modulo"><span class="n">03</span><div><h3>Prazos, controle e responsabilidade</h3><p>Onde a prática encontra o contencioso.</p></div><span>— aulas</span></div>
+        <div class="modulo"><span class="n">04</span><div><h3>Casos e aplicação</h3><p>Estudos de caso conduzidos em aula ao vivo.</p></div><span>— aulas</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao">
+    <div class="wrap">
+      <div class="cab"><span class="eyebrow">Como o estudo funciona</span><h2>Pensar antes de agir. <span>Compreender antes de aplicar.</span></h2></div>
+      <div class="metodo">
+        <div><small>Semana a semana</small><h3>Assistir</h3><p>Aulas curtas o bastante para caber na rotina, densas o bastante para exigir atenção.</p></div>
+        <div><small>Com suas palavras</small><h3>Anotar</h3><p>Anotações presas ao trecho da aula, para voltar direto ao ponto.</p></div>
+        <div><small>1, 7 e 30 dias</small><h3>Revisar</h3><p>A Minerva marca as revisões no intervalo em que a memória mais precisa.</p></div>
+        <div><small>Caso concreto</small><h3>Aplicar</h3><p>Cada módulo fecha com um caso resolvido e discutido ao vivo.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao bg-prata" id="investimento">
+    <div class="wrap">
+      <div class="f-cta">
+        <div><span class="eyebrow" style="color:var(--ouro)">Investimento</span><h2 style="margin-top:14px">Formação avulsa ou dentro do Acesso EJUP.</h2></div>
+        <div class="dir"><span style="font:300 40px/1 var(--display);color:var(--branco)">R$ —</span><span class="conf" style="color:var(--prata)">valor, turma e datas a confirmar</span>
+          <a class="btn btn-ouro" href="#investimento" data-ancora>Quero me inscrever</a></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ======================= PAINEL ======================= -->
+<main class="view" id="v-painel">
+  <div class="app">
+    <aside class="lat">
+      <img class="logo" src="img/ejup-horizontal-white.svg" alt="EJUP">
+      <nav aria-label="Painel">
+        <button type="button" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 11l8-6 8 6v9h-5v-6H9v6H4z"/></svg>Hoje</button>
+        <button type="button" data-toast="Tela de plano semanal na próxima versão"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Plano</button>
+        <button type="button" data-ir="formacao"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 5.5C5.5 4 9 4 12 6c3-2 6.5-2 9-.5V19c-2.5-1.5-6-1.5-9 .5-3-2-6.5-2-9-.5z"/></svg>Formações</button>
+        <button type="button" class="x" data-toast="Agenda de aulas ao vivo na próxima versão"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="3"/><path d="M6.3 6.3a8 8 0 0 0 0 11.4M17.7 6.3a8 8 0 0 1 0 11.4"/></svg>Ao vivo</button>
+        <button type="button" data-toast="Anotações na próxima versão"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h4"/></svg>Anotações</button>
+        <button type="button" class="x" data-toast="EJUPcast dentro do painel na próxima versão"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>EJUPcast</button>
+        <button type="button" data-ir="site"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M15 5l-7 7 7 7"/></svg>Site</button>
+      </nav>
+      <div class="pe"><i></i>Alma clássica,<br>repertório contemporâneo</div>
+    </aside>
+
+    <div class="main">
+      <div class="aviso"><span class="conf">dados de exemplo</span>Aluna fictícia para mostrar o funcionamento. Tudo aqui é interativo.</div>
+      <div class="p-topo">
+        <p class="ola" id="ola"></p>
+        <button type="button" class="foco-btn" id="abrir-foco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>Modo foco</button>
+      </div>
+
+      <div class="pgrid">
+        <div class="pcol">
+          <section class="painel hoje" aria-label="Meta de hoje">
+            <div class="anel">
+              <svg viewBox="0 0 176 176"><circle cx="88" cy="88" r="78" fill="none" stroke="rgba(209,211,212,.1)" stroke-width="8"/>
+                <circle id="anel-p" cx="88" cy="88" r="78" fill="none" stroke="#f0b855" stroke-width="8" stroke-linecap="round" stroke-dasharray="490" stroke-dashoffset="490"/></svg>
+              <div class="t"><b id="anel-n">0</b><small id="anel-de">de 0 min</small></div>
+            </div>
+            <div><span class="eyebrow">Hoje</span><h1 id="hoje-t" style="margin-top:12px"></h1><p id="hoje-p"></p></div>
+          </section>
+
+          <section class="continua">
+            <img src="img/arco.webp" alt="">
+            <span class="eyebrow">Continue · Módulo 2 · Aula 3</span>
+            <h3>Modalidades e procedimento</h3>
+            <p>Lei Geral do Licenciamento Ambiental. Você parou aos 14 minutos.</p>
+            <div class="row"><button type="button" class="btn btn-ouro btn-sm" id="continuar">Continuar aula</button><div class="barra"><i style="width:42%"></i></div><span style="font-size:12px;color:var(--prata-60)">42% da formação</span></div>
+          </section>
+
+          <section class="painel">
+            <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h2>Sua semana</h2><p class="sub" id="semana-sub"></p></div></div>
+            <div class="semana" id="semana"></div>
+            <div class="legenda"><span><i></i>Estudado</span><span><i class="p"></i>Planejado</span></div>
+          </section>
+
+          <section class="painel">
+            <h2>Estratégias de estudo</h2><p class="sub">Escolhidas para o momento em que você está na formação</p>
+            <div class="estrats">
+              <div class="estrat"><small>Durante a aula</small><b>Leitura ativa</b><p>Pause a cada trecho e escreva a ideia central antes de seguir.</p></div>
+              <div class="estrat"><small>Depois da aula</small><b>Com suas palavras</b><p>Explique o conceito como se fosse a um colega. Onde travar, volte.</p></div>
+              <div class="estrat"><small>1, 7 e 30 dias</small><b>Revisão espaçada</b><p>Revisar no intervalo certo fixa mais do que reler tudo de uma vez.</p></div>
+              <div class="estrat"><small>Fim do módulo</small><b>Caso concreto</b><p>Aplique o módulo a um caso real do seu dia antes de avançar.</p></div>
+            </div>
+          </section>
+
+          <section class="painel">
+            <h2>Sua jornada na formação</h2><p class="sub">Lei Geral do Licenciamento Ambiental · estrutura ilustrativa</p>
+            <div class="jornada">
+              <div class="m ok"><i></i><b>Módulo 1</b><span>Fundamentos · concluído</span></div>
+              <div class="m at"><i></i><b>Módulo 2</b><span>Procedimento · aula 3 de 6</span></div>
+              <div class="m"><i></i><b>Módulo 3</b><span>Prazos e controle</span></div>
+              <div class="m"><i></i><b>Módulo 4</b><span>Casos e aplicação</span></div>
+            </div>
+          </section>
+        </div>
+
+        <div class="pcol">
+          <section class="painel min-card" aria-live="polite">
+            <div class="quem"><img src="img/ejup-symbol-gold.svg" alt=""><div><h2>Minerva</h2><p class="sub">Orientadora de estudo</p></div></div>
+            <p class="fala" id="fala"></p>
+            <div class="opts">
+              <button type="button" class="chip" data-m="replanejar">Replanejar a semana</button>
+              <button type="button" class="chip" data-m="leitura">O que ler agora?</button>
+              <button type="button" class="chip" data-m="revisar">O que revisar?</button>
+            </div>
+          </section>
+
+          <section class="painel">
+            <h2>Meu plano</h2><p class="sub">A Minerva distribui as aulas pelo seu tempo</p>
+            <div class="plano-ctrl">
+              <div><label for="meta">Horas por semana <b id="meta-v"></b></label><input type="range" id="meta" min="1" max="12" step="0.5"></div>
+              <div><label>Dias de estudo</label><div class="dias" id="dias"></div></div>
+              <div><label for="hora">Horário preferido <b id="hora-v"></b></label><input type="range" id="hora" min="5" max="23" step="1"></div>
+              <p class="previsao" id="previsao"></p>
+            </div>
+          </section>
+
+          <section class="painel">
+            <h2>Revisões de hoje</h2><p class="sub">Marque ao concluir</p>
+            <div class="revisoes" id="revisoes"></div>
+          </section>
+
+          <section class="painel">
+            <h2>Percurso</h2><p class="sub">Desde a matrícula</p>
+            <div class="percurso"><div><b id="p-horas"></b><small>horas de estudo</small></div><div><b>1 de 4</b><small>módulos</small></div><div><b id="p-sem"></b><small>semanas seguidas</small></div></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="foco" id="foco" hidden role="dialog" aria-modal="true" aria-labelledby="foco-t">
+  <button type="button" class="fechar" id="fechar-foco">Sair do modo foco</button>
+  <div class="caixa">
+    <span class="eyebrow" id="foco-t">Modo foco · Módulo 2 · Aula 3</span>
+    <div class="rel" id="rel">25:00</div>
+    <div class="dur" id="dur"><button type="button" data-min="25" aria-pressed="true">25 min</button><button type="button" data-min="50" aria-pressed="false">50 min</button><button type="button" data-min="80" aria-pressed="false">80 min</button></div>
+    <label for="nota" class="eyebrow" style="color:var(--prata-60)">Anote com suas palavras</label>
+    <textarea id="nota" placeholder="A ideia central deste trecho é..."></textarea>
+    <div class="bts"><button type="button" class="btn btn-ouro" id="play">Começar</button><button type="button" class="btn btn-linha-escuro" id="encerrar">Encerrar e registrar</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const reduz = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---- Navegação entre telas ---- */
+  const VIEWS = ["site","formacao","painel"];
+  function ir(v, rolar=true){
+    if(!VIEWS.includes(v)) v = "site";
+    VIEWS.forEach(x => { $("#v-"+x).classList.toggle("ativa", x===v); $("#t-"+x).setAttribute("aria-current", x===v ? "page" : "false"); });
+    try{ history.replaceState(null,"","#"+v); }catch(e){}
+    if(rolar) window.scrollTo({top:0});
+    if(v==="painel") desenhar();
+  }
+  document.addEventListener("click", e => {
+    const b = e.target.closest("[data-ir]"); if(b){ e.preventDefault(); ir(b.dataset.ir); return; }
+    const a = e.target.closest("a[data-ancora]");
+    if(a){ e.preventDefault(); const alvo = document.querySelector(a.getAttribute("href")); if(alvo) alvo.scrollIntoView({behavior: reduz ? "auto" : "smooth"}); }
+    const t = e.target.closest("[data-toast]"); if(t) toast(t.dataset.toast);
+  });
+  const h = (location.hash||"").slice(1);
+  ir(VIEWS.includes(h) ? h : "site", false);
+
+  let tt;
+  function toast(msg){ const el=$("#toast"); el.textContent=msg; el.hidden=false; clearTimeout(tt); tt=setTimeout(()=>el.hidden=true,2600); }
+
+  /* ---- Professores (espaços reservados) ---- */
+  const car = $("#carrossel"), sil = '<svg class="sil" viewBox="0 0 100 120" fill="#d1d3d4"><circle cx="50" cy="34" r="24"/><path d="M6 120c4-30 22-46 44-46s40 16 44 46z"/></svg>';
+  const areas = ["IA, Direito e ética","Constitucional e processual","Licenciamento ambiental","Formação estratégica","Convidado do EJUPcast","Aulas ao vivo"];
+  car.innerHTML = areas.map((a,i)=>`<div class="prof">${sil}<div class="info"><small>${String(i+1).padStart(2,"0")} / ${String(areas.length).padStart(2,"0")}</small><b>Professor a confirmar</b><span>${a}</span></div></div>`).join("");
+  $$("[data-car]").forEach(b => b.addEventListener("click", () => car.scrollBy({left: (+b.dataset.car)*260, behavior: reduz ? "auto" : "smooth"})));
+
+  /* ---- Onda do EJUPcast ---- */
+  const onda = $("#onda"); let barras = "";
+  for(let i=0;i<48;i++){ const v = 18 + Math.abs(Math.sin(i*0.55)*52 + Math.sin(i*1.7)*22); barras += `<i style="height:${Math.min(100,v)}%"></i>`; }
+  onda.innerHTML = barras;
+
+  /* ---- Painel: estado (exemplo) ---- */
+  const DIAS = ["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"];
+  const HOJE = 3; // quinta, no exemplo
+  const padrao = { meta:4, dias:[0,2,3,5], hora:20, feito:[80,0,85,28,0,0,0], revs:[false,false,false], horasAntes:1120 };
+  let S = padrao;
+  try{ const g = JSON.parse(localStorage.getItem("ejup-painel")||"null"); if(g && Array.isArray(g.feito)) S = Object.assign({}, padrao, g); }catch(e){}
+  const salvar = () => { try{ localStorage.setItem("ejup-painel", JSON.stringify(S)); }catch(e){} };
+
+  const plano = () => { const por = Math.round((S.meta*60)/Math.max(1,S.dias.length)/5)*5; return DIAS.map((_,i)=> S.dias.includes(i) ? por : 0); };
+  const fmtMin = m => m>=60 ? `${Math.floor(m/60)}h${String(m%60).padStart(2,"0")}` : `${m} min`;
+  const fmtHora = x => String(x).padStart(2,"0")+":00";
+
+  const REVS = [
+    ["Módulo 1 · Aula 4 · Fundamentos","7 dias"],
+    ["Módulo 2 · Aula 1 · Etapas do procedimento","1 dia"],
+    ["Módulo 1 · Aula 1 · O lugar da lei geral","30 dias"]
+  ];
+
+  let falaModo = "auto";
+  function desenhar(){
+    const p = plano(), metaHoje = p[HOJE], feitoHoje = S.feito[HOJE];
+    const totalFeito = S.feito.reduce((a,b)=>a+b,0), metaSem = S.meta*60;
+    $("#ola").innerHTML = `Boa noite, <b>Ana</b>. Quinta-feira, semana 7 da formação.`;
+    // anel
+    const frac = metaHoje ? Math.min(1, feitoHoje/metaHoje) : (feitoHoje ? 1 : 0);
+    $("#anel-p").style.strokeDashoffset = 490*(1-frac);
+    $("#anel-n").textContent = feitoHoje;
+    $("#anel-de").textContent = metaHoje ? `de ${metaHoje} min` : "sem meta hoje";
+    if(!metaHoje){ $("#hoje-t").innerHTML = "Hoje é <b>descanso.</b>"; $("#hoje-p").textContent = "Quinta não está no seu plano. Se sobrar tempo, uma revisão curta mantém o ritmo."; }
+    else if(feitoHoje >= metaHoje){ $("#hoje-t").innerHTML = "Meta de hoje <b>cumprida.</b>"; $("#hoje-p").textContent = "O resto da noite pode ser da revisão ou do descanso. Os dois contam."; }
+    else { $("#hoje-t").innerHTML = `Faltam <b>${metaHoje-feitoHoje} minutos.</b>`; $("#hoje-p").textContent = `Seu bloco de hoje começa às ${fmtHora(S.hora)}. A aula 3 do Módulo 2 cabe inteira nele.`; }
+    // semana
+    const maxv = Math.max(60, ...p, ...S.feito);
+    $("#semana").innerHTML = DIAS.map((d,i)=>`<div class="dia${i===HOJE?" hj":""}"><div class="col">${p[i]?`<span class="plan" style="height:${p[i]/maxv*100}%"></span>`:""}<span class="feito" style="height:${S.feito[i]/maxv*100}%"></span></div>${d}</div>`).join("");
+    $("#semana-sub").textContent = `${fmtMin(totalFeito)} de ${fmtMin(metaSem)} planejadas`;
+    // controles
+    $("#meta").value = S.meta; $("#meta-v").textContent = String(S.meta).replace(".",",")+" h";
+    $("#hora").value = S.hora; $("#hora-v").textContent = fmtHora(S.hora);
+    $("#dias").innerHTML = DIAS.map((d,i)=>`<button type="button" aria-pressed="${S.dias.includes(i)}" data-dia="${i}" aria-label="${d}">${d[0]}</button>`).join("");
+    const cargaMin = 24*60, feitoCurso = Math.round(cargaMin*0.42);
+    const semanas = Math.ceil((cargaMin - feitoCurso)/Math.max(30,metaSem));
+    const fim = new Date(2026,9,1); fim.setDate(fim.getDate()+semanas*7);
+    $("#previsao").innerHTML = `Nesse ritmo, você conclui a formação em <b>${semanas} semanas</b>, perto de <b>${fim.toLocaleDateString("pt-BR",{day:"numeric",month:"long"})}</b>. <span class="conf">carga ilustrativa de 24 h</span>`;
+    // revisões
+    $("#revisoes").innerHTML = REVS.map((r,i)=>`<label class="rev${S.revs[i]?" ok":""}"><input type="checkbox" id="rev-${i}" ${S.revs[i]?"checked":""} data-rev="${i}">${r[0]}<span>${r[1]}</span></label>`).join("");
+    // percurso
+    const totMin = S.horasAntes + totalFeito;
+    $("#p-horas").textContent = (totMin/60).toFixed(1).replace(".",",");
+    $("#p-sem").textContent = "6";
+    falar();
+  }
+
+  function proximoBloco(){
+    const p = plano();
+    for(let k=0;k<7;k++){ const i=(HOJE+k)%7; if(p[i] && S.feito[i] < p[i]) return {i, min:p[i]-S.feito[i]}; }
+    return null;
+  }
+  function falar(){
+    const p = plano(), total = S.feito.reduce((a,b)=>a+b,0), falta = S.meta*60 - total, pend = S.revs.filter(x=>!x).length;
+    let t;
+    if(falaModo==="leitura") t = `Antes da aula 3, leia os artigos que ela comenta, <b>no texto da própria lei</b>. Quinze minutos de leitura direta rendem mais do que qualquer resumo.`;
+    else if(falaModo==="revisar") t = pend ? `Você tem <b>${pend} revisão${pend>1?"ões":""}</b> hoje. Comece pela de 1 dia: ela é a que mais se perde se ficar para amanhã.` : `Revisões de hoje concluídas. A próxima cai no <b>sábado</b>.`;
+    else if(falaModo==="replanejar"){ t = falta>0 ? `Replanejei: os <b>${fmtMin(falta)}</b> que faltam ficam distribuídos entre ${S.dias.filter(d=>d>=HOJE).map(d=>DIAS[d].toLowerCase()).join(" e ")||"a próxima semana"}, às ${fmtHora(S.hora)}.` : `A semana já fechou a meta. Nada para mover.`; }
+    else {
+      const nb = proximoBloco();
+      if(falta<=0) t = `Semana completa: <b>${fmtMin(total)}</b> estudadas. Use o tempo livre para a revisão de 30 dias.`;
+      else if(nb) t = `Faltam <b>${fmtMin(falta)}</b> para a sua meta da semana. Seu próximo bloco é ${nb.i===HOJE?"<b>hoje</b>":"<b>"+DIAS[nb.i].toLowerCase()+"</b>"}, às ${fmtHora(S.hora)}: ${fmtMin(nb.min)} para a aula 3 do Módulo 2.`;
+      else t = `Faltam <b>${fmtMin(falta)}</b> e o plano não tem mais dias nesta semana. Quer incluir o sábado?`;
+    }
+    $("#fala").innerHTML = t;
+  }
+
+  $("#meta").addEventListener("input", e => { S.meta = +e.target.value; falaModo="auto"; salvar(); desenhar(); });
+  $("#hora").addEventListener("input", e => { S.hora = +e.target.value; salvar(); desenhar(); });
+  $("#dias").addEventListener("click", e => { const b=e.target.closest("[data-dia]"); if(!b) return; const i=+b.dataset.dia;
+    S.dias = S.dias.includes(i) ? S.dias.filter(x=>x!==i) : [...S.dias,i].sort(); if(!S.dias.length) S.dias=[i]; falaModo="auto"; salvar(); desenhar(); });
+  $("#revisoes").addEventListener("change", e => { const i=e.target.dataset.rev; if(i===undefined) return; S.revs[+i]=e.target.checked; falaModo="revisar"; salvar(); desenhar(); });
+  $$("[data-m]").forEach(b => b.addEventListener("click", () => { falaModo=b.dataset.m; falar(); }));
+  $("#continuar").addEventListener("click", abrirFoco);
+
+  /* ---- Modo foco ---- */
+  let dur=25*60, resta=dur, rodando=false, iv=null, inicio=0, acumulado=0;
+  const rel = () => { $("#rel").textContent = `${String(Math.floor(resta/60)).padStart(2,"0")}:${String(resta%60).padStart(2,"0")}`; };
+  function abrirFoco(){ $("#foco").hidden=false; document.body.style.overflow="hidden"; rel(); $("#play").focus(); }
+  function parar(){ rodando=false; clearInterval(iv); $("#play").textContent = resta<dur ? "Retomar" : "Começar"; }
+  function fechar(){ parar(); $("#foco").hidden=true; document.body.style.overflow=""; }
+  $("#abrir-foco").addEventListener("click", abrirFoco);
+  $("#fechar-foco").addEventListener("click", fechar);
+  document.addEventListener("keydown", e => { if(e.key==="Escape" && !$("#foco").hidden) fechar(); });
+  $("#dur").addEventListener("click", e => { const b=e.target.closest("[data-min]"); if(!b||rodando) return;
+    $$("#dur button").forEach(x=>x.setAttribute("aria-pressed", x===b)); dur=+b.dataset.min*60; resta=dur; rel(); $("#play").textContent="Começar"; });
+  $("#play").addEventListener("click", () => {
+    if(rodando){ parar(); return; }
+    rodando=true; $("#play").textContent="Pausar";
+    iv=setInterval(()=>{ resta--; rel(); if(resta<=0){ parar(); registrar(); } },1000);
+  });
+  function registrar(){
+    const min = Math.max(0, Math.round((dur-resta)/60));
+    if(min>0){ S.feito[HOJE] += min; salvar(); toast(`${min} min registrados no seu dia`); } else toast("Sessão encerrada sem tempo registrado");
+    resta=dur; rel(); falaModo="auto"; desenhar(); fechar();
+  }
+  $("#encerrar").addEventListener("click", registrar);
+})();
+</script>
