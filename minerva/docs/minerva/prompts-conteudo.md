@@ -250,6 +250,14 @@ tempo real, só a ordem da fala. A Minerva escolhe as citações mais fortes
 pelo conteúdo, mas o tempo exato (ex. "22:44") precisa ser conferido por
 quem edita o vídeo antes de ir para a arte final, nunca inventado.
 
+**Legenda do carrossel de divulgação (modelo recebido em 30/09/2026, post do
+#018 no @ejup.oficial):** (1) "No episódio #NNN do EJUPcast, recebemos [nome
+e descrição], para uma conversa com a Dra. Rossana Fonseca sobre [temas]."
+(2) parágrafo de apresentação com cargos, com os mesmos dados da tela de
+biografia do carrossel; (3) "Uma conversa que passa por questões que...",
+com os pontos fortes ditos no episódio; (4) "Assista ao episódio completo
+agora." e "Link na bio." em linhas separadas. Só vale com o episódio no ar.
+
 ### 5. Timecodes para cortes de Instagram
 _Recebido em 25/09/2026._
 
