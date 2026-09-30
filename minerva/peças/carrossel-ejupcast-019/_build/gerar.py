@@ -153,10 +153,10 @@ DURACAO = "[duração]"  # ex. "1h06"; o colchete sinaliza que falta
 
 
 def telas():
-    capa_foto = foto("capa", rotulo="FOTO · MARCO BRUNO (3:4)")
-    foto_f1 = foto("frase-1", rotulo="FOTO · MARCO BRUNO FALANDO")
-    foto_f2 = foto("frase-2", rotulo="FOTO · OUTRO PLANO DELE")
-    conversa = foto("conversa", largura=1712, rotulo="FOTO · MESA, ELE E A DRA. ROSSANA")
+    capa_foto = foto("capa", (0.44, 0.09, 0.78, 0.895), 1080, rotulo="FOTO · MARCO BRUNO (3:4)")
+    foto_f1 = foto("frase-1", (0.425, 0.107, 0.80, 0.607), rotulo="FOTO · MARCO BRUNO FALANDO")
+    foto_f2 = foto("frase-2", (0.63, 0.20, 0.93, 0.60), rotulo="FOTO · OUTRO PLANO DELE")
+    conversa = foto("conversa", (0.0, 0.035, 1.0, 0.95), largura=1712, rotulo="FOTO · MESA, ELE E A DRA. ROSSANA")
     return [
         # 1 · capa
         f"""<section class="s papel">

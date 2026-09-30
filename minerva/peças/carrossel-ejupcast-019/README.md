@@ -27,3 +27,9 @@ Fontes:
 - TRF5, "Inspirado na Justiça Federal, CNJ cria Centro de Inteligência": https://www.trf5.jus.br/index.php/noticias/leitura-de-noticias?%2Fid=322736
 - TRF5, livro sobre Amaro Cavalcanti: https://www.trf5.jus.br/index.php/noticias/leitura-de-noticias?/id=327365
 - Currículo público (UFRN, Berkeley): https://www.escavador.com/sobre/6226771/marco-bruno-miranda-clementino
+
+## Fotos (30/09/2026)
+Frames do episódio enviados pelo Victor, todos com Marco Bruno de boca fechada:
+capa (ouvindo, mãos entrelaçadas), citação 1 (gesticulando), citação 2 (perfil,
+recorte do plano aberto) e biografia (plano aberto da mesa com a Dra. Rossana;
+mesmo frame da citação 2, em outro enquadramento). Legenda em `legenda.md`.
