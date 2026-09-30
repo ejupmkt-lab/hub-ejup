@@ -438,6 +438,12 @@ segue:
 Sem travessão, sem a figura "não é X, é Y", linguagem formal e fácil de
 entender, valem sempre.
 
+**Regra do quadro (30/09/2026):** nas legendas de A Sala, nunca nomear
+quem apresenta (por exemplo, "Roberto abrindo cada episódio"), porque nem
+sempre será a mesma pessoa. Dizer "uma frase que abre cada episódio".
+Vale também para legenda de vídeo de expectativa: sem revelar tema nem
+caso, com data de estreia e convite para o público comentar o palpite.
+
 ### 12. Legenda para carrossel de caso real (tema de episódio de A Sala)
 _Recebido em 28/09/2026._
 
