@@ -18,6 +18,9 @@ estrutura fixa de `docs/minerva/prompts-conteudo.md`.
   simples, a nossa matéria-prima é justiça e segurança jurídica"). A versão
   anterior, "A gente tem doutrina...", saiu porque a tela 3 também começa com
   "A gente". Conferir o tempo do corte (`TEMPO_2`) com quem edita.
+- **Citação 1 trocada (30/09/2026)**, a pedido: "Se tudo fosse perfeito, nós
+  éramos robôs." (transcrição: "porque se tudo fosse perfeito, nós éramos
+  robôs"). Conferir `TEMPO_1` com quem edita.
 
 ## Biografia: o que mudou e por quê (itens 20 e 21)
 - Nome: "Marco Bruno **Miranda** Clementino", como nas fontes oficiais (o

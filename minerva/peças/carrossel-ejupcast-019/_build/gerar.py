@@ -174,8 +174,8 @@ def telas():
   <p class="temas-rod">Uma conversa com a Dra. Rossana Fonseca.</p>
   {SETA}
 </section>""",
-        frase("A gente vai perceber que a verdadeira perfeição <em>é imperfeita.</em>",
-              "Marco Bruno", TEMPO_1, foto_f1, "e", corpo=80),
+        frase("Se tudo fosse perfeito, nós éramos <em>robôs.</em>",
+              "Marco Bruno", TEMPO_1, foto_f1, "e", corpo=88),
         frase("A nossa matéria-prima é <em>justiça e segurança jurídica.</em>",
               "Marco Bruno", TEMPO_2, foto_f2, "d", corpo=80),
         # 5 · cartão (o que o Roberto aprovou)
