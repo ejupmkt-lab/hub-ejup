@@ -135,3 +135,7 @@ objetos no meio do clipe (braço de luminária no c3): conferir frame a frame.
 - [ ] Autorização de imagem das pessoas identificáveis.
 - [ ] Confirmar a licença da faixa "Shades" na conta Artlist da EJUP.
 - [ ] Vinheta: versões de 6 s e 9:16, se forem para Reels.
+
+## Regras de foto acrescentadas em 29 e 30/09/2026 (Victor)
+- **Nunca escolher frame de pessoa com a boca aberta.** Falando, a boca sai entreaberta e a foto fica estranha; buscar a pessoa ouvindo, pensando ou entre frases.
+- **Sempre centralizar a pessoa no recorte.** Rosto e tronco no eixo do quadro (ou do cartão), nunca encostados na borda.
