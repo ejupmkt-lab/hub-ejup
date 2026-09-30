@@ -13,9 +13,11 @@ estrutura fixa de `docs/minerva/prompts-conteudo.md`.
 - **Citação 2 trocada (30/09/2026).** A frase "A missão da nossa geração é
   destruir a inteligência artificial..." estava atribuída a ele por engano: é
   o que um comediante disse a formandos de Harvard, contado por ele, e no
-  original é "geração de vocês". Entrou uma fala dele, do trecho sobre
-  doutrina: "A gente tem doutrina de excelente qualidade e tem doutrina
-  banalizada." Conferir o tempo do corte (`TEMPO_2`) com quem edita.
+  original é "geração de vocês". Entrou uma fala dele: "A nossa
+  matéria-prima é justiça e segurança jurídica." (transcrição: "Acho que é
+  simples, a nossa matéria-prima é justiça e segurança jurídica"). A versão
+  anterior, "A gente tem doutrina...", saiu porque a tela 3 também começa com
+  "A gente". Conferir o tempo do corte (`TEMPO_2`) com quem edita.
 
 ## Biografia: o que mudou e por quê (itens 20 e 21)
 - Nome: "Marco Bruno **Miranda** Clementino", como nas fontes oficiais (o

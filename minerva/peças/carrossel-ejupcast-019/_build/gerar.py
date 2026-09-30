@@ -176,8 +176,8 @@ def telas():
 </section>""",
         frase("A gente vai perceber que a verdadeira perfeição <em>é imperfeita.</em>",
               "Marco Bruno", TEMPO_1, foto_f1, "e", corpo=80),
-        frase("A gente tem doutrina de excelente qualidade e tem <em>doutrina banalizada.</em>",
-              "Marco Bruno", TEMPO_2, foto_f2, "d", corpo=72),
+        frase("A nossa matéria-prima é <em>justiça e segurança jurídica.</em>",
+              "Marco Bruno", TEMPO_2, foto_f2, "d", corpo=80),
         # 5 · cartão (o que o Roberto aprovou)
         f"""<section class="s papel">
   {painel(460, '<div class="play" style="top:40px;right:48px">Assistir <span>&#9654;</span></div>')}
