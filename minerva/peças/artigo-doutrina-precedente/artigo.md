@@ -1,13 +1,13 @@
-# Doutrina ou precedente? O que o CPC exige da fundamentação em petições e decisões
+# Art. 489 do CPC: o que a fundamentação exige ao citar precedente e doutrina
 
-**SEO title:** Doutrina ou precedente? O que o CPC exige da fundamentação
-**Meta description:** Veja o que o CPC exige ao citar precedente e doutrina em petições e decisões: art. 489, §1º, art. 927, fundamentos determinantes e distinção.
-**Slug:** /doutrina-precedente-fundamentacao-cpc/
+**SEO title:** Art. 489 do CPC: fundamentação com precedente e doutrina
+**Meta description:** Fundamentação da decisão judicial no CPC: o que o art. 489, §1º e o art. 927 exigem ao citar precedente e doutrina em petições e decisões.
+**Slug:** /fundamentacao-decisao-art-489-cpc/
 **Autoria:** Equipe EJUP
 **Revisão técnica:** [nome do especialista]
 **Publicado em:** [data] · **Fontes legais conferidas em:** [data]
 
-O Código de Processo Civil de 2015 exige que a decisão judicial explique por que um precedente se aplica ao caso concreto. A doutrina não integra a lista de pronunciamentos que juízes e tribunais devem observar, e cumpre outra função: ajuda a identificar os fundamentos determinantes de um precedente, a demonstrar distinções e a sustentar a superação de um entendimento. Este artigo apresenta o que dizem os arts. 489, 926 e 927 do CPC, o que o Superior Tribunal de Justiça decidiu sobre o dever de responder aos argumentos das partes e como organizar a citação de precedente e de doutrina em uma petição.
+A fundamentação da decisão judicial, segundo o art. 489 do Código de Processo Civil de 2015, precisa explicar por que um precedente se aplica ao caso concreto. A doutrina não integra a lista de pronunciamentos que juízes e tribunais devem observar, e cumpre outra função: ajuda a identificar os fundamentos determinantes de um precedente, a demonstrar distinções e a sustentar a superação de um entendimento. Este artigo apresenta o que dizem os arts. 489, 926 e 927 do CPC, o que o Superior Tribunal de Justiça decidiu sobre o dever de responder aos argumentos das partes e como organizar a citação de precedente e de doutrina em uma petição.
 
 ## Em resumo
 
