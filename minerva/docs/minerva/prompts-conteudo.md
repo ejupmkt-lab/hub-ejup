@@ -129,6 +129,16 @@ na arte como elementos visuais à parte (nome embaixo do título, selo do
 episódio no canto), no sistema do cartão já aprovado, não colados na mesma
 frase com " | ".
 
+**Estilo visual da arte (referência do Victor, 01/10/2026, thumb "O comando
+oculto"):** é o padrão das thumbs da EJUP no YouTube e substitui o sistema do
+cartão nesse formato. Plano aberto do estúdio em toda a largura (todos no
+quadro, boca fechada, cena centrada na TV), logo EJUP horizontal branco no
+canto superior direito, faixa navy de cerca de 220 px embaixo com a frase em
+duas linhas centradas: a primeira em branco, Gotham Medium, caixa alta,
+menor; a segunda em dourado, Gotham Black, caixa alta, grande. Sem nome do
+convidado nem número do episódio na arte (vão no título do vídeo). Gerador
+de exemplo: `peças/youtube-ejupcast-019/_build/thumb.py`.
+
 ### 3. Descrição do episódio para o YouTube
 _Recebido em 25/09/2026, como print de uma descrição já publicada (episódio
 com Correia Júnior e Thiago Correia)._

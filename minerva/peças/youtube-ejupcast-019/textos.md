@@ -45,9 +45,10 @@ Instagram do convidado: @marcobrunom
 - Itens 20 e 21: confirmar a especialização da ENFAM em fonte externa. Sem confirmação, segue atribuída a ele.
 
 ## Thumbnail (arte)
-`thumbnail-1280x720.png`, gerada por `python3 _build/thumb.py` no sistema do
-cartão do carrossel #019: painel navy com facetas, logo ejup/cast, frase em
-Gotham Black com "inovação" em dourado, nome do convidado e selo do episódio
-embaixo, foto em cartão à direita. Frame `capa.jpg` do carrossel (boca
-fechada, pessoa centrada no cartão). Zero crédito do Higgsfield.
-- Publicação só com o ok do Roberto Pivotto.
+`thumbnail-1280x720.png`, gerada por `python3 _build/thumb.py`, no estilo de
+thumb da EJUP no YouTube (referência do Victor, 01/10/2026): plano aberto do
+estúdio em toda a largura, logo EJUP branco no canto superior direito, faixa
+navy embaixo com a frase em duas linhas centradas ("EXISTE INOVAÇÃO NA" em
+branco Medium; "JUSTIÇA FEDERAL?" em dourado Black, maior). Frame
+`conversa.jpg` do carrossel, os dois de boca fechada. Zero crédito do
+Higgsfield.
