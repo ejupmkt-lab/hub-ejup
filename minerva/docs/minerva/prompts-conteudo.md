@@ -273,6 +273,8 @@ ou menos onde fica na conversa) e avisa que o tempo exato precisa ser
 conferido por quem edita. Quando a transcrição já vier com marcação de
 tempo, a Minerva usa o tempo real.
 
+**Cortes de até 90 segundos (01/10/2026):** com transcrição em timecode real, indicar início e fim de cada corte, a duração e uma linha do que o corte contém. Variar os temas (nem todos jurídicos), começar e terminar em frase completa, e apontar o que o corte afirma que precisa de checagem antes da legenda.
+
 ### 6. Frase para post manifesto / aspas
 _Recebido em 25/09/2026, junto com o item 7 (ver abaixo)._
 
@@ -528,3 +530,26 @@ ambíguo (a sua o quê?). Sempre que uma frase mais solta usar pronome ("a
 sua", "isso", "ela"), o substantivo precisa estar na mesma frase ou na
 imediatamente anterior, nunca a dois parágrafos de distância. Versão
 corrigida desse caso: "Qual seria a sua confissão? Deixa nos comentários."
+
+### 13. Artigo da coluna a partir da transcrição de um episódio
+_Recebido em 01/10/2026, de uma estagiária da EJUP. O fluxo: depois do
+EJUPcast, um especialista, com ajuda de IA, escolhe um tema do episódio para
+virar artigo._
+
+> Sou estagiária da EJUP, e depois do EJUPcast, um expert (meu chefe) com
+> ajuda de IA puxa um tema abordado no podcast que pode ser transformado em
+> um artigo. Vou mandar a transcrição do podcast que é o do artigo. Use a
+> melhor estrutura de artigo para a coluna da EJUP, visando o melhor para o
+> GEO. Identifique o tema e faça o artigo completo.
+
+**Como aplicar:** (1) escolher o tema do episódio que tenha base legal ou
+institucional verificável, dentro dos pilares do board, e dizer qual foi e
+por quê; (2) estrutura de `peças/artigo-doutrina-precedente/artigo.md` e as
+correções do documento de orientação do artigo da ANEEL: resumo no topo,
+H2 em forma de pergunta com resposta direta nas duas primeiras frases,
+definições curtas, tabela ou lista de passos, "Dúvidas rápidas" sem repetir
+os H2, fontes por categoria com link, nenhuma afirmação absoluta, dado sempre
+com período; (3) trechos do episódio entram com timecode e rotulados como
+percepção do convidado, nunca como regra; (4) entregar com um README de
+"antes de publicar", dizendo o que não foi possível conferir; (5) travessão,
+"não é X, é Y" e promessa de resultado seguem proibidos.
