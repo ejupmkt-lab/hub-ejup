@@ -100,7 +100,7 @@ def main():
   <p class="sub" style="top:1100px">Quem percebeu foi o advogado da parte que perdeu.</p>
   <img class="logo" src="{b64(LOGO, 'image/svg+xml')}" alt="">
   <p class="arraste">Arraste</p>""",
-        f'<div class="bg" style="background-image:url({img("web-assinatura.jpg")});background-position:40% 30%;filter:brightness(.5) saturate(.6) contrast(1.1)"></div><div class="veu baixo"></div>'))
+        f'<div class="bg" style="background-image:url({img("web-assinatura-pt.jpg")});background-position:40% 30%;filter:brightness(.5) saturate(.6) contrast(1.1)"></div><div class="veu baixo"></div>'))
     # 2 · o que aconteceu (papel) · o cartão da foto atravessa para a tela 3
     t.append(tela(1, "papel", f"""
   <h2 class="tit" style="top:150px">O ChatGPT tinha inventado <em>decisões do STJ.</em></h2>
