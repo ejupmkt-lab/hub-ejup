@@ -1,22 +1,27 @@
-# Destaque do Instagram · Quem somos · 6 telas 1080x1920
+# Destaque do Instagram · Quem somos · 5 telas 1080x1920
 
 `python3 _build/gerar.py && python3 _build/render.py`
 
-Telas em `telas/tela-01..06.png`; visão geral em `visualizacao-completa.png`.
+Telas em `telas/tela-01..05.png`; visão geral em `visualizacao-completa.png`.
 
-1. Abertura: símbolo dourado e assinatura "Alma clássica, repertório contemporâneo."
-2. Quem somos: escola jurídica dedicada à educação jurídica estratégica e à formação de líderes.
-3. Missão: notório saber jurídico em soluções educacionais digitais, com a figura da ponte entre experts e mercado.
-4. Fundamentos: tradição sem mofo, inovação sem vulgarização, digital sem superficialidade.
-5. Para quem: o jurista que trata o aprendizado como percurso, com a frase de corte do manifesto.
-6. Contato: site, e-mail, WhatsApp, endereço e Instagram.
+Versão de 02/10/2026, com os textos definidos pelo Victor/equipe (a tela de fundamentos foi descartada):
+
+1. Abertura: símbolo dourado e "Alma clássica, repertório contemporâneo."
+2. "A EJUP é uma instituição de ensino dedicada à educação jurídica estratégica e à formação de líderes do Direito." + "Notório saber jurídico transformado em formato digital de alto nível."
+3. "Transformamos o conhecimento dos experts em soluções jurídicas digitais escaláveis" (sem ponto final, como no pedido), com a ponte entre Experts e Soluções digitais.
+4. "Para o jurista que trata o aprendizado como percurso e que quer construir soluções digitais dentro da nova economia" (sem ponto final) + "Se você é corajoso demais, a EJUP é pra você."
+5. Contato: site, e-mail, WhatsApp, endereço e Instagram.
 
 ## Decisões
-- Textos retirados do Manual da Marca (missão, três fundamentos, frase de corte) e do contato institucional do CLAUDE.md.
 - Só as cores do MIV. Dourado sobre fundo escuro, bronze sobre fundo claro (tela 3).
-- Texto alinhado à esquerda: em linhas curtas, o texto justificado abria buracos entre as palavras.
-- Conteúdo fora das faixas que o Instagram cobre (topo e rodapé). Logo na mesma altura em todas as telas.
+- Texto à esquerda, conteúdo fora das faixas que o Instagram cobre, logo na mesma altura em todas as telas.
 - Sem foto, sem emoji, sem pessoas. Nenhum crédito do Higgsfield usado.
+- Na tela 3 saiu o parágrafo de apoio ("Conectamos experts ao mercado...") porque o texto novo substitui a tela inteira.
+
+## Pontos de vigilância (CLAUDE.md)
+- "escaláveis" vem de "escalar", que está na lista de termos a evitar (§4). Alternativas: "soluções jurídicas digitais de alcance nacional" ou "em larga escala".
+- "pra você" é coloquial. A voz da marca é formal e fácil; a grafia padrão é "para você".
+- "nova economia" é expressão de negócios digitais; o léxico da marca evita jargão de guru. Conferir se mantém.
 
 ## Conferir antes de subir
 - O site `ejup.com.br` foi deduzido do domínio do e-mail. Confirmar o endereço correto.

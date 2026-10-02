@@ -46,36 +46,28 @@ t1 = tela("navy", f'''
 # 2. quem somos
 t2 = tela("ink", '''
   <div class="fio"></div>
-  <p class="corpo">A EJUP é uma escola jurídica dedicada à <em>educação jurídica estratégica</em> e à formação de líderes.</p>
-  <p class="apoio">Notório saber jurídico, rigor e tradição, em formato digital de alto nível.</p>
+  <p class="corpo">A EJUP é uma instituição de ensino dedicada à <em>educação jurídica estratégica</em> e à formação de líderes do Direito.</p>
+  <p class="apoio">Notório saber jurídico transformado em formato digital de alto nível.</p>
 ''', f'<svg class="bg" viewBox="0 0 1080 1920">{arcos(1080, 1560, [900, 680, 460], "#d1d3d4", 0.10)}</svg>')
 
 # 3. missão (fundo claro)
 t3 = tela("papel", '''
-  <p class="corpo">Transformamos o <em>notório saber jurídico</em> em soluções educacionais digitais de alto nível.</p>
+  <p class="corpo">Transformamos o conhecimento dos experts em <em>soluções jurídicas digitais escaláveis</em></p>
   <div class="ponte">
     <svg viewBox="0 0 800 230">
       <path d="M60,190 V150 A340,110 0 0 1 740,150 V190" fill="none" stroke="#9b6b26" stroke-width="5"/>
       <line x1="30" y1="190" x2="770" y2="190" stroke="#031c37" stroke-width="3"/>
       <circle cx="60" cy="150" r="11" fill="#9b6b26"/><circle cx="740" cy="150" r="11" fill="#9b6b26"/>
     </svg>
-    <div class="ponte-r"><span>Experts</span><span>Mercado</span></div>
+    <div class="ponte-r"><span>Experts</span><span>Soluções digitais</span></div>
   </div>
-  <p class="apoio">Conectamos experts ao mercado e capacitamos profissionais para a excelência na prática do Direito.</p>
 ''', logo=LOGO_NAVY)
-
-# 4. fundamentos
-t4 = tela("navy", '''
-  <div class="linha"><span class="a">Tradição</span><span class="b">sem mofo</span></div>
-  <div class="linha"><span class="a">Inovação</span><span class="b">sem vulgarização</span></div>
-  <div class="linha"><span class="a">Digital</span><span class="b">sem superficialidade</span></div>
-''')
 
 # 5. para quem
 t5 = tela("steel", '''
-  <p class="corpo">Para o jurista que trata o aprendizado como <em>percurso</em> e respeita a densidade do estudo.</p>
+  <p class="corpo">Para o jurista que trata o aprendizado como <em>percurso</em> e que quer construir soluções digitais dentro da nova economia</p>
   <div class="degraus"><i></i><i></i><i></i><i class="top"></i></div>
-  <p class="corte">Se isso parece exigente demais, a EJUP não é para você.</p>
+  <p class="corte">Se você é corajoso demais, a EJUP é pra você.</p>
 ''')
 
 # 6. contato
@@ -118,7 +110,7 @@ p{{text-align:left;hyphens:manual}}
 .slogan{{font-weight:900;font-size:104px;line-height:1.08;letter-spacing:-.025em;text-align:center}}
 .slogan em{{display:inline-block;margin-top:10px}}
 /* 3 */
-.papel .corpo{{color:var(--navy)}}
+.papel .corpo{{color:var(--navy);font-size:92px}}
 .ponte{{margin:70px 0 10px}} .ponte svg{{width:100%;height:auto;display:block}}
 .ponte-r{{display:flex;justify-content:space-between;padding:0 10px;margin-top:18px}}
 .ponte-r span{{font-weight:500;font-size:26px;letter-spacing:.14em;text-transform:uppercase;color:var(--navy)}}
@@ -129,7 +121,7 @@ p{{text-align:left;hyphens:manual}}
 .linha .a{{display:block;font-weight:900;font-size:128px;line-height:1.02;letter-spacing:-.025em}}
 .linha .b{{display:block;font-weight:300;font-size:60px;margin-top:14px;color:var(--gold)}}
 /* 5 */
-.steel .corpo{{font-size:72px}}
+.steel .corpo{{font-size:66px}}
 .degraus{{display:flex;align-items:flex-end;gap:16px;height:210px;margin:72px 0}}
 .degraus i{{display:block;flex:1;background:rgba(209,211,212,.28)}}
 .degraus i:nth-child(1){{height:25%}} .degraus i:nth-child(2){{height:50%}} .degraus i:nth-child(3){{height:75%}}
@@ -146,7 +138,7 @@ p{{text-align:left;hyphens:manual}}
 
 html = f'''<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Destaque Quem somos</title>
 <style>{CSS}</style></head><body>
-{t1}{t2}{t3}{t4}{t5}{t6}
+{t1}{t2}{t3}{t5}{t6}
 </body></html>'''
 (OUT / "destaque.html").write_text(html)
 print("destaque.html gerado")
