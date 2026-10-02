@@ -67,7 +67,7 @@ t3 = tela("papel", '''
 t5 = tela("steel", '''
   <p class="corpo">Para o jurista que trata o aprendizado como <em>percurso</em> e que quer construir soluções digitais dentro da nova economia</p>
   <div class="degraus"><i></i><i></i><i></i><i class="top"></i></div>
-  <p class="corte">Se você é corajoso demais, a EJUP é pra você.</p>
+  <p class="corte">Se você é audacioso demais, a EJUP é pra você.</p>
 ''')
 
 # 6. contato
