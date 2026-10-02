@@ -13,3 +13,20 @@ telas essenciais da Parte 2 (07, 10, 12, 13, 15).
   do quadro 2k, 1920x1080, sem custo.
 
 Gasto: 5 + 9 = 14 créditos (saldo 14,66 → 0,66).
+
+## Versão com ação (02/10/2026, aprovada para gerar pelo Victor)
+
+Cada tela com quadro de início e de fim, para a IA executar a ação do roteiro.
+
+- `quadros-fim/`: quadros de fim (e o início sem caixa da 13), gpt_image_2_5
+  alta 2k, 2,75 créditos cada, 5 imagens.
+- `clipes-acao/`: Kling 3.0 pro, 5 s, 1912x1080, sem som, 8,75 créditos cada.
+  - 07 · a chave passa de uma mão para a outra (2ª tomada)
+  - 10 · as moedas deslizam até o banco
+  - 12 · as moedas dos bancos caem na tigela do FGC
+  - 13 · a caixa de acrílico desce e deixa três pilhas de fora
+  - 15 · a câmera percorre a fila e para no cofre (2ª tomada)
+  - `*-take1-descartado.mp4`: primeiras tomadas da 07 (chave solta no ar) e
+    da 15 (silhuetas deformando), guardadas só como registro.
+
+Gasto desta etapa: 13,75 + 43,75 + 17,5 (refações) = 75 créditos.
