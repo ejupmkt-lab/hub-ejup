@@ -75,7 +75,7 @@ t6 = tela("ink", '''
   <div class="contato">
     <div class="c"><b>Site</b><span>ejup.com.br</span></div>
     <div class="c"><b>E-mail</b><span>contato@ejup.com.br</span></div>
-    <div class="c"><b>WhatsApp</b><span class="ouro">85 9 9271.4050</span></div>
+    <div class="c zap"><b>WhatsApp</b><div class="zl"><span class="ouro">85 9 9271.4050</span><i class="pill">Link na bio<svg viewBox="0 0 24 24"><path d="M12 20V6M6 12l6-6 6 6" fill="none" stroke="#0d131a" stroke-width="3" stroke-linecap="square"/></svg></i></div></div>
     <div class="c"><b>Endereço</b><span class="peq">Rua da Saudade, 1028<br>Lagoa Nova, Natal/RN</span></div>
     <div class="c"><b>Instagram</b><span>@ejup.oficial</span></div>
   </div>
@@ -133,6 +133,9 @@ p{{text-align:left;hyphens:manual}}
 .c:last-child{{border-bottom:2px solid rgba(209,211,212,.22)}}
 .c b{{display:block;font-weight:500;font-size:24px;letter-spacing:.14em;text-transform:uppercase;color:var(--silver);margin-bottom:14px}}
 .c span{{display:block;font-weight:300;font-size:56px;line-height:1.2}}
+.zl{{display:flex;align-items:center;justify-content:space-between;gap:24px}}
+.pill{{display:inline-flex;align-items:center;gap:14px;background:var(--gold);color:var(--ink);font-style:normal;font-weight:700;font-size:26px;letter-spacing:.1em;text-transform:uppercase;padding:18px 28px;border-radius:999px;white-space:nowrap}}
+.pill svg{{width:30px;height:30px}}
 .c .peq{{font-size:44px}} .c .ouro{{color:var(--gold);font-weight:500}}
 '''
 

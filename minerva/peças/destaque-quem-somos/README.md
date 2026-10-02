@@ -10,7 +10,7 @@ Versão de 02/10/2026, com os textos definidos pelo Victor/equipe (a tela de fun
 2. "A EJUP é uma instituição de ensino dedicada à educação jurídica estratégica e à formação de líderes do Direito." + "Notório saber jurídico transformado em formato digital de alto nível."
 3. "Transformamos o conhecimento dos experts em soluções jurídicas digitais escaláveis" (sem ponto final, como no pedido), com a ponte entre Experts e Soluções digitais.
 4. "Para o jurista que trata o aprendizado como percurso e que quer construir soluções digitais dentro da nova economia" (sem ponto final) + "Se você é audacioso demais, a EJUP é pra você."
-5. Contato: site, e-mail, WhatsApp, endereço e Instagram.
+5. Contato: site, e-mail, WhatsApp com selo dourado "Link na bio", endereço e Instagram.
 
 ## Decisões
 - Só as cores do MIV. Dourado sobre fundo escuro, bronze sobre fundo claro (tela 3).
