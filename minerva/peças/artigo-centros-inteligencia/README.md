@@ -2,8 +2,8 @@
 
 Tema 1 da lista extraída do EJUPcast #019 (trechos 00:56:07 a 01:03:00). Estrutura
 da referência "Artigo STF" (título em pergunta/tema, subtítulos em pergunta, dúvidas
-rápidas, bloco "Continue essa conversa no EJUPcast"), mais resumo no topo, tabelas e
-fontes por categoria, seguindo as correções do board no artigo da ANEEL.
+rápidas, bloco "Continue essa conversa no EJUPcast"), mais resumo no topo e
+fontes por categoria (sem tabelas, como na referência), seguindo as correções do board no artigo da ANEEL.
 
 ## Conferir antes de publicar
 1. **Sites oficiais bloqueados na leitura** (CNJ e portal de atos retornaram 403, e a notícia do TRF1 deu timeout). O texto integral da Resolução CNJ 349/2020 NÃO foi lido. O conteúdo dos arts. 2º e 4º e a composição do Grupo Decisório vêm de resumos de busca e de páginas de tribunais. Conferir no portal de atos do CNJ, inclusive as alterações posteriores (há menção às Resoluções CNJ 374/2021 e 442/2021).

@@ -27,10 +27,7 @@ A lógica do centro parte de uma pergunta anterior ao julgamento: por que esse m
 
 Há duas normas centrais, uma da Justiça Federal e outra de alcance nacional.
 
-| Âmbito | Norma | O que estabelece |
-|---|---|---|
-| Justiça Federal | Resolução CJF nº 499/2018 | Cria o Centro Nacional de Inteligência da Justiça Federal e os centros locais, com Grupo de Decisão e Grupo Operacional |
-| Poder Judiciário | Resolução CNJ nº 349, de 23/10/2020 | Institui o CIPJ junto ao CNJ e determina a criação de centros locais nos tribunais |
+A primeira é a Resolução CJF nº 499/2018, que cria o Centro Nacional de Inteligência da Justiça Federal e os centros locais, organizados em um Grupo de Decisão e um Grupo Operacional. A segunda é a Resolução CNJ nº 349, de 23 de outubro de 2020, que institui o Centro de Inteligência do Poder Judiciário (CIPJ) junto ao CNJ e determina a criação de centros locais nos tribunais.
 
 A Resolução CNJ nº 349/2020 atribui ao CIPJ, no art. 2º, prevenir o ajuizamento de demandas repetitivas ou de massa a partir da identificação das causas geradoras do litígio em âmbito nacional, com a possível autocomposição ou o encaminhamento de solução na esfera administrativa, e propor ao CNJ recomendações para uniformização de procedimentos e rotinas. O CIPJ se organiza em um Grupo Decisório, que fixa as diretrizes de trabalho e aprova ou rejeita as notas técnicas, e um Grupo Operacional.
 
@@ -44,16 +41,9 @@ No EJUPcast #019, o juiz federal Marco Bruno Miranda Clementino, que dirigiu o f
 
 ## Como os Centros de Inteligência funcionam na prática?
 
-O funcionamento segue uma sequência que se repete nos centros da Justiça Federal e nos demais ramos, com variações de cada tribunal:
+O funcionamento segue uma sequência que se repete nos centros da Justiça Federal e nos demais ramos, com variações de cada tribunal.
 
-| Etapa | O que acontece |
-|---|---|
-| 1. Monitoramento | O centro acompanha o volume e o padrão das ações em curso e identifica temas com potencial de repetição |
-| 2. Provocação | Magistrados, servidores e usuários externos podem apontar demandas que merecem análise |
-| 3. Estudo | O Grupo Operacional pesquisa as causas do litígio, os dados e a jurisprudência |
-| 4. Nota técnica | O estudo vira uma nota técnica com recomendações |
-| 5. Deliberação | O Grupo Decisório aprova ou rejeita a nota |
-| 6. Encaminhamento | A recomendação segue para órgãos do Judiciário, para a administração pública ou para as partes envolvidas, em busca de solução na origem |
+Primeiro vem o monitoramento: o centro acompanha o volume e o padrão das ações em curso e identifica temas com potencial de repetição. Magistrados, servidores e usuários externos também podem apontar demandas que merecem análise. Em seguida, o Grupo Operacional pesquisa as causas do litígio, os dados e a jurisprudência, e o estudo vira uma nota técnica com recomendações. O Grupo Decisório aprova ou rejeita a nota, e a recomendação aprovada segue para órgãos do Judiciário, para a administração pública ou para as partes envolvidas, em busca de solução na origem.
 
 A nota técnica reúne estudos e recomendações sobre prevenção de conflitos, monitoramento de demandas e gestão de precedentes. Ela orienta a atuação e mantém a independência de cada juiz, que continua decidindo o caso concreto segundo a lei e a prova dos autos.
 
@@ -61,14 +51,7 @@ A nota técnica reúne estudos e recomendações sobre prevenção de conflitos,
 
 O CPC oferece instrumentos para tratar controvérsias em massa depois que elas aparecem nos tribunais, como o incidente de resolução de demandas repetitivas (art. 976) e o julgamento de recursos especial e extraordinário repetitivos (art. 1.036). Eles produzem uma tese com força de precedente.
 
-O Centro de Inteligência atua em outro momento e com outra finalidade:
-
-| Critério | IRDR e recursos repetitivos | Centro de Inteligência |
-|---|---|---|
-| Momento | Controvérsia já judicializada em muitos processos | Monitoramento que pode antecipar a repetição |
-| Resultado | Tese jurídica com efeito de precedente | Nota técnica com recomendações |
-| Foco | Questão de direito controvertida | Causas geradoras do litígio e soluções administrativas ou consensuais |
-| Quem decide | Órgão colegiado competente | Grupo Decisório do centro, que aprova a nota |
+O Centro de Inteligência atua em outro momento e com outra finalidade. O IRDR e os recursos repetitivos partem de uma controvérsia já judicializada em muitos processos e resultam em uma tese jurídica com efeito de precedente, definida pelo órgão colegiado competente. O centro faz um monitoramento que pode antecipar a repetição, tem como foco as causas geradoras do litígio e as soluções administrativas ou consensuais, e produz uma nota técnica com recomendações, aprovada pelo próprio Grupo Decisório.
 
 Os dois mecanismos se complementam. O centro pode indicar que um tema merece afetação a um incidente, e o precedente formado depois ajuda o centro a monitorar a aplicação da tese.
 
