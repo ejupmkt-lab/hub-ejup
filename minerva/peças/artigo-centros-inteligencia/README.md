@@ -17,7 +17,7 @@ Reestruturado em 02/10/2026 conforme o documento "Recomendações para reestrutu
 - Estrutura de H2 na ordem recomendada, mais a seção "O que está mudando em 2026?" (datada, revisão tratada como em andamento).
 - Resolução CNJ 349/2020 conferida no portal de atos do CNJ (página com as alterações das Resoluções 374/2021 e 442/2021). Competências (art. 2º, dez incisos), composição do Grupo Decisório (inclui TRF e o conselheiro do LIODS, que a versão anterior omitia) e art. 4º com redação da Res. 374/2021 estão no texto.
 - Portaria CNJ 333/2026 (24/07/2026, DJe 4/08/2026) e notícia do CNJ de 23/09/2026 lidas na fonte.
-- Quadro comparativo Centro de Inteligência x IRDR x recursos repetitivos (item 9 do documento). É a única tabela do texto. Se a EJUP preferir prosa, basta converter.
+- Comparação Centro de Inteligência x IRDR x recursos repetitivos (item 9 do documento) escrita em prosa, sem tabela, a pedido da Anna.
 - Seção da advocacia ampliada (diagnóstico, argumentação, prevenção, participação na consulta pública) e FAQ com as 8 perguntas do documento.
 - Links para fontes primárias dentro do texto. Trechos do episódio saíram dos parágrafos. O EJUPcast aparece só no bloco final.
 

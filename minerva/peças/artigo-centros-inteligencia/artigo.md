@@ -44,11 +44,11 @@ O caminho segue uma ordem. O centro monitora o volume e o padrão das ações e 
 
 O Código de Processo Civil oferece instrumentos para uniformizar controvérsias que já aparecem em múltiplos processos, como o incidente de resolução de demandas repetitivas (art. 976) e o julgamento de recursos especial e extraordinário repetitivos (art. 1.036). O Centro de Inteligência atua em outro plano: identifica as causas do litígio e propõe prevenção ou racionalização, e pode indicar que um tema merece afetação a um desses instrumentos.
 
-| Instrumento | Função | Momento | Produto principal |
-|---|---|---|---|
-| Centro de Inteligência | Identificar causas da litigiosidade e propor prevenção ou racionalização | Pode atuar antes ou durante a multiplicação dos conflitos | Nota técnica, estudo ou recomendação |
-| IRDR | Uniformizar questão jurídica repetitiva | Controvérsia já presente em múltiplos processos | Tese jurídica fixada pelo tribunal |
-| Recursos repetitivos | Uniformizar questão jurídica em recursos aos tribunais superiores | Controvérsia judicializada e repetitiva | Precedente qualificado |
+Em resumo, o Centro de Inteligência tem a função de identificar as causas da litigiosidade e propor prevenção ou racionalização. Pode atuar antes ou durante a multiplicação dos conflitos, e seu produto principal é a nota técnica, o estudo ou a recomendação.
+
+O IRDR tem a função de uniformizar uma questão jurídica repetitiva. Atua quando a controvérsia já está presente em múltiplos processos, e seu produto principal é a tese jurídica fixada pelo tribunal.
+
+Os recursos repetitivos uniformizam a questão jurídica em recursos aos tribunais superiores. Atuam quando a controvérsia já está judicializada e é repetitiva, e seu produto principal é o precedente qualificado.
 
 Os instrumentos se complementam. O precedente formado pelo IRDR ou pelo julgamento repetitivo ajuda o centro a monitorar a aplicação da tese, e o art. 2º, V, da Resolução CNJ nº 349/2020 prevê que o CIPJ auxilie na internalização das normas construídas em precedentes qualificados sobre serviços regulados, nos termos dos arts. 985, § 2º, e 1.040, IV, do CPC.
 
