@@ -1,0 +1,15 @@
+{
+  "foto": "../material/rossana-frame.webp",
+  "foco": [1000, 470],
+  "linhas": [
+    {"texto": "Direito", "estilo": "it"},
+    {"faixa": true},
+    {"texto": "e", "estilo": "bk", "janela": "direita"},
+    {"texto": "moral", "estilo": "it", "janela": "esquerda"}
+  ],
+  "nome": "Dra. Rossana Fonseca",
+  "episodio": "EJUPcast #18",
+  "apoio": "A primeira lição do curso de Direito, e a que muita gente",
+  "apoio_destaque": "esqueceu.",
+  "saida": "capa-1080x1920.png"
+}
