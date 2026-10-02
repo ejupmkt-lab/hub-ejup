@@ -51,7 +51,7 @@ def x(k):
 
 
 # ---------- fio dourado: um caminho só, cruzando as oito telas ----------
-PTS = [(1030, 1470), (1062, 1100), (1080, 820), (1620, 820), (2160, 800), (2700, 770),
+PTS = [(1030, 1470), (1062, 1100), (1080, 852), (1620, 856), (2160, 840), (2700, 770),
        (3240, 735), (3780, 730), (4320, 760), (4860, 770), (5180, 520), (5360, 150),
        (5650, 96), (6250, 96), (6520, 170), (6620, 480), (6740, 740), (7200, 760), (7560, 760),
        (7900, 900), (8200, 1010), (8700, 1040)]
@@ -73,7 +73,7 @@ def fio():
     d = caminho(PTS)
     claros = "".join(f'<rect x="{x(k)}" y="0" width="{W}" height="{H}"/>' for k in range(N) if k not in ESCURAS)
     escuros = "".join(f'<rect x="{x(k)}" y="0" width="{W}" height="{H}"/>' for k in ESCURAS)
-    pinos = [(1080, 820), (3240, 735), (6250, 96), (8200, 1010)]
+    pinos = [(1080, 852), (3240, 735), (6250, 96), (8200, 1010)]
     pin = "".join(f'<circle cx="{a}" cy="{b}" r="9"/>' for a, b in pinos)
     return f"""<svg class="fio" viewBox="0 0 {W*N} {H}" width="{W*N}" height="{H}">
   <defs><clipPath id="ce">{escuros}</clipPath><clipPath id="cc">{claros}</clipPath>
@@ -104,14 +104,14 @@ def main():
     # 2 · o que aconteceu (papel) · o cartão da foto atravessa para a tela 3
     t.append(tela(1, "papel", f"""
   <h2 class="tit" style="top:150px">O ChatGPT tinha inventado <em>decisões do STJ.</em></h2>
-  <p class="txt" style="top:430px">O juiz federal da 1ª Região atribuiu o erro ao excesso de trabalho e a um servidor que ajudou na redação.</p>
-  <p class="txt" style="top:600px">O CNJ abriu investigação. A corregedoria do TRF1 recomendou que juízes não usem IA aberta e não homologada para pesquisar jurisprudência.</p>
-  {fonte("Fonte: CNJ e TRF1, via Rota Jurídica e Conjur, nov. 2023")}"""))
+  <p class="txt" style="top:430px">O juiz federal Jefferson Ferreira Rodrigues, no Acre, disse que um assessor redigiu a decisão com ajuda de IA. Chamou de mero equívoco.</p>
+  <p class="txt" style="top:620px">O CNJ investigou. O corregedor regional Néviton Guedes recomendou: nada de IA aberta e não homologada para pesquisar jurisprudência.</p>
+  {fonte("Fontes: Olhar Digital, Rota Jurídica e AFP, nov. 2023")}"""))
     # 3 · o outro lado da mesa
     t.append(tela(2, "escura", f"""
   <h2 class="tit" style="top:150px">Do outro lado da mesa, <em>a conta também chegou.</em></h2>
-  <p class="txt" style="top:390px">O TSE confirmou multa de R$ 2 mil a uma advogada que citou precedentes inexistentes.</p>
-  <p class="txt" style="top:530px">TJPR, TRT-MT e TJSC também aplicaram multas por jurisprudência falsa atribuída à IA.</p>
+  <p class="txt" style="top:390px">O TSE confirmou, por unanimidade, multa de R$&nbsp;2&nbsp;mil à advogada Francisleidi Nigra, que citou precedentes inexistentes.</p>
+  <p class="txt" style="top:580px">TJPR, TRT-MT e TJSC também aplicaram multas por jurisprudência falsa atribuída à IA.</p>
   {fonte("Fontes: Conjur, Migalhas, TJSC")}""",
         f'<div class="bg" style="background-image:url({img("web-tribunal.jpg")});background-position:50% 40%;filter:brightness(.32) saturate(.5)"></div><div class="veu" style="background:linear-gradient(180deg,rgba(3,28,55,.75),rgba(13,19,26,.55) 55%,rgba(13,19,26,.9))"></div>'))
     # 4 · a regra (papel) · documento oficial atravessa para a tela 5
