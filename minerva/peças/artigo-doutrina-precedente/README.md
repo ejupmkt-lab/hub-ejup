@@ -1,4 +1,6 @@
-# Artigo · Doutrina ou precedente? O que o CPC exige da fundamentação
+# Artigo · Art. 489 do CPC: o que a fundamentação exige ao citar precedente e doutrina
+
+Título, SEO title, meta description e slug ajustados em 01/10/2026 para as buscas reais ("art. 489 CPC fundamentação", "art. 927 precedentes"). O gancho "Doutrina ou precedente?" ficou como chamada editorial, se a EJUP quiser usá-lo na arte ou no post.
 
 Artigo para a coluna jurídica do site, derivado do tema discutido no EJUPcast
 #019 (doutrina bem escolhida, precedente e sustentação oral). Texto em

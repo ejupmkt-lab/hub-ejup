@@ -569,3 +569,8 @@ com período; (3) trechos do episódio entram com timecode e rotulados como
 percepção do convidado, nunca como regra; (4) entregar com um README de
 "antes de publicar", dizendo o que não foi possível conferir; (5) travessão,
 "não é X, é Y" e promessa de resultado seguem proibidos.
+
+### Legenda de corte do EJUPcast (pedido de 01/10/2026)
+> consegue me dar a legenda do post de cada um dos cortes que vc fez? use essa referencia (post do corte do #018, @ejup.oficial, 23/09)
+
+Modelo: frase de abertura com a tese do corte; parágrafos curtos com o que foi dito, atribuído ao convidado; menção a quem conduz (@rossanadfonseca) e ao convidado; pergunta curta para comentários; linha "Título | Convidado | EJUPcast #NNN"; "Acompanhe o episódio NN do EJUPcast na íntegra no YouTube da EJUP e no Spotify. Link na bio." Não copiar a figura "não é X, é Y" do modelo. Exemplo em `peças/cortes-ejupcast-019/legendas.md`.
