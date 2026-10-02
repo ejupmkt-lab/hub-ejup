@@ -38,3 +38,15 @@ todos (nenhum de câmera parada) e o texto aplicado sem Higgsfield
 (`_build/finalizar.py`): LIQUIDANTE e BANCO CENTRAL nos cartões da 07, FGC na
 etiqueta da tigela da 12, em Gotham, impressos por multiplicação para a
 sombra da mão passar por cima da tinta.
+
+## Telas animadas em código (sem IA generativa)
+
+- `telas-codigo/fonte/NN.png`: quadros recortados das pranchas (~480 px).
+- `_build/preparar_telas.py`: Real-ESRGAN x4 (CPU) e mapa de profundidade
+  (Depth Anything V2 Small). Saídas em `telas-codigo/up/` e `profundidade/`,
+  fora do git porque se refazem com o script.
+- `_build/motor.py`: câmera 2,5D com paralaxe, foco que muda, luzes, poeira,
+  grão e vinheta; fio dourado e alfinetes.
+- `_build/cenas_p1.py`: prancha 01 (01, 02, 03, 04, 06, 08). A 05 é a vinheta.
+- Para refazer em alta: trocar `telas-codigo/up/NN.png` pela imagem nova (mesmo
+  enquadramento), apagar `profundidade/NN.png` e rodar de novo os dois scripts.
