@@ -1,42 +1,47 @@
-# Artigo · Centros de Inteligência do Judiciário: o que são e como previnem litígios
+# Artigo · Centros de Inteligência do Judiciário: o que são, como funcionam e como atuam nas demandas repetitivas
 
-Tema 1 do EJUPcast #019. Reescrito em 02/10/2026 para seguir a referência "Artigo STF"
-à risca: título, introdução com contexto e escopo, subtítulos em pergunta com texto
-corrido (sem tabelas e sem lista de resumo), conclusão, "Dúvidas rápidas" e, no fim,
-o bloco "Continue essa conversa no EJUPcast". O episódio aparece só nesse bloco final,
-nunca nos parágrafos do artigo.
+Reestruturado em 02/10/2026 conforme o documento "Recomendações para reestruturação do artigo"
+(diretrizes editoriais de outubro de 2026), sobre a versão anterior que seguia a referência "Artigo STF".
 
-## Dados de publicação (ficam fora do texto, como na referência)
-- **SEO title:** Centro de Inteligência do Judiciário e prevenção de litígios (60)
-- **Meta description:** Entenda o que são os Centros de Inteligência do Judiciário, a base da Resolução CNJ 349/2020 e da Resolução CJF 499/2018, como funcionam as notas técnicas e o que muda para quem advoga.
-- **Slug:** /centros-de-inteligencia-judiciario/
-- **Autoria:** Equipe EJUP · **Revisão técnica:** [nome] · **Publicado em / fontes conferidas em:** [datas]
-- **Link do episódio #019:** [inserir]
+## Dados de publicação
+- **H1:** Centros de Inteligência do Judiciário: o que são, como funcionam e como atuam nas demandas repetitivas
+- **Title SEO:** Centros de Inteligência do Judiciário: como funcionam
+- **Slug:** /centros-inteligencia-judiciario/
+- **Meta description:** Entenda o que são os Centros de Inteligência do Judiciário, como atuam nas demandas repetitivas, produzem notas técnicas e o que muda para a advocacia.
+- **Termo principal:** Centros de Inteligência do Judiciário. **Apoio:** CIPJ, Centro de Inteligência do Poder Judiciário, demandas repetitivas, prevenção de litígios, gestão de precedentes, notas técnicas, Resolução CNJ 349/2020.
+- Revisão jurídica, data de publicação e link do episódio #019: a preencher.
 
-## Fontes para linkar na versão publicada (itens 20 e 21)
-Atos normativos
-- Resolução CNJ nº 349, de 23/10/2020: https://atos.cnj.jus.br/atos/detalhar/3547
-- Resolução CJF nº 499/2018 (página do Centro Nacional de Inteligência): https://www.cjf.jus.br/cjf/corregedoria-da-justica-federal/centro-de-estudos-judiciarios-1/nucleo-de-estudo-e-pesquisa
-- Lei nº 13.105/2015 (CPC), arts. 976 e 1.036: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13105.htm
-
-Institucionais
-- TRF5, "Inspirado na Justiça Federal, CNJ cria Centro de Inteligência": https://www.trf5.jus.br/index.php/noticias/leitura-de-noticias?%2Fid=322736
-- CNJ, "Centros de Inteligência podem atuar para prevenção de litígios": https://www.cnj.jus.br/centros-de-inteligencias-podem-atuar-para-prevencao-de-litigios/
-
-Doutrina e pesquisa
-- SILVEIRA, André Luiz Cavalcanti. Acesso à justiça, demandas repetitivas e centros de inteligência. THEMIS: Revista da Esmec, v. 21, n. 1, p. 41-62, 2023. https://doi.org/10.56256/themis.v21i1.908
-- TEMER, Sofia; ESTEVES, Juliana. Os novos Centros de Inteligência nos tribunais brasileiros. Migalhas: https://www.migalhas.com.br/depeso/349852/os-novos-centros-de-inteligencia-nos-tribunais-brasileiros
+## O que foi feito (checklist do documento)
+- RN só como marco histórico (um parágrafo da seção de origem), conectado logo à institucionalização nacional (CJF 2018, CNJ 2020). Nenhum RN/Natal/JFRN no H1, title, meta, slug ou conclusão.
+- Definição de Centro de Inteligência nos primeiros parágrafos, com "Centro de Inteligência do Poder Judiciário (CIPJ)" por extenso.
+- Estrutura de H2 na ordem recomendada, mais a seção "O que está mudando em 2026?" (datada, revisão tratada como em andamento).
+- Resolução CNJ 349/2020 conferida no portal de atos do CNJ (página com as alterações das Resoluções 374/2021 e 442/2021). Competências (art. 2º, dez incisos), composição do Grupo Decisório (inclui TRF e o conselheiro do LIODS, que a versão anterior omitia) e art. 4º com redação da Res. 374/2021 estão no texto.
+- Portaria CNJ 333/2026 (24/07/2026, DJe 4/08/2026) e notícia do CNJ de 23/09/2026 lidas na fonte.
+- Quadro comparativo Centro de Inteligência x IRDR x recursos repetitivos (item 9 do documento). É a única tabela do texto. Se a EJUP preferir prosa, basta converter.
+- Seção da advocacia ampliada (diagnóstico, argumentação, prevenção, participação na consulta pública) e FAQ com as 8 perguntas do documento.
+- Links para fontes primárias dentro do texto. Trechos do episódio saíram dos parágrafos. O EJUPcast aparece só no bloco final.
 
 ## Conferir antes de publicar
-1. Sites do CNJ bloquearam a leitura (403). O texto integral da Resolução CNJ 349/2020 NÃO foi lido. Arts. 2º e 4º e a composição do Grupo Decisório vêm de resumos de busca e de páginas de tribunais. Conferir no portal de atos, inclusive alterações (Resoluções CNJ 374/2021 e 442/2021 aparecem na busca).
-2. Resolução CJF 499/2018: página do CJF e busca confirmam. Um resumo do TRF5 trouxe "49/2018", provável erro de digitação.
-3. "CJF adotou em 2018" e "CNJ levou a todo o Judiciário em 2020": a data da norma do CNJ é 23/10/2020 (o TRF5 cita 20/10/2020, provável sessão).
-4. Origem em 2015 na JFRN (Comissão de Prevenção de Demandas): notícia do TRF5. O episódio (Marco Bruno, "onze anos") confirma, mas não é citado no texto.
-5. "Estratégia nacional, consolidação do sistema de precedentes": vem do artigo de Temer e Esteves (Migalhas, macrodesafio da Estratégia 2021-2026). Conferir na estratégia do CNJ.
-6. CPC, arts. 976 e 1.036: de memória do texto legal. Conferir no Planalto.
-7. Provocação por usuários externos e "a nota preserva a independência do juiz": conferir na norma.
-8. Silveira: o resumo do artigo foi lido, o texto completo não. Ler antes de manter a conclusão atribuída a ele.
-9. Frase de abertura "um dos grandes desafios": apoiada no resumo do artigo da Themis. Se o revisor preferir, trocar por dado do Justiça em Números (CNJ), com fonte.
+1. **Revisão jurídica obrigatória** do quadro comparativo (o documento pede revisão para não simplificar as diferenças processuais).
+2. **Composição do Grupo Operacional e do Decisório:** lida na página de atos do CNJ em 02/10/2026. Confirmar no "Texto Compilado" oficial antes de publicar.
+3. **Marco Bruno no grupo de trabalho:** consta na Portaria 333/2026. As Portarias 402 (24/08/2026) e 440 (17/09/2026) não foram lidas. A 440 altera o inciso VIII e a 402 revoga outro, mas conferir se a lista de integrantes continua igual.
+4. **Prazo de 90 dias** do grupo de trabalho: conta da publicação (4/08/2026). Se houver prorrogação, atualizar.
+5. **Atalaia:** citada pelo CNJ na notícia de 23/09/2026 como ferramenta que pode contribuir. O texto atribui isso à notícia, sem afirmar adoção pelos centros.
+6. **Resolução CNJ 235/2016:** citada como norma correlata (consta nos considerandos e nos "correlatos" do ato). Inserir link.
+7. **CPC (arts. 976, 985 §2º, 1.036 e 1.040, IV):** art. 985 §2º e 1.040 IV vêm da própria Res. 349; arts. 976 e 1.036 de memória. Conferir no Planalto.
+8. **Estudo da Revista Themis (Silveira, 2023):** só o resumo foi lido. Ler o texto completo antes de manter a frase atribuída.
+9. **Data da Resolução 349:** norma de 23/10/2020; Plenário aprovou em 20/10/2020 (considerandos da própria norma).
+10. **Links internos** do cluster (inovação no Judiciário, precedentes, litigância abusiva, IA, advocacia preventiva): colocar as URLs reais no bloco final.
+11. **Pergunta sobre notas vinculantes:** o texto diz que são estudos e recomendações, com supervisão de aderência (art. 2º, X). Revisor confirma se há efeito além disso.
+
+## Fontes primárias usadas
+- Resolução CNJ 349/2020: https://atos.cnj.jus.br/atos/detalhar/3547
+- Resoluções CNJ 374/2021 e 442/2021: https://atos.cnj.jus.br/atos/detalhar/3748 e https://atos.cnj.jus.br/atos/detalhar/4301
+- Portaria CNJ 333/2026: https://atos.cnj.jus.br/atos/detalhar/6939
+- CNJ, 23/09/2026: https://www.cnj.jus.br/regras-dos-centros-de-inteligencia-serao-revisadas-para-combater-litigancia-abusiva/
+- Resolução CJF 499/2018 (Centro Nacional de Inteligência): https://www.cjf.jus.br/cjf/corregedoria-da-justica-federal/centro-de-estudos-judiciarios-1/nucleo-de-estudo-e-pesquisa
+- TRF5, origem do modelo: https://www.trf5.jus.br/index.php/noticias/leitura-de-noticias?%2Fid=322736
+- Pesquisa: SILVEIRA, André L. C. Acesso à justiça, demandas repetitivas e centros de inteligência. Themis, v. 21, n. 1, 2023: https://doi.org/10.56256/themis.v21i1.908
 
 ## Fora do artigo de propósito
-Caso da dívida do município de Natal e o valor de 250 milhões; números de notas técnicas e de tribunais com centro; qualquer trecho do episódio nos parágrafos.
+Caso da dívida do município de Natal e o valor de 250 milhões; qualquer fala do episódio nos parágrafos; números de notas técnicas e de tribunais com centro.
