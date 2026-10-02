@@ -139,6 +139,12 @@ menor; a segunda em dourado, Gotham Black, caixa alta, grande. Sem nome do
 convidado nem número do episódio na arte (vão no título do vídeo). Gerador
 de exemplo: `peças/youtube-ejupcast-019/_build/thumb.py`.
 
+### Capa dos cortes (padrão, 02/10/2026)
+O Victor padronizou as capas dos cortes no modelo "Direito e moral" (corte
+#18, opção A1): título com faixas de foto intercaladas, fundo papel, selo
+ejup/cast, nome e episódio no fio, linha de apoio com fim em bronze.
+Gerador e regras em `skills/ejup-design/templates/capa-corte/`.
+
 ### 3. Descrição do episódio para o YouTube
 _Recebido em 25/09/2026, como print de uma descrição já publicada (episódio
 com Correia Júnior e Thiago Correia)._

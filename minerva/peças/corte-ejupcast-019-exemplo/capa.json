@@ -1,0 +1,15 @@
+{
+  "foto": "material/frame.jpg",
+  "foco": [1110, 360],
+  "linhas": [
+    {"texto": "Tradição", "estilo": "it"},
+    {"faixa": true},
+    {"texto": "e", "estilo": "bk", "janela": "direita"},
+    {"texto": "inovação", "estilo": "it"}
+  ],
+  "nome": "Marco Bruno",
+  "episodio": "EJUPcast #19",
+  "apoio": "A tradição só é tradição porque um dia foi",
+  "apoio_destaque": "inovadora.",
+  "saida": "capa-1080x1920.png"
+}
