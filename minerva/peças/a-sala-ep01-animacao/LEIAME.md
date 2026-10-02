@@ -30,3 +30,11 @@ Cada tela com quadro de início e de fim, para a IA executar a ação do roteiro
     da 15 (silhuetas deformando), guardadas só como registro.
 
 Gasto desta etapa: 13,75 + 43,75 + 17,5 (refações) = 75 créditos.
+
+## Versão final (02/10/2026)
+
+`clipes-final/`: os cinco clipes em 1920x1080, 24 fps, com zoom lento em
+todos (nenhum de câmera parada) e o texto aplicado sem Higgsfield
+(`_build/finalizar.py`): LIQUIDANTE e BANCO CENTRAL nos cartões da 07, FGC na
+etiqueta da tigela da 12, em Gotham, impressos por multiplicação para a
+sombra da mão passar por cima da tinta.
