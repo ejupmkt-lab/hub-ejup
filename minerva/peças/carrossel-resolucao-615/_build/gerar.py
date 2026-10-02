@@ -100,7 +100,7 @@ def main():
   <p class="sub" style="top:1100px">Quem percebeu foi o advogado da parte que perdeu.</p>
   <img class="logo" src="{b64(LOGO, 'image/svg+xml')}" alt="">
   <p class="arraste">Arraste</p>""",
-        f'<div class="bg" style="background-image:url({img("contrato.jpg")});background-position:50% 0"></div><div class="veu baixo"></div>'))
+        f'<div class="bg" style="background-image:url({img("web-assinatura.jpg")});background-position:40% 30%;filter:brightness(.5) saturate(.6) contrast(1.1)"></div><div class="veu baixo"></div>'))
     # 2 · o que aconteceu (papel) · o cartão da foto atravessa para a tela 3
     t.append(tela(1, "papel", f"""
   <h2 class="tit" style="top:150px">O ChatGPT tinha inventado <em>decisões do STJ.</em></h2>
@@ -113,7 +113,7 @@ def main():
   <p class="txt" style="top:390px">O TSE confirmou multa de R$ 2 mil a uma advogada que citou precedentes inexistentes.</p>
   <p class="txt" style="top:530px">TJPR, TRT-MT e TJSC também aplicaram multas por jurisprudência falsa atribuída à IA.</p>
   {fonte("Fontes: Conjur, Migalhas, TJSC")}""",
-        '<div class="bg" style="background:radial-gradient(90% 70% at 70% 30%,#0f2b48 0%,#031c37 50%,#0d131a 100%)"></div>'))
+        f'<div class="bg" style="background-image:url({img("web-tribunal.jpg")});background-position:50% 40%;filter:brightness(.32) saturate(.5)"></div><div class="veu" style="background:linear-gradient(180deg,rgba(3,28,55,.75),rgba(13,19,26,.55) 55%,rgba(13,19,26,.9))"></div>'))
     # 4 · a regra (papel) · documento oficial atravessa para a tela 5
     t.append(tela(3, "papel", f"""
   <h2 class="tit" style="top:830px">Em 2025, o CNJ <em>escreveu a regra.</em></h2>
@@ -124,7 +124,7 @@ def main():
   <h2 class="tit" style="top:880px">Quem assina, <em>responde.</em></h2>
   <p class="txt" style="top:1020px">O juiz pode usar IA generativa como apoio, inclusive as ferramentas abertas na internet. A decisão continua sendo dele, e ele responde integralmente por ela e pelas informações que ela contém.</p>
   {fonte("Res. CNJ 615/2025, art. 19, § 3º, II")}""",
-        f'<div class="bg" style="background-image:url({img("livros.jpg")});background-size:auto 100%;background-position:28% 50%"></div><div class="veu baixo"></div>'))
+        f'<div class="bg" style="background-image:url({img("web-livros.jpg")});background-position:55% 50%;filter:brightness(.8) blur(4px);transform:scale(1.04)"></div><div class="veu baixo"></div>'))
     # 6 · as linhas que a IA não cruza (papel)
     itens = ["Entregar resultado que ninguém consegue revisar.",
              "Prever crime ou reincidência pela personalidade de alguém.",
@@ -141,19 +141,19 @@ def main():
   <h2 class="tit" style="top:760px">A advocacia está na mesa. <em>Com voz, sem voto.</em></h2>
   <p class="txt" style="top:1020px">O Comitê Nacional de IA do Judiciário fiscaliza a norma. OAB, Ministério Público, Defensoria e sociedade civil participam do debate. O voto fica com o CNJ e a magistratura.</p>
   {fonte("Res. CNJ 615/2025, art. 15, §§ 1º e 3º")}""",
-        f'<div class="bg" style="background-image:url({img("plenario.jpg")});background-position:50% 20%"></div><div class="veu baixo"></div>'))
+        f'<div class="bg" style="background-image:url({img("web-cadeiras.jpg")});background-position:50% 30%;filter:brightness(.75)"></div><div class="veu baixo"></div>'))
     # 8 · fecho e chamada
     t.append(tela(7, "escura", f"""
   <h2 class="tit" style="top:200px">A régua vale para <em>os dois lados da mesa.</em></h2>
   <p class="txt" style="top:440px">Quem decide e quem peticiona respondem pelo que assinam. Usar IA com critério passou a fazer parte da competência jurídica.</p>
   <div class="cta" style="top:1060px"><p>Comente <b>RESOLUÇÃO</b> e a gente te envia o texto oficial da 615 com os artigos que mais afetam a advocacia marcados.</p></div>
   <img class="logo" src="{b64(LOGO, 'image/svg+xml')}" alt="">""",
-        f'<div class="bg" style="background-image:url({img("pedra-chave.jpg")});background-size:auto 100%;background-position:78% 50%"></div><div class="veu cima"></div>'))
+        f'<div class="bg" style="background-image:url({img("web-nicho.jpg")});background-position:60% 50%;filter:brightness(.8)"></div><div class="veu cima"></div>'))
 
     # elementos que atravessam telas
     ponte = f"""
-  <div class="cartao" style="left:{x(1)+96}px;top:880px;width:1260px;height:450px;background-image:url({img('celular.jpg')});background-position:50% 55%"></div>
-  <div class="doc" style="left:{x(3)+640}px;top:64px;width:470px;transform:rotate(4deg)"><img src="{img('doc-p1.jpg', 1400)}" alt=""></div>"""
+  <div class="cartao" style="left:{x(1)+96}px;top:880px;width:1260px;height:450px;background-image:url({img('web-laptop.jpg')});background-position:50% 50%"></div>
+  <div class="doc" style="left:{x(3)+740}px;top:70px;width:500px;transform:rotate(4deg)"><img src="{img('doc-p1.jpg', 1400)}" alt=""></div>"""
 
     html = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Carrossel Res 615</title><style>
 {fontes()}
