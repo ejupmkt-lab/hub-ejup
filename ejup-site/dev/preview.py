@@ -13,7 +13,7 @@ def must(s, a, b):
     return s.replace(a, b)
 
 fonts = {n: 'data:font/woff2;base64,' + base64.b64encode(open(os.path.join(here, 'fonts', f'gotham-{n}.woff2'), 'rb').read()).decode()
-         for n in ['light', 'book', 'bookitalic', 'medium', 'black']}
+         for n in ['light', 'book', 'medium', 'black']}
 def inline_fonts(css):
     return re.sub(r'url\(/fonts/gotham-(\w+)\.woff2\)', lambda m: f'url({fonts[m.group(1)]})', css)
 
@@ -45,7 +45,8 @@ css = inline_fonts(R('assets/style.css'))
 shell = R('index.html')
 body = shell[shell.index('<body>') + 6:shell.index('</body>')]
 title = re.search(r'<title>.*?</title>', shell).group(0)
-page = f'{title}\n<style>\n{css}\n</style>\n{SHIM}\n{body}\n{BADGE}\n<script>\n{js}\n</script>\n'
+gfonts = '\n'.join(re.findall(r'<link rel="(?:preconnect|stylesheet)" href="https://fonts[^>]+>', shell))
+page = f'{title}\n{gfonts}\n<style>\n{css}\n</style>\n{SHIM}\n{body}\n{BADGE}\n<script>\n{js}\n</script>\n'
 open(os.path.join(out, 'index.html'), 'w', encoding='utf-8').write(page)
 
 # ---------- Minerva ----------

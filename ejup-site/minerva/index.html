@@ -10,9 +10,12 @@
 <meta property="og:description" content="A inteligência institucional da EJUP. Tecnologia a serviço do pensamento jurídico.">
 <meta property="og:image" content="/minerva/aberta.jpg">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="preload" href="/fonts/gotham-black.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/gotham-book.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/gotham-light.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/minerva/repouso.jpg" as="image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&display=swap">
 <style>
 @font-face{font-family:"Gotham";src:url(/fonts/gotham-light.woff2) format("woff2");font-weight:300;font-display:swap}
 @font-face{font-family:"Gotham";src:url(/fonts/gotham-book.woff2) format("woff2");font-weight:400;font-display:swap}
@@ -33,6 +36,7 @@
   --ink:#0d131a;--navy:#031c37;--steel:#304557;--grafite:#414042;--cinza:#5f6062;--prata:#d1d3d4;--bronze:#9b6b26;--ouro:#f0b855;--branco:#fff;
   --p08:rgba(209,211,212,.08);--p16:rgba(209,211,212,.16);--p28:rgba(209,211,212,.28);--p72:rgba(209,211,212,.72);
   --sans:"Gotham","Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"Instrument Serif","Cormorant Garamond",Georgia,serif;
   --ease:cubic-bezier(.16,1,.3,1);
   --gut:clamp(16px,4vw,56px);
   --panel:min(440px,100vw);
@@ -53,7 +57,7 @@ img,video{display:block}
 
 .eyebrow{font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ouro);line-height:1.4}
 .lead{font-weight:300;font-size:clamp(17px,1.4vw,19px);line-height:1.6;color:var(--p72);max-width:34em}
-.btn{display:inline-flex;align-items:center;gap:12px;height:52px;padding:0 28px;border-radius:4px;background:var(--ouro);color:var(--navy);font-weight:500;font-size:15px;letter-spacing:.02em;box-shadow:0 8px 24px rgba(3,28,55,.4);transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+.btn{display:inline-flex;align-items:center;gap:12px;height:52px;padding:0 28px;border-radius:999px;background:var(--ouro);color:var(--navy);font-weight:500;font-size:15px;letter-spacing:.02em;box-shadow:0 8px 24px rgba(3,28,55,.4);transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
 .btn:hover{transform:translateY(-1px);box-shadow:0 12px 32px rgba(3,28,55,.55)}
 .btn svg{width:16px;height:16px}
 
@@ -69,7 +73,8 @@ img,video{display:block}
   background:radial-gradient(ellipse 70% 60% at 72% 50%,rgba(3,28,55,.9),transparent 70%),var(--ink)}
 .hero::after{content:"";position:absolute;inset:auto var(--gut) 0;height:1px;background:var(--p16)}
 .hero-t{position:relative;z-index:2;display:grid;gap:24px;max-width:560px;transition:opacity .36s var(--ease),transform .36s var(--ease)}
-.hero h1{font-weight:900;font-size:clamp(60px,8vw,112px);line-height:1.02;letter-spacing:-.025em}
+.hero h1{font-weight:400;font-size:clamp(60px,8vw,112px);line-height:1.02;letter-spacing:-.025em}
+em.s{font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.12em;letter-spacing:-.01em;color:var(--ouro)}
 .hero .note{font-size:14px;color:var(--p72)}
 .hero .acts{display:flex;flex-wrap:wrap;align-items:center;gap:20px 28px;margin-top:12px}
 
@@ -95,13 +100,13 @@ body.chat .stage{left:calc((100vw - var(--panel))/2);width:min(calc(100vw - var(
 /* seção de princípios */
 .sec{padding:clamp(80px,10vw,144px) var(--gut)}
 .wrap{max-width:1200px;margin:0 auto}
-.sec h2{font-weight:900;font-size:clamp(32px,3.4vw,44px);line-height:1.08;letter-spacing:-.02em;max-width:18em;margin-top:16px}
+.sec h2{font-weight:400;font-size:clamp(32px,3.4vw,44px);line-height:1.08;letter-spacing:-.02em;max-width:18em;margin-top:16px}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,3vw,48px);margin-top:clamp(48px,6vw,80px)}
 .grid article{border-top:1px solid var(--p28);padding-top:24px;display:grid;gap:12px;align-content:start}
 .grid h3{font-weight:500;font-size:18px;line-height:1.35}
 .grid p{color:var(--p72)}
 .quote{margin-top:clamp(64px,8vw,112px);font-weight:300;font-size:clamp(22px,2.2vw,30px);line-height:1.35;letter-spacing:-.01em;max-width:24em}
-.quote strong{font-weight:900;color:var(--ouro)}
+.quote strong{font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.12em;color:var(--ouro)}
 
 /* rodapé */
 .foot{border-top:1px solid var(--p16);padding:48px var(--gut);font-size:14px;color:var(--p72)}
@@ -115,7 +120,7 @@ body.chat .stage{left:calc((100vw - var(--panel))/2);width:min(calc(100vw - var(
   transform:translateX(100%);visibility:hidden;transition:transform .36s var(--ease),visibility 0s linear .36s}
 body.chat .panel{transform:none;visibility:visible;transition:transform .36s var(--ease),visibility 0s}
 .p-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 20px 16px 24px;border-bottom:1px solid var(--p16)}
-.p-head h2{font-weight:900;font-size:24px;letter-spacing:-.02em;line-height:1.1;margin-top:4px}
+.p-head h2{font-weight:400;font-size:24px;letter-spacing:-.02em;line-height:1.1;margin-top:4px}
 .p-tools{display:flex;align-items:center;gap:4px}
 .tbtn{height:36px;padding:0 12px;border-radius:4px;font-weight:500;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--prata);transition:background .2s,color .2s}
 .tbtn:hover{background:var(--p08);color:var(--branco)}
@@ -137,13 +142,13 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
 .chip{border:1px solid var(--p28);border-radius:999px;padding:8px 14px;font-size:13px;line-height:1.3;color:var(--prata);text-align:left;transition:border-color .2s,color .2s}
 .chip:hover{border-color:var(--ouro);color:var(--branco)}
 .form{display:flex;gap:8px;align-items:center;padding:16px 20px 8px 24px;border-top:1px solid var(--p16)}
-.field{flex:1;min-width:0;height:48px;padding:0 16px;border-radius:4px;border:1px solid var(--p28);background:rgba(13,19,26,.5);font-size:16px;font-weight:400;transition:border-color .2s}
+.field{flex:1;min-width:0;height:48px;padding:0 18px;border-radius:999px;border:1px solid var(--p28);background:rgba(13,19,26,.5);font-size:16px;font-weight:400;transition:border-color .2s}
 .field::placeholder{color:var(--p72);font-weight:300}
 .field:focus{outline:none;border-color:var(--ouro)}
-.send{width:48px;height:48px;display:grid;place-items:center;border-radius:4px;background:var(--ouro);color:var(--navy);flex:none;transition:opacity .2s}
+.send{width:48px;height:48px;display:grid;place-items:center;border-radius:999px;background:var(--ouro);color:var(--navy);flex:none;transition:opacity .2s}
 .send:disabled{opacity:.4;cursor:default}
 .send svg,.mic svg{width:18px;height:18px}
-.mic{width:48px;height:48px;display:grid;place-items:center;border-radius:4px;border:1px solid var(--p28);color:var(--prata);flex:none;transition:border-color .2s,color .2s}
+.mic{width:48px;height:48px;display:grid;place-items:center;border-radius:999px;border:1px solid var(--p28);color:var(--prata);flex:none;transition:border-color .2s,color .2s}
 .mic:hover{color:var(--branco)}
 .mic[aria-pressed="true"]{border-color:var(--ouro);color:var(--ouro);animation:pulse-b 1.4s ease-in-out infinite}
 @keyframes pulse-b{50%{box-shadow:0 0 0 6px rgba(240,184,85,.12)}}
@@ -212,7 +217,7 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
   <section class="sec" aria-labelledby="t-como">
     <div class="wrap">
       <p class="eyebrow">Como ela conversa</p>
-      <h2 id="t-como">Tecnologia a serviço do pensamento. Não no lugar dele.</h2>
+      <h2 id="t-como">Tecnologia a serviço do pensamento. <em class="s">Não no lugar dele.</em></h2>
       <div class="grid">
         <article>
           <h3>Pensa antes de responder</h3>
