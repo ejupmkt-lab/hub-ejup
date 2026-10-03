@@ -354,3 +354,21 @@ test('newsletter: equipe envia edição com descadastro individual; link e um cl
   await a.call('prefs', { body: { news: true } });
   assert.equal(fake.db.leads.find((l) => l.email === 'aluno@ejup.com.br').descadastrado_em, null);
 });
+
+test('envio de arquivos: só equipe, tipo e tamanho conferidos, link de envio de uso único', async () => {
+  const a = await logged('aluno@ejup.com.br', 'senha-aluno-1');
+  assert.equal((await a.call('eq-upload', { body: { bucket: 'site', nome: 'x.jpg', tamanho: 100 } })).statusCode, 403);
+  const e = await logged('equipe@ejup.com.br', 'senha-equipe-1');
+  assert.equal((await e.call('eq-upload', { body: { bucket: 'site', nome: 'capa.svg', tamanho: 100 } })).statusCode, 400, 'svg não');
+  assert.equal((await e.call('eq-upload', { body: { bucket: 'site', nome: 'capa.jpg', tamanho: 6 * 1024 * 1024 } })).statusCode, 400, 'imagem até 5 MB');
+  assert.equal((await e.call('eq-upload', { body: { bucket: 'outro', nome: 'a.pdf', tamanho: 10 } })).statusCode, 400);
+  const r = (await e.call('eq-upload', { body: { bucket: 'site', nome: 'Capa da Formação.JPG', tamanho: 120000 } })).payload;
+  assert.match(r.caminho, /^\d{4}-\d{2}\/[a-f0-9]{8}-capa-da-formacao\.jpg$/);
+  assert.equal(r.publico, `${fake.url}/storage/v1/object/public/site/${r.caminho}`);
+  const put = await fake.fetchImpl(r.url, { method: 'PUT', body: 'bytes', headers: { 'content-type': 'image/jpeg' } });
+  assert.equal(put.status, 200);
+  assert.equal((await fake.fetchImpl(r.url, { method: 'PUT', body: 'de novo' })).status, 400, 'uso único');
+  assert.ok(fake.files.has(`site/${r.caminho}`));
+  const m = (await e.call('eq-upload', { body: { bucket: 'materiais', nome: 'slides.pdf', tamanho: 2000000 } })).payload;
+  assert.equal(m.publico, null, 'material é privado');
+});

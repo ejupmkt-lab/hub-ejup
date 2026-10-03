@@ -12,11 +12,13 @@ const api = handler;
 const { default: leadHandler } = await import('../api/lead.js');
 let paginaHandler = (await import('../api/pagina.js')).default;
 // FAKE_SB=1: Portal com Supabase em memória (dev/fake-supabase.mjs), com aluno e professor de exemplo
+let fake = null;
 let portalHandler = (await import('../api/portal.js')).default;
 if (process.env.FAKE_SB) {
   const { createFakeSupabase, seed } = await import('./fake-supabase.mjs');
   const { createPortalHandler } = await import('../api/_lib/portal.js');
-  const fake = createFakeSupabase();
+  // o Supabase falso responde no próprio servidor, para o navegador conseguir enviar e abrir arquivos
+  fake = createFakeSupabase({ url: `http://localhost:${port}` });
   seed(fake);
   const { createPaginaHandler } = await import('../api/pagina.js');
   paginaHandler = createPaginaHandler({ fetchImpl: fake.fetchImpl, env: { SUPABASE_URL: fake.url, SUPABASE_SERVICE_ROLE_KEY: 'dev' } });
@@ -39,6 +41,12 @@ http.createServer(async (req, res) => {
     res.json = (p) => { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(p)); return res; };
     if (url.pathname === '/api/portal') return portalHandler(req, res);
     return url.pathname === '/api/lead' ? leadHandler(req, res) : api(req, res);
+  }
+  if (fake && url.pathname.startsWith('/storage/v1/')) {
+    const chunks = []; for await (const c of req) chunks.push(c);
+    const r = await fake.fetchImpl(`http://localhost:${port}${req.url}`, { method: req.method, headers: req.headers, body: chunks.length ? Buffer.concat(chunks) : undefined });
+    if (r.body) { res.writeHead(r.status, { 'Content-Type': r.headers?.['content-type'] || 'application/octet-stream', 'Access-Control-Allow-Origin': '*' }); return res.end(r.body); }
+    res.writeHead(r.status, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }); return res.end(await r.text());
   }
   // páginas do site (sem extensão), /sitemap.xml e /robots.txt: como na Vercel, passam pelo api/pagina.js
   if (!extname(url.pathname) || url.pathname === '/sitemap.xml' || url.pathname === '/robots.txt') {

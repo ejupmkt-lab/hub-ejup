@@ -1014,7 +1014,7 @@ const EV={},ECR={matriculas:'Matrículas',formacoes:'Formações e aulas',minerv
 function eqView(arg,first,y=0){
  const main=$('#pmain');if(!main)return;S.earg=arg;const v=EV[(arg||'').split('/')[0]]?(arg||'').split('/')[0]:'matriculas';S.view=v;
  const put=()=>{try{main.innerHTML=EV[v]()}catch(e){console.error(e);main.innerHTML=errBox('Não foi possível abrir esta tela.',true)}
-  links(main);main.classList.remove('pv-out');$('#pcrumb').innerHTML=crumb('Área da Equipe',ECR[v]);syncUser(Q().perfil);
+  links(main);upGanchos(main);main.classList.remove('pv-out');$('#pcrumb').innerHTML=crumb('Área da Equipe',ECR[v]);syncUser(Q().perfil);
   $$('[data-pv]').forEach(a=>{const on=a.dataset.pv===v;a.classList.toggle('on',on);on?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')});
   const pm=$('#pmenu');if(pm)pm.hidden=true;document.title=`${ECR[v]} · Área da Equipe · EJUP`;
   if(!first){scrollTo({top:y,behavior:'instant'});main.focus({preventScroll:true})}reveal();$$('.seg',main).forEach(placeSeg)};
@@ -1234,5 +1234,38 @@ document.addEventListener('click',async e=>{
    if(teste){say(m,`Teste enviado para ${r.para}. Confira a caixa de entrada.`);return}
    S.nwDraft=null;S.news=null;eqRe();toast(`Edição enviada para ${plural(r.enviados,'inscrito','inscritos')}.`)}
   catch(err){busy(x,false);say(m,err.message,true)}return}
+});
+
+/* ----- Área da Equipe › envio de arquivos: imagens do site, materiais e vídeos das aulas ----- */
+const UP={site:{accept:'.jpg,.jpeg,.png,.webp',l:'Enviar imagem',max:5},materiais:{accept:'.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.txt,.jpg,.jpeg,.png',l:'Enviar material',max:50},aulas:{accept:'.mp4,.webm,.m4v,.mov',l:'Enviar vídeo',max:50}};
+function subir(file,bucket,onp){
+ return api('eq-upload',{body:{bucket,nome:file.name,tamanho:file.size}}).then(r=>new Promise((ok,no)=>{
+  const x=new XMLHttpRequest();x.open('PUT',r.url);x.setRequestHeader('Content-Type',file.type||'application/octet-stream');x.setRequestHeader('x-upsert','false');
+  x.upload.onprogress=e=>{if(e.lengthComputable&&onp)onp(Math.round(e.loaded/e.total*100))};
+  x.onload=()=>x.status<300?ok(r):no(new Error(x.status===413?`O arquivo passa do limite do armazenamento (${UP[bucket].max} MB).`:'O armazenamento recusou o arquivo. Confira o tipo e o tamanho.'));
+  x.onerror=()=>no(new Error('Sem conexão com o armazenamento. Tente de novo.'));x.send(file)}));
+}
+function upGanchos(root){
+ const alvos=[...$$('form[data-eq-item] input[name="img"],form[data-eq-item] input[name="imgv"],form[data-eq-item] input[name="foto"],form[data-eq-curso] input[name="capa"]',root).map(i=>[i,'site']),
+  ...$$('form[data-eq-aula] input[name="video"]',root).map(i=>[i,'aulas']),...$$('form[data-eq-aula] textarea[name="materiais"]',root).map(i=>[i,'materiais'])];
+ alvos.forEach(([campo,bucket])=>{if(campo.dataset.up||campo.closest('fieldset[disabled]'))return;campo.dataset.up=bucket;
+  const w=document.createElement('span');w.className='up-w';campo.after(w);
+  w.innerHTML=`<button type="button" class="ftool" data-up-b="${bucket}">${ic('plus',14)}<span>${UP[bucket].l}</span></button><input type="file" accept="${UP[bucket].accept}" hidden><span class="sm up-s" aria-live="polite"></span>${bucket==='site'&&/^https?:|^\//.test(campo.value)?`<img class="up-t" src="${esc(campo.value)}" alt="">`:''}`;
+ });
+}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-up-b]');if(!b||S.area!=='equipe')return;e.preventDefault();$('input[type=file]',b.parentElement).click()});
+document.addEventListener('change',async e=>{
+ const fi=e.target;if(S.area!=='equipe'||fi.type!=='file'||!fi.closest('.up-w'))return;
+ const w=fi.closest('.up-w'),campo=w.previousElementSibling,bucket=campo.dataset.up,file=fi.files[0],st=$('.up-s',w),b=$('[data-up-b]',w);if(!file)return;
+ if(file.size>UP[bucket].max*1024*1024){say(st,`O arquivo passa de ${UP[bucket].max} MB.${bucket==='aulas'?' Para vídeos grandes, use YouTube, Vimeo ou Panda e cole o link.':''}`,true);fi.value='';return}
+ b.disabled=true;say(st,'Enviando…');
+ try{const r=await subir(file,bucket,p=>say(st,`Enviando… ${p}%`));
+  if(bucket==='materiais'){const nome=file.name.replace(/\.[^.]+$/,''),ext=(file.name.match(/\.([^.]+)$/)||[])[1]||'';campo.value=(campo.value.trim()?campo.value.trim()+'\n':'')+`${nome} | ${r.caminho} | ${ext.toUpperCase()}`}
+  else campo.value=bucket==='site'?r.publico:r.caminho;
+  campo.dispatchEvent(new Event('input',{bubbles:true}));
+  say(st,`Enviado: ${file.name}. Salve o formulário para publicar.`);
+  if(bucket==='site'){let t=$('.up-t',w);if(!t){t=document.createElement('img');t.className='up-t';t.alt='';w.appendChild(t)}t.src=URL.createObjectURL(file)}
+ }catch(err){say(st,err.message,true)}
+ b.disabled=false;fi.value='';
 });
 })();

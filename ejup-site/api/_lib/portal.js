@@ -932,6 +932,32 @@ R['eq-resposta'] = {
   },
 };
 
+/* ----- envio de arquivos pela Área da Equipe (Supabase Storage) ----- */
+// site: imagens públicas (capas, retratos); materiais e aulas: privados, abertos no Portal por link temporário
+const MB = 1024 * 1024;
+export const UPLOADS = {
+  site: { max: 5, ext: ['jpg', 'jpeg', 'png', 'webp'] },
+  materiais: { max: 50, ext: ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'txt', 'jpg', 'jpeg', 'png'] },
+  aulas: { max: 50, ext: ['mp4', 'webm', 'm4v', 'mov'] },
+};
+R['eq-upload'] = {
+  method: 'POST', auth: true, limit: 60,
+  run: async (ctx, b) => {
+    requireEquipe(ctx);
+    const bucket = Object.hasOwn(UPLOADS, b.bucket) ? b.bucket : fail(400, 'Destino inválido.');
+    const regra = UPLOADS[bucket], max = bucket === 'site' ? regra.max : Number(ctx.env.STORAGE_MAX_MB) || regra.max;
+    const nome = str(b.nome, 160), ext = (nome.match(/\.([a-z0-9]{2,5})$/i) || [])[1]?.toLowerCase();
+    if (!ext || !regra.ext.includes(ext)) fail(400, `Tipo de arquivo não aceito aqui. Use: ${regra.ext.join(', ')}.`);
+    const tamanho = Number(b.tamanho) || 0;
+    if (tamanho <= 0 || tamanho > max * MB) fail(400, `O arquivo passa de ${max} MB.${bucket === 'aulas' ? ' Para vídeos grandes, use YouTube, Vimeo ou Panda e cole o link.' : ''}`);
+    const base = slug(nome.replace(/\.[^.]+$/, '')).slice(0, 50) || 'arquivo';
+    const path = `${new Date(ctx.now()).toISOString().slice(0, 7)}/${crypto.randomBytes(4).toString('hex')}-${base}.${ext}`;
+    const url = await ctx.sb.uploadUrl(bucket, path);
+    if (!url) fail(502, 'O armazenamento não gerou o link de envio. Confira se o SQL do Portal foi rodado (buckets).');
+    return { ok: true, url, caminho: path, publico: bucket === 'site' ? ctx.sb.publicUrl(bucket, path) : null };
+  },
+};
+
 /* ----- conteúdo do site (vitrine): formações, professores, artigos, episódios, perguntas e links ----- */
 export const TIPOS = ['formacao', 'professor', 'artigo', 'episodio', 'faq', 'config'];
 const URL_KEYS = new Set(['img', 'imgv', 'foto', 'checkout', 'whatsapp', 'instagram', 'youtube', 'spotify', 'mapa']);
@@ -940,7 +966,7 @@ function limpaDados(v, key = '', depth = 0) {
   if (depth > 4) return null;
   if (typeof v === 'string') {
     const x = v.trim().slice(0, 30000);
-    if (URL_KEYS.has(key) && x && !/^(https:\/\/[^\s"'<>]+|\/[\w./-]+|[\w-]+)$/.test(x)) fail(400, `Endereço inválido em “${key}”: use https://, /img/arquivo.jpg ou o nome do arquivo.`);
+    if (URL_KEYS.has(key) && x && !/^(https:\/\/[^\s"'<>]+|http:\/\/localhost(:\d+)?\/[^\s"'<>]*|\/[\w./-]+|[\w-]+)$/.test(x)) fail(400, `Endereço inválido em “${key}”: use https://, /img/arquivo.jpg ou o nome do arquivo.`);
     if (key === 'yt' && x && !/^[\w-]{6,20}$/.test(x)) fail(400, 'O vídeo do YouTube deve ser só o código (ex.: dQw4w9WgXcQ).');
     return x;
   }

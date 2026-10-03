@@ -17,6 +17,7 @@ o site.** Todas as outras produções da EJUP seguem o MIV (ver `CLAUDE.md` na r
 | `SUPABASE_URL` | Banco de respostas da Minerva, newsletter, in company e Portal |
 | `SUPABASE_SERVICE_ROLE_KEY` | Idem — chave secreta (`sb_secret_…` ou *service_role*), só no servidor |
 | `RESEND_API_KEY`, `EMAIL_FROM` | Opcional. E-mails do Portal (dúvida nova, resposta do professor, plantão, lembretes). Sem elas, o Portal funciona sem e-mails |
+| `STORAGE_MAX_MB` | Opcional. Tamanho máximo, em MB, de material e vídeo enviados pela Área da Equipe (padrão 50) |
 | `EQUIPE_EMAILS` | Opcional. E-mails fixos da equipe; padrão `ejup.mkt@gmail.com,contato@ejup.com.br` |
 | `CRON_SECRET` | Opcional. Protege a tarefa diária de lembretes (`/api/portal?r=cron`, 8h de Fortaleza) |
 | `SITE_URL` | Opcional. Endereço oficial (ex.: `https://ejup.com.br`) usado nos links dos e-mails |
@@ -116,6 +117,13 @@ que só o dono do e-mail entra como equipe.
 
 **Professor:** a equipe põe o e-mail dele na formação (Formações e aulas → e-mails dos professores). O
 professor cria a conta com esse e-mail ("Sou professor → Primeiro acesso") e já entra na Área do Professor.
+
+**Arquivos:** nos formulários da Área da Equipe, "Enviar imagem" (capas e retratos, até 5 MB, JPG/PNG/WebP,
+bucket público `site`), "Enviar material" (PDF, Word, Excel, PowerPoint, ZIP… bucket privado `materiais`)
+e "Enviar vídeo" (MP4/WebM, bucket privado `aulas`). O arquivo vai do navegador direto para o Supabase; o
+campo é preenchido sozinho e vale depois de salvar. Materiais e vídeos só abrem para quem tem acesso, por
+link temporário. Limite por arquivo: 50 MB no plano gratuito do Supabase (`STORAGE_MAX_MB` na Vercel se o
+plano permitir mais). Para aulas longas, YouTube, Vimeo ou Panda continuam sendo o melhor caminho.
 
 ### Operar pelo Table Editor do Supabase (alternativa)
 - **Liberar um aluno:** em `matriculas`, nova linha com `email` (o da inscrição), `curso_id`

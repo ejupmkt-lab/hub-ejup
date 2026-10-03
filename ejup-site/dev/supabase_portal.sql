@@ -297,3 +297,10 @@ create table if not exists public.newsletter_edicoes (
   enviada_em timestamptz not null default now()
 );
 alter table public.newsletter_edicoes enable row level security;
+
+-- ---------- arquivos enviados pela Área da Equipe ----------
+-- site: imagens públicas do site (capas, retratos); materiais e aulas continuam privados
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('site', 'site', true, 5242880, array['image/jpeg', 'image/png', 'image/webp'])
+on conflict (id) do update set public = true, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
+update storage.buckets set file_size_limit = 52428800 where id in ('aulas', 'materiais') and file_size_limit is null;

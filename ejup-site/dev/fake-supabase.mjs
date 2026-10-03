@@ -59,6 +59,8 @@ export function createFakeSupabase({ url = 'https://fake.supabase.co', now = () 
   const tokens = new Map(); // access -> user id
   const refresh = new Map(); // refresh -> user id
   const sent = []; // e-mails do Auth (confirmação/recuperação)
+  const files = new Map(); // Storage: 'bucket/caminho' -> { body, type }
+  const uploads = new Map(); // token de envio -> 'bucket/caminho'
   let seq = 1;
   const state = { confirmEmail: false };
 
@@ -113,6 +115,18 @@ export function createFakeSupabase({ url = 'https://fake.supabase.co', now = () 
     if (u.origin !== new URL(url).origin) throw new Error('fake: host inesperado ' + u.origin);
     const method = (init.method || 'GET').toUpperCase();
     const headers = Object.fromEntries(Object.entries(init.headers || {}).map(([k, v]) => [k.toLowerCase(), v]));
+    // Storage: envio por link assinado e leitura pública
+    const up = u.pathname.match(/^\/storage\/v1\/object\/upload\/sign\/(.+)$/);
+    if (up && method === 'POST') { const tk = 'up-' + crypto.randomUUID(); uploads.set(tk, decodeURIComponent(up[1])); return json(200, { url: `/object/upload/sign/${up[1]}?token=${tk}`, token: tk }); }
+    if (up && method === 'PUT') {
+      const alvo = uploads.get(u.searchParams.get('token'));
+      if (!alvo || alvo !== decodeURIComponent(up[1])) return json(400, { message: 'invalid token' });
+      uploads.delete(u.searchParams.get('token'));
+      files.set(alvo, { body: init.body, type: headers['content-type'] || 'application/octet-stream' });
+      return json(200, { Key: alvo });
+    }
+    const pubM = method === 'GET' && u.pathname.match(/^\/storage\/v1\/object\/(?:public|sign)\/(.+)$/);
+    if (pubM) { const f = files.get(decodeURIComponent(pubM[1])); return f ? { ok: true, status: 200, headers: { 'content-type': f.type }, body: f.body, text: async () => '' } : json(404, {}); }
     const body = init.body ? JSON.parse(init.body) : undefined;
     const bearer = (headers.authorization || '').replace(/^Bearer /, '');
     const path = u.pathname;
@@ -213,7 +227,7 @@ export function createFakeSupabase({ url = 'https://fake.supabase.co', now = () 
     return json(405, {});
   }
 
-  return { url, fetchImpl, db, users, sent, state, addUser, insert: (t, r) => insert(t, r, { upsert: true }).row };
+  return { url, fetchImpl, db, users, sent, files, state, addUser, insert: (t, r) => insert(t, r, { upsert: true }).row };
 }
 
 // dados de exemplo: a formação Licenciamento com 14 aulas, um aluno, uma professora

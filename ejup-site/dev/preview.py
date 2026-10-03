@@ -60,6 +60,7 @@ const fake=__M.createFakeSupabase({url:'https://previa.supabase.co'});__M.seed(f
 const handler=__M.createPortalHandler({fetchImpl:fake.fetchImpl,env:{SUPABASE_URL:fake.url,SUPABASE_SERVICE_ROLE_KEY:'previa'}});
 const jar={};window.__sess=false;
 window.__portalApi=async(u,o)=>{const url=new URL(u,location.href);
+ if(url.searchParams.get('r')==='eq-upload')return new Response(JSON.stringify({error:'Na prévia, o envio de arquivos fica desligado: não há armazenamento para guardar o arquivo. No site publicado ele funciona.'}),{status:503,headers:{'Content-Type':'application/json'}});
  const req={method:(o&&o.method)||'GET',url:url.pathname+url.search,headers:{host:location.host,'x-forwarded-proto':'https',cookie:Object.entries(jar).map(([k,v])=>k+'='+encodeURIComponent(v)).join('; ')},body:o&&o.body?JSON.parse(o.body):undefined};
  const res={statusCode:200,h:{},setHeader(k,v){this.h[k.toLowerCase()]=v},status(c){this.statusCode=c;return this},json(p){this.payload=p;return this}};
  await handler(req,res);

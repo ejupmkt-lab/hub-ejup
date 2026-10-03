@@ -61,5 +61,14 @@ export function createSb({ env, fetchImpl = fetch }) {
     return u ? base + '/storage/v1' + (u.startsWith('/') ? u : '/' + u) : null;
   }
 
-  return { configured: Boolean(base && key), rest, auth, signed, base };
+  // envio direto do navegador: link de upload de uso único, válido por 2 horas
+  const limpa = (path) => String(path).replace(/^\/+/, '').split('/').map(encodeURIComponent).join('/');
+  async function uploadUrl(bucket, path) {
+    const r = await call(`/storage/v1/object/upload/sign/${bucket}/${limpa(path)}`, { method: 'POST', body: {} });
+    const u = r?.url;
+    return u ? base + '/storage/v1' + (u.startsWith('/') ? u : '/' + u) : null;
+  }
+  const publicUrl = (bucket, path) => `${base}/storage/v1/object/public/${bucket}/${limpa(path)}`;
+
+  return { configured: Boolean(base && key), rest, auth, signed, uploadUrl, publicUrl, base };
 }
