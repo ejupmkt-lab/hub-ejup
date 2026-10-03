@@ -219,8 +219,11 @@ R.criar = {
     if (nome.length < 2) fail(400, 'Digite seu nome completo.');
     if (!okMail(email)) fail(400, 'Digite um e-mail válido, como voce@exemplo.com.');
     if (senha.length < 8) fail(400, 'A senha precisa ter pelo menos 8 caracteres.');
+    if (b.termos !== true) fail(400, 'Para criar a conta, aceite os Termos de Uso e a Política de Privacidade.');
+    // o aceite fica no cadastro do Supabase Auth (raw_user_meta_data) e no perfil
+    const aceite = { termos_versao: str(b.termos_versao, 20) || 'sem-versao', termos_em: new Date(ctx.now()).toISOString() };
     let r;
-    try { r = await ctx.sb.auth.signup(email, senha, { nome }, `${ctx.origin}/entrar`); } catch (err) {
+    try { r = await ctx.sb.auth.signup(email, senha, { nome, ...aceite }, `${ctx.origin}/entrar`); } catch (err) {
       const msg = JSON.stringify(err?.body || '');
       if (/already|registered|exists/i.test(msg)) fail(409, 'Já existe uma conta com este e-mail. Entre ou recupere a senha.');
       if (/password/i.test(msg)) fail(400, 'Escolha uma senha mais forte, com letras e números.');

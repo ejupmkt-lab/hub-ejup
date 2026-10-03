@@ -266,3 +266,16 @@ create table if not exists public.site_itens (
   primary key (tipo, id)
 );
 alter table public.site_itens enable row level security;
+
+-- ---------- aceite dos Termos de Uso (vem do cadastro) ----------
+alter table public.perfis add column if not exists termos_versao text;
+alter table public.perfis add column if not exists termos_em timestamptz;
+create or replace function public.ejup_novo_usuario() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.perfis (id, email, nome, termos_versao, termos_em)
+  values (new.id, lower(new.email), coalesce(new.raw_user_meta_data->>'nome', ''),
+          new.raw_user_meta_data->>'termos_versao', (new.raw_user_meta_data->>'termos_em')::timestamptz)
+  on conflict (id) do nothing;
+  return new;
+end $$;

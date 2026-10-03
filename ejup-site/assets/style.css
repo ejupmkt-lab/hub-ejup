@@ -1012,3 +1012,5 @@ button.fq:hover,a.fq:hover{padding-left:6px}
 .eq-sel{background:var(--w05);border:1px solid var(--w16);border-radius:999px;height:34px;padding:0 12px;color:inherit;font:inherit;font-size:13px;max-width:100%}.eq-sel option{color:#0D131A}
 .pgf textarea.inp.tall{height:280px}
 .ptit>.chips.eq-tabs{display:flex;flex-wrap:wrap;gap:8px}
+.chk{display:flex;gap:12px;align-items:flex-start;font-size:13px;line-height:1.5;color:var(--w82);cursor:pointer;padding-top:4px}.chk input{flex:none;width:18px;height:18px;margin-top:1px;accent-color:var(--ouro-400)}.chk a,.au-g .sm a{color:var(--ouro-400);text-decoration:underline;text-underline-offset:3px}.chk input.bad{outline:2px solid var(--erro);outline-offset:2px}
+.forgot[hidden],#au-tx[hidden]{display:none}

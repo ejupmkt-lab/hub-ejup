@@ -133,6 +133,8 @@ let PROF=[
 const FE=()=>F.find(f=>f.incompany)||F[F.length-1]||{f:[]};
 const profOf=id=>PROF.find(p=>p.id===id);
 const profF=p=>F.filter(f=>(f.profs||[]).some(x=>x.id===p.id));
+/* versão dos Termos de Uso: muda junto com o texto; o aceite fica registrado na conta */
+const TERMOS_VERSAO='2026-10-03',TERMOS_DATA='3 de outubro de 2026';
 const NAV=[['escola','A escola'],['formacoes','Formações'],['professores','Professores'],['ejupcast','EJUPcast'],['coluna','Coluna Jurídica'],['incompany','In company']];
 
 /* ---------- componentes ---------- */
@@ -161,7 +163,7 @@ const footer=cta=>`<footer class="sec deep foot">${orb('orb-foot',{arc:false,par
  <div class="foot-cols">
   <ul><li class="lbl">A escola</li><li><a href="#formacoes">Formações</a></li><li><a href="#professores">Professores</a></li><li><a href="#incompany">In company</a></li></ul>
   <ul><li class="lbl">Conteúdos</li><li><a href="#ejupcast">EJUPcast</a></li><li><a href="#coluna">Coluna Jurídica</a></li><li><a href="#coluna.newsletter">Newsletter</a></li></ul>
-  <ul><li class="lbl">Legal</li><li><a href="#privacidade">Política de Privacidade</a></li></ul>
+  <ul><li class="lbl">Legal</li><li><a href="#termos">Termos de Uso</a></li><li><a href="#privacidade">Política de Privacidade</a></li></ul>
  </div></div></div></footer>`;
 const symAv=`<span class="sym">${SYM('')}</span>`;
 
@@ -402,6 +404,40 @@ incompany:()=>`
 </div></section>
 ${footer()}`,
 
+termos:()=>`
+<section class="sec light hero" data-hero><div class="wrap hero-c">${tag('Legal')}
+ <h1 class="d1 blur" data-r>Termos ${em('de Uso.')}</h1>
+ <p class="lead" data-r>As regras para usar o site, a conta e o Portal do Aluno da EJUP. Versão de ${TERMOS_DATA}.</p></div></section>
+<section class="sec light flush"><div class="wrap"><div class="art-t priv" data-r>
+ <h2 class="h3">1. Quem somos e o que estes termos regem</h2>
+ <p>EJUP — Educação Jurídica, CNPJ 41.402.986/0001-03, Rua da Saudade, 1028, Lagoa Nova, Natal/RN. Estes termos valem para o site, a conta de aluno ou professor, o Portal do Aluno, a Área do Professor e a Minerva. Ao criar a conta, você declara que leu e aceita estes termos e a <a href="#privacidade">Política de Privacidade</a>.</p>
+ <h2 class="h3">2. Conta</h2>
+ <p>A conta é pessoal e intransferível. Você se compromete a informar dados verdadeiros, manter a senha em sigilo e avisar a EJUP se suspeitar de uso indevido. Para contratar uma formação é preciso ter 18 anos ou ser representado por quem tenha. O acesso simultâneo da mesma conta por várias pessoas não é permitido.</p>
+ <h2 class="h3">3. Acesso às formações</h2>
+ <p>As formações aparecem no Portal do Aluno depois que a EJUP libera o acesso no e-mail usado na inscrição. O prazo de acesso, a carga horária, o formato e o plano de suporte (Essencial, Acompanhado ou Mentoria) são os informados na oferta de cada formação. Prazos de resposta do professor, plantões e mentorias seguem o plano contratado. A EJUP pode atualizar aulas e materiais para manter o conteúdo correto, sem reduzir a carga horária contratada.</p>
+ <h2 class="h3">4. Pagamento, cancelamento e arrependimento</h2>
+ <p>Valores, formas de pagamento e parcelamento são os da oferta no momento da compra. Na contratação pela internet, você pode desistir em até 7 dias contados da contratação ou da liberação do acesso, com devolução integral do valor pago, como prevê o art. 49 do Código de Defesa do Consumidor. O pedido é feito pelo e-mail <a href="mailto:contato@ejup.com.br">contato@ejup.com.br</a> ou pelo WhatsApp da escola.</p>
+ <h2 class="h3">5. Propriedade intelectual</h2>
+ <p>Aulas, materiais, textos, marcas e o conteúdo do site pertencem à EJUP ou aos professores e são protegidos pela Lei nº 9.610/1998. O acesso é para estudo pessoal. Não é permitido gravar, baixar por meios não oferecidos pelo portal, copiar, compartilhar, transmitir ou revender aulas e materiais. A violação leva à suspensão do acesso, sem prejuízo das medidas legais cabíveis.</p>
+ <h2 class="h3">6. Conduta</h2>
+ <p>Dúvidas, plantões e mentorias são espaços de estudo. Pedimos respeito aos professores e aos colegas. Não envie dados pessoais de terceiros nem informações sigilosas de clientes ou processos: descreva o caso em termos gerais.</p>
+ <h2 class="h3">7. Natureza do conteúdo e da Minerva</h2>
+ <p>O conteúdo da EJUP tem finalidade educacional e não constitui consultoria ou parecer jurídico sobre casos concretos. A Minerva responde com o banco de respostas cadastrado pela EJUP e pelos professores; ela pode não ter a resposta ou não cobrir as particularidades do seu caso. Decisões profissionais continuam sendo de responsabilidade de quem as toma.</p>
+ <h2 class="h3">8. Certificados</h2>
+ <p>O certificado é emitido quando a carga horária da formação é concluída no portal. Cada certificado tem um código e uma página pública de conferência, que mostra o nome que você escolheu para o certificado, a formação, a carga horária e a data de conclusão.</p>
+ <h2 class="h3">9. Suspensão e encerramento</h2>
+ <p>A EJUP pode suspender ou encerrar a conta em caso de descumprimento destes termos, com aviso por e-mail. Você pode encerrar a conta a qualquer momento no seu perfil; o encerramento apaga perfil, progresso, anotações e dúvidas, e não gera reembolso fora das hipóteses do item 4.</p>
+ <h2 class="h3">10. Disponibilidade</h2>
+ <p>Trabalhamos para manter o site e o portal no ar, mas podem ocorrer interrupções para manutenção ou por falhas de terceiros (hospedagem, vídeo, e-mail). Interrupções longas que impeçam o uso do que foi contratado dão direito a prorrogação proporcional do acesso.</p>
+ <h2 class="h3">11. Alterações destes termos</h2>
+ <p>Quando estes termos mudarem, a nova versão será publicada nesta página com a data, e quem tem conta será avisado por e-mail. As mudanças não alteram as condições de formações já contratadas.</p>
+ <h2 class="h3">12. Lei e foro</h2>
+ <p>Estes termos seguem as leis brasileiras. Fica eleito o foro de Natal/RN, ressalvado o direito do consumidor de propor ação no foro do seu domicílio.</p>
+ <h2 class="h3">Contato</h2>
+ <p><a href="mailto:contato@ejup.com.br">contato@ejup.com.br</a> · WhatsApp 85 9 9271.4050.</p>
+</div></div></section>
+${footer()}`,
+
 privacidade:()=>`
 <section class="sec light hero" data-hero><div class="wrap hero-c">${tag('Legal')}
  <h1 class="d1 blur" data-r>Política de ${em('Privacidade.')}</h1>
@@ -412,7 +448,7 @@ privacidade:()=>`
  <h2 class="h3">Que dados coletamos e para quê</h2>
  <p>Newsletter: o seu e-mail, para enviar a edição semanal da Coluna Jurídica. Proposta in company: nome, e-mail, organização, tamanho da equipe, tema e mensagem, para preparar e responder ao pedido. Coletamos apenas o que você digita nesses formulários, com o seu consentimento.</p>
  <h2 class="h3">Portal do Aluno e Área do Professor</h2>
- <p>Para quem tem conta: nome, e-mail, senha (guardada de forma cifrada pelo provedor de login), dados opcionais do perfil (telefone, área de atuação, inscrição na OAB, nome no certificado), as formações liberadas, o progresso nas aulas, as anotações, as dúvidas enviadas ao professor, os encontros de mentoria e as preferências de estudo e de e-mail. Usamos esses dados para dar acesso às formações, emitir certificados, encaminhar dúvidas ao professor da formação e enviar os avisos que você escolher. O professor da formação vê o nome, o e-mail, o plano e o progresso dos alunos da turma. No perfil, você baixa uma cópia dos seus dados ou exclui a conta.</p>
+ <p>Para quem tem conta: nome, e-mail, senha (guardada de forma cifrada pelo provedor de login), dados opcionais do perfil (telefone, área de atuação, inscrição na OAB, nome no certificado), as formações liberadas, o progresso nas aulas, as anotações, as dúvidas enviadas ao professor, os encontros de mentoria, as preferências de estudo e de e-mail e o registro do aceite dos Termos de Uso (versão e data). Usamos esses dados para dar acesso às formações, emitir certificados, encaminhar dúvidas ao professor da formação e enviar os avisos que você escolher. O professor da formação vê o nome, o e-mail, o plano e o progresso dos alunos da turma. No perfil, você baixa uma cópia dos seus dados ou exclui a conta.</p>
  <h2 class="h3">Minerva</h2>
  <p>No site público, as perguntas feitas à Minerva são usadas só para encontrar a resposta no banco de respostas da EJUP e não são guardadas. No Portal do Aluno, as perguntas ficam registradas na sua conta, junto com a avaliação “ajudou” ou “não ajudou”, para que o professor revise e melhore as respostas da formação. Não informe dados pessoais ou detalhes sigilosos de casos na conversa.</p>
  <h2 class="h3">Com quem compartilhamos</h2>
@@ -487,7 +523,7 @@ const closeModal=()=>{if(!modal.classList.contains('on'))return;modal.classList.
 let cur=null,secs=[],hero=null,pars=[],prog=null,spies=[],io,cio,vio;
 /* aceita caminho (/formacao/licenciamento) e o formato antigo com # (#formacao.licenciamento) */
 const parse=h=>{h=(h||'').replace(/^[#/]+/,'').replace(/\/+$/,'');if(!h)return ['home',''];const i=h.search(/[./]/);return i<0?[h,'']:[h.slice(0,i),h.slice(i+1)]};
-const TITLES={home:'EJUP · Educação Jurídica',escola:'A escola',formacoes:'Formações',formacao:'Formação',professores:'Professores',ejupcast:'EJUPcast',coluna:'Coluna Jurídica',artigo:'Artigo',incompany:'In company',privacidade:'Política de Privacidade',entrar:'Entrar',criar:'Criar conta',recuperar:'Recuperar senha',portal:'Portal do Aluno',prof:'Área do Professor',equipe:'Área da Equipe',certificado:'Certificado'};
+const TITLES={home:'EJUP · Educação Jurídica',escola:'A escola',formacoes:'Formações',formacao:'Formação',professores:'Professores',ejupcast:'EJUPcast',coluna:'Coluna Jurídica',artigo:'Artigo',incompany:'In company',privacidade:'Política de Privacidade',termos:'Termos de Uso',entrar:'Entrar',criar:'Criar conta',recuperar:'Recuperar senha',portal:'Portal do Aluno',prof:'Área do Professor',equipe:'Área da Equipe',certificado:'Certificado'};
 const SCR={};
 /* Portal do Aluno, Área do Professor e login ficam em /assets/portal.js, carregado só quando alguém vai até lá */
 const PORTAL=['entrar','criar','recuperar','portal','prof','equipe','certificado'];
@@ -664,7 +700,7 @@ function aplicar(c){
  if(f)F=f;if(e)E=e;if(a)AR=a;if(q)FAQ=q.map(x=>[x.q,x.a]);if(pr)PROF=pr;
  const cfg=(c.config||[])[0];if(cfg)['whatsapp','instagram','youtube','spotify','mapa'].forEach(k=>{if(typeof cfg[k]==='string'&&(!cfg[k]||/^https:\/\//.test(cfg[k])))LINKS[k]=cfg[k]});
 }
-window.EJUP={$,$$,RM,ic,btn,tag,em,orb,LOGO,SYM,DEF,get F(){return F},LINKS,waMsg,okMail,toast,go,links,hydrate,withImg,placeSeg,reveal,syncSess,PAGES,TITLES,app,nav,cur:()=>cur};
+window.EJUP={TERMOS_VERSAO,$,$$,RM,ic,btn,tag,em,orb,LOGO,SYM,DEF,get F(){return F},LINKS,waMsg,okMail,toast,go,links,hydrate,withImg,placeSeg,reveal,syncSess,PAGES,TITLES,app,nav,cur:()=>cur};
 addEventListener('popstate',()=>go(location.pathname,{push:false}));
 links(nav);links(menu);
 const inicio=()=>go(location.pathname==='/'&&location.hash.length>1?location.hash:location.pathname,{push:false,instant:true});

@@ -88,11 +88,12 @@ function auth(m){const a=AUTH[m],pf=m==='prof';return `
    <div class="fx${m==='criar'?' on':''}" id="au-fx"${m==='criar'?'':' inert'}><div><label class="fl"><span>Nome completo</span><input class="inp" id="au-nome" placeholder="Seu nome" autocomplete="name"></label></div></div>
    <label class="fl"><span id="au-el">${pf?'E-mail cadastrado pela EJUP':'E-mail'}</span><input class="inp" id="au-email" type="email" placeholder="voce@exemplo.com" autocomplete="email"></label>
    ${pwField('au-senha','Senha',m==='criar'?'new-password':'current-password')}
+   <div id="au-tx"${m==='criar'?'':' hidden'}><div><label class="chk"><input type="checkbox" id="au-termos"><span>Li e aceito os <a href="/termos" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="/privacidade" target="_blank" rel="noopener">Política de Privacidade</a>.</span></label></div></div>
    <p class="err" id="au-err" role="alert"></p>
   </div>
   <button type="button" class="forgot swap" id="au-fg" data-go-rec${m==='criar'?' hidden':''}>Esqueci minha senha</button>
   <button type="submit" class="btn b-gold full"><span id="au-b">${a.b}</span>${ic('ar')}</button>
-  <div class="fxc" id="au-gx" inert><div class="au-g"><div class="or">ou</div><a class="btn b-glass full" id="au-google" href="#"><span>Continuar com Google</span></a></div></div>
+  <div class="fxc" id="au-gx" inert><div class="au-g"><div class="or">ou</div><a class="btn b-glass full" id="au-google" href="#"><span>Continuar com Google</span></a><p class="sm" style="text-align:center">Ao continuar com Google, você aceita os <a href="/termos" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="/privacidade" target="_blank" rel="noopener">Política de Privacidade</a>.</p></div></div>
   <p class="alt"><span id="au-q">${a.q}</span> ${pf?`<a id="au-o" href="${WA('Olá, sou professor da EJUP e preciso de acesso à Área do Professor.')}" target="_blank" rel="noopener">${a.o[1]}</a>`:`<button type="button" id="au-o" data-mode="${a.o[0]}">${a.o[1]}</button>`}</p>
  </form></div></section>`}
 function setAuth(m){
@@ -102,7 +103,7 @@ function setAuth(m){
  const sx=$('#au-sx');sx.classList.toggle('on',!pf);sx.toggleAttribute('inert',pf);googleBox(!pf);
  const swp=$$('.swap',f.parentElement);swp.forEach(x=>x.classList.add('x'));
  setTimeout(()=>{$('#au-tag').textContent=pf?'Área do Professor':'Portal do Aluno';$('#au-h').innerHTML=a.h;$('#au-p').textContent=a.p;$('#au-t').innerHTML=`<h2 class="h3">${a.t}</h2><p class="body">${a.s}</p>`;$('#au-fg').hidden=m==='criar';swp.forEach(x=>x.classList.remove('x'))},RM?0:220);
- const fx=$('#au-fx');fx.classList.toggle('on',m==='criar');fx.toggleAttribute('inert',m!=='criar');
+ const fx=$('#au-fx');fx.classList.toggle('on',m==='criar');fx.toggleAttribute('inert',m!=='criar');$('#au-tx').hidden=m!=='criar';
  $('#au-b').textContent=a.b;$('#au-q').textContent=a.q;$('#au-senha').setAttribute('autocomplete',m==='criar'?'new-password':'current-password');
  const o=$('#au-o'),n=pf?Object.assign(document.createElement('a'),{id:'au-o',href:WA('Olá, sou professor da EJUP e preciso de acesso à Área do Professor.'),target:'_blank',rel:'noopener'}):Object.assign(document.createElement('button'),{id:'au-o',type:'button'});
  if(!pf)n.dataset.mode=a.o[0];n.textContent=a.o[1];o.replaceWith(n);
@@ -131,11 +132,12 @@ async function authSubmit(f){
  else if(!okMail(em_.value)){msg='Digite um e-mail válido, como voce@exemplo.com.';bad=em_}
  else if(m==='criar'&&pw.value.length<8){msg='A senha precisa ter pelo menos 8 caracteres.';bad=pw}
  else if(!pw.value){msg='Digite a sua senha.';bad=pw}
+ else if(m==='criar'&&!$('#au-termos').checked){msg='Para criar a conta, aceite os Termos de Uso e a Política de Privacidade.';bad=$('#au-termos')}
  if(bad){bad.classList.add('bad');say(er,msg,true);bad.focus();return}
  say(er,'');busy(b,true,m==='criar'?'Criando a conta…':'Entrando…');
  try{
   if(m==='criar'){
-   const r=await api('criar',{body:{nome:nm.value.trim(),email:em_.value.trim(),senha:pw.value}});
+   const r=await api('criar',{body:{nome:nm.value.trim(),email:em_.value.trim(),senha:pw.value,termos:true,termos_versao:E.TERMOS_VERSAO}});
    if(r.confirmar){f.innerHTML=`<div class="okbox"><span class="ck">${ic('mail',28)}</span><p class="h3">Confirme o seu e-mail.</p><p class="body">Enviamos um link para <strong style="color:var(--branco);font-weight:500">${esc(em_.value.trim())}</strong>. Abra o link para ativar a conta e entrar no portal.</p><p class="sm">Não chegou? Veja a caixa de spam ou fale com a equipe: contato@ejup.com.br.</p></div>`;return}
    E.syncSess();toast('Conta criada. Bem-vindo ao Portal do Aluno.');voltar('portal');return}
   const r=await api('entrar',{body:{email:em_.value.trim(),senha:pw.value}});pw.value='';E.syncSess();

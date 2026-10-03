@@ -44,7 +44,7 @@ async function logged(email, senha) {
 
 test('cria conta, entra com cookie HttpOnly e sai', async () => {
   const b = browser();
-  const c = await b.call('criar', { body: { nome: 'Carla Melo', email: 'Carla@Exemplo.com', senha: 'umasenhaboa1' } });
+  const c = await b.call('criar', { body: { nome: 'Carla Melo', email: 'Carla@Exemplo.com', senha: 'umasenhaboa1', termos: true, termos_versao: '2026-10-03' } });
   assert.equal(c.statusCode, 200);
   assert.equal(c.payload.sessao, true);
   const cookies = c.headers['set-cookie'];
@@ -64,10 +64,10 @@ test('login errado, senha curta e confirmação de e-mail', async () => {
   assert.equal((await b.call('entrar', { body: { email: 'aluno@ejup.com.br', senha: 'errada' } })).statusCode, 401);
   assert.equal((await b.call('criar', { body: { nome: 'X Y', email: 'x@y.com', senha: '123' } })).statusCode, 400);
   fake.state.confirmEmail = true;
-  const c = await b.call('criar', { body: { nome: 'Dora Reis', email: 'dora@exemplo.com', senha: 'senhaforte9' } });
+  const c = await b.call('criar', { body: { nome: 'Dora Reis', email: 'dora@exemplo.com', senha: 'senhaforte9', termos: true } });
   assert.equal(c.payload.confirmar, true);
   assert.equal(fake.sent.at(-1).redirect, 'https://ejup.test/entrar');
-  const e = await b.call('entrar', { body: { email: 'dora@exemplo.com', senha: 'senhaforte9' } });
+  const e = await b.call('entrar', { body: { email: 'dora@exemplo.com', senha: 'senhaforte9', termos: true } });
   assert.equal(e.statusCode, 403);
   assert.match(e.payload.error, /Confirme/);
 });
@@ -98,7 +98,7 @@ test('portal do aluno: matrículas, estrutura, progresso e materiais assinados',
   assert.equal(v.video.provedor, 'youtube');
   // quem não tem matrícula não abre a aula
   const c = browser();
-  await c.call('criar', { body: { nome: 'Sem Acesso', email: 'sem@acesso.com', senha: 'senhaforte9' } });
+  await c.call('criar', { body: { nome: 'Sem Acesso', email: 'sem@acesso.com', senha: 'senhaforte9', termos: true } });
   assert.equal((await c.call('aula', { query: '&id=lic-m1-a1' })).statusCode, 403);
 });
 
@@ -282,4 +282,15 @@ test('conteúdo do site: equipe edita, site lê publicado, endereços validados'
   assert.equal((await e.call('equipe')).payload.site.length, 2);
   const a = await logged('aluno@ejup.com.br', 'senha-aluno-1');
   assert.equal((await a.call('eq-item', { body: { tipo: 'faq', id: 'x', dados: {} } })).statusCode, 403);
+});
+
+test('cadastro exige aceite dos Termos e guarda a versão', async () => {
+  const b = browser();
+  const sem = await b.call('criar', { body: { nome: 'Eva Lima', email: 'eva@exemplo.com', senha: 'senhaforte9' } });
+  assert.equal(sem.statusCode, 400);
+  assert.match(sem.payload.error, /Termos/);
+  assert.equal((await b.call('criar', { body: { nome: 'Eva Lima', email: 'eva@exemplo.com', senha: 'senhaforte9', termos: true, termos_versao: '2026-10-03' } })).statusCode, 200);
+  const u = fake.users.find((x) => x.email === 'eva@exemplo.com');
+  assert.equal(u.meta.termos_versao, '2026-10-03');
+  assert.ok(u.meta.termos_em);
 });
