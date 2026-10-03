@@ -26,11 +26,12 @@ export function createHandler({ fetchImpl = fetch, env = process.env, now = Date
     if (!url || !key) return RESPOSTAS_LOCAIS;
     if (cache.items && now() - cache.at < CACHE_MS) return cache.items;
     try {
-      const r = await fetchImpl(`${url.replace(/\/$/, '')}/rest/v1/minerva_respostas?ativo=eq.true&select=id,pergunta,variacoes,palavras,resposta&order=ordem.asc`, {
+      const r = await fetchImpl(`${url.replace(/\/$/, '')}/rest/v1/minerva_respostas?ativo=eq.true&select=*&order=ordem.asc`, {
         headers: { apikey: key, ...authHeader(key) },
       });
       if (!r.ok) throw new Error(String(r.status));
-      const items = await r.json();
+      // respostas de uma formação ou só do Portal do Aluno ficam fora do hotsite
+      const items = (await r.json() || []).filter?.((i) => !i.curso_id && !i.portal);
       if (!Array.isArray(items) || !items.length) throw new Error('tabela vazia');
       cache = { at: now(), items };
       return items;

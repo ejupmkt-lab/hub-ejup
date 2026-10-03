@@ -2,6 +2,19 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "headers": [
     {
+      "source": "/(portal|prof|entrar|criar|recuperar)(/.*)?",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
       "source": "/minerva(.*)",
       "headers": [
         {
@@ -74,6 +87,9 @@
     },
     "api/lead.js": {
       "maxDuration": 10
+    },
+    "api/portal.js": {
+      "maxDuration": 30
     }
   },
   "rewrites": [
@@ -84,6 +100,12 @@
     {
       "source": "/((?!api/|minerva/|assets/|img/|vid/|fonts/|favicon\\.svg).*)",
       "destination": "/index.html"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/portal?r=cron",
+      "schedule": "0 11 * * *"
     }
   ]
 }
