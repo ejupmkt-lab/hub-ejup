@@ -1018,3 +1018,11 @@ button.fq:hover,a.fq:hover{padding-left:6px}
 .cp-box{max-width:560px}.cp-f{width:100%}.cp-f .field{flex:1}
 @media (max-width:1380px){.nav-acts>a[href="/minerva"],.nav-acts>a[href="minerva.html"]{display:none}}
 .up-w{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:8px}.up-w .up-s{flex:1 1 200px}.up-w .up-s.bad{color:var(--erro)}.up-t{width:64px;height:40px;object-fit:cover;border-radius:6px;border:1px solid var(--w16)}
+
+/* acessibilidade (revisão do Portal) */
+.skip-link{position:fixed;left:16px;top:-80px;z-index:200;padding:12px 18px;border-radius:999px;background:var(--ouro-400);color:var(--navy-900);font-weight:500;font-size:14px;transition:top .2s}
+.skip-link:focus{top:16px}
+.light :focus-visible{outline-color:var(--navy-900)}
+.priv a{color:var(--navy-900);text-decoration-color:var(--ouro-700);text-decoration-thickness:1px}
+.pplayer>iframe:focus,.pplayer>video:focus-visible{outline:2px solid var(--ouro-400);outline-offset:-2px}
+.puser .sm a,.puser .lk-in{display:inline-block;padding:4px 0;min-height:24px}.pu-n{padding:2px 0}

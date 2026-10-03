@@ -653,6 +653,7 @@ document.addEventListener('submit',async e=>{
 /* ---------- cliques ---------- */
 document.addEventListener('click',e=>{
  const t=e.target;if(!t.closest)return;
+ if(t.closest('[data-pular]')){e.preventDefault();const m=$('#pmain')||app;m.focus();m.scrollIntoView({block:'start'});return}
  if(dragged){e.preventDefault();return}
  const a=t.closest('a[href]');
  if(a&&!a.target&&!e.metaKey&&!e.ctrlKey&&!e.shiftKey&&!e.altKey&&a.origin===location.origin&&(PAGES[parse(a.pathname)[0]]||PORTAL.includes(parse(a.pathname)[0]))){e.preventDefault();go(a.pathname);return}

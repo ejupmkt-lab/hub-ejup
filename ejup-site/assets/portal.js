@@ -36,7 +36,7 @@ const iniOf=n=>(n||'').trim().split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,
 const fav=(i,c='')=>`<span class="fav ${c}">${esc(i)}</span>`;
 
 /* ---------- peças ---------- */
-const mnv=(sz='s')=>`<span class="mnv ${sz}" data-mnv aria-hidden="true"><span class="mnv-f"><i class="mnv-h"></i><img src="/minerva/repouso.jpg" alt=""><img class="on" src="/minerva/aberta.jpg" alt=""></span></span>`;
+const mnv=(sz='s')=>`<span class="mnv ${sz}" data-mnv aria-hidden="true"><span class="mnv-f"><i class="mnv-h"></i><img src="/minerva/repouso-p.jpg" alt=""><img class="on" src="/minerva/aberta-p.jpg" alt=""></span></span>`;
 const mnvSet=(m,open)=>{if(!m)return;m.classList.toggle('open',open);m.classList.toggle('still',open)};
 const crumb=(a,b)=>`<span>${esc(a)}</span>${b?`<i>/</i><strong>${esc(b)}</strong>`:''}`;
 const lk=(l,o={})=>o.go?`<a href="/${o.go}" class="lk"${o.attr?' '+o.attr:''}><span>${l}</span>${ic('ar',14)}</a>`:o.href?`<a href="${o.href}" class="lk" target="_blank" rel="noopener"><span>${l}</span>${ic('ar',14)}</a>`:`<button type="button" class="lk"${o.attr?' '+o.attr:''}><span>${l}</span>${ic('ar',14)}</button>`;
@@ -90,8 +90,8 @@ function auth(m){const a=AUTH[m],k=accDe(m),pf=k!=='aluno';return `
   <div class="fxc${pf?'':' on'}" id="au-sx"${pf?' inert':''}><div><div class="seg"><span class="seg-ind"></span><button type="button" data-mode="entrar"${m!=='criar'?' class="on"':''}>Entrar</button><button type="button" data-mode="criar"${m==='criar'?' class="on"':''}>Criar conta</button></div></div></div>
   <div class="tt swap" id="au-t"><h2 class="h3">${a.t}</h2><p class="body">${a.s}</p></div>
   <div class="fields">
-   <div class="fx${m==='criar'?' on':''}" id="au-fx"${m==='criar'?'':' inert'}><div><label class="fl"><span>Nome completo</span><input class="inp" id="au-nome" placeholder="Seu nome" autocomplete="name"></label></div></div>
-   <label class="fl"><span id="au-el">${auEmail(m)}</span><input class="inp" id="au-email" type="email" placeholder="voce@exemplo.com" autocomplete="email"></label>
+   <div class="fx${m==='criar'?' on':''}" id="au-fx"${m==='criar'?'':' inert'}><div><label class="fl"><span>Nome completo</span><input class="inp" id="au-nome" placeholder="Seu nome" autocomplete="name" aria-describedby="au-err"></label></div></div>
+   <label class="fl"><span id="au-el">${auEmail(m)}</span><input class="inp" id="au-email" type="email" placeholder="voce@exemplo.com" autocomplete="email" aria-describedby="au-err"></label>
    ${pwField('au-senha','Senha',m==='criar'?'new-password':'current-password')}
    <div id="au-tx"${m==='criar'?'':' hidden'}><div><label class="chk"><input type="checkbox" id="au-termos"><span>Li e aceito os <a href="/termos" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="/privacidade" target="_blank" rel="noopener">Política de Privacidade</a>.</span></label></div></div>
    <p class="err" id="au-err" role="alert"></p>
@@ -140,7 +140,8 @@ async function authSubmit(f){
  else if(m==='criar'&&pw.value.length<8){msg='A senha precisa ter pelo menos 8 caracteres.';bad=pw}
  else if(!pw.value){msg='Digite a sua senha.';bad=pw}
  else if(m==='criar'&&!$('#au-termos').checked){msg='Para criar a conta, aceite os Termos de Uso e a Política de Privacidade.';bad=$('#au-termos')}
- if(bad){bad.classList.add('bad');say(er,msg,true);bad.focus();return}
+ $$('[aria-invalid]',f).forEach(i=>i.removeAttribute('aria-invalid'));
+ if(bad){bad.classList.add('bad');bad.setAttribute('aria-invalid','true');say(er,msg,true);bad.focus();return}
  say(er,'');busy(b,true,m==='criar'?'Criando a conta…':'Entrando…');
  try{
   if(m==='criar'){
@@ -264,10 +265,10 @@ PAGES.portal=()=>`
  <aside class="pside"><div class="pside-t"><a href="/portal" class="logo" aria-label="Portal do Aluno, início">${LOGO}</a>
   <nav class="pnav" aria-label="Portal do Aluno">${PNAV.map(([k,l,i])=>`<a href="/portal${k?'/'+k:''}" data-pv="${k}">${ic(i,18)}<span>${l}</span></a>`).join('')}</nav></div>
   <div class="pside-b"><a href="/portal/planos" class="pplan"><span class="lbl g">Seu plano</span><span class="h4" data-plan-n>—</span><span class="sm" data-curso-n></span></a>
-   <div class="puser"><a href="/portal/perfil" class="pav" data-u-ini aria-label="Meu perfil"></a><div><a href="/portal/perfil" class="pu-n" data-u-nome></a><p class="sm"><a href="/portal/perfil">Meu perfil</a><span data-prof-link hidden> · <a href="/prof">Área do Professor</a></span> · <button type="button" class="lk-in" data-logout>Sair</button></p></div></div></div></aside>
+   <div class="puser"><span class="pav" aria-hidden="true"><span data-u-ini></span></span><div><span class="pu-n" data-u-nome></span><p class="sm"><a href="/portal/perfil">Meu perfil</a><span data-prof-link hidden> · <a href="/prof">Área do Professor</a></span> · <button type="button" class="lk-in" data-logout>Sair</button></p></div></div></div></aside>
  <div class="pbody">
   <header class="ptop"><a href="/portal" class="logo pmo" aria-label="Portal do Aluno, início">${LOGO}</a><p class="pcrumb" id="pcrumb"></p>
-   <div class="ptop-r"><form class="field psearch" id="p-sf" role="search" novalidate>${ic('search',16)}<input type="search" placeholder="Buscar aula, material ou dúvida" aria-label="Buscar no portal"></form><button type="button" class="pico pbell" data-bell aria-label="Avisos" aria-haspopup="true" aria-expanded="false">${ic('bell',18)}<i class="dot" hidden></i></button><button type="button" class="pav pmo" data-pmenu aria-haspopup="true" aria-expanded="false" aria-label="Conta: perfil, certificados, planos e sair" data-u-ini></button></div>
+   <div class="ptop-r"><form class="field psearch" id="p-sf" role="search" novalidate>${ic('search',16)}<input type="search" placeholder="Buscar aula, material ou dúvida" aria-label="Buscar no portal"></form><button type="button" class="pico pbell" data-bell aria-label="Avisos" aria-haspopup="true" aria-expanded="false">${ic('bell',18)}<i class="dot" hidden></i></button><button type="button" class="pav pmo" data-pmenu aria-haspopup="true" aria-expanded="false" aria-label="Conta: perfil, certificados, planos e sair"><span data-u-ini aria-hidden="true"></span></button></div>
    <div class="pmenu" id="pmenu" hidden><p class="sm"><span data-u-nome></span></p><a href="/portal/perfil">${ic('user',16)}<span>Meu perfil</span></a><a href="/portal/cert">${ic('award',16)}<span>Certificados</span></a><a href="/portal/planos">${ic('crown',16)}<span>Planos de acesso</span></a><a href="/prof" data-prof-link hidden>${ic('users',16)}<span>Área do Professor</span></a><a href="/equipe" data-eq-link hidden>${ic('shield',16)}<span>Área da Equipe</span></a><button type="button" data-logout>${ic('ar',16)}<span>Sair</span></button></div>
    <div class="pmenu pavisos" id="pavisos" hidden></div></header>
   <div id="pmain" class="pmain" tabindex="-1"><div class="okbox"><p class="sm">Carregando o portal…</p></div></div>
@@ -524,7 +525,7 @@ PB.suporte=()=>{renderThreads();renderLive();renderMent()};
 function renderThreads(){
  const l=$('#th-list');if(!l)return;const ds=M().duvidas;$('#th-n').textContent=ds.length;
  if(S.sel==null&&S.draft==null&&ds.length)S.sel=ds[0].id;
- l.innerHTML=ds.length?ds.map(d=>`<button type="button" class="pth${S.sel===d.id?' on':''}" data-th="${d.id}"><span class="t"></span><span class="pth-f"><span class="sm"></span>${tag(ST[d.status],d.status==='respondida'?'gold':'')}</span></button>`).join(''):'<p class="sm" style="padding:8px 0">Nenhuma dúvida enviada ainda.</p>';
+ l.innerHTML=ds.length?ds.map(d=>`<button type="button" class="pth${S.sel===d.id?' on':''}"${S.sel===d.id?' aria-current="true"':''} data-th="${d.id}"><span class="t"></span><span class="pth-f"><span class="sm"></span>${tag(ST[d.status],d.status==='respondida'?'gold':'')}</span></button>`).join(''):'<p class="sm" style="padding:8px 0">Nenhuma dúvida enviada ainda.</p>';
  $$('.pth',l).forEach((b,i)=>{const d=ds[i],a=d.aula_id&&aulaOf(d.aula_id);$('.t',b).textContent=d.titulo;$('.sm',b).textContent=(a?lesL(a)+(d.segundo?' · '+mmss(d.segundo):''):cursoOf(d.curso_id)?.titulo||'')+' · '+rel(d.criado_em)});
  renderThread();
 }
@@ -679,10 +680,10 @@ PAGES.prof=()=>`
  <aside class="pside"><div class="pside-t"><a href="/prof" class="logo" aria-label="Área do Professor, painel">${LOGO}</a><div>${tag('Área do Professor','gold')}</div>
   <nav class="pnav" aria-label="Área do Professor">${FNAV.map(([k,l,i])=>`<a href="/prof${k?'/'+k:''}" data-pv="${k||'painel'}">${ic(i,18)}<span>${l}</span>${k==='duvidas'?'<span class="cnt" data-fq-n hidden></span>':''}</a>`).join('')}</nav></div>
   <div class="pside-b"><div class="pplan"><span class="lbl g">Formação</span><span id="pc-box"></span><span class="sm" data-pc-n></span></div>
-   <div class="puser"><a href="/prof/perfil" class="pav gold" data-u-ini aria-label="Meu perfil"></a><div><a href="/prof/perfil" class="pu-n" data-u-nome></a><p class="sm"><a href="/prof/perfil">Perfil</a> · <a href="/portal">Ver como aluno</a> · <button type="button" class="lk-in" data-logout>Sair</button></p></div></div></div></aside>
+   <div class="puser"><span class="pav gold" aria-hidden="true"><span data-u-ini></span></span><div><span class="pu-n" data-u-nome></span><p class="sm"><a href="/prof/perfil">Perfil</a> · <a href="/portal">Ver como aluno</a> · <button type="button" class="lk-in" data-logout>Sair</button></p></div></div></div></aside>
  <div class="pbody">
   <header class="ptop"><a href="/prof" class="logo pmo" aria-label="Área do Professor, painel">${LOGO}</a><p class="pcrumb" id="pcrumb"></p>
-   <div class="ptop-r"><form class="field psearch" id="f-sf" role="search" novalidate>${ic('search',16)}<input type="search" placeholder="Buscar aluno ou dúvida" aria-label="Buscar na área do professor"></form><button type="button" class="pav gold pmo" data-pmenu aria-haspopup="true" aria-expanded="false" aria-label="Conta: perfil, ver como aluno e sair" data-u-ini></button></div>
+   <div class="ptop-r"><form class="field psearch" id="f-sf" role="search" novalidate>${ic('search',16)}<input type="search" placeholder="Buscar aluno ou dúvida" aria-label="Buscar na área do professor"></form><button type="button" class="pav gold pmo" data-pmenu aria-haspopup="true" aria-expanded="false" aria-label="Conta: perfil, ver como aluno e sair"><span data-u-ini aria-hidden="true"></span></button></div>
    <div class="pmenu" id="pmenu" hidden><p class="sm" data-u-nome></p><a href="/prof/perfil">${ic('user',16)}<span>Meu perfil</span></a><a href="/portal">${ic('book',16)}<span>Ver como aluno</span></a><a href="/equipe" data-eq-link hidden>${ic('shield',16)}<span>Área da Equipe</span></a><button type="button" data-logout>${ic('ar',16)}<span>Sair</span></button></div></header>
   <div id="pmain" class="pmain" tabindex="-1"><div class="okbox"><p class="sm">Carregando a Área do Professor…</p></div></div>
  </div>
@@ -761,7 +762,7 @@ function renderFQ(){
  const w=$('#fq-list');if(!w)return;const l=fqView();
  if(!l.some(d=>d.id===S.fsel))S.fsel=l.length?l[0].id:null;
  const host=w.closest('.pl4').parentElement;host.classList.toggle('fq-open',!!S.fopen&&!!S.fsel);
- w.innerHTML=l.length?l.map(d=>{const du=dueOf(d);return `<button type="button" class="pth${d.id===S.fsel?' on':''}" data-fq="${d.id}"><span class="fh">${fav(iniOf(d.aluno),'s')}<span class="sm" style="flex:1">${esc(d.aluno)}</span>${tag(d.status==='professor'?du.t:ST[d.status],d.status==='professor'&&du.urg?'gold':'')}</span><span class="t">${esc(d.titulo)}</span><span class="sm c">${d.aula_id&&pAula(d.aula_id)?esc(pLesL(pAula(d.aula_id)))+(d.segundo?' · '+mmss(d.segundo):''):''}${d.plano==='mentoria'?' · Mentoria':''}</span></button>`}).join(''):`<p class="sm" style="padding:16px 12px">Nada por aqui com este filtro.</p>`;
+ w.innerHTML=l.length?l.map(d=>{const du=dueOf(d);return `<button type="button" class="pth${d.id===S.fsel?' on':''}"${d.id===S.fsel?' aria-current="true"':''} data-fq="${d.id}"><span class="fh">${fav(iniOf(d.aluno),'s')}<span class="sm" style="flex:1">${esc(d.aluno)}</span>${tag(d.status==='professor'?du.t:ST[d.status],d.status==='professor'&&du.urg?'gold':'')}</span><span class="t">${esc(d.titulo)}</span><span class="sm c">${d.aula_id&&pAula(d.aula_id)?esc(pLesL(pAula(d.aula_id)))+(d.segundo?' · '+mmss(d.segundo):''):''}${d.plano==='mentoria'?' · Mentoria':''}</span></button>`}).join(''):`<p class="sm" style="padding:16px 12px">Nada por aqui com este filtro.</p>`;
  renderFQD();
 }
 function renderFQD(){
@@ -997,7 +998,7 @@ PAGES.equipe=()=>`
   <nav class="pnav" aria-label="Área da Equipe">${ENAV.map(([k,l,i])=>`<a href="/equipe${k?'/'+k:''}" data-pv="${k||'matriculas'}">${ic(i,18)}<span>${l}</span></a>`).join('')}</nav></div>
   <div class="pside-b"><div class="puser"><span class="pav gold" data-u-ini></span><div><span class="pu-n" data-u-nome></span><p class="sm"><a href="/prof">Área do Professor</a> · <a href="/portal">Portal</a> · <button type="button" class="lk-in" data-logout>Sair</button></p></div></div></div></aside>
  <div class="pbody">
-  <header class="ptop"><a href="/equipe" class="logo pmo" aria-label="Área da Equipe">${LOGO}</a><p class="pcrumb" id="pcrumb"></p><div class="ptop-r"><button type="button" class="pav gold pmo" data-pmenu aria-haspopup="true" aria-expanded="false" aria-label="Conta" data-u-ini></button></div>
+  <header class="ptop"><a href="/equipe" class="logo pmo" aria-label="Área da Equipe">${LOGO}</a><p class="pcrumb" id="pcrumb"></p><div class="ptop-r"><button type="button" class="pav gold pmo" data-pmenu aria-haspopup="true" aria-expanded="false" aria-label="Conta"><span data-u-ini aria-hidden="true"></span></button></div>
    <div class="pmenu" id="pmenu" hidden><p class="sm" data-u-nome></p><a href="/prof">${ic('users',16)}<span>Área do Professor</span></a><a href="/portal">${ic('book',16)}<span>Portal do Aluno</span></a><button type="button" data-logout>${ic('ar',16)}<span>Sair</span></button></div></header>
   <div id="pmain" class="pmain" tabindex="-1"><div class="okbox"><p class="sm">Carregando a Área da Equipe…</p></div></div>
  </div>
@@ -1268,4 +1269,9 @@ document.addEventListener('change',async e=>{
  }catch(err){say(st,err.message,true)}
  b.disabled=false;fi.value='';
 });
+
+/* abas (.seg) e filtros: o estado visual "on" também vai para leitores de tela */
+const sincAria=root=>$$('.seg button,.chip[data-fpl],.chip[data-st],[data-ff],[data-pace],[data-tom]',root).forEach(b=>b.setAttribute('aria-pressed',b.classList.contains('on')));
+document.addEventListener('click',()=>setTimeout(()=>sincAria(document),0));
+let sincT=0;new MutationObserver(()=>{clearTimeout(sincT);sincT=setTimeout(()=>sincAria(document),30)}).observe(document.getElementById('app'),{childList:true,subtree:true});
 })();
