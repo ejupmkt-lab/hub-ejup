@@ -294,3 +294,23 @@ test('cadastro exige aceite dos Termos e guarda a versão', async () => {
   assert.equal(u.meta.termos_versao, '2026-10-03');
   assert.ok(u.meta.termos_em);
 });
+
+test('equipe: e-mails fixos viram equipe ao entrar; equipe adiciona e tira pessoas', async () => {
+  fake.addUser('contato@ejup.com.br', 'senha-contato-1', { nome: 'Contato EJUP' });
+  const c = browser();
+  const r = await c.call('entrar', { body: { email: 'contato@ejup.com.br', senha: 'senha-contato-1' } });
+  assert.equal(r.payload.equipe, true);
+  const d = (await c.call('equipe')).payload;
+  assert.ok(d.pessoas.some((x) => x.email === 'contato@ejup.com.br' && x.fixa));
+  assert.equal((await c.call('eq-pessoa', { body: { email: 'ninguem@exemplo.com' } })).statusCode, 404);
+  assert.equal((await c.call('eq-pessoa', { body: { email: 'bruno@ejup.com.br' } })).statusCode, 200);
+  const b = await logged('bruno@ejup.com.br', 'senha-bruno-1');
+  assert.equal((await b.call('equipe')).statusCode, 200);
+  assert.equal((await c.call('eq-pessoa', { body: { email: 'contato@ejup.com.br', remover: true } })).statusCode, 400);
+  assert.equal((await c.call('eq-pessoa', { body: { email: 'bruno@ejup.com.br', remover: true } })).statusCode, 200);
+  _resetCache();
+  assert.equal((await b.call('equipe')).statusCode, 403);
+  // outro e-mail não vira equipe
+  const a = await logged('aluno@ejup.com.br', 'senha-aluno-1');
+  assert.equal((await a.call('estado')).payload.equipe, false);
+});

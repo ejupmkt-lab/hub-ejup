@@ -67,26 +67,31 @@ const S={me:null,prof:null,cfg:null,curso:null,pc:null,aulas:{},chat:{},view:'',
 const cfg=async()=>S.cfg||(S.cfg=await api('config').catch(()=>({google:null,email:false})));
 const VOLTA='ejup_volta';
 function precisaEntrar(){try{sessionStorage.setItem(VOLTA,location.pathname);history.replaceState(null,'','/entrar')}catch(e){}S.me=S.prof=null;go('entrar',{push:false})}
-function voltar(def){let v='';try{v=sessionStorage.getItem(VOLTA)||'';sessionStorage.removeItem(VOLTA)}catch(e){}go(v&&/^\/(portal|prof|equipe)/.test(v)?v:def)}
+function voltar(def){let v='';try{v=sessionStorage.getItem(VOLTA)||'';sessionStorage.removeItem(VOLTA)}catch(e){}go(v&&new RegExp('^[#/]'+def+'(?![a-z])').test(v)?v:def)}
 
 /* ======================================================================
    ENTRAR · CRIAR CONTA · RECUPERAR
    ====================================================================== */
 const AUTH={entrar:{h:`Continue ${em('de onde parou.')}`,p:'Acesse suas formações, aulas e materiais no Portal do Aluno.',t:'Acesse sua conta',s:'Continue de onde parou em suas formações.',b:'Entrar',q:'Ainda não tem conta?',o:['criar','Criar conta']},
  criar:{h:`Formações e ${em('conteúdos exclusivos.')}`,p:'Crie sua conta com o e-mail usado na inscrição. A equipe da EJUP libera as formações nesse e-mail.',t:'Crie sua conta',s:'Use o mesmo e-mail da sua inscrição.',b:'Criar conta',q:'Já tem uma conta?',o:['entrar','Entrar']},
- prof:{h:`A sua turma, ${em('em um só lugar.')}`,p:'Responda às dúvidas, conduza os plantões e acompanhe a turma na Área do Professor.',t:'Acesso do professor',s:'Use o e-mail cadastrado pela EJUP.',b:'Entrar na Área do Professor',q:'Ainda não tem acesso?',o:['','Falar com a EJUP']}};
-const accOpt=(k,i,t,s,on)=>`<button type="button" role="radio" aria-checked="${on}" class="acc-o${on?' on':''}" data-acc="${k}"><span class="icb">${ic(i,18)}</span><span><strong>${t}</strong><span class="sm">${s}</span></span></button>`;
+ prof:{h:`A sua turma, ${em('em um só lugar.')}`,p:'Responda às dúvidas, conduza os plantões e acompanhe a turma na Área do Professor.',t:'Acesso do professor',s:'Use o e-mail que a EJUP cadastrou na sua formação.',b:'Entrar na Área do Professor',q:'Primeiro acesso?',o:['criar','Criar conta com este e-mail']},
+ equipe:{h:`A escola ${em('por dentro.')}`,p:'Libere alunos, edite formações, aulas e o conteúdo do site na Área da Equipe.',t:'Acesso da equipe',s:'Use o seu e-mail da equipe EJUP.',b:'Entrar na Área da Equipe',q:'Primeiro acesso?',o:['criar','Criar conta com este e-mail']}};
+/* aluno escolhe entre Entrar e Criar conta; professor e equipe entram com o e-mail já reconhecido pela EJUP */
+const ACC={aluno:['book','Sou aluno','Portal do Aluno'],prof:['users','Sou professor','Área do Professor'],equipe:['shield','Sou equipe EJUP','Área da Equipe']};
+const accDe=m=>m==='prof'||m==='equipe'?m:'aluno';
+const accOpt=(k,on)=>`<button type="button" role="radio" aria-checked="${on}" class="acc-o${on?' on':''}" data-acc="${k}"><span class="icb">${ic(ACC[k][0],18)}</span><span><strong>${ACC[k][1]}</strong><span class="sm">${ACC[k][2]}</span></span></button>`;
 const pwField=(id,l,ac)=>`<label class="fl"><span>${l}</span><span class="pw"><input class="inp" id="${id}" type="password" placeholder="••••••••" autocomplete="${ac}"><button type="button" data-eye="${id}" aria-label="Mostrar senha">${ic('eye',18)}</button></span></label>`;
-function auth(m){const a=AUTH[m],pf=m==='prof';return `
+const auEmail=m=>m==='prof'?'E-mail cadastrado pela EJUP':m==='equipe'?'E-mail da equipe':'E-mail';
+function auth(m){const a=AUTH[m],k=accDe(m),pf=k!=='aluno';return `
 <section class="sec dark authp" data-hero>${orb('orb-b',{a0:-56,a1:-36,d:-120})}<div class="wrap auth">
- <div class="auth-m"><span class="tag gold swap" id="au-tag">${pf?'Área do Professor':'Portal do Aluno'}</span><h1 class="d1 swap" id="au-h">${a.h}</h1><p class="lead swap" id="au-p">${a.p}</p><p class="lbl">Reconhecida por quem valoriza excelência</p></div>
+ <div class="auth-m"><span class="tag gold swap" id="au-tag">${ACC[k][2]}</span><h1 class="d1 swap" id="au-h">${a.h}</h1><p class="lead swap" id="au-p">${a.p}</p><p class="lbl">Reconhecida por quem valoriza excelência</p></div>
  <form class="card authc glow" id="au-f" novalidate data-mode="${m}">
-  <div class="acc"><p class="lbl" id="au-acc-l">Tipo de acesso</p><div class="acc-g" role="radiogroup" aria-labelledby="au-acc-l">${accOpt('aluno','book','Sou aluno','Portal do Aluno',!pf)}${accOpt('prof','users','Sou professor','Área do Professor',pf)}</div></div>
+  <div class="acc"><p class="lbl" id="au-acc-l">Tipo de acesso</p><div class="acc-g" role="radiogroup" aria-labelledby="au-acc-l">${Object.keys(ACC).map(x=>accOpt(x,x===k)).join('')}</div></div>
   <div class="fxc${pf?'':' on'}" id="au-sx"${pf?' inert':''}><div><div class="seg"><span class="seg-ind"></span><button type="button" data-mode="entrar"${m!=='criar'?' class="on"':''}>Entrar</button><button type="button" data-mode="criar"${m==='criar'?' class="on"':''}>Criar conta</button></div></div></div>
   <div class="tt swap" id="au-t"><h2 class="h3">${a.t}</h2><p class="body">${a.s}</p></div>
   <div class="fields">
    <div class="fx${m==='criar'?' on':''}" id="au-fx"${m==='criar'?'':' inert'}><div><label class="fl"><span>Nome completo</span><input class="inp" id="au-nome" placeholder="Seu nome" autocomplete="name"></label></div></div>
-   <label class="fl"><span id="au-el">${pf?'E-mail cadastrado pela EJUP':'E-mail'}</span><input class="inp" id="au-email" type="email" placeholder="voce@exemplo.com" autocomplete="email"></label>
+   <label class="fl"><span id="au-el">${auEmail(m)}</span><input class="inp" id="au-email" type="email" placeholder="voce@exemplo.com" autocomplete="email"></label>
    ${pwField('au-senha','Senha',m==='criar'?'new-password':'current-password')}
    <div id="au-tx"${m==='criar'?'':' hidden'}><div><label class="chk"><input type="checkbox" id="au-termos"><span>Li e aceito os <a href="/termos" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="/privacidade" target="_blank" rel="noopener">Política de Privacidade</a>.</span></label></div></div>
    <p class="err" id="au-err" role="alert"></p>
@@ -94,35 +99,37 @@ function auth(m){const a=AUTH[m],pf=m==='prof';return `
   <button type="button" class="forgot swap" id="au-fg" data-go-rec${m==='criar'?' hidden':''}>Esqueci minha senha</button>
   <button type="submit" class="btn b-gold full"><span id="au-b">${a.b}</span>${ic('ar')}</button>
   <div class="fxc" id="au-gx" inert><div class="au-g"><div class="or">ou</div><a class="btn b-glass full" id="au-google" href="#"><span>Continuar com Google</span></a><p class="sm" style="text-align:center">Ao continuar com Google, você aceita os <a href="/termos" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="/privacidade" target="_blank" rel="noopener">Política de Privacidade</a>.</p></div></div>
-  <p class="alt"><span id="au-q">${a.q}</span> ${pf?`<a id="au-o" href="${WA('Olá, sou professor da EJUP e preciso de acesso à Área do Professor.')}" target="_blank" rel="noopener">${a.o[1]}</a>`:`<button type="button" id="au-o" data-mode="${a.o[0]}">${a.o[1]}</button>`}</p>
+  <p class="alt"><span id="au-q">${a.q}</span> <button type="button" id="au-o" data-mode="${a.o[0]}">${a.o[1]}</button></p>
  </form></div></section>`}
 function setAuth(m){
- const f=$('#au-f');if(!f||f.dataset.mode===m)return;const a=AUTH[m],pf=m==='prof';f.dataset.mode=m;
+ const f=$('#au-f');if(!f||f.dataset.mode===m)return;const a=AUTH[m],k=accDe(m),pf=k!=='aluno';
+ // "Criar conta com este e-mail" a partir de professor ou equipe: guarda para onde ir depois
+ if(m==='criar')f.dataset.volta=accDe(f.dataset.mode)!=='aluno'?accDe(f.dataset.mode):(f.dataset.volta||'');else if(m!=='entrar')f.dataset.volta='';
+ f.dataset.mode=m;
  $$('.seg button',f).forEach(b=>b.classList.toggle('on',b.dataset.mode===(pf?'entrar':m)));placeSeg($('.seg',f));
- $$('[data-acc]',f).forEach(b=>{const on=(b.dataset.acc==='prof')===pf;b.classList.toggle('on',on);b.setAttribute('aria-checked',on)});
+ $$('[data-acc]',f).forEach(b=>{const on=b.dataset.acc===k;b.classList.toggle('on',on);b.setAttribute('aria-checked',on)});
  const sx=$('#au-sx');sx.classList.toggle('on',!pf);sx.toggleAttribute('inert',pf);googleBox(!pf);
  const swp=$$('.swap',f.parentElement);swp.forEach(x=>x.classList.add('x'));
- setTimeout(()=>{$('#au-tag').textContent=pf?'Área do Professor':'Portal do Aluno';$('#au-h').innerHTML=a.h;$('#au-p').textContent=a.p;$('#au-t').innerHTML=`<h2 class="h3">${a.t}</h2><p class="body">${a.s}</p>`;$('#au-fg').hidden=m==='criar';swp.forEach(x=>x.classList.remove('x'))},RM?0:220);
+ setTimeout(()=>{$('#au-tag').textContent=ACC[k][2];$('#au-h').innerHTML=a.h;$('#au-p').textContent=a.p;$('#au-t').innerHTML=`<h2 class="h3">${a.t}</h2><p class="body">${a.s}</p>`;$('#au-fg').hidden=m==='criar';swp.forEach(x=>x.classList.remove('x'))},RM?0:220);
  const fx=$('#au-fx');fx.classList.toggle('on',m==='criar');fx.toggleAttribute('inert',m!=='criar');$('#au-tx').hidden=m!=='criar';
  $('#au-b').textContent=a.b;$('#au-q').textContent=a.q;$('#au-senha').setAttribute('autocomplete',m==='criar'?'new-password':'current-password');
- const o=$('#au-o'),n=pf?Object.assign(document.createElement('a'),{id:'au-o',href:WA('Olá, sou professor da EJUP e preciso de acesso à Área do Professor.'),target:'_blank',rel:'noopener'}):Object.assign(document.createElement('button'),{id:'au-o',type:'button'});
- if(!pf)n.dataset.mode=a.o[0];n.textContent=a.o[1];o.replaceWith(n);
- $('#au-el').textContent=pf?'E-mail cadastrado pela EJUP':'E-mail';
+ const o=$('#au-o');o.dataset.mode=a.o[0];o.textContent=a.o[1];
+ $('#au-el').textContent=auEmail(m);
  say($('#au-err'),'');$$('.inp.bad',f).forEach(i=>i.classList.remove('bad'));
- try{history.replaceState(null,'',m==='criar'?'/criar':pf?'/entrar/professor':'/entrar')}catch(e){}
+ try{history.replaceState(null,'',m==='criar'?'/criar':m==='prof'?'/entrar/professor':m==='equipe'?'/entrar/equipe':'/entrar')}catch(e){}
 }
 function googleBox(show){const g=$('#au-gx');if(!g)return;const on=show&&!!(S.cfg&&S.cfg.google);g.classList.toggle('on',on);g.toggleAttribute('inert',!on);if(on)$('#au-google').href=S.cfg.google}
 /* o link do e-mail (confirmação ou nova senha) e o Google voltam com os tokens no endereço */
 function hashTokens(){const h=new URLSearchParams(location.hash.slice(1));if(!h.get('access_token'))return h.get('error_description')?{erro:h.get('error_description')}:null;
  const t={access_token:h.get('access_token'),refresh_token:h.get('refresh_token'),expires_in:+h.get('expires_in')||3600,type:h.get('type')||''};try{history.replaceState(null,'',location.pathname)}catch(e){}return t}
 async function mountAuth(){
- await cfg();googleBox($('#au-f')&&$('#au-f').dataset.mode!=='prof');
+ await cfg();googleBox($('#au-f')&&accDe($('#au-f').dataset.mode)==='aluno');
  const t=hashTokens();if(!t)return;
  if(t.erro){say($('#au-err'),'O link expirou ou já foi usado. Entre com e-mail e senha ou peça um novo link.',true);return}
  try{await api('sessao',{body:t});E.syncSess();toast(t.type==='signup'?'E-mail confirmado. Bem-vindo ao Portal do Aluno.':'Você entrou na sua conta.');voltar('portal')}
  catch(e){say($('#au-err'),e.message,true)}
 }
-PAGES.entrar=a=>auth(a==='professor'?'prof':'entrar');PAGES.entrar.mount=mountAuth;
+PAGES.entrar=a=>auth(a==='professor'?'prof':a==='equipe'?'equipe':'entrar');PAGES.entrar.mount=mountAuth;
 PAGES.criar=()=>auth('criar');PAGES.criar.mount=mountAuth;
 
 async function authSubmit(f){
@@ -139,10 +146,11 @@ async function authSubmit(f){
   if(m==='criar'){
    const r=await api('criar',{body:{nome:nm.value.trim(),email:em_.value.trim(),senha:pw.value,termos:true,termos_versao:E.TERMOS_VERSAO}});
    if(r.confirmar){f.innerHTML=`<div class="okbox"><span class="ck">${ic('mail',28)}</span><p class="h3">Confirme o seu e-mail.</p><p class="body">Enviamos um link para <strong style="color:var(--branco);font-weight:500">${esc(em_.value.trim())}</strong>. Abra o link para ativar a conta e entrar no portal.</p><p class="sm">Não chegou? Veja a caixa de spam ou fale com a equipe: contato@ejup.com.br.</p></div>`;return}
-   E.syncSess();toast('Conta criada. Bem-vindo ao Portal do Aluno.');voltar('portal');return}
+   E.syncSess();const st=await api('estado').catch(()=>({}));toast(st.equipe?'Conta criada. Bem-vindo à Área da Equipe.':'Conta criada. Bem-vindo ao Portal da EJUP.');voltar(st.equipe?'equipe':st.professor?'prof':'portal');return}
   const r=await api('entrar',{body:{email:em_.value.trim(),senha:pw.value}});pw.value='';E.syncSess();
   if(m==='prof'&&!r.professor){toast('Esta conta não tem Área do Professor. Abrimos o Portal do Aluno.');go('portal');return}
-  voltar(r.equipe?'equipe':m==='prof'?'prof':'portal');
+  if(m==='equipe'&&!r.equipe){toast('Este e-mail não faz parte da equipe EJUP. Abrimos o Portal do Aluno.');go('portal');return}
+  voltar(m==='equipe'?'equipe':m==='prof'?'prof':'portal');
  }catch(e){busy(b,false);pw.classList.add('bad');say(er,e.message,true);pw.focus()}
 }
 
@@ -843,7 +851,7 @@ async function sair(todos){try{await api('sair',{body:{todos:!!todos}})}catch(e)
 document.addEventListener('click',async e=>{
  const t=e.target;if(!t.closest)return;let x;
  /* login */
- if((x=t.closest('[data-acc]'))){setAuth(x.dataset.acc==='prof'?'prof':'entrar');return}
+ if((x=t.closest('[data-acc]'))){setAuth(x.dataset.acc==='aluno'?'entrar':x.dataset.acc);return}
  if((x=t.closest('#au-f [data-mode]'))){setAuth(x.dataset.mode);return}
  if(t.closest('[data-go-rec]')){REC.email=($('#au-email')||{}).value||'';go('recuperar');return}
  if((x=t.closest('[data-rc]'))){REC.step=+x.dataset.rc;renderRec();return}
@@ -1026,7 +1034,11 @@ EV.matriculas=()=>{const f=S.mf||{curso:'',q:''},n=norm(f.q).trim();
   ${ms.slice(0,300).map(m=>`<div class="ftr"><span>${fav(iniOf(m.nome||m.email),'s')}<span style="display:grid;min-width:0"><span class="nm">${esc(m.nome||m.email)}</span>${m.nome?`<span class="sm">${esc(m.email)}</span>`:''}</span></span><span>${esc((qCurso(m.curso_id)||{}).titulo||m.curso_id)}</span>
    <span><select class="eq-sel" data-mat-plano="${m.id}" aria-label="Plano">${optPlanos(m.plano)}</select></span><span>${m.conta?'Criou conta':'Ainda sem conta'}${m.certificado?' · certificado':''}</span>
    <span><label class="psw"><input type="checkbox" data-mat-ativa="${m.id}"${m.ativa?' checked':''} aria-label="Acesso ativo"><i></i></label></span><span><button type="button" class="lk" data-mat-del="${m.id}"><span>Remover</span></button></span></div>`).join('')||'<p class="sm" style="padding:16px 0">Nenhuma matrícula com este filtro.</p>'}</article>
- <p class="sm">${plural(ms.length,'matrícula','matrículas')}${ms.length>300?' · mostrando as 300 mais recentes':''}.</p>`};
+ <p class="sm">${plural(ms.length,'matrícula','matrículas')}${ms.length>300?' · mostrando as 300 mais recentes':''}.</p>
+ <article class="card pc" data-r><div class="pc-h wr"><h2 class="h4">Pessoas da equipe</h2>${tag(plural((Q().pessoas||[]).length,'pessoa','pessoas'))}</div>
+  <p class="sm">Quem está aqui entra pela opção “Sou equipe EJUP” e vê a Área da Equipe e a Área do Professor de todas as formações. A pessoa precisa ter criado a conta no site antes. ${(Q().fixos||[]).length?`Os e-mails ${Q().fixos.map(esc).join(' e ')} são fixos.`:''}</p>
+  ${(Q().pessoas||[]).map(x=>`<div class="fq">${fav(iniOf(x.nome||x.email),'s')}<span class="tx"><strong>${esc(x.nome||x.email)}</strong><span class="sm">${esc(x.email)}${x.fixa?' · fixo':''}</span></span>${x.fixa||x.id===Q().perfil.id?'':`<button type="button" class="lk" data-pessoa-del="${esc(x.email)}"><span>Tirar acesso</span></button>`}</div>`).join('')}
+  <form id="eq-pf" class="aiform" novalidate style="margin-top:8px"><label class="field"><input type="email" id="eq-pe" placeholder="E-mail de quem vai entrar na equipe" aria-label="E-mail da nova pessoa da equipe" autocomplete="off"></label>${btn('Adicionar','gold',{s:1,icon:false,type:'submit'})}</form><p class="msg" id="eq-pm" aria-live="polite"></p></article>`};
 
 /* formações e aulas */
 const linhas=a=>(a||[]).join('\n');
@@ -1087,6 +1099,7 @@ document.addEventListener('submit',async e=>{
   if(f.id==='eq-mf'){const emails=$('#eq-emails').value.trim();if(!emails){say(m,'Digite pelo menos um e-mail.',true);return}busy(b,true,'Liberando…');
    const r=await api('eq-matricula',{body:{email:emails,curso:$('#eq-curso').value,plano:$('#eq-plano').value}});S.ec=$('#eq-curso').value;await done(`Acesso liberado para ${plural(r.matriculas.length,'e-mail','e-mails')}.`);return}
   if(f.matches('[data-eq-curso]')){busy(b,true,'Salvando…');const r=await api('eq-curso',{body:{id:fval(f,'id'),titulo:fval(f,'titulo'),area:fval(f,'area'),horas:+fval(f,'horas')||0,professores:fval(f,'professores'),capa:fval(f,'capa'),professor_emails:fval(f,'professor_emails'),descricao:fval(f,'descricao'),ativo:fval(f,'ativo'),ordem:(qCurso(fval(f,'id'))||{}).ordem??Q().cursos.length+1}});S.ec=r.curso.id;S.cnovo=false;await done('Formação salva.');return}
+  if(f.id==='eq-pf'){const em_=$('#eq-pe').value.trim();if(!okMail(em_)){say($('#eq-pm'),'Digite um e-mail válido.',true);return}busy(b,true,'Adicionando…');try{await api('eq-pessoa',{body:{email:em_}});await done(`${em_} agora faz parte da equipe.`)}catch(err){busy(b,false);say($('#eq-pm'),err.message,true)}return}
   if(f.id==='eq-mod'){busy(b,true,'Criando…');await api('eq-modulo',{body:{curso:S.ec,titulo:fval(f,'titulo'),ordem:+fval(f,'ordem')||0}});await done('Módulo criado.');return}
   if(f.matches('[data-eq-aula]')){busy(b,true,'Salvando…');await api('eq-aula',{body:{id:f.dataset.eqAula||undefined,modulo:f.dataset.mod,titulo:fval(f,'titulo'),ordem:+fval(f,'ordem')||0,duracao_min:+fval(f,'duracao_min')||0,video:fval(f,'video'),sobre:fval(f,'sobre'),topicos:fval(f,'topicos'),materiais:parseMat(fval(f,'materiais')),publicada:fval(f,'publicada')}});await done('Aula salva.');return}
   if(f.matches('[data-eq-resp]')){busy(b,true,'Salvando…');await api('eq-resposta',{body:{id:f.dataset.eqResp||undefined,pergunta:fval(f,'pergunta'),resposta:fval(f,'resposta'),variacoes:fval(f,'variacoes'),palavras:fval(f,'palavras'),curso_id:fval(f,'curso_id'),ordem:+fval(f,'ordem')||0,portal:fval(f,'portal'),ativo:fval(f,'ativo')}});S.rnovo=false;await done('Resposta salva. A Minerva passa a usar em até 1 minuto.');return}
@@ -1096,6 +1109,7 @@ document.addEventListener('click',async e=>{
  const t=e.target;if(S.area!=='equipe'||!t.closest||!t.closest('#pmain'))return;let x;
  const run=async(r,body,msg)=>{try{await api(r,{body});S.eq=await api('equipe');eqRe();toast(msg)}catch(err){toast(err.message)}};
  if(t.closest('[data-curso-novo]')){S.cnovo=!S.cnovo;eqRe();return}
+ if((x=t.closest('[data-pessoa-del]'))){if(confirm(`Tirar o acesso de ${x.dataset.pessoaDel} à Área da Equipe?`))run('eq-pessoa',{email:x.dataset.pessoaDel,remover:true},'Acesso de equipe retirado.');return}
  if((x=t.closest('[data-mat-del]'))){if(confirm('Remover esta matrícula? O aluno perde o acesso à formação.'))run('eq-matricula',{id:+x.dataset.matDel,remover:true},'Matrícula removida.');return}
  if((x=t.closest('[data-aula-del]'))){if(confirm('Excluir esta aula? O progresso dos alunos nela também é apagado.'))run('eq-aula',{id:x.dataset.aulaDel,remover:true},'Aula excluída.');return}
  if((x=t.closest('[data-mod-del]'))){if(confirm('Excluir este módulo?'))run('eq-modulo',{id:x.dataset.modDel,remover:true},'Módulo excluído.');return}

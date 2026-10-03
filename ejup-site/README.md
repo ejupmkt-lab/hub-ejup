@@ -17,6 +17,7 @@ o site.** Todas as outras produções da EJUP seguem o MIV (ver `CLAUDE.md` na r
 | `SUPABASE_URL` | Banco de respostas da Minerva, newsletter, in company e Portal |
 | `SUPABASE_SERVICE_ROLE_KEY` | Idem — chave secreta (`sb_secret_…` ou *service_role*), só no servidor |
 | `RESEND_API_KEY`, `EMAIL_FROM` | Opcional. E-mails do Portal (dúvida nova, resposta do professor, plantão, lembretes). Sem elas, o Portal funciona sem e-mails |
+| `EQUIPE_EMAILS` | Opcional. E-mails fixos da equipe; padrão `ejup.mkt@gmail.com,contato@ejup.com.br` |
 | `CRON_SECRET` | Opcional. Protege a tarefa diária de lembretes (`/api/portal?r=cron`, 8h de Fortaleza) |
 | `SITE_URL` | Opcional. Endereço oficial (ex.: `https://ejup.com.br`) usado nos links dos e-mails |
 | `PORTAL_GOOGLE` | Opcional. `1` mostra "Continuar com Google" (ligar o provedor Google no Supabase antes) |
@@ -95,16 +96,23 @@ create unique index leads_newsletter_email on public.leads (lower(email)) where 
 
 ### Área da Equipe (`/equipe`)
 Libera alunos (vários e-mails de uma vez), troca plano, suspende acesso, cria e edita formações, módulos,
-aulas (vídeo, materiais, tópicos) e as respostas da Minerva, sem abrir o Supabase. Para ganhar acesso:
-crie a sua conta no site e, uma única vez, no Supabase **Table Editor → `perfis`**, mude o seu `papel` para
-`equipe`. Quem é equipe também vê a Área do Professor de todas as formações.
+aulas (vídeo, materiais, tópicos), as respostas da Minerva e o conteúdo do site, sem abrir o Supabase.
+
+**Acesso:** na tela de login, "Sou equipe EJUP". Os e-mails `ejup.mkt@gmail.com` e `contato@ejup.com.br`
+já são equipe: no primeiro acesso, clique em "Criar conta com este e-mail" e confirme pelo link enviado.
+Para trocar a lista fixa, defina `EQUIPE_EMAILS` na Vercel (separados por vírgula). Outras pessoas são
+adicionadas em **Matrículas → Pessoas da equipe** depois de criarem a conta. Mantenha ligada a confirmação
+de e-mail do Supabase (Authentication → Sign In / Providers → Email → Confirm email): é ela que garante
+que só o dono do e-mail entra como equipe.
+
+**Professor:** a equipe põe o e-mail dele na formação (Formações e aulas → e-mails dos professores). O
+professor cria a conta com esse e-mail ("Sou professor → Primeiro acesso") e já entra na Área do Professor.
 
 ### Operar pelo Table Editor do Supabase (alternativa)
 - **Liberar um aluno:** em `matriculas`, nova linha com `email` (o da inscrição), `curso_id`
   (`licenciamento`, `pareceres`…) e `plano` (`essencial`, `acompanhado` ou `mentoria`). Pode ser antes de
   o aluno criar a conta. `ativa = false` suspende o acesso.
-- **Professor:** crie o usuário em **Authentication → Users → Add user** (com senha e *Auto Confirm*) e
-  ponha o e-mail dele em `cursos.professor_emails` da formação. `perfis.papel = equipe` vê todas as formações.
+- **Professor:** ponha o e-mail dele em `cursos.professor_emails` da formação; ele mesmo cria a conta no site.
 - **Aulas:** em `aulas`, preencha `titulo`, `duracao_min`, `sobre`, `topicos` e `video`. O vídeo aceita
   link do YouTube, Vimeo ou Panda Video, arquivo `.mp4`, ou o caminho de um arquivo enviado ao bucket
   privado `aulas` do Storage. `materiais` é uma lista `[{"nome":"Slides","url":"…","tipo":"PDF"}]`; a

@@ -89,9 +89,14 @@ async function requireUser(ctx) {
   if (!p) {
     [p] = await ctx.sb.rest.insert('perfis', { id: s.user.id, email: String(s.user.email).toLowerCase(), nome: s.user.user_metadata?.nome || '' }, { upsert: true, onConflict: 'id' });
   }
+  // e-mails fixos da equipe (EQUIPE_EMAILS na Vercel; padrão: os e-mails oficiais da EJUP) entram como equipe
+  if (p.papel !== 'equipe' && equipeFixa(ctx.env).includes(String(p.email).toLowerCase())) {
+    [p] = await ctx.sb.rest.update('perfis', `id=eq.${p.id}`, { papel: 'equipe' });
+  }
   ctx.perfil = p;
   return p;
 }
+export const equipeFixa = (env) => String(env.EQUIPE_EMAILS || 'ejup.mkt@gmail.com,contato@ejup.com.br').split(/[,;\s]+/).map((e) => e.trim().toLowerCase()).filter(Boolean);
 
 /* ---------- acesso ---------- */
 async function cursosDoProfessor(ctx) {
@@ -190,7 +195,7 @@ R.estado = {
     if (!s) return { logado: false };
     ctx.user = s.user; ctx.token = s.token;
     const p = await requireUser(ctx);
-    return { logado: true, nome: p.nome, professor: p.papel !== 'aluno' || (await cursosDoProfessor(ctx)).length > 0 };
+    return { logado: true, nome: p.nome, equipe: p.papel === 'equipe', professor: p.papel !== 'aluno' || (await cursosDoProfessor(ctx)).length > 0 };
   },
 };
 
@@ -791,12 +796,31 @@ R.equipe = {
       ctx.sb.rest.get('minerva_respostas', 'select=*&order=ordem.asc'),
     ]);
     const site = await ctx.sb.rest.get('site_itens', 'select=*&order=ordem.asc').catch(() => null);
+    const pessoas = (await ctx.sb.rest.get('perfis', 'papel=eq.equipe&select=id,email,nome&order=nome.asc')).map((x) => ({ ...x, fixa: equipeFixa(ctx.env).includes(x.email) }));
     const emails = [...new Set(matriculas.map((m) => m.email))];
     const perfis = emails.length ? await ctx.sb.rest.get('perfis', `email=${inList(emails)}&select=email,nome`) : [];
     return {
-      perfil: publicPerfil(ctx.perfil), cursos, modulos, aulas, respostas, site,
+      perfil: publicPerfil(ctx.perfil), cursos, modulos, aulas, respostas, site, pessoas, fixos: equipeFixa(ctx.env),
       matriculas: matriculas.map((m) => ({ ...m, nome: perfis.find((p) => p.email === m.email)?.nome || null, conta: perfis.some((p) => p.email === m.email) })),
     };
+  },
+};
+
+R['eq-pessoa'] = {
+  method: 'POST', auth: true, limit: 30,
+  run: async (ctx, b) => {
+    requireEquipe(ctx);
+    const email = str(b.email, 254).toLowerCase();
+    if (!okMail(email)) fail(400, 'Digite um e-mail válido.');
+    if (b.remover) {
+      if (equipeFixa(ctx.env).includes(email)) fail(400, 'Este e-mail é fixo da equipe e não pode ser removido por aqui.');
+      if (email === ctx.perfil.email) fail(400, 'Você não pode tirar o seu próprio acesso.');
+      await ctx.sb.rest.update('perfis', `email=eq.${enc(email)}&papel=eq.equipe`, { papel: 'aluno' });
+      return { ok: true };
+    }
+    const [p] = await ctx.sb.rest.update('perfis', `email=eq.${enc(email)}`, { papel: 'equipe' });
+    if (!p) fail(404, 'Ainda não existe conta com este e-mail. Peça para a pessoa criar a conta no site (Entrar → Criar conta) e tente de novo.');
+    return { ok: true, pessoa: { id: p.id, email: p.email, nome: p.nome } };
   },
 };
 
