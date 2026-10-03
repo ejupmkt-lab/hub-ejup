@@ -19,7 +19,7 @@ RAIZ = HERE.parents[2]
 FONTS = RAIZ / "skills" / "ejup-design" / "assets" / "fonts"
 LOGOS = RAIZ / "skills" / "ejup-design" / "assets" / "logo"
 W, H, N = 1080, 1440, 7
-ESCURAS = set(range(7))
+ESCURAS = {0, 1, 2, 4, 5, 6}
 
 
 def b64(p, mime):
@@ -56,8 +56,7 @@ def x(k):
 # a orbe 3D de Minerva: quadros do vídeo de abertura, do fechado ao aberto
 ORBES = [  # (tela, centro x, centro y, largura, quadro)
     (1, 540, 420, 700, "orbe-001.png"),
-    (3, 900, 210, 250, "orbe-040.png"),
-    (5, 900, 210, 270, "orbe-095.png"),
+    (5, 620, 340, 680, "fecha-090.png"),
 ]
 
 
@@ -69,8 +68,8 @@ def orbes():
 
 
 PTS = [(749, 439), (900, 560), (1080, 560), (1320, 470), (1620, 420), (1950, 250), (2160, 110),
-       (2700, 70), (3240, 120), (3700, 190), (4140, 210), (4560, 290), (5080, 364), (5500, 270),
-       (6300, 210), (6700, 330), (7020, 430)]
+       (2700, 70), (3180, 250), (3215, 760), (3290, 1142), (3700, 1142), (4150, 1142), (4275, 940),
+       (4300, 540), (4600, 350), (5080, 364), (5600, 300), (6020, 340), (6700, 340), (7020, 430)]
 
 
 def caminho(p):
@@ -124,11 +123,15 @@ def main():
   <p class="txt" style="top:650px">Na tragédia de Ésquilo, Atena instala um tribunal e desempata o julgamento de Orestes. Vem daí o <b>voto de Minerva</b>: a decisão que pesa quando os lados se equilibram.</p>
   <p class="fonte dir">Ésquilo, <i>Eumênides</i> · Moeda: tetradracma de Atenas, 449–407 a.C., Cleveland Museum of Art</p>"""))
     # 4 · critério (papel)
-    t.append(tela(3, "escura profunda", f"""
-  <h2 class="tit" style="top:420px">Ela guarda<br><em>o critério.</em></h2>
-  <p class="txt estreito" style="top:640px">Palavra, tom, cor, tipografia, imagem. Cada detalhe passa pela régua da marca, e o que destoa volta para ajuste.</p>
-  <blockquote class="frase" style="top:1040px">A EJUP não grita.<br>A EJUP tem peso.</blockquote>""",
-        f'<img class="gravura" src="{img("minerva-gravura-neg.png", 1024, (300, 40, 724, 1000))}" alt="">'))
+    etapas = [("ficha-001.png", "Palavra"), ("ficha-030.png", "Tom"), ("ficha-055.png", "Cor"),
+              ("ficha-080.png", "Tipografia"), ("ficha-121.png", "Imagem")]
+    fita = "".join(f'<figure><img src="{img("../orbe-3d/" + a, 400)}" alt=""><figcaption>{b}</figcaption></figure>'
+                   for a, b in etapas)
+    t.append(tela(3, "papel", f"""
+  <h2 class="tit" style="top:350px">Ela guarda<br><em>o critério.</em></h2>
+  <p class="txt" style="top:560px">Cada detalhe passa pela régua da marca. O que destoa volta para ajuste.</p>
+  <blockquote class="frase" style="top:780px">A EJUP não grita.<br>A EJUP tem peso.</blockquote>
+  <div class="fita">{fita}</div>"""))
     # 5 · fonte
     t.append(tela(4, "escura", """
   <h2 class="tit" style="top:700px">Ela guarda<br><em>a fonte.</em></h2>
@@ -138,20 +141,18 @@ def main():
         '<div class="veu" style="background:linear-gradient(180deg,rgba(13,19,26,0) 35%,rgba(13,19,26,.82) 52%,rgba(13,19,26,.9) 100%)"></div>'))
     # 6 · confiança
     itens = ["Ética profissional da advocacia.",
-             "Dados pessoais tratados conforme a LGPD.",
-             "Direito de imagem e autoria verificados.",
-             "Nenhuma promessa de resultado. Nenhuma urgência fabricada."]
+             "Dados pessoais conforme a LGPD.",
+             "Imagem e autoria verificadas.",
+             "Sem promessa de resultado."]
     lis = "".join(f"<li>{i}</li>" for i in itens)
     t.append(tela(5, "escura", f"""
-  <h2 class="tit" style="top:400px">Ela guarda<br><em>a confiança.</em></h2>
-  <ul class="lista" style="top:640px">{lis}</ul>""",
-        f'<div class="bg" style="background-image:url({img("atena-varv-up.jpg", 1600, (420, 0, 1366, 2048))});background-position:50% 20%;filter:brightness(.4) saturate(.4)"></div>'
-        '<div class="veu" style="background:linear-gradient(90deg,rgba(13,19,26,.92),rgba(13,19,26,.6) 70%,rgba(13,19,26,.35)),linear-gradient(180deg,rgba(13,19,26,.6),rgba(13,19,26,0) 30%)"></div>'))
+  <h2 class="tit" style="top:660px">Ela guarda<br><em>a confiança.</em></h2>
+  <ul class="lista" style="top:880px">{lis}</ul>"""))
     # 7 · fecho
     t.append(tela(6, "escura", f"""
   <h2 class="tit" style="top:790px">Sabedoria também é saber <em>a quem cabe a palavra final.</em></h2>
   <p class="txt" style="top:1080px">Minerva confere, aponta e devolve. Quem decide é sempre uma pessoa da escola.</p>
-  <p class="cta" style="top:1200px">Siga a EJUP</p>
+  <p class="cta">Siga a EJUP</p>
   <img class="logo" src="{logo_b}" alt="">""",
         f'<div class="bg" style="background:#05080c url({img("../orbe-3d/orbe-arco.png", 2000)}) no-repeat -421px -89px/auto 1100px"></div>'
         '<div class="veu" style="background:linear-gradient(180deg,rgba(13,19,26,0) 45%,rgba(13,19,26,.85) 58%,#0d131a 72%)"></div>'))
@@ -185,6 +186,11 @@ h1.tit{{font-size:84px}}
 .arraste{{position:absolute;right:96px;bottom:74px;font-weight:500;font-size:20px;letter-spacing:.14em;text-transform:uppercase;color:#f0b855;z-index:3}}
 .arraste::after{{content:"";display:inline-block;width:46px;height:2px;background:#f0b855;margin-left:14px;vertical-align:middle}}
 .frase{{position:absolute;left:96px;right:96px;font-weight:900;font-size:60px;line-height:1.1;letter-spacing:-.02em;color:#fff;border-left:4px solid #f0b855;padding-left:36px;z-index:3}}
+.papel .frase{{color:#031c37;border-left-color:#9b6b26}}
+.fita{{position:absolute;left:86px;top:1060px;display:flex;gap:22px;z-index:3}}
+.fita figure{{margin:0;width:164px}}
+.fita img{{width:164px;height:164px;border-radius:12px;display:block;box-shadow:0 24px 40px -18px rgba(3,28,55,.55)}}
+.fita figcaption{{margin-top:20px;font-weight:500;font-size:17px;letter-spacing:.12em;text-transform:uppercase;color:#5f6062;text-align:center}}
 .gravura{{position:absolute;right:-150px;bottom:0;height:1100px;mix-blend-mode:screen;opacity:.22;z-index:1}}
 .lista{{position:absolute;left:96px;right:150px;list-style:none;display:grid;gap:30px;z-index:3}}
 .lista li{{position:relative;padding-left:44px;font-weight:300;font-size:40px;line-height:1.3;color:#ecebe7;border-bottom:1px solid rgba(209,211,212,.2);padding-bottom:28px}}
