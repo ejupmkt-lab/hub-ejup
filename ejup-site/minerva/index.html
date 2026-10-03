@@ -31,6 +31,11 @@
   --halo-size:46%;      /* diâmetro do halo em relação à Minerva */
   --float:10px;         /* amplitude da flutuação */
   --float-speed:7s;     /* ciclo da flutuação */
+  --awake-glow:.09;     /* brilho com o painel aberto, antes da primeira pergunta */
+  --open-ramp:3.4s;     /* tempo do brilho subir junto com a abertura */
+  --think-speed:1.5s;   /* ritmo do brilho enquanto a resposta é preparada */
+  --think-max:.38;      /* brilho máximo enquanto pensa ou ouve */
+  --tilt:12px;          /* deslocamento máximo ao seguir o cursor */
 
   /* Paleta MIV */
   --ink:#0d131a;--navy:#031c37;--steel:#304557;--grafite:#414042;--cinza:#5f6062;--prata:#d1d3d4;--bronze:#9b6b26;--ouro:#f0b855;--branco:#fff;
@@ -80,18 +85,30 @@ em.s{font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.12em
 
 /* Minerva: o contêiner usa mix-blend-mode screen, então o preto do vídeo some e só a luz aparece */
 .stage{position:absolute;z-index:1;mix-blend-mode:screen;top:50%;left:72%;width:min(46vw,78vh,640px);aspect-ratio:1;transform:translate(-50%,-50%);transition:left .6s var(--ease),top .6s var(--ease),width .6s var(--ease)}
-.mnv{position:absolute;inset:0;animation:float var(--float-speed) ease-in-out infinite}
-.mnv-f{position:absolute;inset:0}
+.mnv{position:absolute;inset:0;animation:float var(--float-speed) ease-in-out infinite;cursor:pointer}
+.mnv-f{position:absolute;inset:0;transform:translate(calc(var(--px,0)*var(--tilt)),calc(var(--py,0)*var(--tilt)));transition:transform 1.4s var(--ease)}
 .mnv-f>img,.mnv-f>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .mnv-f>.on,.mnv-f>video{opacity:0}
 .mnv-f>img.on{transition:opacity 1.2s ease}
 .mnv-f>video{transition:opacity var(--swap,.35s) ease}
 .mnv.on .mnv-f>img.on,.mnv.va .va,.mnv.vf .vf{opacity:1}
-.mnv-h{position:absolute;inset:0;margin:auto;width:var(--halo-size);height:var(--halo-size);border-radius:50%;
-  background:radial-gradient(circle,rgba(240,184,85,.95),rgba(240,184,85,0) 68%);opacity:var(--rest-glow);transition:opacity 1.2s ease;z-index:3}
-.mnv.open .mnv-h{opacity:var(--pulse-min);animation:pulse var(--pulse-speed) ease-in-out 1.2s infinite}
+/* halo: segue o estado da Minerva */
+.mnv-h,.mnv-b{position:absolute;inset:0;margin:auto;width:var(--halo-size);height:var(--halo-size);border-radius:50%;pointer-events:none;z-index:3;
+  background:radial-gradient(circle,rgba(240,184,85,.95),rgba(240,184,85,0) 68%)}
+.mnv-h{opacity:var(--rest-glow);transition:opacity 1.2s ease;translate:calc(var(--px,0)*var(--tilt)*-.4) calc(var(--py,0)*var(--tilt)*-.4)}
+.mnv[data-state="awake"] .mnv-h{opacity:var(--awake-glow)}
+.mnv[data-state="opening"] .mnv-h{opacity:var(--pulse-min);transition:opacity var(--open-ramp) cubic-bezier(.5,0,.3,1) .5s}
+.mnv[data-state="open"] .mnv-h{opacity:var(--pulse-min);animation:pulse var(--pulse-speed) ease-in-out infinite}
+.mnv[data-state="open"].thinking .mnv-h,.mnv.listening .mnv-h{animation:think var(--think-speed) ease-in-out infinite}
+.mnv[data-state="closing"] .mnv-h{opacity:var(--rest-glow);transition:opacity 1.6s ease .3s}
+.mnv-b{opacity:0}
+.mnv.bloom .mnv-b{animation:bloom 1.6s var(--ease)}
+.mnv:hover{--hover:1}
+.mnv:hover .mnv-h{filter:brightness(1.25)}
 @keyframes float{50%{transform:translateY(calc(var(--float)*-1))}}
 @keyframes pulse{50%{opacity:var(--pulse-max)}}
+@keyframes think{0%,100%{opacity:var(--pulse-min)}50%{opacity:var(--think-max)}}
+@keyframes bloom{0%{opacity:0;transform:scale(.75)}30%{opacity:.32}100%{opacity:0;transform:scale(1.3)}}
 
 /* conversa aberta: a Minerva ocupa o espaço livre ao lado do painel */
 body.chat .hero-t{opacity:0;transform:translateY(-8px);pointer-events:none}
@@ -192,13 +209,14 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
 <main>
   <section class="hero" aria-labelledby="t-hero">
     <div class="stage" aria-hidden="true">
-      <div class="mnv" id="mnv">
+      <div class="mnv" id="mnv" data-state="rest">
         <div class="mnv-f">
           <img class="off" src="/minerva/repouso.jpg" alt="" width="1924" height="1076" decoding="async">
           <img class="on" src="/minerva/aberta.jpg" alt="" width="1924" height="1076" decoding="async" loading="lazy">
           <video class="va" muted playsinline preload="auto"></video>
           <video class="vf" muted playsinline preload="auto"></video>
           <i class="mnv-h"></i>
+          <i class="mnv-b"></i>
         </div>
       </div>
     </div>
@@ -279,6 +297,7 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
 const MINERVA_CONFIG = {
   endpoint: '/api/minerva',
   videos: { abertura: '/minerva/abertura.mp4', fechamento: '/minerva/fechamento.mp4' },
+  speed: { abertura: 1.15, fechamento: 1.4 },   // velocidade de cada vídeo (1 = original, 5 s)
   greeting: 'Sou a Minerva, a inteligência institucional da EJUP. Pergunte sobre a escola, sobre formação jurídica ou sobre um tema do Direito.',
 };
 
@@ -287,63 +306,113 @@ const MINERVA_CONFIG = {
   const $ = (s) => document.querySelector(s);
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- Minerva: fechada em repouso, abre na primeira pergunta, fecha ao encerrar ---------- */
+  /* ---------- Minerva ----------
+     Estados: rest (fechada) → opening (abertura.mp4) → open (aberta, brilho pulsando)
+              → closing (fechamento.mp4) → rest. Pedidos que chegam no meio de uma
+              animação entram na fila e são atendidos quando ela termina, sem saltos. */
   const m = $('#mnv'), va = $('.va'), vf = $('.vf');
+  const SPEED = Object.assign({ abertura: 1.15, fechamento: 1.4 }, MINERVA_CONFIG.speed);
   const failed = { va: RM, vf: RM };
-  let isOpen = false;
+  let state = 'rest', want = false, awake = false, guard = 0;
+
+  const show = () => { m.dataset.state = state === 'rest' && awake ? 'awake' : state; };
+  const setState = (s) => { state = s; clearTimeout(guard); show(); };
+  const slow = (on) => m.style.setProperty('--swap', on ? '1.2s' : '.35s');
+  // se o vídeo travar sem disparar "ended", segue em frente depois de um tempo
+  const watchdog = (fn) => { clearTimeout(guard); guard = setTimeout(fn, 9000); };
 
   if (!RM) {
     va.addEventListener('error', () => { failed.va = true; m.classList.remove('va'); }, { once: true });
     vf.addEventListener('error', () => { failed.vf = true; }, { once: true });
-    va.addEventListener('loadeddata', () => { if (!isOpen) m.classList.add('va'); }, { once: true });
-    va.addEventListener('ended', () => m.classList.add('on'));
+    va.addEventListener('loadeddata', () => { if (state === 'rest') m.classList.add('va'); }, { once: true });
     va.src = MINERVA_CONFIG.videos.abertura;
   }
-  // O fechamento só começa a baixar depois da primeira pergunta.
+  // O fechamento só começa a baixar quando a Minerva abre pela primeira vez.
   const loadClose = () => { if (!RM && !vf.src) vf.src = MINERVA_CONFIG.videos.fechamento; };
 
-  const slow = (on) => m.style.setProperty('--swap', on ? '1.2s' : '.35s');
+  function step() {
+    if (state === 'rest' && want) startOpen();
+    else if (state === 'open' && !want) startClose();
+  }
 
-  function openMinerva() {
-    if (isOpen) return;
-    isOpen = true;
-    m.classList.add('open');
+  function opened() {
+    if (state !== 'opening') return;
+    m.classList.add('on');
+    setState('open');
+    step();
+  }
+
+  function startOpen() {
     loadClose();
-    if (failed.va) { m.classList.add('on'); return; }
+    if (failed.va) { m.classList.add('on'); setState('open'); return step(); }
+    setState('opening');
     slow(false);
     vf.onplaying = vf.onended = null;
     vf.pause();
-    va.currentTime = 0;
+    va.onended = opened;
     va.addEventListener('playing', () => { m.classList.add('va'); m.classList.remove('vf'); }, { once: true });
+    va.playbackRate = SPEED.abertura;
+    va.currentTime = 0;
     const p = va.play();
-    if (p) p.catch(() => { failed.va = true; m.classList.add('on'); });
+    if (p) p.catch(() => { failed.va = true; opened(); });
+    watchdog(opened);
   }
 
-  function closeMinerva() {
-    if (!isOpen) return;
-    isOpen = false;
-    m.classList.remove('open');
-    const showingVideo = m.classList.contains('va') && !failed.va;
-    if (!showingVideo) { m.classList.remove('on'); return; }
-    const fade = () => { slow(true); va.pause(); m.classList.remove('va', 'vf', 'on'); };
-    if (failed.vf) { fade(); return; }
+  function rested() {
+    if (state !== 'closing') return;
+    setState('rest');
+    step();
+  }
+
+  function startClose() {
+    const fade = () => {
+      slow(true); va.pause(); m.classList.remove('va', 'vf', 'on');
+      setState('closing'); setTimeout(rested, 1200);
+    };
+    if (failed.va || !m.classList.contains('va')) { m.classList.remove('on'); setState('closing'); return void setTimeout(rested, 1200); }
+    if (failed.vf) return fade();
+    setState('closing');
     va.pause();
-    vf.currentTime = 0;
     vf.onplaying = () => {
       vf.onplaying = null;
-      if (isOpen) return;
       m.classList.add('vf');
-      setTimeout(() => { if (!isOpen) { m.classList.remove('on'); va.currentTime = 0; } }, 400);
+      setTimeout(() => { m.classList.remove('on'); va.currentTime = 0; }, 400);
     };
     vf.onended = () => {
       vf.onended = null;
-      if (isOpen) return;
       va.currentTime = 0;
       m.classList.add('va');
       requestAnimationFrame(() => m.classList.remove('vf'));
+      rested();
     };
+    vf.playbackRate = SPEED.fechamento;
+    vf.currentTime = 0;
     const p = vf.play();
     if (p) p.catch(() => { failed.vf = true; fade(); });
+    watchdog(() => { if (vf.onended) vf.onended(); });
+  }
+
+  const openMinerva = () => { want = true; step(); };
+  const closeMinerva = () => { want = false; step(); };
+  const setAwake = (v) => { awake = v; show(); };
+  const bloom = () => { m.classList.remove('bloom'); void m.offsetWidth; m.classList.add('bloom'); };
+  $('.mnv-b').addEventListener('animationend', () => m.classList.remove('bloom'));
+
+  // segue o cursor de leve (só com mouse e sem preferência por menos movimento)
+  if (!RM && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const hero = $('.hero');
+    let raf = 0;
+    hero.addEventListener('pointermove', (e) => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const r = m.getBoundingClientRect();
+        const clamp = (v) => Math.max(-1, Math.min(1, v));
+        m.style.setProperty('--px', clamp((e.clientX - (r.left + r.width / 2)) / (r.width * 1.5)).toFixed(3));
+        m.style.setProperty('--py', clamp((e.clientY - (r.top + r.height / 2)) / (r.height * 1.5)).toFixed(3));
+      });
+    });
+    hero.addEventListener('pointerleave', () => { m.style.setProperty('--px', 0); m.style.setProperty('--py', 0); });
   }
 
   /* ---------- painel de conversa ---------- */
@@ -370,6 +439,7 @@ const MINERVA_CONFIG = {
   function openPanel() {
     if (body.classList.contains('chat')) return;
     body.classList.add('chat');
+    setAwake(true);
     opener.setAttribute('aria-expanded', 'true');
     setTimeout(() => q.focus({ preventScroll: true }), 360);
   }
@@ -377,6 +447,7 @@ const MINERVA_CONFIG = {
   function closePanel() {
     if (!body.classList.contains('chat')) return;
     body.classList.remove('chat');
+    setAwake(false);
     opener.setAttribute('aria-expanded', 'false');
     stopMic();
     closeMinerva();
@@ -391,6 +462,7 @@ const MINERVA_CONFIG = {
     addMsg('u', text);
     history.push({ role: 'user', content: text });
     openMinerva();
+    m.classList.add('thinking');
     const wait = document.createElement('div');
     wait.className = 'msg a';
     wait.innerHTML = '<div class="typing" role="status"><span class="vh">A Minerva está escrevendo</span><i></i><i></i><i></i></div>';
@@ -405,16 +477,19 @@ const MINERVA_CONFIG = {
       if (!r.ok || !data.reply) throw new Error(data.error || 'Não consegui responder agora. Tente de novo em instantes.');
       history.push({ role: 'assistant', content: data.reply });
       addMsg('a', data.reply);
+      bloom();
     } catch (e) {
       wait.remove();
       history.pop();
       addMsg('n', e instanceof TypeError ? 'Sem conexão no momento. Verifique a internet e tente de novo.' : e.message);
     } finally {
       busy = false; send.disabled = false;
+      m.classList.remove('thinking');
     }
   }
 
   opener.addEventListener('click', openPanel);
+  m.addEventListener('click', () => (body.classList.contains('chat') ? q.focus() : openPanel()));
   $('#close-chat').addEventListener('click', closePanel);
   $('#new-chat').addEventListener('click', () => { stopMic(); closeMinerva(); reset(); q.focus(); });
   form.addEventListener('submit', (e) => { e.preventDefault(); ask(q.value); });
@@ -441,12 +516,13 @@ const MINERVA_CONFIG = {
         if (e.error === 'not-allowed' || e.error === 'service-not-allowed') addMsg('n', 'Para perguntar pela voz, permita o uso do microfone no navegador.');
       };
       rec.onend = () => {
-        rec = null; mic.setAttribute('aria-pressed', 'false'); mic.setAttribute('aria-label', 'Perguntar pela voz');
+        rec = null; m.classList.remove('listening'); mic.setAttribute('aria-pressed', 'false'); mic.setAttribute('aria-label', 'Perguntar pela voz');
         if (finalText.trim()) ask(finalText);
       };
       try {
         rec.start();
         mic.setAttribute('aria-pressed', 'true'); mic.setAttribute('aria-label', 'Parar de ouvir');
+        m.classList.add('listening');
       } catch { rec = null; }
     });
   }
