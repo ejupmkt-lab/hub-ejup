@@ -172,7 +172,14 @@ function codigoCertificado() {
 /* ---------- rotas ---------- */
 const R = {};
 
-R.config = { method: 'GET', run: (ctx) => ({ google: ctx.env.PORTAL_GOOGLE === '1', email: ctx.mail.enabled }) };
+R.config = {
+  method: 'GET',
+  run: (ctx) => ({
+    // login com Google: ligar o provedor no Supabase (Authentication → Providers) e PORTAL_GOOGLE=1 na Vercel
+    google: ctx.env.PORTAL_GOOGLE === '1' ? `${ctx.sb.base}/auth/v1/authorize?provider=google&redirect_to=${enc(ctx.origin + '/entrar')}` : null,
+    email: ctx.mail.enabled,
+  }),
+};
 
 R.estado = {
   method: 'GET',

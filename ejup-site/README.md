@@ -14,8 +14,12 @@ o site.** Todas as outras produções da EJUP seguem o MIV (ver `CLAUDE.md` na r
 
 | Variável | Para quê |
 |---|---|
-| `SUPABASE_URL` | Banco de respostas da Minerva, newsletter e pedidos in company |
-| `SUPABASE_SERVICE_ROLE_KEY` | Idem — chave *service_role*, só no servidor |
+| `SUPABASE_URL` | Banco de respostas da Minerva, newsletter, in company e Portal |
+| `SUPABASE_SERVICE_ROLE_KEY` | Idem — chave secreta (`sb_secret_…` ou *service_role*), só no servidor |
+| `RESEND_API_KEY`, `EMAIL_FROM` | Opcional. E-mails do Portal (dúvida nova, resposta do professor, plantão, lembretes). Sem elas, o Portal funciona sem e-mails |
+| `CRON_SECRET` | Opcional. Protege a tarefa diária de lembretes (`/api/portal?r=cron`, 8h de Fortaleza) |
+| `SITE_URL` | Opcional. Endereço oficial (ex.: `https://ejup.com.br`) usado nos links dos e-mails |
+| `PORTAL_GOOGLE` | Opcional. `1` mostra "Continuar com Google" (ligar o provedor Google no Supabase antes) |
 
 ## Estrutura
 
@@ -26,6 +30,9 @@ o site.** Todas as outras produções da EJUP seguem o MIV (ver `CLAUDE.md` na r
 | `api/minerva.js`, `api/_lib/busca.js` | Minerva sem IA: busca a pergunta cadastrada mais parecida e devolve a resposta (20 req/min por IP) |
 | `api/_lib/respostas.js` | Respostas iniciais da Minerva; reserva quando o Supabase não estiver configurado |
 | `api/lead.js` | Grava newsletter e pedidos in company no Supabase (5 envios/min por IP) |
+| `assets/portal.js` | Entrar, criar conta, recuperar senha, Portal do Aluno, Área do Professor e `/certificado/CÓDIGO`. Carregado só quando alguém abre essas páginas |
+| `api/portal.js`, `api/_lib/portal.js` | API do Portal em uma função (`/api/portal?r=…`), sessão em cookie HttpOnly |
+| `dev/fake-supabase.mjs` | Supabase em memória para os testes e para `npm run dev:portal` |
 | `img/`, `vid/`, `fonts/` | Imagens, vídeos e Gotham (woff2) |
 | `vercel.json` | Rotas do site, `/minerva`, microfone, cache |
 
@@ -67,10 +74,47 @@ alter table public.leads enable row level security; -- sem políticas: só o ser
 create unique index leads_newsletter_email on public.leads (lower(email)) where tipo = 'newsletter';
 ```
 
+## Portal do Aluno e Área do Professor
+
+### Ligar
+1. No Supabase, **SQL Editor**: rode `dev/supabase_setup.sql` (se ainda não rodou) e depois
+   `dev/supabase_portal.sql`. Ele cria as tabelas do Portal, a formação Licenciamento com os 4 módulos
+   e 14 aulas (títulos e durações provisórios) e a formação Pareceres.
+2. **Authentication → URL Configuration**: *Site URL* = endereço do site (hoje
+   `https://ejup-site.vercel.app`); em *Redirect URLs* acrescente `https://ejup-site.vercel.app/**`
+   (e o domínio próprio quando existir).
+3. **Authentication → Emails → SMTP Settings**: ligue um SMTP próprio (Resend, Gmail Workspace…).
+   O SMTP padrão do Supabase só envia para e-mails da equipe do projeto e com limite por hora:
+   sem SMTP próprio, alunos não recebem a confirmação de cadastro nem o link de nova senha.
+4. Opcional: `RESEND_API_KEY` e `EMAIL_FROM` na Vercel para os avisos do Portal, e `CRON_SECRET`
+   para os lembretes diários.
+
+### Operar pelo Table Editor do Supabase
+- **Liberar um aluno:** em `matriculas`, nova linha com `email` (o da inscrição), `curso_id`
+  (`licenciamento`, `pareceres`…) e `plano` (`essencial`, `acompanhado` ou `mentoria`). Pode ser antes de
+  o aluno criar a conta. `ativa = false` suspende o acesso.
+- **Professor:** crie o usuário em **Authentication → Users → Add user** (com senha e *Auto Confirm*) e
+  ponha o e-mail dele em `cursos.professor_emails` da formação. `perfis.papel = equipe` vê todas as formações.
+- **Aulas:** em `aulas`, preencha `titulo`, `duracao_min`, `sobre`, `topicos` e `video`. O vídeo aceita
+  link do YouTube, Vimeo ou Panda Video, arquivo `.mp4`, ou o caminho de um arquivo enviado ao bucket
+  privado `aulas` do Storage. `materiais` é uma lista `[{"nome":"Slides","url":"…","tipo":"PDF"}]`; a
+  `url` pode ser um link ou um caminho no bucket privado `materiais` (o Portal gera um link temporário).
+  `publicada = false` esconde a aula.
+- **Minerva por formação:** em `minerva_respostas`, `curso_id` liga a resposta a uma formação e
+  `fonte_aula` + `fonte_segundo` mostram "Rever em 11:50". `portal = true` tira a resposta do hotsite.
+  Professores ensinam respostas pela Área do Professor (aparecem com `origem = professor`).
+- **Certificado:** sai sozinho quando o aluno conclui a última aula (`matriculas.certificado`). A
+  conferência pública fica em `/certificado/EJUP-XXXX-XXXX`; o PDF sai pela impressão do navegador.
+
+Planos (Essencial, Acompanhado, Mentoria), prazos de resposta (2 dias úteis; 1 no Mentoria) e o limite
+de 2 mentorias seguem a proposta do protótipo. Mudança de plano é pedida à equipe pelo WhatsApp.
+
 ## Rodar localmente
 
 ```bash
 npm install
 npm test            # testes dos endpoints
 npm run dev         # http://localhost:3000 (a Minerva responde com o banco local)
+npm run dev:portal  # idem, com o Portal ligado a um Supabase em memória:
+                    # aluno@ejup.com.br / senha-aluno-1 · professor@ejup.com.br / senha-prof-1
 ```

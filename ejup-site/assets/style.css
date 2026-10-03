@@ -979,3 +979,23 @@ button.fq:hover,a.fq:hover{padding-left:6px}
 .priv{max-width:760px;display:grid;gap:14px;color:var(--fg2)}
 .priv h2{margin-top:28px;color:var(--fg)}
 .priv a{color:var(--em);text-decoration:underline;text-underline-offset:3px}
+
+/* Portal: player real (vídeo, YouTube, Vimeo, Panda), avisos, certificado público */
+.pplayer.live::after{display:none}
+.pplayer>video,.pplayer>iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.pp-msg{position:relative;z-index:2;max-width:420px;padding:0 24px;text-align:center;color:var(--w82)}
+.pbell{position:relative}.pbell .dot{position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--ouro-400);box-shadow:0 0 0 2px var(--navy-950)}
+.pmenu button{display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:12px;font-size:14px;font-weight:500;text-align:left;transition:background .25s}.pmenu button:hover{background:var(--w10)}.pmenu button .ic{color:var(--ouro-400)}
+.pavisos{min-width:300px;max-width:min(380px,calc(100vw - 32px))}.pavisos a{height:auto;min-height:44px;padding:10px 12px;align-items:flex-start;line-height:1.4;font-weight:300}.pavisos a.on{font-weight:500}.pavisos a .ic{margin-top:2px}
+.lk-in{font:inherit;color:inherit;padding:0}.lk-in:hover{color:var(--branco)}
+.psel-in{position:relative;cursor:pointer}.psel-in select{appearance:none;-webkit-appearance:none;background:none;border:0;outline:0;font:inherit;color:inherit;cursor:pointer;max-width:220px}.psel-in select option{color:#0D131A}
+.cp-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:32px}.cp-h>div:first-child{display:grid;gap:14px;max-width:640px;justify-items:start}
+.cp-logo{display:block;width:150px;color:var(--navy-900);margin-bottom:14px}.cp-logo svg{display:block;width:100%;height:auto;fill:currentColor}
+.cp-doc{max-width:760px;aspect-ratio:1.414/1}.cp-doc .h3{font-size:clamp(24px,3vw,32px)}
+@media (max-width:760px){.cp-doc{aspect-ratio:auto}}
+@media print{
+  .nav,.menu,.toast,.pbar,.no-print,.orb,footer{display:none!important}
+  html,body,.sec,.authp{background:#fff!important;color:#000!important;min-height:0!important;padding:0!important}
+  .cp-h{display:none}.cp-doc{max-width:none;width:100%;box-shadow:none}
+  @page{size:A4 landscape;margin:12mm}
+}

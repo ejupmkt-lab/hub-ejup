@@ -10,7 +10,16 @@ const port = Number(process.env.PORT || 3000);
 const types = { '.webp': 'image/webp', '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.mp4': 'video/mp4', '.woff2': 'font/woff2' };
 const api = handler;
 const { default: leadHandler } = await import('../api/lead.js');
-const { default: portalHandler } = await import('../api/portal.js');
+// FAKE_SB=1: Portal com Supabase em memória (dev/fake-supabase.mjs), com aluno e professor de exemplo
+let portalHandler = (await import('../api/portal.js')).default;
+if (process.env.FAKE_SB) {
+  const { createFakeSupabase, seed } = await import('./fake-supabase.mjs');
+  const { createPortalHandler } = await import('../api/_lib/portal.js');
+  const fake = createFakeSupabase();
+  seed(fake);
+  portalHandler = createPortalHandler({ fetchImpl: fake.fetchImpl, env: { SUPABASE_URL: fake.url, SUPABASE_SERVICE_ROLE_KEY: 'dev', PORTAL_GOOGLE: process.env.PORTAL_GOOGLE } });
+  console.log('Portal com dados de exemplo: aluno@ejup.com.br / senha-aluno-1 · professor@ejup.com.br / senha-prof-1');
+}
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');

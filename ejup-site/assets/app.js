@@ -409,12 +409,14 @@ privacidade:()=>`
  <p>EJUP — Educação Jurídica, Rua da Saudade, 1028, Lagoa Nova, Natal/RN. Contato: <a href="mailto:contato@ejup.com.br">contato@ejup.com.br</a>.</p>
  <h2 class="h3">Que dados coletamos e para quê</h2>
  <p>Newsletter: o seu e-mail, para enviar a edição semanal da Coluna Jurídica. Proposta in company: nome, e-mail, organização, tamanho da equipe, tema e mensagem, para preparar e responder ao pedido. Coletamos apenas o que você digita nesses formulários, com o seu consentimento.</p>
+ <h2 class="h3">Portal do Aluno e Área do Professor</h2>
+ <p>Para quem tem conta: nome, e-mail, senha (guardada de forma cifrada pelo provedor de login), dados opcionais do perfil (telefone, área de atuação, inscrição na OAB, nome no certificado), as formações liberadas, o progresso nas aulas, as anotações, as dúvidas enviadas ao professor, os encontros de mentoria e as preferências de estudo e de e-mail. Usamos esses dados para dar acesso às formações, emitir certificados, encaminhar dúvidas ao professor da formação e enviar os avisos que você escolher. O professor da formação vê o nome, o e-mail, o plano e o progresso dos alunos da turma. No perfil, você baixa uma cópia dos seus dados ou exclui a conta.</p>
  <h2 class="h3">Minerva</h2>
- <p>As perguntas feitas à Minerva são usadas só para encontrar a resposta no banco de respostas da EJUP e não são guardadas. Não informe dados pessoais ou detalhes sigilosos de casos na conversa.</p>
+ <p>No site público, as perguntas feitas à Minerva são usadas só para encontrar a resposta no banco de respostas da EJUP e não são guardadas. No Portal do Aluno, as perguntas ficam registradas na sua conta, junto com a avaliação “ajudou” ou “não ajudou”, para que o professor revise e melhore as respostas da formação. Não informe dados pessoais ou detalhes sigilosos de casos na conversa.</p>
  <h2 class="h3">Com quem compartilhamos</h2>
- <p>Com os serviços que mantêm o site no ar: hospedagem e banco de dados. Não vendemos nem cedemos dados para publicidade.</p>
+ <p>Com os serviços que mantêm o site no ar: hospedagem, banco de dados e login, envio de e-mails e a plataforma que exibe os vídeos das aulas. Não vendemos nem cedemos dados para publicidade.</p>
  <h2 class="h3">Cookies</h2>
- <p>Este site não usa cookies de publicidade nem de rastreamento.</p>
+ <p>Este site não usa cookies de publicidade nem de rastreamento. Quem entra no Portal recebe cookies de sessão, necessários para manter o login.</p>
  <h2 class="h3">Seus direitos</h2>
  <p>Você pode pedir acesso, correção ou exclusão dos seus dados, ou cancelar a newsletter a qualquer momento, escrevendo para <a href="mailto:contato@ejup.com.br">contato@ejup.com.br</a>.</p>
 </div></div></section>
@@ -427,14 +429,17 @@ const nav=$('#nav'),menu=$('#menu'),app=$('#app');app.tabIndex=-1;
 const modal=$('#modal'),toastEl=$('#toast'),pbar=$('#pbar');
 nav.innerHTML=`<div class="wrap nav-in"><a href="#home" class="logo" aria-label="EJUP — início">${LOGO}</a>
  <nav class="nav-pill" aria-label="Principal"><span class="nav-ind"></span>${NAV.map(([k,l])=>`<a href="#${k}" data-p="${k}">${l}</a>`).join('')}</nav>
- <div class="nav-acts"><a href="/minerva" class="btn s b-glass"><span>Minerva</span></a>${btn('Ver formações','gold',{go:'formacoes',s:1})}</div>
- <button class="btn s b-glass nav-menu" id="menu-open" aria-expanded="false" aria-controls="menu">${ic('menu',18)}<span>Menu</span></button></div>`;
+ <div class="nav-acts"><a href="/minerva" class="btn s b-glass"><span>Minerva</span></a>${btn('Entrar','glass',{go:'entrar',s:1,icon:false,attr:'data-sess'})}${btn('Ver formações','gold',{go:'formacoes',s:1})}</div>
+ <button class="btn s b-glass nav-menu" id="menu-open" aria-expanded="false" aria-controls="menu">${ic('menu',18)}<span>Menu</span></button>
+ <a href="#home" class="btn s b-glass nav-back"><span>Voltar ao site</span>${ic('ar',14)}</a></div>`;
 menu.innerHTML=`${orb('',{arc:false})}<div class="menu-top"><a href="#home" class="logo" aria-label="EJUP — início">${LOGO}</a><button class="btn s b-glass" id="menu-close">${ic('x',18)}<span>Fechar</span></button></div>
  <nav class="menu-list" aria-label="Menu">${[...NAV,['minerva','Minerva']].map(([k,l],i)=>`<a href="${k==='minerva'?'/minerva':'#'+k}" data-p="${k}" style="--i:${i}"><span class="n">0${i+1}</span><span class="t">${l}</span>${ic('ar',16)}</a>`).join('')}</nav>
- <div class="menu-bot">${btn('Ver formações','gold',{go:'formacoes'})}<p class="sm">(85) 99271-4050 &nbsp;·&nbsp; @ejup.oficial</p></div>`;
+ <div class="menu-bot">${btn('Ver formações','gold',{go:'formacoes'})}${btn('Entrar','glass',{go:'entrar',icon:false,attr:'data-sess'})}<p class="sm">(85) 99271-4050 &nbsp;·&nbsp; @ejup.oficial</p></div>`;
 const ind=$('.nav-ind'),pill=$('.nav-pill');
 pill.addEventListener('mouseover',e=>{const a=e.target.closest('a');if(!a)return;ind.style.width=a.offsetWidth+'px';ind.style.transform=`translateX(${a.offsetLeft}px)`;ind.style.opacity=1});
 pill.addEventListener('mouseleave',()=>{ind.style.opacity=0});
+/* com sessão aberta (aviso sem token, gravado pelo portal), "Entrar" vira o atalho de volta */
+const syncSess=()=>{const on=/(?:^|; )ejup_on=1/.test(document.cookie);$$('[data-sess]').forEach(a=>{a.setAttribute('href',on?'/portal':'/entrar');$('span',a).textContent=on?'Meu portal':'Entrar'})};
 let menuOn=false;
 const setMenu=v=>{menuOn=v;menu.classList.toggle('on',v);menu.toggleAttribute('inert',!v);$('#menu-open').setAttribute('aria-expanded',v);document.documentElement.style.overflow=v?'hidden':''};
 setMenu(false);
@@ -480,17 +485,25 @@ const closeModal=()=>{if(!modal.classList.contains('on'))return;modal.classList.
 let cur=null,secs=[],hero=null,pars=[],prog=null,spies=[],io,cio,vio;
 /* aceita caminho (/formacao/licenciamento) e o formato antigo com # (#formacao.licenciamento) */
 const parse=h=>{h=(h||'').replace(/^[#/]+/,'').replace(/\/+$/,'');if(!h)return ['home',''];const i=h.search(/[./]/);return i<0?[h,'']:[h.slice(0,i),h.slice(i+1)]};
-const TITLES={home:'EJUP · Educação Jurídica',escola:'A escola',formacoes:'Formações',formacao:'Formação',professores:'Professores',ejupcast:'EJUPcast',coluna:'Coluna Jurídica',artigo:'Artigo',incompany:'In company',privacidade:'Política de Privacidade'};
+const TITLES={home:'EJUP · Educação Jurídica',escola:'A escola',formacoes:'Formações',formacao:'Formação',professores:'Professores',ejupcast:'EJUPcast',coluna:'Coluna Jurídica',artigo:'Artigo',incompany:'In company',privacidade:'Política de Privacidade',entrar:'Entrar',criar:'Criar conta',recuperar:'Recuperar senha',portal:'Portal do Aluno',prof:'Área do Professor',certificado:'Certificado'};
 const SCR={};
+/* Portal do Aluno, Área do Professor e login ficam em /assets/portal.js, carregado só quando alguém vai até lá */
+const PORTAL=['entrar','criar','recuperar','portal','prof','certificado'];
+let portalJs=null;
+const loadPortal=()=>portalJs||(portalJs=new Promise((ok,no)=>{const s=document.createElement('script');s.src='/assets/portal.js?v=1';s.onload=ok;s.onerror=()=>{portalJs=null;no()};document.head.appendChild(s)}));
 function go(tok,o={}){
- let [p,arg]=parse(tok),known=!!PAGES[p];if(!known){p='home';arg=''}
+ let [p,arg]=parse(tok);
+ if(!PAGES[p]&&PORTAL.includes(p)){loadPortal().then(()=>go(tok,o),()=>toast('Não foi possível abrir o portal. Confira a conexão e tente de novo.'));return}
+ let known=!!PAGES[p];if(!known){p='home';arg=''}
  const key=p+(arg?'.'+arg:'');
  setMenu(false);closeModal();
  if(key===cur){afterArg(p,arg)||scrollTo({top:0,behavior:RM?'auto':'smooth'});return}
  const back=o.push===false,y0=back?(SCR[key]||0):0;
+ const inner=PAGES[p].sub&&cur&&parse(cur)[0]===p;
  if(cur)SCR[cur]=scrollY;
  cur=key;
  try{if(o.push!==false)history.pushState(null,'',toPath(key));else if(!known||location.hash)history.replaceState(null,'',toPath(key))}catch(e){}
+ if(inner){PAGES[p].sub(arg,y0);return}
  const swap=()=>{app.innerHTML=withImg(PAGES[p](arg));links(app);hydrate(app);mount(p,arg);scrollTo({top:y0,behavior:'instant'});frame();app.classList.remove('out');if(!o.instant)app.focus({preventScroll:true})};
  if(o.instant||RM){swap();return}
  pbar.className='pbar';void pbar.offsetWidth;pbar.classList.add('run');app.classList.add('out');
@@ -503,6 +516,8 @@ function afterArg(p,arg){
 }
 function mount(p,arg){
  nav.classList.remove('hide');
+ nav.classList.toggle('is-auth',['entrar','criar','recuperar','certificado'].includes(p));nav.classList.toggle('is-portal',p==='portal'||p==='prof');
+ document.documentElement.classList.toggle('in-portal',p==='portal'||p==='prof');syncSess();
  const ttl=p==='formacao'?(F.find(x=>x.id===arg)||F[0]).t:p==='artigo'?(AR.find(x=>x.id===arg)||AR[0]).t:TITLES[p];
  document.title=p==='home'?TITLES.home:`${ttl||'EJUP'} · EJUP`;
  const key={formacao:'formacoes',artigo:'coluna'}[p]||p;
@@ -515,6 +530,7 @@ function mount(p,arg){
  $$('[data-filter]').forEach(b=>applyFilter(b,true));
  $$('.drag').forEach(dragScroll);
  frame();afterArg(p,arg);
+ PAGES[p].mount&&PAGES[p].mount(arg);
 }
 
 /* ---------- entrada no scroll, contagem ---------- */
@@ -623,7 +639,7 @@ document.addEventListener('click',e=>{
  const t=e.target;if(!t.closest)return;
  if(dragged){e.preventDefault();return}
  const a=t.closest('a[href]');
- if(a&&!a.target&&!e.metaKey&&!e.ctrlKey&&!e.shiftKey&&!e.altKey&&a.origin===location.origin&&PAGES[parse(a.pathname)[0]]){e.preventDefault();go(a.pathname);return}
+ if(a&&!a.target&&!e.metaKey&&!e.ctrlKey&&!e.shiftKey&&!e.altKey&&a.origin===location.origin&&(PAGES[parse(a.pathname)[0]]||PORTAL.includes(parse(a.pathname)[0]))){e.preventDefault();go(a.pathname);return}
  let x;
  if(t.closest('#menu-open')){setMenu(true);return}
  if(t.closest('#menu-close')){setMenu(false);return}
@@ -637,6 +653,7 @@ document.addEventListener('click',e=>{
  if((x=t.closest('[data-more]'))){const g=$('#grid-a');$$('[data-extra]',g).forEach(c=>{c.removeAttribute('data-extra');c.hidden=false});x.hidden=true;applyFilter($('[data-filter="a"]'));return}
  if((x=t.closest('.prof'))){setProf(x);return}
 });
+window.EJUP={$,$$,RM,ic,btn,tag,em,orb,LOGO,SYM,F,LINKS,waMsg,okMail,toast,go,links,hydrate,withImg,placeSeg,reveal,syncSess,PAGES,TITLES,app,nav,cur:()=>cur};
 addEventListener('popstate',()=>go(location.pathname,{push:false}));
 links(nav);links(menu);
 go(location.pathname==='/'&&location.hash.length>1?location.hash:location.pathname,{push:false,instant:true});
