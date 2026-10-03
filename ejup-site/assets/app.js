@@ -82,7 +82,7 @@ const waMsg=t=>LINKS.whatsapp+'?text='+encodeURIComponent(t);
 
 /* imagens embutidas na própria página, para não depender de arquivos externos */
 const IMG=new Proxy({},{get:(o,n)=>`/img/${String(n)}.jpg`});
-const VID={logo:'/vid/cast-logo.mp4',sub:'/vid/cast-subscribe.mp4'};
+const VID={logo:'/vid/cast-logo.mp4',sub:'/vid/cast-subscribe.mp4',est:'/vid/estatuas.mp4'};
 const withImg=h=>h.replace(/"img\/(\w+)\.jpg/g,'"/img/$1.jpg');
 const hydrate=root=>$$('video[data-vid]',root).forEach(v=>{const auto=v.hasAttribute('autoplay');if(RM&&auto){v.removeAttribute('autoplay');v.addEventListener('loadedmetadata',()=>{v.currentTime=+(v.dataset.poster||0)},{once:true})}v.src=VID[v.dataset.vid];v.removeAttribute('data-vid');if(auto&&!RM)v.play().catch(()=>{})});
 
@@ -158,7 +158,7 @@ home:()=>`
   <ul class="fronts" data-r><li><a href="#formacoes">Formações</a></li><li><a href="#coluna">Coluna Jurídica</a></li><li><a href="#ejupcast">EJUPcast</a></li><li><a href="#incompany">In company</a></li></ul>
  </div></section>
 <section class="sec dark flush"><div class="wrap"><div class="media" data-scale>
- <img src="img/socios.jpg" alt="Os sócios da EJUP: Leonardo Pivotto, Rossana Fonseca e Roberto Pivotto" width="1672" height="941">
+ <video class="cov" data-vid="est" data-poster="26" autoplay muted loop playsinline aria-label="Abertura do EJUPcast: estátuas de mármore dos três sócios da EJUP"></video>
  <div class="media-ov"><p class="lbl g">Manifesto</p><h2 class="h2s">Vemos o Direito sob outra ótica.</h2><p class="body" style="color:var(--w82)">A prática contemporânea exige maturidade decisória, integração estratégica e responsabilidade intelectual.</p>
   </div>
  
@@ -322,7 +322,7 @@ escola:()=>`
 <section class="sec dark hero" data-hero>${orb('orb-r',{a0:-60,a1:-20,d:60})}<div class="wrap hero-c">${tag('A escola','gold')}
  <h1 class="d1 blur" data-r style="max-width:1100px">Formamos juristas com ${em('alma clássica')} e repertório contemporâneo.</h1>
  <p class="lead" data-r>A EJUP é uma escola de educação jurídica continuada, que oferece formações, uma coluna de análise assinada por especialistas e o EJUPcast, seu podcast institucional.</p></div></section>
-<section class="sec dark flush"><div class="wrap stack"><div class="media cap" data-scale><img src="img/socios.jpg" alt="Os sócios da EJUP: Leonardo Pivotto, Rossana Fonseca e Roberto Pivotto" width="1672" height="941"><div class="media-cap"><div style="display:grid;gap:8px"><p class="lbl g">Quem está por trás</p><h2 class="h2s">Os sócios da EJUP</h2></div><p class="body" style="color:var(--w82)">Leonardo Pivotto · Rossana Fonseca · Roberto Pivotto</p></div></div>
+<section class="sec dark flush"><div class="wrap stack"><div class="media cap" data-scale><video class="cov" data-vid="est" data-poster="26" autoplay muted loop playsinline aria-label="Abertura do EJUPcast: estátuas de mármore dos três sócios da EJUP"></video><div class="media-cap"><div style="display:grid;gap:8px"><p class="lbl g">Quem está por trás</p><h2 class="h2s">Os sócios da EJUP</h2></div><p class="body" style="color:var(--w82)">Leonardo Pivotto · Rossana Fonseca · Roberto Pivotto</p></div></div>
  <div class="g3 hs drag">${[['prof1','Leonardo Pivotto','Sócio','Retrato de Leonardo Pivotto'],['rossana','Rossana Fonseca','Sócia','Retrato de Rossana Fonseca no estúdio do EJUPcast'],['roberto','Roberto Pivotto','Sócio','Retrato de Roberto Pivotto']].map(([img,n,r,alt])=>`<div class="card socio" data-r><span class="sph"><img src="img/${img}.jpg" alt="${alt}" loading="lazy"></span><div><p class="lbl g">${r} da EJUP</p><h3 class="h3">${n}</h3></div></div>`).join('')}</div>
 </div></section>
 <section class="sec light"><div class="wrap stack">
