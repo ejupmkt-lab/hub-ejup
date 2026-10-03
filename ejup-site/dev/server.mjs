@@ -1,19 +1,14 @@
 // Servidor local que imita a Vercel: estáticos de site/, / -> /minerva e POST /api/minerva.
-// MINERVA_MOCK=1 responde sem chamar a API da Anthropic (para testar a interface).
 import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import handler, { createHandler } from '../api/minerva.js';
+import handler from '../api/minerva.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const port = Number(process.env.PORT || 3000);
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.mp4': 'video/mp4', '.woff2': 'font/woff2' };
-const mock = createHandler({ getModel: () => ({ beta: { messages: { create: async ({ messages }) => {
-  await new Promise((r) => setTimeout(r, 900));
-  return { stop_reason: 'end_turn', content: [{ type: 'text', text: `Resposta de teste para: ${messages.at(-1).content}` }] };
-} } } }) });
-const api = process.env.MINERVA_MOCK ? mock : handler;
+const api = handler;
 const { default: leadHandler } = await import('../api/lead.js');
 
 http.createServer(async (req, res) => {
@@ -40,4 +35,4 @@ http.createServer(async (req, res) => {
     res.writeHead(200, { 'Content-Type': type, 'Accept-Ranges': 'bytes', 'Content-Length': data.length });
     res.end(data);
   } catch { res.writeHead(404); res.end(); }
-}).listen(port, () => console.log(`Site em http://localhost:${port}/ · Minerva em /minerva${process.env.MINERVA_MOCK ? ' (mock)' : ''}`));
+}).listen(port, () => console.log(`Site em http://localhost:${port}/ · Minerva em /minerva`));

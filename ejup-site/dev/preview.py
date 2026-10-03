@@ -17,15 +17,21 @@ fonts = {n: 'data:font/woff2;base64,' + base64.b64encode(open(os.path.join(here,
 def inline_fonts(css):
     return re.sub(r'url\(/fonts/gotham-(\w+)\.woff2\)', lambda m: f'url({fonts[m.group(1)]})', css)
 
-SHIM = '''<script>
-/* prévia: as rotas do servidor respondem em modo demonstração */
-(()=>{const f=window.fetch.bind(window);window.fetch=(u,o)=>{const p=String(u);
+# a prévia não tem servidor: a busca da Minerva roda no navegador, com o mesmo código e as mesmas respostas
+busca_js = R('api/_lib/busca.js').replace('export function', 'function').replace('export const', 'const')
+resp_js = R('api/_lib/respostas.js').replace('export default', 'const RESPOSTAS =')
+sem = re.search(r"SEM_RESPOSTA =\s*'([^']+)'", R('api/minerva.js')).group(1)
+SHIM = """<script>
+(()=>{""" + busca_js + resp_js + """
+const SEM = '""" + sem + """';
+const f=window.fetch.bind(window);window.fetch=(u,o)=>{const p=String(u);
  const ok=b=>Promise.resolve(new Response(JSON.stringify(b),{status:200,headers:{'Content-Type':'application/json'}}));
- if(p.endsWith('/api/minerva'))return new Promise(r=>setTimeout(()=>r(ok({reply:'Esta é uma prévia do site. Quando ele estiver publicado, a Minerva responde aqui à sua pergunta.'})),900));
+ if(p.endsWith('/api/minerva')){const b=JSON.parse((o&&o.body)||'{}');const m=(b.messages||[]).filter(x=>x.role==='user').pop();
+  const r=buscar(String(b.pergunta||(m&&m.content)||''),RESPOSTAS);return ok(r.item?{reply:r.item.resposta,id:r.item.id}:{reply:SEM,sugestoes:r.sugestoes})}
  if(p.endsWith('/api/lead'))return ok({ok:true});
  return f(u,o)}})();
-</script>'''
-BADGE = '<div style="position:fixed;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:90;padding:6px 12px;border-radius:999px;background:rgba(8,12,17,.82);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.82);font:500 11px/1.4 Gotham,Montserrat,system-ui,sans-serif;letter-spacing:.06em;pointer-events:none">Prévia · Minerva e formulários em demonstração</div>'
+</script>"""
+BADGE = '<div style="position:fixed;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:90;padding:6px 12px;border-radius:999px;background:rgba(8,12,17,.82);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.82);font:500 11px/1.4 Gotham,Montserrat,system-ui,sans-serif;letter-spacing:.06em;pointer-events:none">Prévia · formulários em demonstração</div>'
 
 # ---------- site ----------
 js = R('assets/app.js')

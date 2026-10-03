@@ -410,9 +410,9 @@ privacidade:()=>`
  <h2 class="h3">Que dados coletamos e para quê</h2>
  <p>Newsletter: o seu e-mail, para enviar a edição semanal da Coluna Jurídica. Proposta in company: nome, e-mail, organização, tamanho da equipe, tema e mensagem, para preparar e responder ao pedido. Coletamos apenas o que você digita nesses formulários, com o seu consentimento.</p>
  <h2 class="h3">Minerva</h2>
- <p>As perguntas feitas à Minerva são enviadas a um provedor de inteligência artificial apenas para gerar a resposta. A EJUP não guarda o histórico das conversas. Não informe dados pessoais ou detalhes sigilosos de casos na conversa.</p>
+ <p>As perguntas feitas à Minerva são usadas só para encontrar a resposta no banco de respostas da EJUP e não são guardadas. Não informe dados pessoais ou detalhes sigilosos de casos na conversa.</p>
  <h2 class="h3">Com quem compartilhamos</h2>
- <p>Com os serviços que mantêm o site no ar: hospedagem, banco de dados e o provedor de inteligência artificial da Minerva. Não vendemos nem cedemos dados para publicidade.</p>
+ <p>Com os serviços que mantêm o site no ar: hospedagem e banco de dados. Não vendemos nem cedemos dados para publicidade.</p>
  <h2 class="h3">Cookies</h2>
  <p>Este site não usa cookies de publicidade nem de rastreamento.</p>
  <h2 class="h3">Seus direitos</h2>

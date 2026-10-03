@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Minerva · EJUP</title>
-<meta name="description" content="Minerva, a inteligência institucional da EJUP. Converse sobre a escola, sobre formação jurídica e sobre o Direito.">
+<meta name="description" content="Minerva, a assistente da EJUP. Tire dúvidas sobre a escola, as formações e os canais de contato.">
 <meta name="theme-color" content="#0d131a">
 <meta property="og:title" content="Minerva · EJUP">
-<meta property="og:description" content="A inteligência institucional da EJUP. Tecnologia a serviço do pensamento jurídico.">
+<meta property="og:description" content="A assistente da EJUP para dúvidas sobre a escola e as formações.">
 <meta property="og:image" content="/minerva/aberta.jpg">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/gotham-book.woff2" as="font" type="font/woff2" crossorigin>
@@ -161,6 +161,8 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
 .chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 24px 16px}
 .chip{border:1px solid var(--p28);border-radius:999px;padding:8px 14px;font-size:13px;line-height:1.3;color:var(--prata);text-align:left;transition:border-color .2s,color .2s}
 .chip:hover{border-color:var(--ouro);color:var(--branco)}
+.sugs{display:flex;flex-wrap:wrap;gap:8px;align-self:stretch}
+.sugs-t{width:100%;font-size:12px;color:var(--p72)}
 .form{display:flex;gap:8px;align-items:center;padding:16px 20px 8px 24px;border-top:1px solid var(--p16)}
 .field{flex:1;min-width:0;height:48px;padding:0 18px;border-radius:999px;border:1px solid var(--p28);background:rgba(13,19,26,.5);font-size:16px;font-weight:400;transition:border-color .2s}
 .field::placeholder{color:var(--p72);font-weight:300}
@@ -226,7 +228,7 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
     <div class="hero-t">
       <p class="eyebrow rise">EJUP · Inteligência institucional</p>
       <h1 id="t-hero" class="rise">Minerva</h1>
-      <p class="lead rise">A inteligência da EJUP para conversar sobre Direito, formação e o modo como pensamos a escola. Com calma, critério e precisão.</p>
+      <p class="lead rise">A assistente da EJUP para tirar dúvidas sobre a escola, as formações e o modo como pensamos o Direito. Com calma, critério e precisão.</p>
       <div class="acts rise">
         <button type="button" class="btn" id="open-chat" aria-controls="panel" aria-expanded="false">Falar com a Minerva
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
@@ -281,7 +283,7 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
   <div class="log" id="log" aria-live="polite"></div>
   <div class="chips" id="chips">
     <button type="button" class="chip">O que é a EJUP?</button>
-    <button type="button" class="chip">Como a EJUP pensa a formação jurídica?</button>
+    <button type="button" class="chip">Quais formações a EJUP oferece?</button>
     <button type="button" class="chip">Como falo com a equipe da EJUP?</button>
   </div>
   <form class="form" id="form" novalidate>
@@ -292,7 +294,7 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
     <button type="submit" class="send" id="send" aria-label="Enviar pergunta">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 2.5 7 9M13.5 2.5l-4.2 11L7 9 2.5 6.7z"/></svg></button>
   </form>
-  <p class="disc">A Minerva pode errar e não substitui a análise de um advogado.</p>
+  <p class="disc">A Minerva responde com o conteúdo cadastrado pela EJUP e não substitui a análise de um advogado.</p>
 </aside>
 
 <script>document.documentElement.classList.add('js')</script>
@@ -303,7 +305,7 @@ const MINERVA_CONFIG = {
   animations: { abertura: '/minerva/abertura.webp', fechamento: '/minerva/fechamento.webp', duration: 5040 },
   // sem conversa, a esfera abre e fecha sozinha; pausa (ms) em cada estado antes de trocar
   idle: { fechada: 3000, aberta: 3000 },
-  greeting: 'Sou a Minerva, a inteligência institucional da EJUP. Pergunte sobre a escola, sobre formação jurídica ou sobre um tema do Direito.',
+  greeting: 'Sou a Minerva, da EJUP. Pergunte sobre a escola, as formações, o EJUPcast ou como falar com a equipe.',
 };
 
 (() => {
@@ -452,6 +454,15 @@ const MINERVA_CONFIG = {
     return el;
   }
 
+  // quando a Minerva não tem a resposta, oferece as perguntas cadastradas mais próximas
+  function addSugestoes(list) {
+    const box = document.createElement('div');
+    box.className = 'sugs';
+    const t = document.createElement('p'); t.className = 'sugs-t'; t.textContent = 'Talvez você queira saber:'; box.appendChild(t);
+    list.forEach((q) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = q; b.addEventListener('click', () => { box.remove(); ask(q); }); box.appendChild(b); });
+    log.appendChild(box); log.scrollTop = log.scrollHeight;
+  }
+
   function reset() {
     history = [];
     log.textContent = '';
@@ -490,16 +501,19 @@ const MINERVA_CONFIG = {
     wait.className = 'msg a';
     wait.innerHTML = '<div class="typing" role="status"><span class="vh">A Minerva está escrevendo</span><i></i><i></i><i></i></div>';
     log.appendChild(wait); log.scrollTop = log.scrollHeight;
+    const t0 = performance.now();
     try {
       const r = await fetch(MINERVA_CONFIG.endpoint, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: history }),
       });
       const data = await r.json().catch(() => ({}));
+      await new Promise((ok) => setTimeout(ok, Math.max(0, 700 - (performance.now() - t0))));
       wait.remove();
       if (!r.ok || !data.reply) throw new Error(data.error || 'Não consegui responder agora. Tente de novo em instantes.');
       history.push({ role: 'assistant', content: data.reply });
       addMsg('a', data.reply);
+      if (Array.isArray(data.sugestoes) && data.sugestoes.length) addSugestoes(data.sugestoes);
       bloom();
     } catch (e) {
       wait.remove();

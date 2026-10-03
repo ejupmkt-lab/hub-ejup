@@ -1,63 +1,44 @@
-import Anthropic from '@anthropic-ai/sdk';
-import { MINERVA_PROMPT } from './_lib/prompt.js';
+import { buscar } from './_lib/busca.js';
+import RESPOSTAS_LOCAIS from './_lib/respostas.js';
 import { clientIp, rateLimit } from './_lib/ratelimit.js';
 
-const MODEL = 'claude-opus-5-5';
-const MAX_TURNS = 12;
-const MAX_CHARS = 1500;
+// A Minerva não usa IA: responde com o banco de perguntas e respostas da EJUP.
+// Fonte: tabela minerva_respostas no Supabase (SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY);
+// sem Supabase, ou se ele falhar, usa as respostas de api/_lib/respostas.js.
 
-const FALLBACK = {
-  refusal: 'Prefiro não seguir por esse caminho. Posso ajudar com outra pergunta sobre o Direito ou sobre a EJUP.',
-  error: 'Não consegui responder agora. Tente de novo em instantes.',
-};
-
-let client;
-const getClient = () => (client ??= new Anthropic());
-
-// Mantém só pares válidos (user/assistant alternados, começando e terminando em user).
-export function cleanMessages(input) {
-  if (!Array.isArray(input)) return null;
-  const msgs = input
-    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
-    .map((m) => ({ role: m.role, content: m.content.trim().slice(0, MAX_CHARS) }))
-    .filter((m) => m.content);
-  const out = [];
-  for (const m of msgs) {
-    if (out.length && out[out.length - 1].role === m.role) out[out.length - 1] = m;
-    else out.push(m);
-  }
-  while (out.length && out[0].role !== 'user') out.shift();
-  if (!out.length || out[out.length - 1].role !== 'user') return null;
-  let recent = out.slice(-MAX_TURNS);
-  if (recent[0].role !== 'user') recent = recent.slice(1);
-  return recent;
-}
-
-// Rede de segurança: o prompt já pede texto corrido; isto remove markdown que escape.
-export function plainText(text) {
-  return text
-    .replace(/```[\s\S]*?```/g, (m) => m.replace(/```\w*/g, ''))
-    .replace(/\*\*(.+?)\*\*|__(.+?)__/g, '$1$2')
-    .replace(/(^|[\s(])[*_]([^*_\n]+)[*_](?=[\s).,;:!?]|$)/g, '$1$2')
-    .replace(/^#{1,6}\s+/gm, '')
-    .replace(/^\s*[-*•]\s+/gm, '')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1 ($2)')
-    .replace(/`([^`]+)`/g, '$1')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-}
+const MAX_CHARS = 500;
+const CACHE_MS = 60_000;
+export const SEM_RESPOSTA =
+  'Ainda não tenho essa resposta cadastrada. Para essa dúvida, fale com a equipe da EJUP pelo WhatsApp 85 9 9271.4050 ou pelo e-mail contato@ejup.com.br.';
 
 function sameOrigin(req) {
   const origin = req.headers.origin;
   if (!origin) return true;
-  try {
-    return new URL(origin).host === req.headers.host;
-  } catch {
-    return false;
-  }
+  try { return new URL(origin).host === req.headers.host; } catch { return false; }
 }
 
-export function createHandler({ getModel = getClient } = {}) {
+export function createHandler({ fetchImpl = fetch, env = process.env, now = Date.now } = {}) {
+  let cache = { at: 0, items: null };
+
+  async function respostas() {
+    const url = env.SUPABASE_URL, key = env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return RESPOSTAS_LOCAIS;
+    if (cache.items && now() - cache.at < CACHE_MS) return cache.items;
+    try {
+      const r = await fetchImpl(`${url.replace(/\/$/, '')}/rest/v1/minerva_respostas?ativo=eq.true&select=id,pergunta,variacoes,palavras,resposta&order=ordem.asc`, {
+        headers: { apikey: key, Authorization: `Bearer ${key}` },
+      });
+      if (!r.ok) throw new Error(String(r.status));
+      const items = await r.json();
+      if (!Array.isArray(items) || !items.length) throw new Error('tabela vazia');
+      cache = { at: now(), items };
+      return items;
+    } catch (err) {
+      console.error('minerva: banco indisponível, usando respostas locais', err?.message);
+      return cache.items || RESPOSTAS_LOCAIS;
+    }
+  }
+
   return async function handler(req, res) {
     if (req.method !== 'POST') {
       res.setHeader('Allow', 'POST');
@@ -72,35 +53,16 @@ export function createHandler({ getModel = getClient } = {}) {
     }
 
     let body = req.body;
-    if (typeof body === 'string') {
-      try { body = JSON.parse(body); } catch { body = null; }
-    }
-    const messages = cleanMessages(body?.messages);
-    if (!messages) return res.status(400).json({ error: 'Envie a pergunta no campo messages.' });
+    if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = null; } }
+    // aceita { pergunta } ou o formato de conversa { messages: [...] } (usa a última pergunta)
+    const msgs = Array.isArray(body?.messages) ? body.messages : [];
+    const last = [...msgs].reverse().find((m) => m && m.role === 'user' && typeof m.content === 'string');
+    const pergunta = String(body?.pergunta ?? last?.content ?? '').trim().slice(0, MAX_CHARS);
+    if (!pergunta) return res.status(400).json({ error: 'Escreva uma pergunta.' });
 
-    try {
-      const response = await getModel().beta.messages.create({
-        model: MODEL,
-        max_tokens: 2048,
-        system: MINERVA_PROMPT,
-        output_config: { effort: 'low' },
-        betas: ['server-side-fallback-2026-07-01'],
-        fallbacks: 'default',
-        messages,
-      });
-      if (response.stop_reason === 'refusal') return res.status(200).json({ reply: FALLBACK.refusal });
-      const text = response.content
-        .filter((b) => b.type === 'text')
-        .map((b) => b.text)
-        .join('');
-      return res.status(200).json({ reply: plainText(text) || FALLBACK.error });
-    } catch (err) {
-      if (err instanceof Anthropic.RateLimitError) {
-        return res.status(503).json({ error: 'A Minerva está com muitas conversas agora. Tente de novo em instantes.' });
-      }
-      console.error('minerva', err?.status, err?.message);
-      return res.status(502).json({ error: FALLBACK.error });
-    }
+    const { item, sugestoes } = buscar(pergunta, await respostas());
+    if (item) return res.status(200).json({ reply: item.resposta, id: item.id });
+    return res.status(200).json({ reply: SEM_RESPOSTA, sugestoes });
   };
 }
 
