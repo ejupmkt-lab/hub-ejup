@@ -58,7 +58,13 @@ export function createHandler({ fetchImpl = fetch, env = process.env } = {}) {
         headers: { apikey: key, ...authHeader(key), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
         body: JSON.stringify(row),
       });
-      // 409: e-mail já inscrito na newsletter — para quem se inscreve, está feito.
+      // 409: e-mail já inscrito; se tinha saído da lista, volta a receber
+      if (r.status === 409 && row.tipo === 'newsletter') {
+        await fetchImpl(`${url.replace(/\/$/, '')}/rest/v1/leads?tipo=eq.newsletter&email=eq.${encodeURIComponent(row.email)}`, {
+          method: 'PATCH', headers: { apikey: key, ...authHeader(key), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+          body: JSON.stringify({ descadastrado_em: null }),
+        }).catch(() => {});
+      }
       if (r.ok || r.status === 409) return res.status(200).json({ ok: true });
       console.error('lead: supabase', r.status, await r.text().catch(() => ''));
       return res.status(502).json({ error: 'Não foi possível enviar agora.' });

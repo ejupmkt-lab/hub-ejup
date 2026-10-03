@@ -3,8 +3,8 @@
 import crypto from 'node:crypto';
 
 const clone = (x) => JSON.parse(JSON.stringify(x));
-const KEYS = { perfis: ['id'], cursos: ['id'], modulos: ['id'], aulas: ['id'], matriculas: ['id'], progresso: ['user_id', 'aula_id'], notas: ['user_id', 'aula_id'], duvidas: ['id'], mensagens: ['id'], plantoes: ['id'], mentorias: ['id'], minerva_log: ['id'], minerva_respostas: ['id'], leads: ['id'], site_itens: ['tipo', 'id'] };
-const SERIAL = new Set(['matriculas', 'duvidas', 'mensagens', 'plantoes', 'mentorias', 'minerva_log', 'leads']);
+const KEYS = { perfis: ['id'], cursos: ['id'], modulos: ['id'], aulas: ['id'], matriculas: ['id'], progresso: ['user_id', 'aula_id'], notas: ['user_id', 'aula_id'], duvidas: ['id'], mensagens: ['id'], plantoes: ['id'], mentorias: ['id'], minerva_log: ['id'], minerva_respostas: ['id'], leads: ['id'], site_itens: ['tipo', 'id'], newsletter_edicoes: ['id'] };
+const SERIAL = new Set(['matriculas', 'duvidas', 'mensagens', 'plantoes', 'mentorias', 'minerva_log', 'leads', 'newsletter_edicoes']);
 
 function splitTop(s) {
   const out = []; let depth = 0, cur = '', quote = false;
@@ -76,8 +76,11 @@ export function createFakeSupabase({ url = 'https://fake.supabase.co', now = () 
       minerva_log: { ajudou: null, revisado: false, criado_em: new Date(now()).toISOString() },
       minerva_respostas: { ativo: true, ordem: 0, curso_id: null, fonte_aula: null, fonte_segundo: null, origem: 'equipe', portal: false, variacoes: [], palavras: [] },
       progresso: { concluida: false, segundo: 0 },
+      leads: { token: crypto.randomUUID().replace(/-/g, ''), descadastrado_em: null, created_at: new Date(now()).toISOString() },
+      newsletter_edicoes: { enviada_em: new Date(now()).toISOString() },
     }[table] || {};
     const found = db[table].find((r) => keys.every((k) => String(r[k]) === String(row[k])));
+    if (table === 'leads' && row.tipo === 'newsletter' && db.leads.some((r) => r.tipo === 'newsletter' && r.email === row.email)) return { conflict: true };
     if (table === 'matriculas' && !upsert && db.matriculas.some((r) => r.email === row.email && r.curso_id === row.curso_id)) return { conflict: true };
     if (found) {
       if (!upsert) return { conflict: true };
@@ -252,5 +255,6 @@ export function seed(fake) {
   fake.insert('minerva_respostas', { id: 'lic-modalidades', pergunta: 'Quais são as modalidades de licenciamento?', variacoes: ['modalidades de licença', 'tipos de licenciamento'], palavras: ['modalidades', 'modalidade'], resposta: 'A nova lei organiza o licenciamento em modalidades conforme o porte e o potencial poluidor do empreendimento. A aula 3 do Módulo 02 percorre cada uma delas.', curso_id: 'licenciamento', fonte_aula: 'lic-m2-a3', fonte_segundo: 710, portal: true, ativo: true, ordem: 1 });
   fake.insert('minerva_log', { user_id: outro.id, curso_id: 'licenciamento', pergunta: 'qual o prazo de renovação da licença?', resposta_id: null, ajudou: false, criado_em: new Date(+now - 86400000).toISOString() });
   fake.insert('minerva_log', { user_id: aluno.id, curso_id: 'licenciamento', pergunta: 'prazo de renovação da licença', resposta_id: null, ajudou: false, criado_em: new Date(+now - 2 * 86400000).toISOString() });
+  ['leitora@exemplo.com', 'advogado@exemplo.com', 'aluno@ejup.com.br'].forEach((email, i) => fake.insert('leads', { tipo: 'newsletter', email, origem: i ? '/coluna' : '/', created_at: new Date(+now - i * 9 * 86400000).toISOString() }));
   return { aluno, prof, outro, equipe };
 }

@@ -20,7 +20,13 @@ if (process.env.FAKE_SB) {
   seed(fake);
   const { createPaginaHandler } = await import('../api/pagina.js');
   paginaHandler = createPaginaHandler({ fetchImpl: fake.fetchImpl, env: { SUPABASE_URL: fake.url, SUPABASE_SERVICE_ROLE_KEY: 'dev' } });
-  portalHandler = createPortalHandler({ fetchImpl: fake.fetchImpl, env: { SUPABASE_URL: fake.url, SUPABASE_SERVICE_ROLE_KEY: 'dev', PORTAL_GOOGLE: process.env.PORTAL_GOOGLE } });
+  // FAKE_MAIL=1: e-mails do Portal e da newsletter "enviados" só no terminal
+  const mail = process.env.FAKE_MAIL ? { RESEND_API_KEY: 're_dev', EMAIL_FROM: 'EJUP <portal@ejup.com.br>' } : {};
+  const fetchDev = async (u, init) => {
+    if (String(u).startsWith('https://api.resend.com')) { const b = JSON.parse(init.body); console.log('e-mail (simulado):', [].concat(b).map((m) => `${m.to} · ${m.subject}`).join(' | ')); return { ok: true, status: 200, text: async () => '{}' }; }
+    return fake.fetchImpl(u, init);
+  };
+  portalHandler = createPortalHandler({ fetchImpl: fetchDev, env: { SUPABASE_URL: fake.url, SUPABASE_SERVICE_ROLE_KEY: 'dev', PORTAL_GOOGLE: process.env.PORTAL_GOOGLE, ...mail } });
   console.log('Portal com dados de exemplo: aluno@ejup.com.br / senha-aluno-1 · professor@ejup.com.br / senha-prof-1');
 }
 

@@ -79,6 +79,15 @@ alter table public.leads enable row level security; -- sem políticas: só o ser
 create unique index leads_newsletter_email on public.leads (lower(email)) where tipo = 'newsletter';
 ```
 
+## Newsletter
+
+Inscrições do site (Home, Coluna, artigos) e do Portal (Perfil → Novidades da EJUP) ficam na tabela
+`leads` (tipo `newsletter`). Na **Área da Equipe → Newsletter**: números, lista, exportação em CSV e envio
+das edições (com "Enviar teste para mim" antes). Cada e-mail sai com o link `/descadastro/<código>` e com o
+descadastro em um clique do Gmail/Yahoo (`List-Unsubscribe`). Quem sai e se inscreve de novo volta para a
+lista. O envio usa o Resend (`RESEND_API_KEY`, `EMAIL_FROM`); o plano gratuito envia 100 e-mails por dia, e
+o site recusa listas acima de 3.000 inscritos: aí, exporte e use uma ferramenta de e-mail marketing.
+
 ## Portal do Aluno e Área do Professor
 
 ### Ligar
@@ -133,7 +142,7 @@ de 2 mentorias seguem a proposta do protótipo. Mudança de plano é pedida à e
 npm install
 npm test            # testes dos endpoints
 npm run dev         # http://localhost:3000 (a Minerva responde com o banco local)
-npm run dev:portal  # idem, com o Portal ligado a um Supabase em memória:
+npm run dev:portal  # idem, com o Portal ligado a um Supabase em memória (FAKE_MAIL=1 simula os e-mails):
                     # aluno@ejup.com.br / senha-aluno-1 · professor@ejup.com.br / senha-prof-1
                     # equipe@ejup.com.br / senha-equipe-1
 ```

@@ -279,3 +279,21 @@ begin
   on conflict (id) do nothing;
   return new;
 end $$;
+
+-- ---------- newsletter: descadastro por link e edições enviadas pela Área da Equipe ----------
+alter table public.leads add column if not exists token text default replace(gen_random_uuid()::text, '-', '');
+update public.leads set token = replace(gen_random_uuid()::text, '-', '') where token is null;
+create unique index if not exists leads_token on public.leads (token);
+alter table public.leads add column if not exists descadastrado_em timestamptz;
+create table if not exists public.newsletter_edicoes (
+  id bigserial primary key,
+  assunto text not null,
+  titulo text,
+  corpo text not null,
+  link text,
+  link_texto text,
+  enviados int not null default 0,
+  autor text,
+  enviada_em timestamptz not null default now()
+);
+alter table public.newsletter_edicoes enable row level security;

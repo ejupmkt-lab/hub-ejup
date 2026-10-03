@@ -23,9 +23,13 @@ test('grava a inscrição na newsletter no Supabase', async () => {
   assert.deepEqual(JSON.parse(seen.init.body), { tipo: 'newsletter', email: 'ana@exemplo.com' });
 });
 
-test('e-mail já inscrito conta como sucesso', async () => {
-  const h = createHandler({ env, fetchImpl: async () => ({ ok: false, status: 409, text: async () => '' }) });
+test('e-mail já inscrito conta como sucesso e volta para a lista se tinha saído', async () => {
+  const calls = [];
+  const h = createHandler({ env, fetchImpl: async (url, init) => { calls.push([init.method, url, init.body]); return calls.length === 1 ? { ok: false, status: 409, text: async () => '' } : { ok: true, status: 204 }; } });
   assert.equal((await call(h, { body: { tipo: 'newsletter', email: 'a@b.com' } })).statusCode, 200);
+  assert.equal(calls[1][0], 'PATCH');
+  assert.match(calls[1][1], /tipo=eq\.newsletter&email=eq\.a%40b\.com/);
+  assert.deepEqual(JSON.parse(calls[1][2]), { descadastrado_em: null });
 });
 
 test('sem Supabase configurado responde 503', async () => {

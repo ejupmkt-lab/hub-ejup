@@ -314,3 +314,43 @@ test('equipe: e-mails fixos viram equipe ao entrar; equipe adiciona e tira pesso
   const a = await logged('aluno@ejup.com.br', 'senha-aluno-1');
   assert.equal((await a.call('estado')).payload.equipe, false);
 });
+
+test('newsletter: equipe envia edição com descadastro individual; link e um clique tiram da lista', async () => {
+  for (const email of ['a@exemplo.com', 'b@exemplo.com', 'c@exemplo.com']) fake.insert('leads', { tipo: 'newsletter', email, origem: '/coluna' });
+  const e = await logged('equipe@ejup.com.br', 'senha-equipe-1');
+  const d = (await e.call('eq-newsletter')).payload;
+  assert.equal(d.inscritos.length, 6, '3 do seed + 3 deste teste');
+  assert.equal((await e.call('eq-news-enviar', { body: { assunto: 'x', corpo: 'curto' } })).statusCode, 400);
+  const t = await e.call('eq-news-enviar', { body: { assunto: 'Edição de outubro', corpo: 'Primeiro parágrafo da edição.\n\nSegundo.', teste: true } });
+  assert.equal(t.payload.para, 'equipe@ejup.com.br');
+  const batches = () => mails.filter((m) => Array.isArray(m));
+  const before = batches().length;
+  const r = await e.call('eq-news-enviar', { body: { assunto: 'Edição de outubro', titulo: 'O que lemos no mês', corpo: 'Primeiro parágrafo da edição.\n\nSegundo.', link: 'https://ejup.com.br/coluna' } });
+  assert.equal(r.payload.enviados, 6);
+  const lote = batches()[before];
+  assert.equal(lote.length, 6);
+  const tok = fake.db.leads.find((l) => l.email === 'b@exemplo.com').token;
+  const msg = lote.find((m) => m.to[0] === 'b@exemplo.com');
+  assert.match(msg.html, new RegExp(`/descadastro/${tok}`));
+  assert.match(msg.headers['List-Unsubscribe'], new RegExp(`news-sair&t=${tok}`));
+  assert.equal(fake.db.newsletter_edicoes.length, 1);
+  // um clique vindo do provedor de e-mail (outra origem)
+  const pub = browser();
+  const s = await pub.call('news-sair', { query: `&t=${tok}`, body: 'List-Unsubscribe=One-Click', headers: { origin: 'https://mail.google.com' } });
+  assert.equal(s.statusCode, 200);
+  assert.equal(s.payload.email, 'b•••@exemplo.com');
+  assert.ok(fake.db.leads.find((l) => l.email === 'b@exemplo.com').descadastrado_em);
+  const r2 = await e.call('eq-news-enviar', { body: { assunto: 'Edição 2', corpo: 'Outro texto da edição.' } });
+  assert.equal(r2.payload.enviados, 5, 'quem saiu não recebe');
+  assert.equal((await pub.call('news-voltar', { body: { token: tok } })).statusCode, 200);
+  assert.equal(fake.db.leads.find((l) => l.email === 'b@exemplo.com').descadastrado_em, null);
+  assert.equal((await pub.call('news-sair', { body: { token: 'nao-existe' } })).statusCode, 404);
+  const a = await logged('aluno@ejup.com.br', 'senha-aluno-1');
+  assert.equal((await a.call('eq-newsletter')).statusCode, 403);
+  // preferência do perfil
+  await a.call('prefs', { body: { news: true } });
+  await a.call('prefs', { body: { news: false } });
+  assert.ok(fake.db.leads.find((l) => l.email === 'aluno@ejup.com.br').descadastrado_em);
+  await a.call('prefs', { body: { news: true } });
+  assert.equal(fake.db.leads.find((l) => l.email === 'aluno@ejup.com.br').descadastrado_em, null);
+});

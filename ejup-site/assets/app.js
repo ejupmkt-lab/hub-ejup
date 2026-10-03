@@ -362,6 +362,13 @@ incompany:()=>`
 </div></section>
 ${footer()}`,
 
+descadastro:t=>{t=String(t||'').replace(/[^a-f0-9]/gi,'');return `
+<section class="sec light hero" data-hero><div class="wrap hero-c">${tag('Newsletter')}
+ <h1 class="d1 blur" data-r>Sair ${em('da lista.')}</h1>
+ <p class="lead" id="ds-p" data-r>Confirme para deixar de receber a newsletter da EJUP. Você pode voltar quando quiser.</p>
+ <div class="acts" id="ds-a" data-r>${t?btn('Confirmar descadastro','navy',{icon:false,attr:`data-ds="sair" data-t="${t}"`}):''}</div></div></section>
+${footer()}`},
+
 termos:()=>`
 <section class="sec light hero" data-hero><div class="wrap hero-c">${tag('Legal')}
  <h1 class="d1 blur" data-r>Termos ${em('de Uso.')}</h1>
@@ -404,7 +411,7 @@ privacidade:()=>`
  <h2 class="h3">Quem trata os dados</h2>
  <p>EJUP — Educação Jurídica, Rua da Saudade, 1028, Lagoa Nova, Natal/RN. Contato: <a href="mailto:contato@ejup.com.br">contato@ejup.com.br</a>.</p>
  <h2 class="h3">Que dados coletamos e para quê</h2>
- <p>Newsletter: o seu e-mail, para enviar a edição semanal da Coluna Jurídica. Proposta in company: nome, e-mail, organização, tamanho da equipe, tema e mensagem, para preparar e responder ao pedido. Coletamos apenas o que você digita nesses formulários, com o seu consentimento.</p>
+ <p>Newsletter: o seu e-mail, para enviar as edições da Coluna Jurídica; cada edição traz um link para sair da lista na hora, e quem sai não recebe mais nada. Proposta in company: nome, e-mail, organização, tamanho da equipe, tema e mensagem, para preparar e responder ao pedido. Coletamos apenas o que você digita nesses formulários, com o seu consentimento.</p>
  <h2 class="h3">Portal do Aluno e Área do Professor</h2>
  <p>Para quem tem conta: nome, e-mail, senha (guardada de forma cifrada pelo provedor de login), dados opcionais do perfil (telefone, área de atuação, inscrição na OAB, nome no certificado), as formações liberadas, o progresso nas aulas, as anotações, as dúvidas enviadas ao professor, os encontros de mentoria, as preferências de estudo e de e-mail e o registro do aceite dos Termos de Uso (versão e data). Usamos esses dados para dar acesso às formações, emitir certificados, encaminhar dúvidas ao professor da formação e enviar os avisos que você escolher. O professor da formação vê o nome, o e-mail, o plano e o progresso dos alunos da turma. No perfil, você baixa uma cópia dos seus dados ou exclui a conta.</p>
  <h2 class="h3">Minerva</h2>
@@ -481,7 +488,7 @@ const closeModal=()=>{if(!modal.classList.contains('on'))return;modal.classList.
 let cur=null,secs=[],hero=null,pars=[],prog=null,spies=[],io,cio,vio;
 /* aceita caminho (/formacao/licenciamento) e o formato antigo com # (#formacao.licenciamento) */
 const parse=h=>{h=(h||'').replace(/^[#/]+/,'').replace(/\/+$/,'');if(!h)return ['home',''];const i=h.search(/[./]/);return i<0?[h,'']:[h.slice(0,i),h.slice(i+1)]};
-const TITLES={home:'EJUP · Educação Jurídica',escola:'A escola',formacoes:'Formações',formacao:'Formação',professores:'Professores',ejupcast:'EJUPcast',coluna:'Coluna Jurídica',artigo:'Artigo',incompany:'In company',privacidade:'Política de Privacidade',termos:'Termos de Uso',entrar:'Entrar',criar:'Criar conta',recuperar:'Recuperar senha',portal:'Portal do Aluno',prof:'Área do Professor',equipe:'Área da Equipe',certificado:'Certificado'};
+const TITLES={home:'EJUP · Educação Jurídica',escola:'A escola',formacoes:'Formações',formacao:'Formação',professores:'Professores',ejupcast:'EJUPcast',coluna:'Coluna Jurídica',artigo:'Artigo',incompany:'In company',privacidade:'Política de Privacidade',termos:'Termos de Uso',descadastro:'Newsletter',entrar:'Entrar',criar:'Criar conta',recuperar:'Recuperar senha',portal:'Portal do Aluno',prof:'Área do Professor',equipe:'Área da Equipe',certificado:'Certificado'};
 const SCR={};
 /* Portal do Aluno, Área do Professor e login ficam em /assets/portal.js, carregado só quando alguém vai até lá */
 const PORTAL=['entrar','criar','recuperar','portal','prof','equipe','certificado'];
@@ -652,6 +659,11 @@ document.addEventListener('click',e=>{
  if((x=t.closest('[data-filter] .chip'))){const box=x.closest('[data-filter]');$$('.chip',box).forEach(c=>{c.classList.toggle('on',c===x);c.setAttribute('aria-pressed',c===x)});applyFilter(box);return}
  if((x=t.closest('[data-more]'))){const g=$('#grid-a');$$('[data-extra]',g).forEach(c=>{c.removeAttribute('data-extra');c.hidden=false});x.hidden=true;applyFilter($('[data-filter="a"]'));return}
  if((x=t.closest('.prof'))){setProf(x);return}
+ if((x=t.closest('[data-ds]'))){const sair=x.dataset.ds==='sair',tk=x.dataset.t,p=$('#ds-p'),a=$('#ds-a');x.disabled=true;
+  fetch(`/api/portal?r=news-${sair?'sair':'voltar'}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tk})}).then(r=>r.json().then(d=>({ok:r.ok,d})))
+   .then(({ok,d})=>{if(!ok)throw new Error(d.error);p.textContent=sair?`Pronto. ${d.email} não recebe mais a newsletter.`:`Pronto. ${d.email} volta a receber a newsletter.`;
+    a.innerHTML=sair?btn('Voltar a receber','lined',{icon:false,attr:`data-ds="voltar" data-t="${tk}"`}):btn('Ir para a Coluna Jurídica','navy',{go:'coluna'});links(a)})
+   .catch(err=>{x.disabled=false;p.textContent=err.message||'Não foi possível concluir agora. Escreva para contato@ejup.com.br.'});return}
 });
 /* conteúdo editado na Área da Equipe (tabela site_itens); sem banco ou sem itens, valem os textos acima */
 const escH=v=>typeof v==='string'?v.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]):Array.isArray(v)?v.map(escH):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,escH(x)])):v;

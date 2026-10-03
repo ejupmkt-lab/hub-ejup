@@ -858,7 +858,7 @@ document.addEventListener('click',async e=>{
  if((x=t.closest('[data-eye]'))){const i=document.getElementById(x.dataset.eye),s=i.type==='password';i.type=s?'text':'password';x.setAttribute('aria-label',s?'Ocultar senha':'Mostrar senha');return}
  if(t.closest('[data-print]')){print();return}
  if(!inPortal())return;
- if(t.closest('[data-reload]')){if(S.area==='equipe'){S.eq=null;PAGES.equipe.mount(S.earg);return}S.area==='prof'?(S.prof=null,PAGES.prof.mount(S.parg)):(S.me=null,PAGES.portal.mount(S.arg));return}
+ if(t.closest('[data-reload]')){if(S.area==='equipe'){S.eq=null;S.news=null;PAGES.equipe.mount(S.earg);return}S.area==='prof'?(S.prof=null,PAGES.prof.mount(S.parg)):(S.me=null,PAGES.portal.mount(S.arg));return}
  /* menus */
  const pm=$('#pmenu'),pa=$('#pavisos');
  if((x=t.closest('[data-pmenu]'))){pm.hidden=!pm.hidden;x.setAttribute('aria-expanded',!pm.hidden);if(pa)pa.hidden=true;return}
@@ -1186,5 +1186,49 @@ document.addEventListener('submit',async e=>{
  busy(b,true,'Salvando…');
  try{await api('eq-item',{body:{tipo,id,dados:itemDados(f,tipo),ordem:Number(f.elements.__ordem.value)||0,publicado:f.elements.__pub.checked}});S.eq=await api('equipe');eqRe();toast('Salvo. O site mostra a mudança em até 1 minuto.')}
  catch(err){busy(b,false);say(m,err.message,true)}
+});
+
+/* ----- Área da Equipe › Newsletter: inscritos, exportação e envio das edições ----- */
+ENAV.splice(3,0,['newsletter','Newsletter','mail']);ECR.newsletter='Newsletter';
+EV.newsletter=()=>{
+ if(!S.news){api('eq-newsletter').then(d=>{S.news=d;eqRe()},e=>{S.news={erro:e.message};eqRe()});return `<div class="okbox"><p class="sm">Carregando a newsletter…</p></div>`}
+ if(S.news.erro)return errBox(S.news.erro,true);
+ const N=S.news,ativos=N.inscritos.filter(i=>!i.descadastrado_em),sairam=N.inscritos.length-ativos.length,novos=ativos.filter(i=>Date.now()-new Date(i.created_at)<30*86400000).length;
+ return `${fhead(`Newsletter ${em('da Coluna.')}`,'Quem se inscreveu no site e no Portal, a exportação da lista e o envio das edições. Cada e-mail sai com o link de descadastro de quem recebe.')}
+ <div class="fstats t3">${fstat('Inscritos',ativos.length,'recebem as próximas edições')}${fstat('Novos em 30 dias',novos,'inscrições recentes')}${fstat('Saíram da lista',sairam,'pelo link do e-mail ou pelo perfil')}</div>
+ ${N.email?`<article class="card pc glow" data-r><h2 class="h4">Nova edição</h2>
+  <form id="nw-f" class="pgf" novalidate>
+   <label class="fl full"><span>Assunto do e-mail</span><input class="inp" name="assunto" value="${esc((S.nwDraft||{}).assunto||'')}" placeholder="Ex.: Coluna Jurídica · outubro"></label>
+   <label class="fl full"><span>Título dentro do e-mail (opcional)</span><input class="inp" name="titulo" value="${esc((S.nwDraft||{}).titulo||'')}"></label>
+   <label class="fl full"><span>Texto (parágrafos separados por uma linha em branco)</span><textarea class="inp tall" name="corpo">${esc((S.nwDraft||{}).corpo||'')}</textarea></label>
+   <label class="fl"><span>Link do botão (opcional, https://)</span><input class="inp" name="link" value="${esc((S.nwDraft||{}).link||'')}" placeholder="https://ejup.com.br/artigo/…"></label>
+   <label class="fl"><span>Texto do botão</span><input class="inp" name="link_texto" value="${esc((S.nwDraft||{}).link_texto||'Ler na Coluna Jurídica')}"></label>
+   <p class="msg full" aria-live="polite"></p>
+   <div class="acts full">${btn('Enviar teste para mim','glass',{icon:false,attr:'data-nw="teste"'})}${btn(`Enviar para ${plural(ativos.length,'inscrito','inscritos')}`,'gold',{icon:false,attr:'data-nw="todos"'})}</div></form>
+  <p class="sm">O teste chega só no seu e-mail. O envio para a lista não pode ser desfeito. Até ${N.limite} inscritos por envio; o plano gratuito do Resend envia 100 e-mails por dia.</p></article>`
+ :`<article class="card pc dash" data-r><h2 class="h4">Envio de edições ainda desligado</h2><p class="sm">Para enviar pela Área da Equipe, ligue os e-mails do site (RESEND_API_KEY e EMAIL_FROM na Vercel). Enquanto isso, exporte a lista e envie pela ferramenta que preferir, sempre com um link para sair da lista.</p></article>`}
+ <div class="prow c2">
+  <article class="card pc" style="gap:0" data-r><div class="pc-h wr" style="padding-bottom:12px"><h2 class="h4">Inscritos</h2>${btn('Exportar lista (CSV)','glass',{s:1,icon:false,attr:'data-nw-exp'})}</div>
+   ${N.inscritos.slice(0,150).map(i=>`<div class="fq"><span class="tx"><strong>${esc(i.email)}</strong><span class="sm">${dia(i.created_at)}${i.origem?' · '+esc(i.origem):''}</span></span>${i.descadastrado_em?tag('Saiu'):''}</div>`).join('')||'<p class="sm">Ninguém inscrito ainda.</p>'}
+   ${N.inscritos.length>150?`<p class="sm" style="padding-top:12px">Mostrando 150 de ${N.inscritos.length}. A lista completa vai na exportação.</p>`:''}</article>
+  <article class="card pc" style="gap:0" data-r><h2 class="h4" style="padding-bottom:12px">Edições enviadas</h2>
+   ${N.edicoes.map(e=>`<div class="fq"><span class="tx"><strong>${esc(e.assunto)}</strong><span class="sm">${dia(e.enviada_em)} · ${plural(e.enviados,'e-mail','e-mails')}${e.autor?' · '+esc(e.autor):''}</span></span></div>`).join('')||'<p class="sm">Nenhuma edição enviada pelo site ainda.</p>'}</article>
+ </div>`};
+document.addEventListener('click',async e=>{
+ const t=e.target;if(S.area!=='equipe'||!t.closest||!t.closest('#pmain'))return;let x;
+ if(t.closest('[data-nw-exp]')){const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;const at=S.news.inscritos.filter(i=>!i.descadastrado_em);
+  download(`newsletter-ejup-${new Date().toISOString().slice(0,10)}.csv`,'﻿'+[['E-mail','Inscrito em','Origem'].map(q).join(';'),...at.map(i=>[i.email,dia(i.created_at),i.origem].map(q).join(';'))].join('\n'),'text/csv;charset=utf-8');return}
+ if((x=t.closest('[data-nw]'))){const f=$('#nw-f'),m=$('.msg',f),teste=x.dataset.nw==='teste';
+  const body={assunto:f.elements.assunto.value.trim(),titulo:f.elements.titulo.value.trim(),corpo:f.elements.corpo.value.trim(),link:f.elements.link.value.trim(),link_texto:f.elements.link_texto.value.trim(),teste};
+  S.nwDraft=body;
+  if(body.assunto.length<3||body.corpo.length<10){say(m,'Preencha o assunto e o texto da edição.',true);return}
+  if(body.link&&!/^https:\/\//.test(body.link)){say(m,'O link precisa começar com https://',true);return}
+  const n=S.news.inscritos.filter(i=>!i.descadastrado_em).length;
+  if(!teste&&!confirm(`Enviar “${body.assunto}” para ${plural(n,'inscrito','inscritos')}? Não dá para desfazer.`))return;
+  busy(x,true,teste?'Enviando teste…':'Enviando…');
+  try{const r=await api('eq-news-enviar',{body});busy(x,false);
+   if(teste){say(m,`Teste enviado para ${r.para}. Confira a caixa de entrada.`);return}
+   S.nwDraft=null;S.news=null;eqRe();toast(`Edição enviada para ${plural(r.enviados,'inscrito','inscritos')}.`)}
+  catch(err){busy(x,false);say(m,err.message,true)}return}
 });
 })();

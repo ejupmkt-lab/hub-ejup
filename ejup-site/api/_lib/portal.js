@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { createSb, inList, SbError } from './sb.js';
-import { createMailer } from './email.js';
+import { createMailer, layout } from './email.js';
 import { buscar } from './busca.js';
 import RESPOSTAS_LOCAIS from './respostas.js';
 import { clientIp, rateLimit } from './ratelimit.js';
@@ -444,7 +444,11 @@ R.prefs = {
     }
     await ctx.sb.rest.update('perfis', `id=eq.${ctx.user.id}`, { prefs });
     if (b.news === true) {
-      await ctx.sb.rest.insert('leads', { tipo: 'newsletter', email: ctx.perfil.email, origem: 'portal' }, { returning: false }).catch(() => {});
+      await ctx.sb.rest.insert('leads', { tipo: 'newsletter', email: ctx.perfil.email, origem: 'portal' }, { returning: false })
+        .catch(() => ctx.sb.rest.update('leads', `tipo=eq.newsletter&email=eq.${enc(ctx.perfil.email)}`, { descadastrado_em: null }).catch(() => {}));
+    }
+    if (b.news === false) {
+      await ctx.sb.rest.update('leads', `tipo=eq.newsletter&email=eq.${enc(ctx.perfil.email)}&descadastrado_em=is.null`, { descadastrado_em: new Date(ctx.now()).toISOString() }).catch(() => {});
     }
     return { ok: true, prefs };
   },
@@ -977,6 +981,75 @@ R['eq-item'] = {
   },
 };
 
+/* ----- newsletter: sair da lista pelo link do e-mail (e em um clique no Gmail/Yahoo) e edições enviadas pela equipe ----- */
+const tokenOk = (t) => (/^[a-f0-9]{16,64}$/i.test(t || '') ? t : null);
+const mascara = (e) => String(e || '').replace(/^(.).*?(@.*)$/, '$1•••$2');
+R['news-sair'] = {
+  // o descadastro em um clique (RFC 8058) chega dos servidores do Gmail/Yahoo, de fora do site
+  method: 'POST', limit: 20, qualquerOrigem: true,
+  run: async (ctx, b) => {
+    const t = tokenOk(b.token || ctx.query.t);
+    if (!t) fail(404, 'Link inválido.');
+    const [l] = await ctx.sb.rest.update('leads', `token=eq.${t}&tipo=eq.newsletter`, { descadastrado_em: new Date(ctx.now()).toISOString() });
+    if (!l) fail(404, 'Link inválido ou inscrição já removida.');
+    return { ok: true, email: mascara(l.email) };
+  },
+};
+R['news-voltar'] = {
+  method: 'POST', limit: 20,
+  run: async (ctx, b) => {
+    const t = tokenOk(b.token);
+    if (!t) fail(404, 'Link inválido.');
+    const [l] = await ctx.sb.rest.update('leads', `token=eq.${t}&tipo=eq.newsletter`, { descadastrado_em: null });
+    if (!l) fail(404, 'Link inválido.');
+    return { ok: true, email: mascara(l.email) };
+  },
+};
+
+R['eq-newsletter'] = {
+  method: 'GET', auth: true,
+  run: async (ctx) => {
+    requireEquipe(ctx);
+    const [inscritos, edicoes] = await Promise.all([
+      ctx.sb.rest.get('leads', 'tipo=eq.newsletter&select=email,origem,created_at,descadastrado_em&order=created_at.desc&limit=20000'),
+      ctx.sb.rest.get('newsletter_edicoes', 'select=*&order=enviada_em.desc&limit=50').catch(() => []),
+    ]);
+    return { inscritos, edicoes, email: ctx.mail.enabled, limite: MAX_NEWS };
+  },
+};
+
+const MAX_NEWS = 3000;
+function edicao(ctx, b, token) {
+  const sair = `${ctx.origin}/descadastro/${token}`;
+  const linhas = String(b.corpo || '').split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean);
+  const html = layout({ selo: 'EJUP · Newsletter', titulo: b.titulo || b.assunto, linhas, botao: b.link ? (b.link_texto || 'Ler na Coluna Jurídica') : null, link: b.link || null,
+    rodape: `Você recebe esta newsletter porque se inscreveu no site da EJUP. <a href="${sair}" style="color:#9b6b26">Sair da lista</a>.` });
+  const text = [b.titulo || b.assunto, ...linhas, b.link || '', `Sair da lista: ${sair}`].filter(Boolean).join('\n\n');
+  return { html, text, headers: { 'List-Unsubscribe': `<${ctx.origin}/api/portal?r=news-sair&t=${token}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' } };
+}
+R['eq-news-enviar'] = {
+  method: 'POST', auth: true, limit: 5,
+  run: async (ctx, b) => {
+    requireEquipe(ctx);
+    if (!ctx.mail.enabled) fail(503, 'O envio de e-mails ainda não foi ligado (RESEND_API_KEY e EMAIL_FROM na Vercel). Exporte a lista para enviar por outra ferramenta.');
+    const ed = { assunto: str(b.assunto, 150), titulo: str(b.titulo, 200), corpo: str(b.corpo, 20000), link: link(b.link), link_texto: str(b.link_texto, 60) };
+    if (ed.assunto.length < 3 || ed.corpo.length < 10) fail(400, 'Preencha o assunto e o texto da edição.');
+    if (b.link && !ed.link) fail(400, 'O link precisa começar com https://');
+    if (b.teste) {
+      const m = edicao(ctx, ed, '0000000000000000teste');
+      await ctx.mail.sendBatch([{ to: ctx.perfil.email, subject: `[Teste] ${ed.assunto}`, ...m }]);
+      return { ok: true, teste: true, para: ctx.perfil.email };
+    }
+    const lista = await ctx.sb.rest.get('leads', 'tipo=eq.newsletter&descadastrado_em=is.null&select=email,token&limit=' + (MAX_NEWS + 1));
+    if (!lista.length) fail(400, 'Ninguém inscrito na newsletter ainda.');
+    if (lista.length > MAX_NEWS) fail(400, `A lista passou de ${MAX_NEWS} inscritos: exporte e envie por uma ferramenta de e-mail marketing.`);
+    const enviados = await ctx.mail.sendBatch(lista.filter((l) => l.token).map((l) => ({ to: l.email, subject: ed.assunto, ...edicao(ctx, ed, l.token) })));
+    const [reg] = await ctx.sb.rest.insert('newsletter_edicoes', { ...ed, enviados, autor: ctx.perfil.email }).catch(() => [null]);
+    if (!enviados) fail(502, 'O serviço de e-mail recusou o envio. Confira o domínio verificado e o limite diário do Resend.');
+    return { ok: true, enviados, total: lista.length, edicao: reg };
+  },
+};
+
 /* ----- tarefa diária (Vercel Cron): lembretes de estudo e resumo para professores ----- */
 R.cron = {
   method: 'GET', cron: true,
@@ -1030,7 +1103,7 @@ export function createPortalHandler({ fetchImpl = fetch, env = process.env, now 
     res.setHeader('Cache-Control', 'no-store');
     if (!route) return res.status(404).json({ error: 'Rota não encontrada.' });
     if (req.method !== route.method) { res.setHeader('Allow', route.method); return res.status(405).json({ error: 'Método não permitido.' }); }
-    if (req.method !== 'GET' && !sameOrigin(req)) return res.status(403).json({ error: 'Origem não permitida.' });
+    if (req.method !== 'GET' && !route.qualquerOrigem && !sameOrigin(req)) return res.status(403).json({ error: 'Origem não permitida.' });
     const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost';
     const proto = req.headers['x-forwarded-proto'] || (/^localhost|^127\./.test(host) ? 'http' : 'https');
     const ctx = {
