@@ -108,6 +108,9 @@ em.s{font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.12em
 @keyframes float{50%{transform:translateY(calc(var(--float)*-1))}}
 @keyframes pulse{50%{opacity:var(--pulse-max)}}
 @keyframes think{0%,100%{opacity:var(--pulse-min)}50%{opacity:var(--think-max)}}
+/* em conversa, aberta: movimento leve de balanço e respiração */
+.mnv.talk[data-state="open"] .mnv-f>.va,.mnv.talk[data-state="open"] .mnv-f>img.on{animation:sway 9s ease-in-out infinite}
+@keyframes sway{0%,100%{rotate:-2deg;scale:1}50%{rotate:2deg;scale:1.03}}
 @keyframes bloom{0%{opacity:0;transform:scale(.75)}30%{opacity:.32}100%{opacity:0;transform:scale(1.3)}}
 
 /* conversa aberta: a Minerva ocupa o espaço livre ao lado do painel */
@@ -298,6 +301,8 @@ const MINERVA_CONFIG = {
   endpoint: '/api/minerva',
   // movimento da esfera: imagens animadas que tocam uma vez (abrir e fechar), 5 s cada
   animations: { abertura: '/minerva/abertura.webp', fechamento: '/minerva/fechamento.webp', duration: 5040 },
+  // sem conversa, a esfera abre e fecha sozinha; pausa (ms) em cada estado antes de trocar
+  idle: { fechada: 3000, aberta: 3000 },
   greeting: 'Sou a Minerva, a inteligência institucional da EJUP. Pergunte sobre a escola, sobre formação jurídica ou sobre um tema do Direito.',
 };
 
@@ -314,7 +319,9 @@ const MINERVA_CONFIG = {
   const A = MINERVA_CONFIG.animations;
   const failed = { va: RM, vf: RM };
   const blobs = {};
-  let state = 'rest', want = false, awake = false, timer = 0;
+  const IDLE = Object.assign({ fechada: 3000, aberta: 3000 }, MINERVA_CONFIG.idle);
+  let state = 'rest', awake = false, timer = 0;
+  let talking = false, idleWant = false, idleTimer = 0;
 
   const show = () => { m.dataset.state = state === 'rest' && awake ? 'awake' : state; };
   const setState = (s) => { state = s; clearTimeout(timer); show(); };
@@ -348,10 +355,20 @@ const MINERVA_CONFIG = {
   }
   if (!RM) load('abertura');
 
+  // Sem conversa: abre e fecha sozinha, em ciclo. Em conversa: fica aberta.
   function step() {
+    const want = talking || idleWant;
     if (state === 'rest' && want) startOpen();
     else if (state === 'open' && !want) startClose();
+    else scheduleIdle();
   }
+  function scheduleIdle() {
+    clearTimeout(idleTimer);
+    if (talking || RM || (state !== 'rest' && state !== 'open')) return;
+    if (document.hidden) return; // retoma quando a aba voltar a ficar visível
+    idleTimer = setTimeout(() => { idleWant = state === 'rest'; step(); }, state === 'rest' ? IDLE.fechada : IDLE.aberta);
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) scheduleIdle(); });
 
   function opened() {
     if (state !== 'opening') return;
@@ -396,9 +413,11 @@ const MINERVA_CONFIG = {
     }).catch(() => { failed.vf = true; slow(true); m.classList.remove('va', 'vf', 'on'); timer = setTimeout(rested, 1200); });
   }
 
-  const openMinerva = () => { want = true; step(); };
-  const closeMinerva = () => { want = false; step(); };
+  const openMinerva = () => { talking = true; m.classList.add('talk'); clearTimeout(idleTimer); step(); };
+  const closeMinerva = () => { talking = false; idleWant = false; m.classList.remove('talk'); step(); };
   const setAwake = (v) => { awake = v; show(); };
+  // começa o ciclo de abrir e fechar assim que a página carrega
+  setTimeout(step, 1200);
   const bloom = () => { m.classList.remove('bloom'); void m.offsetWidth; m.classList.add('bloom'); };
   $('.mnv-b').addEventListener('animationend', () => m.classList.remove('bloom'));
 
