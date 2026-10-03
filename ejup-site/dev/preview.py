@@ -54,6 +54,10 @@ m = R('minerva/index.html')
 m = inline_fonts(m)
 m = re.sub(r'<link rel="preload" href="/fonts/[^>]+>\n', '', m)
 m = must(m, '<link rel="icon" href="/favicon.svg" type="image/svg+xml">\n', '')
+# na prévia os vídeos da Minerva vão embutidos, para tocarem mesmo onde arquivos de mídia separados são bloqueados
+for v in ['abertura', 'fechamento']:
+    data = base64.b64encode(open(os.path.join(here, 'minerva', v + '.mp4'), 'rb').read()).decode()
+    m = must(m, f"'/minerva/{v}.mp4'", f"'data:video/mp4;base64,{data}'")
 m = m.replace('"/minerva/', '"minerva/').replace("'/minerva/", "'minerva/")
 m = must(m, '<a class="logo" href="/"', '<a class="logo" href="index.html"')
 m = must(m, '<a class="mail" href="/">', '<a class="mail" href="index.html">')

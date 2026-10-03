@@ -297,7 +297,7 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
 const MINERVA_CONFIG = {
   endpoint: '/api/minerva',
   videos: { abertura: '/minerva/abertura.mp4', fechamento: '/minerva/fechamento.mp4' },
-  speed: { abertura: 1.15, fechamento: 1.4 },   // velocidade de cada vídeo (1 = original, 5 s)
+  speed: { abertura: 1, fechamento: 1 },   // velocidade de cada vídeo (1 = movimento original, 5 s)
   greeting: 'Sou a Minerva, a inteligência institucional da EJUP. Pergunte sobre a escola, sobre formação jurídica ou sobre um tema do Direito.',
 };
 
@@ -311,7 +311,7 @@ const MINERVA_CONFIG = {
               → closing (fechamento.mp4) → rest. Pedidos que chegam no meio de uma
               animação entram na fila e são atendidos quando ela termina, sem saltos. */
   const m = $('#mnv'), va = $('.va'), vf = $('.vf');
-  const SPEED = Object.assign({ abertura: 1.15, fechamento: 1.4 }, MINERVA_CONFIG.speed);
+  const SPEED = Object.assign({ abertura: 1, fechamento: 1 }, MINERVA_CONFIG.speed);
   const failed = { va: RM, vf: RM };
   let state = 'rest', want = false, awake = false, guard = 0;
 
