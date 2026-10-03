@@ -237,6 +237,8 @@ export function seed(fake) {
   const aluno = fake.addUser('aluno@ejup.com.br', 'senha-aluno-1', { nome: 'Ana Lima' });
   const prof = fake.addUser('professor@ejup.com.br', 'senha-prof-1', { nome: 'Leonardo Pivotto' });
   const outro = fake.addUser('bruno@ejup.com.br', 'senha-bruno-1', { nome: 'Bruno Costa' });
+  const equipe = fake.addUser('equipe@ejup.com.br', 'senha-equipe-1', { nome: 'Equipe EJUP' });
+  fake.db.perfis.find((p) => p.id === equipe.id).papel = 'equipe';
   fake.db.perfis.find((p) => p.id === prof.id).prefs = { disp: [{ dia: 0, ini: '18:00', fim: '19:00', on: true }, { dia: 2, ini: '18:00', fim: '19:00', on: true }, { dia: 4, ini: '12:00', fim: '13:00', on: true }], n1: true, n3: true, n4: true };
   fake.insert('matriculas', { email: 'aluno@ejup.com.br', curso_id: 'licenciamento', plano: 'mentoria' });
   fake.insert('matriculas', { email: 'aluno@ejup.com.br', curso_id: 'pareceres', plano: 'essencial' });
@@ -250,5 +252,5 @@ export function seed(fake) {
   fake.insert('minerva_respostas', { id: 'lic-modalidades', pergunta: 'Quais são as modalidades de licenciamento?', variacoes: ['modalidades de licença', 'tipos de licenciamento'], palavras: ['modalidades', 'modalidade'], resposta: 'A nova lei organiza o licenciamento em modalidades conforme o porte e o potencial poluidor do empreendimento. A aula 3 do Módulo 02 percorre cada uma delas.', curso_id: 'licenciamento', fonte_aula: 'lic-m2-a3', fonte_segundo: 710, portal: true, ativo: true, ordem: 1 });
   fake.insert('minerva_log', { user_id: outro.id, curso_id: 'licenciamento', pergunta: 'qual o prazo de renovação da licença?', resposta_id: null, ajudou: false, criado_em: new Date(+now - 86400000).toISOString() });
   fake.insert('minerva_log', { user_id: aluno.id, curso_id: 'licenciamento', pergunta: 'prazo de renovação da licença', resposta_id: null, ajudou: false, criado_em: new Date(+now - 2 * 86400000).toISOString() });
-  return { aluno, prof, outro };
+  return { aluno, prof, outro, equipe };
 }

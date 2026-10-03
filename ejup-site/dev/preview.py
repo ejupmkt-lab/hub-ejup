@@ -68,7 +68,7 @@ window.__portalApi=async(u,o)=>{const url=new URL(u,location.href);
  return new Response(JSON.stringify(res.payload),{status:res.statusCode,headers:{'Content-Type':'application/json'}})};
 })();
 </script>'''
-BADGE = '<div style="position:fixed;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:90;padding:6px 12px;border-radius:999px;background:rgba(8,12,17,.82);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.82);font:500 11px/1.4 Gotham,Montserrat,system-ui,sans-serif;letter-spacing:.06em;pointer-events:none">Prévia · Portal com dados de exemplo: aluno@ejup.com.br / senha-aluno-1 · professor@ejup.com.br / senha-prof-1</div>'
+BADGE = '<div style="position:fixed;left:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:90;padding:6px 12px;border-radius:999px;background:rgba(8,12,17,.82);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.82);font:500 11px/1.4 Gotham,Montserrat,system-ui,sans-serif;letter-spacing:.06em;pointer-events:none">Prévia · Portal com dados de exemplo: aluno@ejup.com.br / senha-aluno-1 · professor@ejup.com.br / senha-prof-1 · equipe@ejup.com.br / senha-equipe-1</div>'
 
 # ---------- site ----------
 js = R('assets/app.js')
@@ -92,7 +92,7 @@ pj = pj.replace(",'/portal',{", ",'#portal',{").replace(",'/',{", ",'#home',{").
 pj = pj.replace("`/certificado/${m.certificado}?pdf=1`", "`#certificado/${m.certificado}`").replace("`${location.origin}/certificado/${m.certificado}`", "`${location.href.split('#')[0]}#certificado/${m.certificado}`")
 pj = must(pj, "history.replaceState(null,'','/entrar')", "history.replaceState(null,'','#entrar')")
 pj = must(pj, "sessionStorage.setItem(VOLTA,location.pathname)", "sessionStorage.setItem(VOLTA,location.hash)")
-pj = must(pj, "go(v&&/^\\/(portal|prof)/.test(v)?v:def)", "go(v&&/^[#/](portal|prof)/.test(v)?v:def)")
+pj = must(pj, "go(v&&/^\\/(portal|prof|equipe)/.test(v)?v:def)", "go(v&&/^[#/](portal|prof|equipe)/.test(v)?v:def)")
 pj = must(pj, "history.replaceState(null,'',m==='criar'?'/criar':pf?'/entrar/professor':'/entrar')", "history.replaceState(null,'',m==='criar'?'#criar':pf?'#entrar.professor':'#entrar')")
 pj = must(pj, "try{history.replaceState(null,'',location.pathname)}catch(e){}", "")
 pj = pj.replace("abtn('Ir para o portal','gold','/portal'", "abtn('Ir para o portal','gold','#portal'").replace("abtn('Ir para o Portal do Aluno','gold','/portal'", "abtn('Ir para o Portal do Aluno','gold','#portal'")

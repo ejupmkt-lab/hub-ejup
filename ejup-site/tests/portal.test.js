@@ -228,3 +228,35 @@ test('vídeo: YouTube, Vimeo, Panda, arquivo e Storage', () => {
   assert.deepEqual(parseVideo('licenciamento/m1a1.mp4'), { tipo: 'storage', path: 'licenciamento/m1a1.mp4' });
   assert.equal(parseVideo(''), null);
 });
+
+test('equipe: libera alunos em lote, edita formação, aula e banco da Minerva', async () => {
+  const a = await logged('aluno@ejup.com.br', 'senha-aluno-1');
+  assert.equal((await a.call('equipe')).statusCode, 403);
+  assert.equal((await a.call('eq-matricula', { body: { email: 'x@y.com', curso: 'licenciamento' } })).statusCode, 403);
+  const e = await logged('equipe@ejup.com.br', 'senha-equipe-1');
+  const d = (await e.call('equipe')).payload;
+  assert.equal(d.cursos.length, 2);
+  assert.ok(d.matriculas.some((m) => m.email === 'aluno@ejup.com.br' && m.nome === 'Ana Lima'));
+  const r = await e.call('eq-matricula', { body: { email: 'Nova@Exemplo.com\nbruno@ejup.com.br', curso: 'pareceres', plano: 'acompanhado' } });
+  assert.equal(r.statusCode, 200);
+  assert.equal(r.payload.matriculas.length, 2);
+  assert.ok(fake.db.matriculas.some((m) => m.email === 'nova@exemplo.com' && m.plano === 'acompanhado'));
+  assert.equal((await e.call('eq-matricula', { body: { email: 'não é email', curso: 'pareceres' } })).statusCode, 400);
+  const id = fake.db.matriculas.find((m) => m.email === 'nova@exemplo.com').id;
+  assert.equal((await e.call('eq-matricula', { body: { id, ativa: false } })).payload.matricula.ativa, false);
+  const c = (await e.call('eq-curso', { body: { id: 'Power Skills', titulo: 'Negociação para juristas', horas: 6, professor_emails: 'prof2@ejup.com.br' } })).payload.curso;
+  assert.equal(c.id, 'power-skills');
+  const m = (await e.call('eq-modulo', { body: { curso: 'power-skills', titulo: 'Fundamentos', ordem: 1 } })).payload.modulo;
+  const au = await e.call('eq-aula', { body: { modulo: m.id, titulo: 'Abertura', duracao_min: 30, video: 'https://youtu.be/abc', topicos: 'Um\nDois', materiais: [{ nome: 'Ruim', url: 'javascript:alert(1)' }, { nome: 'Bom', url: 'https://x.com/a.pdf' }] } });
+  assert.deepEqual(au.payload.aula.topicos, ['Um', 'Dois']);
+  assert.deepEqual(au.payload.aula.materiais.map((x) => x.nome), ['Bom']);
+  assert.equal((await e.call('eq-aula', { body: { modulo: m.id, titulo: 'X', video: 'javascript:alert(1)' } })).statusCode, 400);
+  assert.equal((await e.call('eq-modulo', { body: { id: m.id, remover: true } })).statusCode, 409);
+  const resp = (await e.call('eq-resposta', { body: { pergunta: 'Tem desconto para grupos?', resposta: 'Sim, fale com a equipe.', variacoes: 'desconto\npreço para grupo', curso_id: 'power-skills', portal: true } })).payload.resposta;
+  assert.equal(resp.origem, 'equipe');
+  assert.deepEqual(resp.variacoes, ['desconto', 'preço para grupo']);
+  // plantão não aceita link javascript:
+  const p = await logged('professor@ejup.com.br', 'senha-prof-1');
+  const pl = (await p.call('plantao', { body: { curso: 'licenciamento', inicio: new Date(Date.now() + 86400000).toISOString(), link: 'javascript:alert(1)' } })).payload.plantao;
+  assert.equal(pl.link, null);
+});

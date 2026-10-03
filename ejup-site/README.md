@@ -89,7 +89,13 @@ create unique index leads_newsletter_email on public.leads (lower(email)) where 
 4. Opcional: `RESEND_API_KEY` e `EMAIL_FROM` na Vercel para os avisos do Portal, e `CRON_SECRET`
    para os lembretes diários.
 
-### Operar pelo Table Editor do Supabase
+### Área da Equipe (`/equipe`)
+Libera alunos (vários e-mails de uma vez), troca plano, suspende acesso, cria e edita formações, módulos,
+aulas (vídeo, materiais, tópicos) e as respostas da Minerva, sem abrir o Supabase. Para ganhar acesso:
+crie a sua conta no site e, uma única vez, no Supabase **Table Editor → `perfis`**, mude o seu `papel` para
+`equipe`. Quem é equipe também vê a Área do Professor de todas as formações.
+
+### Operar pelo Table Editor do Supabase (alternativa)
 - **Liberar um aluno:** em `matriculas`, nova linha com `email` (o da inscrição), `curso_id`
   (`licenciamento`, `pareceres`…) e `plano` (`essencial`, `acompanhado` ou `mentoria`). Pode ser antes de
   o aluno criar a conta. `ativa = false` suspende o acesso.
@@ -117,4 +123,5 @@ npm test            # testes dos endpoints
 npm run dev         # http://localhost:3000 (a Minerva responde com o banco local)
 npm run dev:portal  # idem, com o Portal ligado a um Supabase em memória:
                     # aluno@ejup.com.br / senha-aluno-1 · professor@ejup.com.br / senha-prof-1
+                    # equipe@ejup.com.br / senha-equipe-1
 ```

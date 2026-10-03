@@ -14,6 +14,8 @@ const nivel = (p) => Math.max(0, PLANOS.indexOf(p));
 const okMail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
 const str = (v, max = 200) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 const enc = encodeURIComponent;
+// só http(s): link de sala, gravação e material nunca viram javascript: na tela do aluno
+const link = (v) => { const x = str(v, 500); return /^https?:\/\/[^\s"'<>]+$/i.test(x) ? x : null; };
 const DAY = 86400000;
 
 export class HttpError extends Error {
@@ -206,7 +208,7 @@ R.entrar = {
     setSession(ctx, t);
     ctx.user = t.user; ctx.token = t.access_token;
     const p = await requireUser(ctx);
-    return { ok: true, professor: p.papel !== 'aluno' || (await cursosDoProfessor(ctx)).length > 0 };
+    return { ok: true, equipe: p.papel === 'equipe', professor: p.papel !== 'aluno' || (await cursosDoProfessor(ctx)).length > 0 };
   },
 };
 
@@ -359,7 +361,7 @@ R.aula = {
     }
     const materiais = await Promise.all((aula.materiais || []).map(async (m) => {
       const url = String(m.url || '');
-      const final = /^https?:\/\//i.test(url) ? url : url ? await ctx.sb.signed('materiais', url).catch(() => null) : null;
+      const final = /^https?:\/\//i.test(url) ? link(url) : url ? await ctx.sb.signed('materiais', url).catch(() => null) : null;
       return { nome: m.nome || 'Material', tipo: m.tipo || '', url: final };
     }));
     return { id: aula.id, video, materiais: materiais.filter((m) => m.url) };
@@ -670,8 +672,8 @@ R.plantao = {
       if (b.remover) { await ctx.sb.rest.remove('plantoes', `id=eq.${pl.id}`); return { ok: true, removido: pl.id }; }
       const patch = {};
       if (b.inicio) { const d = new Date(b.inicio); if (Number.isNaN(+d)) fail(400, 'Data inválida.'); patch.inicio = d.toISOString(); }
-      if ('link' in b) patch.link = str(b.link, 500) || null;
-      if ('gravacao' in b) patch.gravacao = str(b.gravacao, 500) || null;
+      if ('link' in b) patch.link = link(b.link);
+      if ('gravacao' in b) patch.gravacao = link(b.gravacao);
       if (Number.isInteger(b.duracao_min)) patch.duracao_min = Math.min(240, Math.max(15, b.duracao_min));
       const [x] = await ctx.sb.rest.update('plantoes', `id=eq.${pl.id}`, patch);
       return { ok: true, plantao: x };
@@ -680,7 +682,7 @@ R.plantao = {
     await requireProf(ctx, cursoId);
     const d = new Date(b.inicio);
     if (Number.isNaN(+d)) fail(400, 'Escolha data e hora do plantão.');
-    const [x] = await ctx.sb.rest.insert('plantoes', { curso_id: cursoId, inicio: d.toISOString(), duracao_min: Number.isInteger(b.duracao_min) ? b.duracao_min : 60, link: str(b.link, 500) || null });
+    const [x] = await ctx.sb.rest.insert('plantoes', { curso_id: cursoId, inicio: d.toISOString(), duracao_min: Number.isInteger(b.duracao_min) ? b.duracao_min : 60, link: link(b.link) });
     return { ok: true, plantao: x };
   },
 };
@@ -712,14 +714,14 @@ R['mentoria-prof'] = {
     if (!m) fail(404, 'Mentoria não encontrada.');
     await requireProf(ctx, m.curso_id);
     const patch = {};
-    if (b.acao === 'confirmar') { patch.status = 'confirmado'; if ('link' in b) patch.link = str(b.link, 500) || null; }
+    if (b.acao === 'confirmar') { patch.status = 'confirmado'; if ('link' in b) patch.link = link(b.link); }
     else if (b.acao === 'propor') {
       const d = new Date(b.inicio);
       if (Number.isNaN(+d) || +d < ctx.now()) fail(400, 'Escolha um horário futuro.');
       Object.assign(patch, { status: 'proposto', inicio: d.toISOString() });
     } else if (b.acao === 'cancelar') patch.status = 'cancelado';
     else if (b.acao === 'realizado') patch.status = 'realizado';
-    else if (b.acao === 'link') patch.link = str(b.link, 500) || null;
+    else if (b.acao === 'link') patch.link = link(b.link);
     else fail(400, 'Ação não permitida.');
     const [x] = await ctx.sb.rest.update('mentorias', `id=eq.${m.id}`, patch);
     if (patch.status && patch.status !== 'realizado') {
@@ -764,6 +766,137 @@ R['minerva-rev'] = {
     }
     await ctx.sb.rest.update('minerva_log', `id=${inList(logs)}&curso_id=eq.${enc(cursoId)}`, { revisado: true });
     return { ok: true };
+  },
+};
+
+/* ----- equipe EJUP: liberar alunos, editar formações e aulas, banco da Minerva (perfis.papel = equipe) ----- */
+function requireEquipe(ctx) {
+  if (ctx.perfil.papel !== 'equipe') fail(403, 'Só a equipe da EJUP acessa esta área.');
+}
+const slug = (v) => str(v, 60).toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const lista = (v, max = 30) => (Array.isArray(v) ? v : String(v || '').split(/\n|;/)).map((x) => str(x, 300)).filter(Boolean).slice(0, max);
+
+R.equipe = {
+  method: 'GET', auth: true,
+  run: async (ctx) => {
+    requireEquipe(ctx);
+    const [cursos, modulos, aulas, matriculas, respostas] = await Promise.all([
+      ctx.sb.rest.get('cursos', 'select=*&order=ordem.asc'),
+      ctx.sb.rest.get('modulos', 'select=*&order=ordem.asc'),
+      ctx.sb.rest.get('aulas', 'select=*&order=ordem.asc'),
+      ctx.sb.rest.get('matriculas', 'select=*&order=criado_em.desc&limit=3000'),
+      ctx.sb.rest.get('minerva_respostas', 'select=*&order=ordem.asc'),
+    ]);
+    const emails = [...new Set(matriculas.map((m) => m.email))];
+    const perfis = emails.length ? await ctx.sb.rest.get('perfis', `email=${inList(emails)}&select=email,nome`) : [];
+    return {
+      perfil: publicPerfil(ctx.perfil), cursos, modulos, aulas, respostas,
+      matriculas: matriculas.map((m) => ({ ...m, nome: perfis.find((p) => p.email === m.email)?.nome || null, conta: perfis.some((p) => p.email === m.email) })),
+    };
+  },
+};
+
+R['eq-matricula'] = {
+  method: 'POST', auth: true, limit: 120,
+  run: async (ctx, b) => {
+    requireEquipe(ctx);
+    if (b.id) {
+      const id = Number(b.id) || 0;
+      if (b.remover) { await ctx.sb.rest.remove('matriculas', `id=eq.${id}`); return { ok: true, removido: id }; }
+      const patch = {};
+      if (PLANOS.includes(b.plano)) patch.plano = b.plano;
+      if (typeof b.ativa === 'boolean') patch.ativa = b.ativa;
+      const [m] = await ctx.sb.rest.update('matriculas', `id=eq.${id}`, patch);
+      if (!m) fail(404, 'Matrícula não encontrada.');
+      return { ok: true, matricula: m };
+    }
+    const emails = lista(b.email, 200).map((e) => e.toLowerCase());
+    if (!emails.length || !emails.every(okMail)) fail(400, 'Confira os e-mails: um por linha, no formato voce@exemplo.com.');
+    const cursoId = str(b.curso, 60);
+    const [c] = await ctx.sb.rest.get('cursos', `id=eq.${enc(cursoId)}&select=id`);
+    if (!c) fail(400, 'Escolha a formação.');
+    const plano = PLANOS.includes(b.plano) ? b.plano : 'essencial';
+    const rows = emails.map((email) => ({ email, curso_id: cursoId, plano, ativa: true }));
+    const out = await ctx.sb.rest.insert('matriculas', rows, { upsert: true, onConflict: 'email,curso_id' });
+    return { ok: true, matriculas: out };
+  },
+};
+
+R['eq-curso'] = {
+  method: 'POST', auth: true, limit: 60,
+  run: async (ctx, b) => {
+    requireEquipe(ctx);
+    const id = slug(b.id);
+    if (!id) fail(400, 'Informe o endereço da formação (ex.: licenciamento).');
+    const titulo = str(b.titulo, 200);
+    if (titulo.length < 3) fail(400, 'Informe o nome da formação.');
+    const emails = lista(b.professor_emails, 20).map((e) => e.toLowerCase());
+    if (!emails.every(okMail)) fail(400, 'Confira os e-mails dos professores.');
+    const row = { id, titulo, area: str(b.area, 80), horas: Math.max(0, Number(b.horas) || 0), descricao: str(b.descricao, 600), capa: str(b.capa, 300) || null, professores: str(b.professores, 200), professor_emails: emails, ativo: b.ativo !== false, ordem: Number.isInteger(b.ordem) ? b.ordem : 0 };
+    const [c] = await ctx.sb.rest.insert('cursos', row, { upsert: true, onConflict: 'id' });
+    return { ok: true, curso: c };
+  },
+};
+
+R['eq-modulo'] = {
+  method: 'POST', auth: true, limit: 60,
+  run: async (ctx, b) => {
+    requireEquipe(ctx);
+    if (b.id && b.remover) {
+      const aulas = await ctx.sb.rest.get('aulas', `modulo_id=eq.${enc(b.id)}&select=id`);
+      if (aulas.length) fail(409, 'Remova ou mova as aulas deste módulo antes.');
+      await ctx.sb.rest.remove('modulos', `id=eq.${enc(b.id)}`);
+      return { ok: true, removido: b.id };
+    }
+    const titulo = str(b.titulo, 200);
+    if (titulo.length < 2) fail(400, 'Informe o título do módulo.');
+    const cursoId = str(b.curso, 60);
+    const ordem = Math.max(0, Math.round(Number(b.ordem) || 0));
+    const id = b.id ? str(b.id, 80) : `${cursoId}-m${Date.now().toString(36)}`;
+    const [m] = await ctx.sb.rest.insert('modulos', { id, curso_id: cursoId, ordem, titulo }, { upsert: true, onConflict: 'id' });
+    return { ok: true, modulo: m };
+  },
+};
+
+R['eq-aula'] = {
+  method: 'POST', auth: true, limit: 120,
+  run: async (ctx, b) => {
+    requireEquipe(ctx);
+    if (b.id && b.remover) { await ctx.sb.rest.remove('aulas', `id=eq.${enc(b.id)}`); return { ok: true, removido: b.id }; }
+    const titulo = str(b.titulo, 200);
+    if (titulo.length < 2) fail(400, 'Informe o título da aula.');
+    const moduloId = str(b.modulo, 80);
+    const [m] = await ctx.sb.rest.get('modulos', `id=eq.${enc(moduloId)}&select=id`);
+    if (!m) fail(400, 'Módulo não encontrado.');
+    const video = str(b.video, 500);
+    if (video && /^[a-z]+:/i.test(video) && !/^https?:\/\//i.test(video)) fail(400, 'O vídeo precisa ser um link https:// ou um caminho no Storage.');
+    const materiais = (Array.isArray(b.materiais) ? b.materiais : []).slice(0, 20).map((x) => ({ nome: str(x?.nome, 120) || 'Material', url: str(x?.url, 500), tipo: str(x?.tipo, 20) }))
+      .filter((x) => x.url && (/^https?:\/\//i.test(x.url) || !/^[a-z]+:/i.test(x.url)));
+    const row = {
+      id: b.id ? str(b.id, 80) : `${moduloId}-a${Date.now().toString(36)}`, modulo_id: moduloId, titulo,
+      ordem: Math.max(0, Math.round(Number(b.ordem) || 0)), duracao_min: Math.max(0, Math.min(600, Math.round(Number(b.duracao_min) || 0))),
+      video: video || null, sobre: str(b.sobre, 3000), topicos: lista(b.topicos, 12), materiais, publicada: b.publicada !== false,
+    };
+    const [a] = await ctx.sb.rest.insert('aulas', row, { upsert: true, onConflict: 'id' });
+    return { ok: true, aula: a };
+  },
+};
+
+R['eq-resposta'] = {
+  method: 'POST', auth: true, limit: 120,
+  run: async (ctx, b) => {
+    requireEquipe(ctx);
+    if (b.id && b.remover) { await ctx.sb.rest.remove('minerva_respostas', `id=eq.${enc(b.id)}`); return { ok: true, removido: b.id }; }
+    const pergunta = str(b.pergunta, 300), resposta = str(b.resposta, 4000);
+    if (pergunta.length < 3 || resposta.length < 3) fail(400, 'Preencha a pergunta e a resposta.');
+    const row = {
+      id: b.id ? str(b.id, 80) : slug(pergunta).slice(0, 40) + '-' + Date.now().toString(36).slice(-4), pergunta, resposta,
+      variacoes: lista(b.variacoes, 30), palavras: lista(b.palavras, 20).map((x) => x.toLowerCase()), ativo: b.ativo !== false,
+      ordem: Math.round(Number(b.ordem) || 0), curso_id: str(b.curso_id, 60) || null, portal: Boolean(b.portal),
+    };
+    if (!b.id) row.origem = 'equipe';
+    const [r] = await ctx.sb.rest.insert('minerva_respostas', row, { upsert: true, onConflict: 'id' });
+    return { ok: true, resposta: r };
   },
 };
 

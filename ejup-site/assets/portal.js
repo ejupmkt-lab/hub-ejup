@@ -67,7 +67,7 @@ const S={me:null,prof:null,cfg:null,curso:null,pc:null,aulas:{},chat:{},view:'',
 const cfg=async()=>S.cfg||(S.cfg=await api('config').catch(()=>({google:null,email:false})));
 const VOLTA='ejup_volta';
 function precisaEntrar(){try{sessionStorage.setItem(VOLTA,location.pathname);history.replaceState(null,'','/entrar')}catch(e){}S.me=S.prof=null;go('entrar',{push:false})}
-function voltar(def){let v='';try{v=sessionStorage.getItem(VOLTA)||'';sessionStorage.removeItem(VOLTA)}catch(e){}go(v&&/^\/(portal|prof)/.test(v)?v:def)}
+function voltar(def){let v='';try{v=sessionStorage.getItem(VOLTA)||'';sessionStorage.removeItem(VOLTA)}catch(e){}go(v&&/^\/(portal|prof|equipe)/.test(v)?v:def)}
 
 /* ======================================================================
    ENTRAR · CRIAR CONTA · RECUPERAR
@@ -140,7 +140,7 @@ async function authSubmit(f){
    E.syncSess();toast('Conta criada. Bem-vindo ao Portal do Aluno.');voltar('portal');return}
   const r=await api('entrar',{body:{email:em_.value.trim(),senha:pw.value}});pw.value='';E.syncSess();
   if(m==='prof'&&!r.professor){toast('Esta conta não tem Área do Professor. Abrimos o Portal do Aluno.');go('portal');return}
-  voltar(m==='prof'?'prof':'portal');
+  voltar(r.equipe?'equipe':m==='prof'?'prof':'portal');
  }catch(e){busy(b,false);pw.classList.add('bad');say(er,e.message,true);pw.focus()}
 }
 
@@ -255,7 +255,7 @@ PAGES.portal=()=>`
  <div class="pbody">
   <header class="ptop"><a href="/portal" class="logo pmo" aria-label="Portal do Aluno, início">${LOGO}</a><p class="pcrumb" id="pcrumb"></p>
    <div class="ptop-r"><form class="field psearch" id="p-sf" role="search" novalidate>${ic('search',16)}<input type="search" placeholder="Buscar aula, material ou dúvida" aria-label="Buscar no portal"></form><button type="button" class="pico pbell" data-bell aria-label="Avisos" aria-haspopup="true" aria-expanded="false">${ic('bell',18)}<i class="dot" hidden></i></button><button type="button" class="pav pmo" data-pmenu aria-haspopup="true" aria-expanded="false" aria-label="Conta: perfil, certificados, planos e sair" data-u-ini></button></div>
-   <div class="pmenu" id="pmenu" hidden><p class="sm"><span data-u-nome></span></p><a href="/portal/perfil">${ic('user',16)}<span>Meu perfil</span></a><a href="/portal/cert">${ic('award',16)}<span>Certificados</span></a><a href="/portal/planos">${ic('crown',16)}<span>Planos de acesso</span></a><a href="/prof" data-prof-link hidden>${ic('users',16)}<span>Área do Professor</span></a><button type="button" data-logout>${ic('ar',16)}<span>Sair</span></button></div>
+   <div class="pmenu" id="pmenu" hidden><p class="sm"><span data-u-nome></span></p><a href="/portal/perfil">${ic('user',16)}<span>Meu perfil</span></a><a href="/portal/cert">${ic('award',16)}<span>Certificados</span></a><a href="/portal/planos">${ic('crown',16)}<span>Planos de acesso</span></a><a href="/prof" data-prof-link hidden>${ic('users',16)}<span>Área do Professor</span></a><a href="/equipe" data-eq-link hidden>${ic('shield',16)}<span>Área da Equipe</span></a><button type="button" data-logout>${ic('ar',16)}<span>Sair</span></button></div>
    <div class="pmenu pavisos" id="pavisos" hidden></div></header>
   <div id="pmain" class="pmain" tabindex="-1"><div class="okbox"><p class="sm">Carregando o portal…</p></div></div>
  </div>
@@ -273,7 +273,7 @@ function syncShell(){
  const me=M();syncUser(me.perfil);
  const c=S.curso&&cursoOf(S.curso),pl=S.curso?PLANS[lvl(planoDe(S.curso))]:null;
  $$('[data-plan-n]').forEach(e=>{e.textContent=pl?pl.n:'Sem formação'});$$('[data-curso-n]').forEach(e=>{e.textContent=c?c.titulo:'Nenhuma formação liberada'});
- $$('[data-prof-link]').forEach(e=>{e.hidden=!me.professor});
+ $$('[data-prof-link]').forEach(e=>{e.hidden=!me.professor});$$('[data-eq-link]').forEach(e=>{e.hidden=me.perfil.papel!=='equipe'});
  const n=avisos().filter(a=>a.novo).length;$$('[data-bell] .dot').forEach(d=>{d.hidden=!n});
 }
 function avisos(){
@@ -670,7 +670,7 @@ PAGES.prof=()=>`
  <div class="pbody">
   <header class="ptop"><a href="/prof" class="logo pmo" aria-label="Área do Professor, painel">${LOGO}</a><p class="pcrumb" id="pcrumb"></p>
    <div class="ptop-r"><form class="field psearch" id="f-sf" role="search" novalidate>${ic('search',16)}<input type="search" placeholder="Buscar aluno ou dúvida" aria-label="Buscar na área do professor"></form><button type="button" class="pav gold pmo" data-pmenu aria-haspopup="true" aria-expanded="false" aria-label="Conta: perfil, ver como aluno e sair" data-u-ini></button></div>
-   <div class="pmenu" id="pmenu" hidden><p class="sm" data-u-nome></p><a href="/prof/perfil">${ic('user',16)}<span>Meu perfil</span></a><a href="/portal">${ic('book',16)}<span>Ver como aluno</span></a><button type="button" data-logout>${ic('ar',16)}<span>Sair</span></button></div></header>
+   <div class="pmenu" id="pmenu" hidden><p class="sm" data-u-nome></p><a href="/prof/perfil">${ic('user',16)}<span>Meu perfil</span></a><a href="/portal">${ic('book',16)}<span>Ver como aluno</span></a><a href="/equipe" data-eq-link hidden>${ic('shield',16)}<span>Área da Equipe</span></a><button type="button" data-logout>${ic('ar',16)}<span>Sair</span></button></div></header>
   <div id="pmain" class="pmain" tabindex="-1"><div class="okbox"><p class="sm">Carregando a Área do Professor…</p></div></div>
  </div>
  <nav class="ptabs" aria-label="Área do Professor">${FTAB.map(([k,l,i])=>`<a href="/prof${k?'/'+k:''}" data-pv="${k||'painel'}">${ic(i,20)}<span>${l}</span></a>`).join('')}</nav>
@@ -683,7 +683,7 @@ PAGES.prof.mount=async arg=>{
 };
 PAGES.prof.sub=(arg,y)=>{if(!S.prof)return PAGES.prof.mount(arg);profView(arg,false,y)};
 function profShell(){
- syncUser(P().perfil);const cs=P().cursos;
+ syncUser(P().perfil);const cs=P().cursos;$$('[data-eq-link]').forEach(e=>{e.hidden=P().perfil.papel!=='equipe'});
  $('#pc-box').innerHTML=cs.length>1?`<label class="psel">${ic('book',16)}<select data-pc-sel aria-label="Formação">${cs.map(c=>`<option value="${c.id}"${c.id===S.pc?' selected':''}>${esc(c.titulo)}</option>`).join('')}</select>${ic('down',14)}</label>`:`<span style="font-size:14px;font-weight:500;line-height:1.4">${esc(pCurso(S.pc).titulo)}</span>`;
  const n=turma(S.pc).length;$$('[data-pc-n]').forEach(e=>{e.textContent=plural(n,'aluno','alunos')});
  const p=pPend().length;$$('[data-fq-n]').forEach(e=>{e.textContent=p;e.hidden=!p});
@@ -848,7 +848,7 @@ document.addEventListener('click',async e=>{
  if((x=t.closest('[data-eye]'))){const i=document.getElementById(x.dataset.eye),s=i.type==='password';i.type=s?'text':'password';x.setAttribute('aria-label',s?'Ocultar senha':'Mostrar senha');return}
  if(t.closest('[data-print]')){print();return}
  if(!inPortal())return;
- if(t.closest('[data-reload]')){S.area==='prof'?(S.prof=null,PAGES.prof.mount(S.parg)):(S.me=null,PAGES.portal.mount(S.arg));return}
+ if(t.closest('[data-reload]')){if(S.area==='equipe'){S.eq=null;PAGES.equipe.mount(S.earg);return}S.area==='prof'?(S.prof=null,PAGES.prof.mount(S.parg)):(S.me=null,PAGES.portal.mount(S.arg));return}
  /* menus */
  const pm=$('#pmenu'),pa=$('#pavisos');
  if((x=t.closest('[data-pmenu]'))){pm.hidden=!pm.hidden;x.setAttribute('aria-expanded',!pm.hidden);if(pa)pa.hidden=true;return}
@@ -971,4 +971,142 @@ document.addEventListener('change',async e=>{
 });
 document.addEventListener('input',e=>{if(e.target.id==='rc-n1'||e.target.id==='rc-n2')recRules()});
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;['#pmenu','#pavisos'].forEach(s=>{const x=$(s);if(x&&!x.hidden){x.hidden=true;const b=$(s==='#pmenu'?'[data-pmenu]':'[data-bell]');b&&b.focus()}})});
+
+/* ======================================================================
+   ÁREA DA EQUIPE (perfis.papel = equipe): matrículas, formações e aulas, banco da Minerva
+   ====================================================================== */
+const Q=()=>S.eq;
+const ENAV=[['','Matrículas','users'],['formacoes','Formações e aulas','book'],['minerva','Banco da Minerva','spark']];
+PAGES.equipe=()=>`
+<section class="sec dark portal farea">
+ <aside class="pside"><div class="pside-t"><a href="/equipe" class="logo" aria-label="Área da Equipe">${LOGO}</a><div>${tag('Área da Equipe','gold')}</div>
+  <nav class="pnav" aria-label="Área da Equipe">${ENAV.map(([k,l,i])=>`<a href="/equipe${k?'/'+k:''}" data-pv="${k||'matriculas'}">${ic(i,18)}<span>${l}</span></a>`).join('')}</nav></div>
+  <div class="pside-b"><div class="puser"><span class="pav gold" data-u-ini></span><div><span class="pu-n" data-u-nome></span><p class="sm"><a href="/prof">Área do Professor</a> · <a href="/portal">Portal</a> · <button type="button" class="lk-in" data-logout>Sair</button></p></div></div></div></aside>
+ <div class="pbody">
+  <header class="ptop"><a href="/equipe" class="logo pmo" aria-label="Área da Equipe">${LOGO}</a><p class="pcrumb" id="pcrumb"></p><div class="ptop-r"><button type="button" class="pav gold pmo" data-pmenu aria-haspopup="true" aria-expanded="false" aria-label="Conta" data-u-ini></button></div>
+   <div class="pmenu" id="pmenu" hidden><p class="sm" data-u-nome></p><a href="/prof">${ic('users',16)}<span>Área do Professor</span></a><a href="/portal">${ic('book',16)}<span>Portal do Aluno</span></a><button type="button" data-logout>${ic('ar',16)}<span>Sair</span></button></div></header>
+  <div id="pmain" class="pmain" tabindex="-1"><div class="okbox"><p class="sm">Carregando a Área da Equipe…</p></div></div>
+ </div>
+ <nav class="ptabs" aria-label="Área da Equipe">${ENAV.map(([k,l,i])=>`<a href="/equipe${k?'/'+k:''}" data-pv="${k||'matriculas'}">${ic(i,20)}<span>${l.split(' ')[0]}</span></a>`).join('')}</nav>
+</section>`;
+PAGES.equipe.mount=async arg=>{
+ S.area='equipe';
+ try{S.eq=await api('equipe')}catch(e){if(e.status===401)return precisaEntrar();$('#pmain').innerHTML=e.status===403?`<div class="okbox"><span class="icb">${ic('lock',20)}</span><p class="h4">${esc(e.message)}</p>${abtn('Ir para o Portal do Aluno','gold','/portal',{s:1})}</div>`:errBox(e.message,true);links($('#pmain'));return}
+ if(!S.ec||!Q().cursos.some(c=>c.id===S.ec))S.ec=(Q().cursos[0]||{}).id||null;
+ eqView(arg,true);
+};
+PAGES.equipe.sub=(arg,y)=>{if(!S.eq)return PAGES.equipe.mount(arg);eqView(arg,false,y)};
+const EV={},ECR={matriculas:'Matrículas',formacoes:'Formações e aulas',minerva:'Banco da Minerva'};
+function eqView(arg,first,y=0){
+ const main=$('#pmain');if(!main)return;S.earg=arg;const v=EV[(arg||'').split('/')[0]]?(arg||'').split('/')[0]:'matriculas';S.view=v;
+ const put=()=>{try{main.innerHTML=EV[v]()}catch(e){console.error(e);main.innerHTML=errBox('Não foi possível abrir esta tela.',true)}
+  links(main);main.classList.remove('pv-out');$('#pcrumb').innerHTML=crumb('Área da Equipe',ECR[v]);syncUser(Q().perfil);
+  $$('[data-pv]').forEach(a=>{const on=a.dataset.pv===v;a.classList.toggle('on',on);on?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')});
+  const pm=$('#pmenu');if(pm)pm.hidden=true;document.title=`${ECR[v]} · Área da Equipe · EJUP`;
+  if(!first){scrollTo({top:y,behavior:'instant'});main.focus({preventScroll:true})}reveal();$$('.seg',main).forEach(placeSeg)};
+ if(first||RM){put();return}main.classList.add('pv-out');setTimeout(put,180);
+}
+const eqRe=()=>{const y=scrollY;eqView(S.earg,true);scrollTo({top:y,behavior:'instant'})};
+const qCurso=id=>Q().cursos.find(c=>c.id===id);
+const optCursos=(sel,todas)=>(todas?`<option value="">${todas}</option>`:'')+Q().cursos.map(c=>`<option value="${esc(c.id)}"${c.id===sel?' selected':''}>${esc(c.titulo)}</option>`).join('');
+const optPlanos=sel=>PLANS.map(p=>`<option value="${p.k}"${p.k===sel?' selected':''}>${p.n}</option>`).join('');
+
+/* matrículas */
+EV.matriculas=()=>{const f=S.mf||{curso:'',q:''},n=norm(f.q).trim();
+ const ms=Q().matriculas.filter(m=>(!f.curso||m.curso_id===f.curso)&&(!n||norm(m.email+' '+(m.nome||'')).includes(n)));
+ return `${fhead(`Quem tem ${em('acesso.')}`,'Libere uma formação pelo e-mail usado na inscrição. O aluno vê a formação no portal assim que entra com esse e-mail, mesmo que crie a conta depois.')}
+ <article class="card pc glow" data-r><h2 class="h4">Liberar acesso</h2>
+  <form id="eq-mf" class="pgf" novalidate><label class="fl full"><span>E-mails (um por linha)</span><textarea class="inp" id="eq-emails" placeholder="aluno@exemplo.com"></textarea></label>
+   <label class="fl"><span>Formação</span><select class="inp" id="eq-curso">${optCursos(S.ec)}</select></label><label class="fl"><span>Plano</span><select class="inp" id="eq-plano">${optPlanos('essencial')}</select></label>
+   <p class="msg full" aria-live="polite"></p><div class="full">${btn('Liberar acesso','gold',{type:'submit',icon:false})}</div></form></article>
+ <div class="ptit mid" data-r><label class="psel">${ic('book',16)}<select data-mf="curso" aria-label="Filtrar por formação">${optCursos(f.curso,'Todas as formações')}</select>${ic('down',14)}</label><label class="field psearch">${ic('search',16)}<input type="search" data-mf="q" value="${esc(f.q)}" placeholder="Buscar por e-mail ou nome" aria-label="Buscar aluno"></label></div>
+ <article class="card ftb" data-r><div class="ftr h"><span class="lbl">Aluno</span><span class="lbl">Formação</span><span class="lbl">Plano</span><span class="lbl">Conta</span><span class="lbl">Acesso</span><span></span></div>
+  ${ms.slice(0,300).map(m=>`<div class="ftr"><span>${fav(iniOf(m.nome||m.email),'s')}<span style="display:grid;min-width:0"><span class="nm">${esc(m.nome||m.email)}</span>${m.nome?`<span class="sm">${esc(m.email)}</span>`:''}</span></span><span>${esc((qCurso(m.curso_id)||{}).titulo||m.curso_id)}</span>
+   <span><select class="eq-sel" data-mat-plano="${m.id}" aria-label="Plano">${optPlanos(m.plano)}</select></span><span>${m.conta?'Criou conta':'Ainda sem conta'}${m.certificado?' · certificado':''}</span>
+   <span><label class="psw"><input type="checkbox" data-mat-ativa="${m.id}"${m.ativa?' checked':''} aria-label="Acesso ativo"><i></i></label></span><span><button type="button" class="lk" data-mat-del="${m.id}"><span>Remover</span></button></span></div>`).join('')||'<p class="sm" style="padding:16px 0">Nenhuma matrícula com este filtro.</p>'}</article>
+ <p class="sm">${plural(ms.length,'matrícula','matrículas')}${ms.length>300?' · mostrando as 300 mais recentes':''}.</p>`};
+
+/* formações e aulas */
+const linhas=a=>(a||[]).join('\n');
+const matTxt=ms=>(ms||[]).map(m=>[m.nome,m.url,m.tipo].filter(Boolean).join(' | ')).join('\n');
+const parseMat=t=>t.split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(p=>p[0]).map(([nome,url,tipo])=>({nome:url?nome:'Material',url:url||nome,tipo:tipo||''}));
+EV.formacoes=()=>{const c=S.ec&&qCurso(S.ec),mods=c?Q().modulos.filter(m=>m.curso_id===c.id).sort((a,b)=>a.ordem-b.ordem):[];
+ const cursoForm=(x,novo)=>`<form class="pgf" data-eq-curso novalidate>
+   <label class="fl"><span>Nome da formação</span><input class="inp" name="titulo" value="${esc(x.titulo||'')}"></label>
+   <label class="fl"><span>Endereço${novo?' (ex.: licenciamento)':''}</span><input class="inp" name="id" value="${esc(x.id||'')}"${novo?'':' readonly'}></label>
+   <label class="fl"><span>Área</span><input class="inp" name="area" value="${esc(x.area||'')}"></label><label class="fl"><span>Carga horária (horas)</span><input class="inp" name="horas" type="number" min="0" step="0.5" value="${esc(x.horas??'')}"></label>
+   <label class="fl"><span>Professores (como aparece ao aluno)</span><input class="inp" name="professores" value="${esc(x.professores||'')}"></label><label class="fl"><span>Capa (ex.: /img/curso1.jpg)</span><input class="inp" name="capa" value="${esc(x.capa||'')}"></label>
+   <label class="fl full"><span>E-mails dos professores com acesso à Área do Professor (um por linha)</span><textarea class="inp" name="professor_emails">${esc(linhas(x.professor_emails))}</textarea></label>
+   <label class="fl full"><span>Descrição curta</span><textarea class="inp" name="descricao">${esc(x.descricao||'')}</textarea></label>
+   <label class="psw full"><span>Formação ativa</span><input type="checkbox" name="ativo"${x.ativo!==false?' checked':''}><i></i></label>
+   <p class="msg full" aria-live="polite"></p><div class="full">${btn(novo?'Criar formação':'Salvar formação','gold',{type:'submit',icon:false})}</div></form>`;
+ const aulaForm=(a,mid)=>`<form class="pgf" data-eq-aula="${esc(a.id||'')}" data-mod="${esc(mid)}" novalidate>
+   <label class="fl full"><span>Título</span><input class="inp" name="titulo" value="${esc(a.titulo||'')}"></label>
+   <label class="fl"><span>Ordem no módulo</span><input class="inp" name="ordem" type="number" min="0" value="${esc(a.ordem??'')}"></label><label class="fl"><span>Duração (minutos)</span><input class="inp" name="duracao_min" type="number" min="0" value="${esc(a.duracao_min??'')}"></label>
+   <label class="fl full"><span>Vídeo: link do YouTube, Vimeo, Panda ou .mp4, ou caminho no Storage (bucket aulas)</span><input class="inp" name="video" value="${esc(a.video||'')}" placeholder="https://"></label>
+   <label class="fl full"><span>Sobre a aula</span><textarea class="inp" name="sobre">${esc(a.sobre||'')}</textarea></label>
+   <label class="fl full"><span>Tópicos (um por linha)</span><textarea class="inp" name="topicos">${esc(linhas(a.topicos))}</textarea></label>
+   <label class="fl full"><span>Materiais (um por linha: nome | link ou caminho no bucket materiais | tipo)</span><textarea class="inp" name="materiais" placeholder="Slides da aula | https://… | PDF">${esc(matTxt(a.materiais))}</textarea></label>
+   <label class="psw full"><span>Publicada para os alunos</span><input type="checkbox" name="publicada"${a.publicada!==false?' checked':''}><i></i></label>
+   <p class="msg full" aria-live="polite"></p><div class="acts full">${btn(a.id?'Salvar aula':'Criar aula','gold',{type:'submit',icon:false,s:1})}${a.id?btn('Excluir aula','line',{icon:false,s:1,attr:`data-aula-del="${esc(a.id)}"`}):''}</div></form>`;
+ return `${fhead(`Formações ${em('e aulas.')}`,'O que o aluno vê no portal: módulos, aulas, vídeos e materiais. As mudanças valem na hora.')}
+ <div class="ptit mid" data-r>${Q().cursos.length?`<label class="psel">${ic('book',16)}<select data-ec aria-label="Formação">${optCursos(S.ec)}</select>${ic('down',14)}</label>`:''}${btn('Nova formação','glass',{s:1,icon:false,attr:'data-curso-novo'})}</div>
+ ${S.cnovo?`<article class="card pc glow" data-r><h2 class="h4">Nova formação</h2>${cursoForm({},true)}</article>`:''}
+ ${c?`<details class="card pc eqd" data-r><summary><span class="h4">${esc(c.titulo)}</span><span class="sm">${c.ativo===false?'inativa · ':''}${c.horas} horas · ${plural((c.professor_emails||[]).length,'professor','professores')} · editar</span></summary>${cursoForm(c,false)}</details>
+ ${mods.map(m=>{const as=Q().aulas.filter(a=>a.modulo_id===m.id).sort((a,b)=>a.ordem-b.ordem);return `<article class="card pc" data-r><div class="pc-h wr"><h2 class="h4">Módulo ${pad(m.ordem)} · ${esc(m.titulo)}</h2><span class="acts">${btn('Renomear','line',{s:1,icon:false,attr:`data-mod-ren="${esc(m.id)}"`})}${as.length?'':btn('Excluir módulo','line',{s:1,icon:false,attr:`data-mod-del="${esc(m.id)}"`})}</span></div>
+  ${as.map(a=>`<details class="eqd"><summary><span><strong>${a.ordem}. ${esc(a.titulo)}</strong></span><span class="sm">${a.duracao_min} min · ${a.video?'com vídeo':'sem vídeo'}${(a.materiais||[]).length?` · ${plural(a.materiais.length,'material','materiais')}`:''}${a.publicada===false?' · oculta':''}</span></summary>${aulaForm(a,m.id)}</details>`).join('')}
+  <details class="eqd"><summary><span><strong>${ic('plus',14)} Nova aula neste módulo</strong></span></summary>${aulaForm({ordem:as.length+1},m.id)}</details></article>`}).join('')}
+ <article class="card pc dash" data-r><h2 class="h4">Novo módulo</h2><form class="pgf" id="eq-mod" novalidate><label class="fl"><span>Título</span><input class="inp" name="titulo"></label><label class="fl"><span>Ordem</span><input class="inp" name="ordem" type="number" min="0" value="${mods.length+1}"></label><p class="msg full" aria-live="polite"></p><div class="full">${btn('Criar módulo','glass',{type:'submit',icon:false,s:1})}</div></form></article>`
+ :'<p class="sm">Nenhuma formação cadastrada. Crie a primeira.</p>'}`};
+
+/* banco da Minerva */
+EV.minerva=()=>{const f=S.rf||{esc:'todas',q:''},n=norm(f.q).trim();
+ const rs=Q().respostas.filter(r=>(f.esc==='todas'||(f.esc==='site'?!r.curso_id&&!r.portal:f.esc==='portal'?!r.curso_id&&r.portal:r.curso_id===f.esc))&&(!n||norm(r.pergunta+' '+r.resposta+' '+(r.variacoes||[]).join(' ')).includes(n)));
+ const form=r=>`<form class="pgf" data-eq-resp="${esc(r.id||'')}" novalidate>
+   <label class="fl full"><span>Pergunta principal</span><input class="inp" name="pergunta" value="${esc(r.pergunta||'')}"></label>
+   <label class="fl full"><span>Resposta</span><textarea class="inp" name="resposta">${esc(r.resposta||'')}</textarea></label>
+   <label class="fl"><span>Outras formas de perguntar (uma por linha)</span><textarea class="inp" name="variacoes">${esc(linhas(r.variacoes))}</textarea></label>
+   <label class="fl"><span>Palavras-chave (uma por linha)</span><textarea class="inp" name="palavras">${esc(linhas(r.palavras))}</textarea></label>
+   <label class="fl"><span>Vale para</span><select class="inp" name="curso_id"><option value="">Todas (geral)</option>${Q().cursos.map(c=>`<option value="${esc(c.id)}"${c.id===r.curso_id?' selected':''}>${esc(c.titulo)}</option>`).join('')}</select></label>
+   <label class="fl"><span>Ordem</span><input class="inp" name="ordem" type="number" value="${esc(r.ordem??0)}"></label>
+   <label class="psw"><span>Só no Portal (fora do hotsite)</span><input type="checkbox" name="portal"${r.portal?' checked':''}><i></i></label><label class="psw"><span>Ativa</span><input type="checkbox" name="ativo"${r.ativo!==false?' checked':''}><i></i></label>
+   <p class="msg full" aria-live="polite"></p><div class="acts full">${btn(r.id?'Salvar resposta':'Criar resposta','gold',{type:'submit',icon:false,s:1})}${r.id?btn('Excluir','line',{icon:false,s:1,attr:`data-resp-del="${esc(r.id)}"`}):''}</div></form>`;
+ return `${fhead(`O que a Minerva ${em('sabe responder.')}`,'A Minerva não usa IA: compara a pergunta com estas linhas e devolve a resposta mais parecida. As mudanças valem em até 1 minuto.')}
+ <div class="ptit mid" data-r><label class="psel">${ic('spark',16)}<select data-rf="esc" aria-label="Filtrar">${[['todas','Todas'],['site','Hotsite e Portal (gerais)'],['portal','Só no Portal'],...Q().cursos.map(c=>[c.id,c.titulo])].map(([k,l])=>`<option value="${esc(k)}"${k===f.esc?' selected':''}>${esc(l)}</option>`).join('')}</select>${ic('down',14)}</label><label class="field psearch">${ic('search',16)}<input type="search" data-rf="q" value="${esc(f.q)}" placeholder="Buscar pergunta ou resposta" aria-label="Buscar resposta"></label></div>
+ <article class="card pc glow" data-r><details class="eqd"${S.rnovo?' open':''}><summary><span><strong>${ic('plus',14)} Nova resposta</strong></span></summary>${form({ativo:true})}</details></article>
+ <article class="card pc" data-r>${rs.map(r=>`<details class="eqd"><summary><span><strong>${esc(r.pergunta)}</strong></span><span class="sm">${r.curso_id?esc((qCurso(r.curso_id)||{}).titulo||r.curso_id):r.portal?'Só no Portal':'Geral'}${r.origem==='professor'?' · ensinada por professor':''}${r.ativo===false?' · desativada':''}</span></summary>${form(r)}</details>`).join('')||'<p class="sm">Nenhuma resposta com este filtro.</p>'}</article>
+ <p class="sm">${plural(rs.length,'resposta','respostas')}.</p>`};
+
+const fval=(f,n)=>{const e=f.elements[n];return e?(e.type==='checkbox'?e.checked:e.value.trim()):undefined};
+document.addEventListener('submit',async e=>{
+ const f=e.target;if(S.area!=='equipe'||!$('#pmain')||!f.closest('#pmain'))return;
+ const b=$('button[type="submit"]',f),m=$('.msg',f),done=async(msg)=>{S.eq=await api('equipe');eqRe();toast(msg)};
+ try{
+  if(f.id==='eq-mf'){const emails=$('#eq-emails').value.trim();if(!emails){say(m,'Digite pelo menos um e-mail.',true);return}busy(b,true,'Liberando…');
+   const r=await api('eq-matricula',{body:{email:emails,curso:$('#eq-curso').value,plano:$('#eq-plano').value}});S.ec=$('#eq-curso').value;await done(`Acesso liberado para ${plural(r.matriculas.length,'e-mail','e-mails')}.`);return}
+  if(f.matches('[data-eq-curso]')){busy(b,true,'Salvando…');const r=await api('eq-curso',{body:{id:fval(f,'id'),titulo:fval(f,'titulo'),area:fval(f,'area'),horas:+fval(f,'horas')||0,professores:fval(f,'professores'),capa:fval(f,'capa'),professor_emails:fval(f,'professor_emails'),descricao:fval(f,'descricao'),ativo:fval(f,'ativo'),ordem:(qCurso(fval(f,'id'))||{}).ordem??Q().cursos.length+1}});S.ec=r.curso.id;S.cnovo=false;await done('Formação salva.');return}
+  if(f.id==='eq-mod'){busy(b,true,'Criando…');await api('eq-modulo',{body:{curso:S.ec,titulo:fval(f,'titulo'),ordem:+fval(f,'ordem')||0}});await done('Módulo criado.');return}
+  if(f.matches('[data-eq-aula]')){busy(b,true,'Salvando…');await api('eq-aula',{body:{id:f.dataset.eqAula||undefined,modulo:f.dataset.mod,titulo:fval(f,'titulo'),ordem:+fval(f,'ordem')||0,duracao_min:+fval(f,'duracao_min')||0,video:fval(f,'video'),sobre:fval(f,'sobre'),topicos:fval(f,'topicos'),materiais:parseMat(fval(f,'materiais')),publicada:fval(f,'publicada')}});await done('Aula salva.');return}
+  if(f.matches('[data-eq-resp]')){busy(b,true,'Salvando…');await api('eq-resposta',{body:{id:f.dataset.eqResp||undefined,pergunta:fval(f,'pergunta'),resposta:fval(f,'resposta'),variacoes:fval(f,'variacoes'),palavras:fval(f,'palavras'),curso_id:fval(f,'curso_id'),ordem:+fval(f,'ordem')||0,portal:fval(f,'portal'),ativo:fval(f,'ativo')}});S.rnovo=false;await done('Resposta salva. A Minerva passa a usar em até 1 minuto.');return}
+ }catch(err){busy(b,false);say(m,err.message,true)}
+});
+document.addEventListener('click',async e=>{
+ const t=e.target;if(S.area!=='equipe'||!t.closest||!t.closest('#pmain'))return;let x;
+ const run=async(r,body,msg)=>{try{await api(r,{body});S.eq=await api('equipe');eqRe();toast(msg)}catch(err){toast(err.message)}};
+ if(t.closest('[data-curso-novo]')){S.cnovo=!S.cnovo;eqRe();return}
+ if((x=t.closest('[data-mat-del]'))){if(confirm('Remover esta matrícula? O aluno perde o acesso à formação.'))run('eq-matricula',{id:+x.dataset.matDel,remover:true},'Matrícula removida.');return}
+ if((x=t.closest('[data-aula-del]'))){if(confirm('Excluir esta aula? O progresso dos alunos nela também é apagado.'))run('eq-aula',{id:x.dataset.aulaDel,remover:true},'Aula excluída.');return}
+ if((x=t.closest('[data-mod-del]'))){if(confirm('Excluir este módulo?'))run('eq-modulo',{id:x.dataset.modDel,remover:true},'Módulo excluído.');return}
+ if((x=t.closest('[data-mod-ren]'))){const md=Q().modulos.find(y=>y.id===x.dataset.modRen),n=prompt('Novo título do módulo:',md.titulo);if(n&&n.trim())run('eq-modulo',{id:md.id,curso:md.curso_id,titulo:n.trim(),ordem:md.ordem},'Módulo renomeado.');return}
+ if((x=t.closest('[data-resp-del]'))){if(confirm('Excluir esta resposta da Minerva?'))run('eq-resposta',{id:x.dataset.respDel,remover:true},'Resposta excluída.');return}
+});
+document.addEventListener('change',async e=>{
+ const t=e.target,d=t.dataset||{};if(S.area!=='equipe'||!t.closest||!t.closest('#pmain'))return;
+ if(d.ec!==undefined){S.ec=t.value;eqRe();return}
+ if(d.mf){S.mf={...(S.mf||{curso:'',q:''}),[d.mf]:t.value};eqRe();return}
+ if(d.rf){S.rf={...(S.rf||{esc:'todas',q:''}),[d.rf]:t.value};eqRe();return}
+ const save=async(body,msg,undo)=>{try{const r=await api('eq-matricula',{body});const i=Q().matriculas.findIndex(m=>m.id===r.matricula.id);Object.assign(Q().matriculas[i],r.matricula);toast(msg)}catch(err){undo();toast(err.message)}};
+ if(d.matPlano){const old=Q().matriculas.find(m=>m.id===+d.matPlano).plano;save({id:+d.matPlano,plano:t.value},`Plano alterado para ${PLANS[lvl(t.value)].n}.`,()=>{t.value=old});return}
+ if(d.matAtiva){save({id:+d.matAtiva,ativa:t.checked},t.checked?'Acesso reativado.':'Acesso suspenso.',()=>{t.checked=!t.checked});return}
+});
 })();

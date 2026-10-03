@@ -485,10 +485,10 @@ const closeModal=()=>{if(!modal.classList.contains('on'))return;modal.classList.
 let cur=null,secs=[],hero=null,pars=[],prog=null,spies=[],io,cio,vio;
 /* aceita caminho (/formacao/licenciamento) e o formato antigo com # (#formacao.licenciamento) */
 const parse=h=>{h=(h||'').replace(/^[#/]+/,'').replace(/\/+$/,'');if(!h)return ['home',''];const i=h.search(/[./]/);return i<0?[h,'']:[h.slice(0,i),h.slice(i+1)]};
-const TITLES={home:'EJUP · Educação Jurídica',escola:'A escola',formacoes:'Formações',formacao:'Formação',professores:'Professores',ejupcast:'EJUPcast',coluna:'Coluna Jurídica',artigo:'Artigo',incompany:'In company',privacidade:'Política de Privacidade',entrar:'Entrar',criar:'Criar conta',recuperar:'Recuperar senha',portal:'Portal do Aluno',prof:'Área do Professor',certificado:'Certificado'};
+const TITLES={home:'EJUP · Educação Jurídica',escola:'A escola',formacoes:'Formações',formacao:'Formação',professores:'Professores',ejupcast:'EJUPcast',coluna:'Coluna Jurídica',artigo:'Artigo',incompany:'In company',privacidade:'Política de Privacidade',entrar:'Entrar',criar:'Criar conta',recuperar:'Recuperar senha',portal:'Portal do Aluno',prof:'Área do Professor',equipe:'Área da Equipe',certificado:'Certificado'};
 const SCR={};
 /* Portal do Aluno, Área do Professor e login ficam em /assets/portal.js, carregado só quando alguém vai até lá */
-const PORTAL=['entrar','criar','recuperar','portal','prof','certificado'];
+const PORTAL=['entrar','criar','recuperar','portal','prof','equipe','certificado'];
 let portalJs=null;
 const loadPortal=()=>portalJs||(portalJs=new Promise((ok,no)=>{const s=document.createElement('script');s.src='/assets/portal.js?v=1';s.onload=ok;s.onerror=()=>{portalJs=null;no()};document.head.appendChild(s)}));
 function go(tok,o={}){
@@ -516,8 +516,8 @@ function afterArg(p,arg){
 }
 function mount(p,arg){
  nav.classList.remove('hide');
- nav.classList.toggle('is-auth',['entrar','criar','recuperar','certificado'].includes(p));nav.classList.toggle('is-portal',p==='portal'||p==='prof');
- document.documentElement.classList.toggle('in-portal',p==='portal'||p==='prof');syncSess();
+ nav.classList.toggle('is-auth',['entrar','criar','recuperar','certificado'].includes(p));nav.classList.toggle('is-portal',['portal','prof','equipe'].includes(p));
+ document.documentElement.classList.toggle('in-portal',['portal','prof','equipe'].includes(p));syncSess();
  const ttl=p==='formacao'?(F.find(x=>x.id===arg)||F[0]).t:p==='artigo'?(AR.find(x=>x.id===arg)||AR[0]).t:TITLES[p];
  document.title=p==='home'?TITLES.home:`${ttl||'EJUP'} · EJUP`;
  const key={formacao:'formacoes',artigo:'coluna'}[p]||p;

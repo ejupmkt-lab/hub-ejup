@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "headers": [
     {
-      "source": "/(portal|prof|entrar|criar|recuperar)(/.*)?",
+      "source": "/(portal|prof|equipe|entrar|criar|recuperar)(/.*)?",
       "headers": [
         {
           "key": "X-Frame-Options",

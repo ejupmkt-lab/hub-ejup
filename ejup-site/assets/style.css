@@ -999,3 +999,14 @@ button.fq:hover,a.fq:hover{padding-left:6px}
   .cp-h{display:none}.cp-doc{max-width:none;width:100%;box-shadow:none}
   @page{size:A4 landscape;margin:12mm}
 }
+
+/* Área da Equipe: listas que abrem para editar */
+.eqd{display:grid;gap:0}
+.eqd>summary{list-style:none;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px 16px;padding:14px 0;border-top:1px solid var(--line);cursor:pointer}
+.eqd>summary::-webkit-details-marker{display:none}
+.card>.eqd:first-child>summary,.card.eqd>summary{border-top:0;padding-top:0}
+.eqd>summary strong{font-size:14px;font-weight:500;color:var(--branco);display:inline-flex;align-items:center;gap:8px}
+.eqd>summary:hover strong{color:var(--ouro-400)}
+.eqd[open]>summary{color:var(--ouro-400)}
+.eqd>form{padding:4px 0 20px}
+.eq-sel{background:var(--w05);border:1px solid var(--w16);border-radius:999px;height:34px;padding:0 12px;color:inherit;font:inherit;font-size:13px;max-width:100%}.eq-sel option{color:#0D131A}
