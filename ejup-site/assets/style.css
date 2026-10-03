@@ -979,3 +979,10 @@ button.fq:hover,a.fq:hover{padding-left:6px}
 .priv{max-width:760px;display:grid;gap:14px;color:var(--fg2)}
 .priv h2{margin-top:28px;color:var(--fg)}
 .priv a{color:var(--em);text-decoration:underline;text-underline-offset:3px}
+
+/* foto dos sócios no celular: imagem acima do texto, sem cobrir os rostos */
+@media (max-width:760px){
+  .media{min-height:0;justify-content:flex-start;background:var(--navy-900)}
+  .media>img{position:relative;inset:auto;order:-1;height:auto;aspect-ratio:16/11;object-position:60% 30%;animation:none}
+  .media::before{display:none}
+}

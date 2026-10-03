@@ -31,7 +31,7 @@ BADGE = '<div style="position:fixed;left:12px;bottom:calc(env(safe-area-inset-bo
 js = R('assets/app.js')
 js = must(js, "const withImg=h=>h.replace(/\"img\\/(\\w+)\\.jpg/g,'\"/img/$1.jpg');", "const withImg=h=>h;")
 js = must(js, "const IMG=new Proxy({},{get:(o,n)=>`/img/${String(n)}.jpg`});", "const IMG=new Proxy({},{get:(o,n)=>`img/${String(n)}.jpg`});")
-js = must(js, "const VID={logo:'/vid/cast-logo.mp4',sub:'/vid/cast-subscribe.mp4',est:'/vid/estatuas.mp4'};", "const VID={logo:'vid/cast-logo.mp4',sub:'vid/cast-subscribe.mp4',est:'vid/estatuas.mp4'};")
+js = must(js, "const VID={logo:'/vid/cast-logo.mp4',sub:'/vid/cast-subscribe.mp4'};", "const VID={logo:'vid/cast-logo.mp4',sub:'vid/cast-subscribe.mp4'};")
 js = must(js, "const toPath=tok=>{const [p,a]=parse(tok);return p==='home'?'/':'/'+p+(a?'/'+a:'')};", "const toPath=tok=>{const [p,a]=parse(tok);return '#'+p+(a?'.'+a:'')};")
 js = must(js, "if(k==='privacidade'){toLink(el,'/privacidade',true);return}", "if(k==='privacidade'){toLink(el,'#privacidade',true);return}")
 js = must(js, " $$('a[href^=\"#\"]',root).forEach(a=>a.setAttribute('href',toPath(a.getAttribute('href'))));\n", "")
