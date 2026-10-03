@@ -19,7 +19,7 @@ RAIZ = HERE.parents[2]
 FONTS = RAIZ / "skills" / "ejup-design" / "assets" / "fonts"
 LOGOS = RAIZ / "skills" / "ejup-design" / "assets" / "logo"
 W, H, N = 1080, 1440, 7
-ESCURAS = {0, 2, 3, 4, 6}           # 1 (verbete) e 5 (carta) são papel
+ESCURAS = {0, 1, 3, 5, 6}        # 2 (verbete) e 4 (semana) são papel
 
 
 def b64(p, mime):
@@ -55,10 +55,10 @@ def x(k):
 
 # a orbe 3D de Minerva: quadros do vídeo de abertura, do fechado ao aberto
 # a orbe 3D aparece só em três momentos: capa, fonte e fecho (imagens de fundo)
-PTS = [(749, 439), (900, 520), (1060, 560), (1176, 562), (1960, 562), (2110, 640), (2135, 900),
-       (2160, 1250), (2300, 1385), (2700, 1395), (3100, 1360), (3330, 1170), (3700, 1170),
-       (4230, 1170), (4275, 900), (4300, 560), (4600, 380), (5080, 364), (5500, 300), (5880, 360),
-       (6060, 420), (6500, 480), (7020, 430)]
+PTS = [(749, 439), (900, 300), (1080, 120), (1600, 90), (2160, 140), (2700, 150), (3140, 200),
+       (3205, 420), (3210, 900), (3240, 1250), (3380, 1385), (3800, 1395), (4180, 1360),
+       (4330, 1110), (4600, 1100), (5000, 1100), (5304, 1100), (5370, 900), (5400, 560), (5700, 380),
+       (6160, 364), (6580, 300), (7020, 430)]
 
 
 def caminho(p):
@@ -90,77 +90,81 @@ def tela(k, classe, miolo, fundo=""):
     return f'<section class="t {classe}" style="left:{x(k)}px">{fundo}{miolo}</section>'
 
 
-def regua():
-    """A régua da marca: traço longo com marcas a cada 12 px e cinco medidas nomeadas."""
-    marcas = "".join(
-        f'<line x1="{i}" y1="0" x2="{i}" y2="{30 if i % 60 == 0 else 14}" />' for i in range(0, 889, 12))
-    nomes = ["Palavra", "Tom", "Cor", "Tipografia", "Imagem"]
-    pos = [0, 216, 432, 648, 888]
-    rot = "".join(f'<text x="{p}" y="72" text-anchor="{"start" if i == 0 else "end" if i == 4 else "middle"}">{n}</text>'
-                  for i, (p, n) in enumerate(zip(pos, nomes)))
-    big = "".join(f'<line x1="{p}" y1="0" x2="{p}" y2="46" class="maior"/>' for p in pos)
-    return f'<svg class="regua" viewBox="-4 -2 896 90" width="896" height="90">{marcas}{big}{rot}</svg>'
+def semana():
+    """A semana do aluno: aulas e revisões distribuídas no tempo que ele tem."""
+    dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"]
+    blocos = {1: ("aula", "Aula", "40 min"), 2: ("rev", "Revisão", "1 dia"), 3: ("aula", "Aula", "40 min"),
+              5: ("rev", "Revisão", "7 dias")}
+    col = []
+    for i, d in enumerate(dias):
+        b = blocos.get(i)
+        miolo = f'<div class="bloco {b[0]}"><b>{b[1]}</b><span>{b[2]}</span></div>' if b else '<div class="bloco livre"></div>'
+        col.append(f'<div class="dia"><p>{d}</p>{miolo}</div>')
+    return f'<div class="semana">{"".join(col)}</div>'
 
 
 def main():
     logo_b = b64(LOGOS / "ejup-horizontal-white.svg", "image/svg+xml")
     t = []
-    # 1 · capa: a coruja e a orbe
+    # 1 · capa: a cena do dia a dia
     t.append(tela(0, "escura", f"""
-  <h1 class="tit" style="top:880px">Antes de chegar até você, tudo passa <em>por&nbsp;ela.</em></h1>
-  <p class="sub" style="top:1170px">Conheça Minerva, a guardiã da marca EJUP.</p>
+  <h1 class="tit" style="top:700px">22h40. Você saiu do escritório com uma dúvida <em>da aula de ontem.</em></h1>
+  <p class="sub" style="top:1100px">Quem estuda na EJUP tem a quem perguntar.</p>
   <img class="logo" src="{logo_b}" alt="">
   <p class="arraste">Arraste</p>""",
-        f'<div class="bg" style="background:#05080c url({img("../orbe-3d/orbe-coruja.png", 1600)}) no-repeat -60px 40px/1600px auto"></div>'
-        '<div class="veu" style="background:linear-gradient(180deg,rgba(13,19,26,0) 40%,rgba(13,19,26,.8) 58%,#0d131a 70%)"></div>'))
-    # 2 · verbete (papel)
-    t.append(tela(1, "papel", """
-  <p class="classe" style="top:300px">Substantivo próprio · feminino</p>
-  <h2 class="verbete" style="top:352px">Mi·ner·va</h2>
-  <ol class="acepcoes" style="top:680px">
+        f'<div class="bg" style="background:#05080c url({img("../orbe-3d/orbe-coruja.png", 1600)}) no-repeat -60px 0/1600px auto"></div>'
+        '<div class="veu" style="background:linear-gradient(180deg,rgba(13,19,26,0) 34%,rgba(13,19,26,.8) 52%,#0d131a 64%)"></div>'))
+    # 2 · a conversa no portal (campo azul)
+    falas = [("eu", "Tenho 40 minutos hoje. Por onde eu começo?"),
+             ("ela", "Pela revisão da aula de ontem, que vence hoje. A próxima aula fica para quinta, no seu horário de estudo."),
+             ("eu", "E aquela parte do fim da aula que eu não entendi?"),
+             ("ela", "Eu explico com base no material da aula e sugiro uma leitura para aprofundar.")]
+    chat = "".join(
+        (f'<div class="fala ela"><p class="quem">Minerva</p><p>{f}</p></div>' if q == "ela"
+         else f'<div class="fala eu"><p>{f}</p></div>') for q, f in falas)
+    t.append(tela(1, "azul", f"""
+  <div class="chat" style="top:200px">{chat}</div>
+  <p class="fonte">Conversa ilustrativa no portal do aluno EJUP.</p>"""))
+    # 3 · verbete (papel)
+    t.append(tela(2, "papel", """
+  <p class="classe" style="top:250px">Substantivo próprio · feminino</p>
+  <h2 class="verbete" style="top:302px">Mi·ner·va</h2>
+  <ol class="acepcoes" style="top:630px">
     <li>Deusa romana da sabedoria, a Atena dos gregos. Seu símbolo é a coruja.</li>
-    <li>Na EJUP, a guardiã da marca. Confere qualidade, segurança e coerência de tudo o que leva o nome da escola, antes de chegar a você.</li>
+    <li>No portal do aluno EJUP, a orientadora de estudo. Responde dúvidas do curso com base no material da escola e organiza o estudo no tempo que você tem.</li>
   </ol>"""))
-    # 3 · voto de Minerva: a estátua
-    t.append(tela(2, "escura", """
+    # 4 · voto de Minerva: a estátua
+    t.append(tela(3, "escura", """
   <h2 class="tit" style="top:620px">Vem dela o<br><em>voto de Minerva.</em></h2>
-  <p class="txt" style="top:830px;width:820px">Na tragédia de Ésquilo, Atena instala um tribunal e desempata o julgamento de Orestes. É a decisão que pesa quando os lados se equilibram.</p>
+  <p class="txt" style="top:830px;width:820px">Na tragédia de Ésquilo, Atena desempata o julgamento de Orestes. No seu estudo, Minerva ajuda a decidir o que vem primeiro.</p>
   <p class="fonte topo">Ésquilo, <i>Eumênides</i> · Atena Varvakeion, séc. III d.C.</p>""",
         f'<div class="bg" style="background-image:url({img("atena-varv2-up.jpg", 1400)});background-size:auto 112%;background-position:62% 0%;filter:brightness(.72) saturate(.5)"></div>'
         '<div class="veu" style="background:linear-gradient(180deg,rgba(13,19,26,.15) 0%,rgba(13,19,26,0) 30%,rgba(13,19,26,.82) 50%,#0d131a 68%)"></div>'))
-    # 4 · critério: campo azul, tipografia e a régua
-    t.append(tela(3, "azul", f"""
-  <h2 class="tit pequeno" style="top:170px">Ela guarda <em>o critério.</em></h2>
-  <p class="manifesto" style="top:380px">A EJUP<br>não grita.<br><em>A EJUP<br>tem peso.</em></p>
-  <p class="txt" style="top:960px;width:820px">Cada detalhe passa pela régua da marca. O que destoa volta para ajuste.</p>
-  <div style="position:absolute;left:96px;top:1170px;z-index:3">{regua()}</div>"""))
-    # 5 · fonte: a orbe sobre os livros
-    t.append(tela(4, "escura", """
-  <h2 class="tit" style="top:700px">Ela guarda<br><em>a fonte.</em></h2>
-  <p class="txt" style="top:910px">Número, citação, decisão e nome próprio só entram com origem rastreada, sustentada por fontes de naturezas diferentes.</p>
-  <p class="txt" style="top:1170px">Afirmação sem fonte devolve a peça. Simplificação que distorce o Direito também.</p>""",
+    # 5 · tempo (papel): a semana
+    t.append(tela(4, "papel", f"""
+  <h2 class="tit" style="top:190px">Ela organiza<br><em>o seu tempo.</em></h2>
+  <p class="txt" style="top:400px">Você diz quantas horas tem e em quais dias estuda. Ela distribui as aulas, marca as revisões e ajusta o plano quando a semana foge do previsto.</p>
+  <div style="position:absolute;left:96px;top:780px;z-index:3">{semana()}</div>
+  <p class="nota" style="top:1270px">Revisões marcadas em 1, 7 e 30 dias.</p>"""))
+    # 6 · dúvidas: a orbe sobre os livros
+    t.append(tela(5, "escura", """
+  <h2 class="tit" style="top:700px">Ela responde com<br><em>o material da escola.</em></h2>
+  <p class="txt" style="top:910px">A dúvida do curso ganha resposta com base nas aulas e nos materiais da EJUP, no momento em que aparece.</p>
+  <p class="txt" style="top:1150px">Com o mesmo critério das aulas: referência clara e nenhum atalho.</p>""",
         f'<div class="bg" style="background:#05080c url({img("../orbe-3d/orbe-livros.png", 2600)}) no-repeat -489px 0/auto 1440px"></div>'
         '<div class="veu" style="background:linear-gradient(180deg,rgba(13,19,26,0) 35%,rgba(13,19,26,.82) 52%,rgba(13,19,26,.9) 100%)"></div>'))
-    # 6 · confiança (papel): a carta lacrada atravessa para a tela 7
-    itens = [("Ética", "profissional da advocacia"), ("Dados", "pessoais conforme a LGPD"),
-             ("Imagem", "e autoria verificadas"), ("Nenhuma", "promessa de resultado")]
-    grade = "".join(f"<div><b>{a}</b> {b}</div>" for a, b in itens)
-    t.append(tela(5, "papel", f"""
-  <h2 class="tit" style="top:830px">Ela guarda<br><em>a confiança.</em></h2>
-  <div class="grade" style="top:1050px">{grade}</div>"""))
-    # 7 · fecho: a orbe aberta sob o arco
+    # 7 · fecho: exclusiva de quem estuda na EJUP
     t.append(tela(6, "escura", f"""
-  <h2 class="tit" style="top:790px">Sabedoria também é saber <em>a quem cabe a palavra final.</em></h2>
-  <p class="txt" style="top:1080px">Minerva confere, aponta e devolve. Quem decide é sempre uma pessoa da escola.</p>
-  <p class="cta">Siga a EJUP</p>
+  <h2 class="tit" style="top:790px">Minerva é exclusiva de quem <em>estuda na EJUP.</em></h2>
+  <p class="txt" style="top:1080px">Ela acompanha cada aluno no portal, da primeira aula à última revisão.</p>
+  <p class="cta">Conheça as formações · ejup.com.br</p>
   <img class="logo" src="{logo_b}" alt="">""",
         f'<div class="bg" style="background:#05080c url({img("../orbe-3d/orbe-arco.png", 2000)}) no-repeat -421px -89px/auto 1100px"></div>'
         '<div class="veu" style="background:linear-gradient(180deg,rgba(13,19,26,0) 45%,rgba(13,19,26,.85) 58%,#0d131a 72%)"></div>'))
 
-    ponte = (f'<img class="moeda" src="{img("moeda-recorte.png", 900)}" alt="" style="left:{x(2) - 240}px;top:1110px;width:440px">'
-             f'<div class="carta" style="left:{x(5) + 170}px;top:150px;width:900px"><img src="{img("lacre-carta-sobrio.jpg", 1400)}" alt=""></div>')
+    ponte = f'<img class="moeda" src="{img("moeda-recorte.png", 900)}" alt="" style="left:{x(3) - 240}px;top:1110px;width:440px">'
 
-    html = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Carrossel Minerva</title><style>
+    html = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Carrossel Minerva aluno</title><style>
 {fontes()}
 *{{box-sizing:border-box;margin:0;padding:0}}
 body{{background:#222;font-family:'Gotham',sans-serif}}
@@ -194,6 +198,22 @@ h1.tit{{font-size:84px}}
 .acepcoes li+li::before{{top:38px}}
 .manifesto{{position:absolute;left:96px;font-weight:900;font-size:118px;line-height:.98;letter-spacing:-.035em;color:#fff;z-index:3}}
 .manifesto em{{font-style:normal;color:#f0b855}}
+.chat{{position:absolute;left:96px;right:96px;display:grid;gap:44px;z-index:3}}
+.fala{{max-width:800px;display:grid;gap:10px}}
+.fala p{{font-weight:300;font-size:40px;line-height:1.38}}
+.fala.eu{{justify-self:end}}
+.fala.eu p{{background:rgba(209,211,212,.12);border:1px solid rgba(209,211,212,.22);border-radius:12px 12px 2px 12px;padding:26px 30px;color:#fff}}
+.fala.ela p:last-child{{background:#0d131a;border:1.5px solid rgba(240,184,85,.55);border-radius:12px 12px 12px 2px;padding:26px 30px;color:#ecebe7}}
+.fala .quem{{font-weight:500;font-size:20px;letter-spacing:.14em;text-transform:uppercase;color:#f0b855;padding-left:4px}}
+.semana{{display:grid;grid-template-columns:repeat(7,120px);gap:8px}}
+.dia p{{font-weight:500;font-size:18px;letter-spacing:.14em;text-transform:uppercase;color:#5f6062;text-align:center;margin-bottom:14px}}
+.bloco{{height:360px;border-radius:8px;display:flex;flex-direction:column;justify-content:flex-end;padding:16px 12px;gap:6px}}
+.bloco.livre{{border:1px dashed rgba(3,28,55,.2)}}
+.bloco.aula{{background:#031c37;color:#fff}}
+.bloco.rev{{background:#fff;border:2px solid #9b6b26;color:#9b6b26}}
+.bloco b{{font-weight:900;font-size:21px;letter-spacing:-.01em}}
+.bloco span{{font-weight:300;font-size:17px}}
+.nota{{position:absolute;left:96px;font-weight:500;font-size:22px;letter-spacing:.14em;text-transform:uppercase;color:#9b6b26;z-index:3}}
 .regua line{{stroke:#f0b855;stroke-width:2}}
 .regua line.maior{{stroke-width:3}}
 .regua text{{fill:#d1d3d4;font-family:'Gotham';font-weight:500;font-size:17px;letter-spacing:.14em;text-transform:uppercase}}

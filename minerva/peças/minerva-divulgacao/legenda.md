@@ -1,19 +1,18 @@
-# Legenda sugerida · Carrossel "Minerva, a guardiã da marca"
+# Legenda sugerida · Carrossel "Minerva, a orientadora do aluno EJUP"
 
-Antes de chegar até você, tudo passa por ela.
+22h40. Você saiu do escritório com uma dúvida da aula de ontem e quarenta minutos livres.
 
-Minerva é a inteligência que a EJUP criou para guardar a própria marca. Ela confere critério, fonte e confiança de cada conteúdo antes que ele exista em público. A palavra final continua com uma pessoa da escola.
+Quem estuda na EJUP tem a quem perguntar. No portal do aluno, a Minerva responde dúvidas do curso com base no material da escola, organiza o estudo no tempo que você tem e marca as revisões em 1, 7 e 30 dias.
 
-O nome vem de longe. Minerva é a Atena dos romanos, deusa da sabedoria. Em Ésquilo, é ela quem instala um tribunal e desempata o julgamento de Orestes. Daí o voto de Minerva.
+O nome vem de longe: Minerva é a Atena dos romanos, deusa da sabedoria. Em Ésquilo, é ela quem desempata o julgamento de Orestes. Daí o voto de Minerva.
 
-Siga a EJUP.
+Minerva é exclusiva de quem estuda na EJUP. Conheça as formações em ejup.com.br.
 
 ---
 
-## Fontes a conferir antes de publicar
+## Antes de publicar
 
-1. Ésquilo, *Eumênides* (Oresteia): Atena institui o tribunal do Areópago e dá o voto de desempate na absolvição de Orestes. Fonte literária clássica.
-2. Cleveland Museum of Art, tetradracma ateniense com a coruja, 449–407 a.C. (via Flickr/museado, CC0). Fonte de acervo.
-3. **Pendente:** uma fonte jurídica sobre o uso de "voto de Minerva" no Direito brasileiro (glossário do STF ou artigo no Migalhas/Conjur). A busca foi interrompida nesta sessão; incluir antes de ir ao gate.
-
-Imagens: créditos em `material/CREDITOS.md`.
+- Conferir com o time do portal: as funções descritas (dúvidas com base no material, plano semanal, ajuste do plano, revisões em 1, 7 e 30 dias, sugestão de leitura) precisam estar no ar no dia da publicação.
+- A conversa da tela 2 é ilustrativa e está sinalizada como tal.
+- Fontes: Ésquilo, *Eumênides* (fonte literária); tetradracma de Atenas, Cleveland Museum of Art (acervo). Pendente: uma fonte jurídica sobre a expressão "voto de Minerva".
+- Imagens: créditos em `material/CREDITOS.md`.
