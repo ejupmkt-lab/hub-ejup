@@ -32,7 +32,7 @@
       ]
     },
     {
-      "source": "/minerva/(.*)\\.(webp|jpg)",
+      "source": "/minerva/(.*)\\.(webm|mp4|jpg)",
       "headers": [
         {
           "key": "Cache-Control",

@@ -87,7 +87,7 @@ em.s{font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.12em
 .stage{position:absolute;z-index:1;mix-blend-mode:screen;top:50%;left:72%;width:min(46vw,78vh,640px);aspect-ratio:1;transform:translate(-50%,-50%);transition:left .6s var(--ease),top .6s var(--ease),width .6s var(--ease)}
 .mnv{position:absolute;inset:0;animation:float var(--float-speed) ease-in-out infinite;cursor:pointer}
 .mnv-f{position:absolute;inset:0;transform:translate(calc(var(--px,0)*var(--tilt)),calc(var(--py,0)*var(--tilt)));transition:transform 1.4s var(--ease)}
-.mnv-f>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mnv-f>img,.mnv-f>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .mnv-f>.on,.mnv-f>.va,.mnv-f>.vf{opacity:0}
 .mnv-f>img.on{transition:opacity 1.2s ease}
 .mnv-f>.va,.mnv-f>.vf{transition:opacity var(--swap,.35s) ease}
@@ -216,10 +216,10 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
     <div class="stage" aria-hidden="true">
       <div class="mnv" id="mnv" data-state="rest">
         <div class="mnv-f">
-          <img class="off" src="/minerva/repouso.jpg" alt="" width="720" height="720" decoding="async">
-          <img class="on" src="/minerva/aberta.jpg" alt="" width="720" height="720" decoding="async">
-          <img class="va" alt="" width="720" height="720">
-          <img class="vf" alt="" width="720" height="720">
+          <img class="off" src="/minerva/repouso.jpg" alt="" width="1076" height="1076" decoding="async">
+          <img class="on" src="/minerva/aberta.jpg" alt="" width="1076" height="1076" decoding="async">
+          <video class="va" muted playsinline preload="none" disablepictureinpicture disableremoteplayback tabindex="-1"></video>
+          <video class="vf" muted playsinline preload="none" disablepictureinpicture disableremoteplayback tabindex="-1"></video>
           <i class="mnv-h"></i>
           <i class="mnv-b"></i>
         </div>
@@ -301,8 +301,13 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
 <script>
 const MINERVA_CONFIG = {
   endpoint: '/api/minerva',
-  // movimento da esfera: imagens animadas que tocam uma vez (abrir e fechar), 5 s cada
-  animations: { abertura: '/minerva/abertura.webp', fechamento: '/minerva/fechamento.webp', duration: 5040 },
+  // movimento da esfera: vídeos curtos que tocam uma vez (abrir e fechar), 5 s cada.
+  // WebM (VP9) primeiro; MP4 (H.264) para os navegadores que não tocam WebM
+  animations: {
+    abertura: ['/minerva/abertura.webm', '/minerva/abertura.mp4'],
+    fechamento: ['/minerva/fechamento.webm', '/minerva/fechamento.mp4'],
+    duration: 5040,
+  },
   // sem conversa, a esfera abre e fecha sozinha; pausa (ms) em cada estado antes de trocar
   idle: { fechada: 3000, aberta: 3000 },
   greeting: 'Sou a Minerva, da EJUP. Pergunte sobre a escola, as formações, o EJUPcast ou como falar com a equipe.',
@@ -314,13 +319,15 @@ const MINERVA_CONFIG = {
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------- Minerva ----------
-     Estados: rest (fechada) → opening (abertura.webp) → open (aberta, brilho pulsando)
-              → closing (fechamento.webp) → rest. Pedidos que chegam no meio de uma
-              animação entram na fila e são atendidos quando ela termina, sem saltos. */
+     Estados: rest (fechada) → opening (abertura) → open (aberta, brilho pulsando)
+              → closing (fechamento) → rest. Pedidos que chegam no meio de uma
+              animação entram na fila e são atendidos quando ela termina, sem saltos.
+              O vídeo é decodificado pelo hardware e roda liso; se não tocar (movimento
+              reduzido, economia de bateria, formato não suportado), as imagens paradas
+              trocam com um esmaecimento suave. */
   const m = $('#mnv'), va = $('.va'), vf = $('.vf');
   const A = MINERVA_CONFIG.animations;
   const failed = { va: RM, vf: RM };
-  const blobs = {};
   const IDLE = Object.assign({ fechada: 3000, aberta: 3000 }, MINERVA_CONFIG.idle);
   let state = 'rest', awake = false, timer = 0;
   let talking = false, idleWant = false, idleTimer = 0;
@@ -329,33 +336,27 @@ const MINERVA_CONFIG = {
   const setState = (s) => { state = s; clearTimeout(timer); show(); };
   const slow = (on) => m.style.setProperty('--swap', on ? '1.2s' : '.35s');
 
-  // Toca a animação do começo. Tenta, em ordem: endereço blob: novo (o mais confiável
-  // para reiniciar), o próprio arquivo com um parâmetro novo e, por fim, o arquivo puro.
-  let plays = 0;
-  function attempt(img, url, onShown) {
-    return new Promise((ok, fail) => {
-      img.onload = () => { img.onload = img.onerror = null; onShown(); ok(); };
-      img.onerror = () => { img.onload = img.onerror = null; fail(new Error('imagem')); };
-      img.src = url;
-    });
+  // escolhe o formato que o navegador toca e começa a baixar
+  function load(v, key) {
+    if (RM || v.src) return;
+    const fmt = [].concat(A[key]).find((u) => v.canPlayType(/\.webm$/.test(u) ? 'video/webm; codecs="vp9"' : 'video/mp4; codecs="avc1.640028"'));
+    if (!fmt) return;
+    v.preload = 'auto';
+    v.src = fmt;
   }
-  function play(img, key, onShown) {
-    const n = ++plays;
-    return load(key).then((blob) => {
-      if (!blob) throw new Error('sem blob');
-      if (img._url) URL.revokeObjectURL(img._url);
-      img._url = URL.createObjectURL(blob);
-      return attempt(img, img._url, onShown);
-    }).catch(() => attempt(img, A[key] + '?p=' + n, onShown))
-      .catch(() => attempt(img, A[key], onShown));
+  // toca do começo; avisa quando o primeiro quadro está na tela e quando termina
+  function play(v, key, onShown, onEnd) {
+    load(v, key);
+    if (!v.src) return Promise.reject(new Error('formato'));
+    v.onended = onEnd;
+    try { v.currentTime = 0; } catch (e) { /* ainda sem metadados */ }
+    return Promise.resolve(v.play()).then(() => new Promise((ok) => {
+      // mostra só depois de o quadro novo ser pintado: evita piscar o fim da vez anterior
+      if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(() => ok());
+      else requestAnimationFrame(() => requestAnimationFrame(ok));
+    })).then(onShown);
   }
-  // o arquivo em si não falha por causa do fetch: só desiste se a imagem não carregar
-  function load(key) {
-    if (RM) return Promise.resolve(null);
-    if (!blobs[key]) blobs[key] = fetch(A[key]).then((r) => (r.ok ? r.blob() : null)).catch(() => null);
-    return blobs[key];
-  }
-  if (!RM) load('abertura');
+  if (!RM) load(va, 'abertura');
 
   // Sem conversa: abre e fecha sozinha, em ciclo. Em conversa: fica aberta.
   function step() {
@@ -380,12 +381,16 @@ const MINERVA_CONFIG = {
   }
 
   function startOpen() {
-    load('fechamento');
+    load(vf, 'fechamento');
     setState('opening');
     if (failed.va) { timer = setTimeout(opened, 400); return; }
     slow(false);
-    play(va, 'abertura', () => { m.classList.add('va'); m.classList.remove('vf'); clearTimeout(timer); timer = setTimeout(opened, A.duration); })
-      .catch(() => { failed.va = true; opened(); });
+    const fim = () => { clearTimeout(timer); opened(); };
+    play(va, 'abertura', () => {
+      if (state !== 'opening') return;
+      m.classList.add('va'); m.classList.remove('vf');
+      clearTimeout(timer); timer = setTimeout(fim, A.duration + 1500); // rede caiu no meio: segue mesmo assim
+    }, fim).catch(() => { failed.va = true; opened(); });
   }
 
   function rested() {
@@ -403,16 +408,14 @@ const MINERVA_CONFIG = {
       return;
     }
     slow(false);
+    // último quadro do fechamento = imagem de repouso
+    const fim = () => { clearTimeout(timer); m.classList.remove('vf'); rested(); };
     play(vf, 'fechamento', () => {
+      if (state !== 'closing') return;
       m.classList.add('vf');
       setTimeout(() => { m.classList.remove('on', 'va'); }, 400);
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        // último quadro do fechamento = imagem de repouso
-        m.classList.remove('vf');
-        rested();
-      }, A.duration);
-    }).catch(() => { failed.vf = true; slow(true); m.classList.remove('va', 'vf', 'on'); timer = setTimeout(rested, 1200); });
+      clearTimeout(timer); timer = setTimeout(fim, A.duration + 1500);
+    }, fim).catch(() => { failed.vf = true; slow(true); m.classList.remove('va', 'vf', 'on'); timer = setTimeout(rested, 1200); });
   }
 
   const openMinerva = () => { talking = true; m.classList.add('talk'); clearTimeout(idleTimer); step(); };
