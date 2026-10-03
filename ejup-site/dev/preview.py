@@ -72,6 +72,9 @@ BADGE = '<div style="position:fixed;left:12px;bottom:calc(env(safe-area-inset-bo
 
 # ---------- site ----------
 js = R('assets/app.js')
+# o conteúdo padrão vem de um módulo; na prévia ele entra embutido no próprio script
+padrao = re.sub(r'^//.*\n', '', R('assets/padrao.js'), flags=re.M).replace('export default', 'const PADRAO =', 1)
+js = must(js, "import PADRAO from '/assets/padrao.js';", padrao)
 js = must(js, "const withImg=h=>h.replace(/\"img\\/(\\w+)\\.jpg/g,'\"/img/$1.jpg');", "const withImg=h=>h;")
 js = must(js, "const IMG=new Proxy({},{get:(o,n)=>`/img/${String(n)}.jpg`});", "const IMG=new Proxy({},{get:(o,n)=>`img/${String(n)}.jpg`});")
 js = must(js, "const VID={logo:'/vid/cast-logo.mp4',sub:'/vid/cast-subscribe.mp4',est:'/vid/estatuas.mp4'};", "const VID={logo:'vid/cast-logo.mp4',sub:'vid/cast-subscribe.mp4',est:'vid/estatuas.mp4'};")
@@ -102,7 +105,7 @@ pj = pj[:-5] + 'window.__portalOk&&window.__portalOk();window.__portal=Promise.r
 js = js.replace("href=\"/minerva\"", "href=\"minerva.html\"").replace("k==='minerva'?'/minerva'", "k==='minerva'?'minerva.html'")
 js = js.replace('src="img/', 'src="img/')  # templates já usam caminho relativo
 css = inline_fonts(R('assets/style.css'))
-shell = R('index.html')
+shell = R('app.html')
 body = shell[shell.index('<body>') + 6:shell.index('</body>')]
 title = re.search(r'<title>.*?</title>', shell).group(0)
 gfonts = '\n'.join(re.findall(r'<link rel="(?:preconnect|stylesheet)" href="https://fonts[^>]+>', shell))

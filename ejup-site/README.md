@@ -25,7 +25,7 @@ o site.** Todas as outras produções da EJUP seguem o MIV (ver `CLAUDE.md` na r
 
 | Caminho | O que é |
 |---|---|
-| `index.html`, `assets/app.js`, `assets/style.css` | Site: Home, A escola, Formações, Professores, EJUPcast, Coluna Jurídica, In company, Política de Privacidade. Rotas reais (`/escola`, `/formacao/licenciamento`…). |
+| `app.html`, `assets/app.js`, `assets/style.css` | Site: Home, A escola, Formações, Professores, EJUPcast, Coluna Jurídica, In company, Política de Privacidade. Rotas reais (`/escola`, `/formacao/licenciamento`…). |
 | `minerva/` | Página `/minerva`; `abertura.webp` e `fechamento.webp` (movimento da esfera, tocam uma vez), `repouso.jpg` e `aberta.jpg` (estados parados) |
 | `api/minerva.js`, `api/_lib/busca.js` | Minerva sem IA: busca a pergunta cadastrada mais parecida e devolve a resposta (20 req/min por IP) |
 | `api/_lib/respostas.js` | Respostas iniciais da Minerva; reserva quando o Supabase não estiver configurado |
@@ -34,6 +34,8 @@ o site.** Todas as outras produções da EJUP seguem o MIV (ver `CLAUDE.md` na r
 | `api/portal.js`, `api/_lib/portal.js` | API do Portal em uma função (`/api/portal?r=…`), sessão em cookie HttpOnly |
 | `dev/fake-supabase.mjs` | Supabase em memória para os testes e para `npm run dev:portal` |
 | `img/`, `vid/`, `fonts/` | Imagens, vídeos e Gotham (woff2) |
+| `assets/padrao.js` | Textos padrão do site (formações, professores, artigos, episódios, perguntas, links) e títulos/descrições das páginas |
+| `api/pagina.js`, `api/_lib/seo.js` | Entrega cada página com título, descrição, imagem de prévia (WhatsApp, LinkedIn) e dados estruturados (Google); gera `/sitemap.xml` e `/robots.txt` |
 | `vercel.json` | Rotas do site, `/minerva`, microfone, cache |
 
 **Conteúdo do site** (formações e suas páginas, professores, artigos da Coluna, episódios do

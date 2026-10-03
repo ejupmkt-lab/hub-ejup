@@ -1,3 +1,4 @@
+import PADRAO from '/assets/padrao.js';
 (()=>{
 'use strict';
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
@@ -69,18 +70,12 @@ const orb=(cls,o={})=>{
 };
 /* ações que levam para fora: o endereço vem de LINKS; botão sem endereço não aparece */
 const T={yt:'@youtube',sp:'@spotify',wa:'@whatsapp',map:'@mapa',soc:'@instagram',leg:'@privacidade',more:'@youtube',mail:'@mail'};
-let LINKS={
- whatsapp:'https://wa.me/5585992714050',
- mapa:'https://www.google.com/maps/search/?api=1&query=Rua%20da%20Saudade%2C%201028%20-%20Lagoa%20Nova%2C%20Natal%20-%20RN',
- instagram:'https://www.instagram.com/ejup.oficial/',
- youtube:'',   // canal da EJUP no YouTube
- spotify:''    // EJUPcast no Spotify
-};
+let LINKS={...PADRAO.LINKS};
 /* link de pagamento de cada formação; vazio = o botão abre o WhatsApp com a formação já citada */
 const CHECKOUT={licenciamento:'',pareceres:'',equipes:''};
 const waMsg=t=>LINKS.whatsapp+'?text='+encodeURIComponent(t);
 /* imagem: nome de arquivo em img/ (curso1) ou endereço completo (/img/x.jpg, https://…) */
-const src=u=>/^(https?:|\/)/.test(u||'')?u:`img/${u}.jpg`;
+const src=(u,pad='ep18')=>/^(https?:|\/)/.test(u||'')?u:`img/${u||pad}.jpg`;
 const paras=t=>String(t||'').split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
 
 /* imagens embutidas na própria página, para não depender de arquivos externos */
@@ -91,45 +86,8 @@ const hydrate=root=>$$('video[data-vid]',root).forEach(v=>{const auto=v.hasAttri
 
 /* ---------- conteúdo ---------- */
 const CATS=[['todos','Todos'],['direito','Direito'],['power','Power Skills'],['negocios','Negócios & Inovação']];
-let F=[
- {id:'licenciamento',img:'curso1',cat:'direito',lb:'Direito Ambiental',t:'Marco Legal do Licenciamento Ambiental',d:'Domine a nova Lei Geral do Licenciamento Ambiental (Lei 15.190/2025) com foco em aplicação prática e segurança jurídica.',f:['10 horas','4 módulos','Online','Certificado'],alt:'Capa da formação Marco Legal do Licenciamento Ambiental, com os professores Leonardo Pivotto e Maria Helena Cortez',
-  fd:['10 horas','4 módulos','Online','Certificado de conclusão'],incl:['10 horas de curso','4 módulos','Acesso online','Certificado de conclusão'],preco:'R$ 649,90',preco_de:'R$ 990,00',parcelas:'ou 12x de R$ 65',checkout:'',
-  sobre:'A Formação Novo Marco Legal do Licenciamento Ambiental oferece uma análise prática, técnica e aprofundada da Lei Geral do Licenciamento Ambiental, explorando suas principais inovações, modalidades de licenciamento, hipóteses de dispensa, competências institucionais e aspectos procedimentais de maior relevância para a atuação profissional.\n\nConduzido por Leonardo Pivotto, com participação da professora convidada Maria Helena Cortez, o curso foi estruturado para proporcionar segurança jurídica, atualização normativa e capacidade de aplicação concreta da nova legislação no contexto de consultorias, órgãos públicos, empreendimentos e atividades sujeitas ao controle ambiental.',
-  aprender:['Compreender profundamente a nova Lei Geral do Licenciamento Ambiental','Aplicar corretamente prazos, renovações e condicionantes ambientais','Dominar as novas modalidades de licenciamento ambiental','Evitar erros comuns de interpretação da nova legislação','Identificar hipóteses de dispensa e atividades não sujeitas ao licenciamento','Utilizar o novo marco legal na prática profissional'],
-  modulos:[{t:'Introdução e Princípios Fundamentais'},{t:'As Modalidades de Licenciamento'},{t:'Isenções e Dispensas de Licenciamento'},{t:'Temas Transversais e Procedimentais'}],
-  profs:[{id:'leonardo-pivotto'},{id:'maria-helena-cortez',papel:'Professora convidada'}]},
- {id:'pareceres',img:'curso2',cat:'direito',lb:'Direito Ambiental',t:'Formação em Pareceres Técnicos Ambientais',d:'Da estrutura à argumentação: como produzir pareceres robustos e defensáveis.',f:['8 horas','Online','Certificado'],alt:'Capa da formação Elaboração de Parecer Técnico, com o professor Leonardo Pivotto',profs:[{id:'leonardo-pivotto'}]},
- {id:'equipes',img:'curso3',cat:'direito',lb:'Direito Ambiental · Corporativo',t:'Marco Legal do Licenciamento Ambiental para equipes',d:'Formação presencial voltada à compreensão prática da nova Lei Geral do Licenciamento Ambiental (Lei nº 15.190/2025).',f:['5 horas','Presencial','In company'],alt:'Capa da formação corporativa Marco Legal do Licenciamento Ambiental, com o professor Leonardo Pivotto',profs:[{id:'leonardo-pivotto'}],incompany:true}
-];
-let E=[
- {n:18,m:'Ep. 18 · 67 min',img:'ep18',cat:'direito',t:'Decisões por IA, Tribunais e Rumos da Advocacia',d:'O que separa a agilidade técnica de um processo da sua real segurança jurídica? Quase sempre, um profissional disposto a exercer o pensamento crítico.'},
- {n:17,m:'Ep. 17 · 60 min',img:'ep17',cat:'negocios',t:'O Risco Que Virou Case de Sucesso',d:'O que separa uma ideia de um negócio consolidado? Muitas vezes, alguém disposto a apostar antes de qualquer garantia.'},
- {n:16,m:'Ep. 16',img:'ep16',cat:'power',t:'Repertório Não Se Improvisa',d:'Como o repertório jurídico se constrói com tempo, estudo, prática e escuta ativa — e por que a pressa pode ser a maior inimiga da solidez profissional.'}
-];
-let AR=[
- {id:'multiportas',img:'art1',imgv:'art1v',t:'O sistema multiportas do setor elétrico',d:'Mediação na ANEEL e arbitragem na CCEE: como funciona cada porta.',by:'Equipe EJUP',min:12,date:'29 de setembro de 2026',
-  corpo:'Ao longo da evolução do marco regulatório do setor elétrico brasileiro, consolidaram-se diferentes mecanismos de tratamento de conflitos. Entre eles estão a Ouvidoria Setorial e a mediação administrativa no âmbito da Agência Nacional de Energia Elétrica (ANEEL), além da arbitragem aplicável a determinadas controvérsias no ambiente da Câmara de Comercialização de Energia (CCEE). Esse conjunto de vias, ao lado do próprio processo judicial, é chamado, na doutrina, de sistema multiportas do setor elétrico.\n\n## O que é o sistema multiportas no setor elétrico?\n\nSistema multiportas é a expressão doutrinária usada para descrever um modelo em que o mesmo conflito pode ser encaminhado por caminhos distintos, a depender de sua natureza e complexidade. No setor elétrico, essas portas incluem a Ouvidoria Setorial e a mediação administrativa, ambas conduzidas pela ANEEL, a arbitragem realizada por câmaras credenciadas no ambiente da CCEE, e o próprio processo judicial.\n\nÉ importante não tratar esse conjunto como uma estrutura única pertencente institucionalmente à ANEEL. A Ouvidoria Setorial e a mediação administrativa integram as competências da Agência, atribuídas pela Lei nº 9.427/1996. Já a arbitragem ocorre em outro ambiente institucional, o da CCEE, regida por sua própria Convenção Arbitral, homologada pela ANEEL.\n\n## Qual é a base legal da mediação administrativa na ANEEL?\n\nA mediação administrativa da ANEEL tem fundamento na Lei nº 9.427/1996, que atribui à Agência a função de dirimir divergências no âmbito administrativo, e é operacionalizada hoje pela Superintendência de Mediação Administrativa e das Relações de Consumo (SMA). A estrutura de resolução de conflitos do setor elétrico está amparada em um conjunto de normas que se complementam.'},
- {id:'stf',img:'art2',t:'A eventual responsabilização de ministros do STF: quais mecanismos o ordenamento brasileiro prevê?',st:'A eventual responsabilização de ministros do STF',d:'Quem pode julgar ministros do STF, o alcance do CNJ, o papel do Senado e os limites institucionais previstos no ordenamento.',by:'Equipe EJUP',min:15},
- {id:'policia',img:'art3',t:'Poder de polícia ambiental municipal: o licenciamento simplificado é eficaz sem capacidade técnica?',st:'Poder de polícia ambiental municipal',d:'Sem órgão ambiental capacitado, a simplificação reduz a burocracia sem reduzir o risco ambiental.',by:'Leonardo Pivotto',min:15},
- {id:'investigacao',img:'art4',t:'A legitimidade da investigação defensiva no processo penal: fundamentos, limites e aplicação prática',d:'',by:'',min:0}
-];
-let FAQ=[
- ['O que é a EJUP?','A EJUP é uma escola de educação jurídica continuada, que oferece formações, uma coluna de análise assinada por especialistas e o EJUPcast, seu podcast institucional. Não é um curso preparatório para concursos nem para o exame da OAB: é formação continuada para quem já exerce ou está prestes a exercer sua profissão.'],
- ['Para quem é a EJUP?','A EJUP é indicada a quem busca profundidade e visão estratégica: advogados e juristas, professores e pesquisadores, profissionais da interface jurídica e estudantes em fase final. Não é indicada a quem procura atalho formativo, fórmula pronta ou promessa de resultado imediato.'],
- ['O que a EJUP ensina?','Três pilares. Base jurídica: o núcleo técnico e doutrinário do Direito. Negócios & Inovação: como o Direito opera dentro de mercados, empresas e políticas públicas. Power Skills: negociação, mediação, posicionamento profissional e construção de relacionamento.'],
- ['Como a EJUP é diferente de outros cursos jurídicos?','A oferta comum é organizada por velocidade: conteúdo curto, promessa de resultado rápido, técnica descolada de contexto. A EJUP parte do oposto: trata o tempo de estudo como valor e a profundidade como vantagem competitiva. Não substitui o ensino formal: é seu prolongamento qualificado.'],
- ['Quem ensina na EJUP?','As formações e a coluna são conduzidas por profissionais com notório saber em suas áreas — advogados, professores e especialistas com trajetória reconhecida no exercício e na produção intelectual do Direito.'],
- ['O que é o EJUPcast?','É o podcast institucional da EJUP: conversas longas com profissionais que construíram trajetória no Direito, nos negócios e nas instituições. Está disponível no YouTube e no Spotify. A EJUP é uma escola; o podcast é um de seus meios.'],
- ['Como faço para estudar na EJUP?','Cada formação apresenta conteúdo programático, carga horária e forma de ingresso. A inscrição é feita na própria página da formação, e as aulas ficam no Portal do Aluno.'],
- ['A EJUP emite certificado?','Sim. O certificado é emitido quando você finaliza a carga horária do curso.'],
- ['A EJUP oferece formações in-company?','Sim. Para escritórios, departamentos jurídicos e instituições públicas que desejam treinar suas equipes, oferecemos formações fechadas e personalizadas. Entre em contato para receber uma proposta.']
-];
-let PROF=[
- {id:'leonardo-pivotto',nome:'Leonardo Pivotto',cargo:'Advogado e Consultor Ambiental',foto:'prof1',resumo:'Doutor e mestre em áreas relacionadas a meio ambiente, sustentabilidade e inovação. Assessora empresas e instituições em processos regulatórios e ambientais.',
-  bio:'Leonardo Pivotto Nicodemo é advogado e consultor ambiental, doutor e mestre em áreas relacionadas a meio ambiente, sustentabilidade e inovação. Possui formação multidisciplinar em Direito, Meio Ambiente, Engenharia de Produção e Desenvolvimento Sustentável, com atuação voltada a temas de Direito Ambiental, licenciamento e auditoria ambiental.\n\nAtua na assessoria jurídica e técnica a empresas e instituições em processos regulatórios e ambientais, além de desenvolver projetos que integram gestão ambiental, sustentabilidade e inovação tecnológica aplicada.'},
- {id:'maria-helena-cortez',nome:'Maria Helena Cortez',cargo:'Advogada e Diretora Jurídica',foto:'mh',resumo:'Advogada especialista em Direito Ambiental, Urbanístico e Regulatório, com mais de 15 anos de experiência. Diretora da Assessoria Jurídica da SEMURB/Natal.',
-  bio:'Maria Helena Bezerra Cortez de Freitas é advogada especialista em Direito Ambiental, Urbanístico e Regulatório, com mais de 15 anos de experiência na área. É Diretora da Assessoria Jurídica da Secretaria Municipal de Meio Ambiente e Urbanismo de Natal (SEMURB), atuando na condução de processos de licenciamento ambiental e na elaboração de normas ambientais e urbanísticas.\n\nSócia do escritório Cortez de Freitas Advocacia, é autora do livro Direito Ambiental (Editora ITB) e palestrante em eventos na área ambiental e urbanística.'}
-];
+const copia=x=>JSON.parse(JSON.stringify(x));
+let F=copia(PADRAO.F),E=copia(PADRAO.E),AR=copia(PADRAO.AR),FAQ=copia(PADRAO.FAQ),PROF=copia(PADRAO.PROF);
 const FE=()=>F.find(f=>f.incompany)||F[F.length-1]||{f:[]};
 const profOf=id=>PROF.find(p=>p.id===id);
 const profF=p=>F.filter(f=>(f.profs||[]).some(x=>x.id===p.id));
@@ -139,14 +97,14 @@ const NAV=[['escola','A escola'],['formacoes','Formações'],['professores','Pro
 
 /* ---------- componentes ---------- */
 const cardF=f=>`<article class="card cf glow" data-cat="${f.cat}" data-text="${f.t} ${f.lb}" data-r>
- <a href="#formacao.${f.id}" class="cover" aria-label="${f.t}"><img src="${src(f.img)}" alt="${f.alt||''}" loading="lazy"></a>
+ <a href="#formacao.${f.id}" class="cover" aria-label="${f.t}"><img src="${src(f.img,'curso1')}" alt="${f.alt||''}" loading="lazy"></a>
  <div class="cf-b"><p class="lbl g">${f.lb}</p><h3 class="h3"><a href="#formacao.${f.id}">${f.t}</a></h3><p class="body">${f.d}</p><div class="tags">${f.f.map(x=>tag(x)).join('')}</div>
  <div class="cf-f">${btn('Saiba mais','glass',{go:'formacao.'+f.id,s:1,icon:false})}${btn('Adquirir agora','gold',{s:1,attr:`data-buy="${f.id}"`})}</div></div></article>`;
 const cardE=e=>`<article class="ce" data-cat="${e.cat}" data-text="${e.t}" data-r>
  <button class="cover thumb" data-modal="ep${e.n}" aria-label="Assistir: ${e.t}"><img src="${src(e.img)}" alt="" loading="lazy"><span class="play">${ic('play',20)}</span></button>
  <div class="ce-b"><p class="lbl g">${e.m}</p><h3 class="h3">${e.t}</h3><p class="body">${e.d}</p></div></article>`;
 const cardA=(a,hid)=>`<a href="#artigo.${a.id}" class="ca" data-cat="direito" data-text="${a.t} ${a.by}" data-r${hid?' hidden data-extra':''}>
- <span class="cover"><img src="${src(a.img)}" alt="" loading="lazy"></span>
+ ${a.img?`<span class="cover"><img src="${src(a.img)}" alt="" loading="lazy"></span>`:''}
  <span class="ca-b"><span class="lbl g">Direito</span><span class="h3">${a.t}</span>${a.d?`<span class="body">${a.d}</span>`:''}${a.by?`<span class="sm">${a.by} · ${a.min} min de leitura</span>`:''}</span></a>`;
 const filters=(k,ph,on='todos')=>`<div class="filters" data-filter="${k}" data-r><div class="chips" role="group" aria-label="Filtrar por pilar">${CATS.map(([v,l])=>`<button class="chip${v===on?' on':''}" data-cat="${v}" aria-pressed="${v===on}">${l}</button>`).join('')}</div><label class="field">${ic('search',18)}<input id="q-${k}" type="search" placeholder="${ph}" aria-label="${ph}" autocomplete="off"></label></div>`;
 const empty=(k,t)=>`<div class="empty" id="empty-${k}" hidden><p class="h3">${t}</p><p class="body">Limpe a busca ou escolha outro pilar.</p></div>`;
@@ -295,7 +253,7 @@ coluna:()=>`
 <section class="sec light hero" data-hero>${orb('orb-l',{arc:false})}<div class="wrap hero-2">
  <div class="hero-c">${tag('Coluna EJUP')}<h1 class="d1 blur" data-r>Análises que constroem ${em('pensamento jurídico.')}</h1>
   <p class="lead" data-r>Ensaios, comentários e provocações de quem pensa o Direito com profundidade — e escreve para ser entendido.</p></div>
- ${AR[0]?`<article class="card cf" data-r><a href="#artigo.${AR[0].id}" class="cover" aria-label="${AR[0].t}"><img src="${src(AR[0].img)}" alt="Capa do artigo ${AR[0].t}"></a>
+ ${AR[0]?`<article class="card cf" data-r>${AR[0].img?`<a href="#artigo.${AR[0].id}" class="cover" aria-label="${AR[0].t}"><img src="${src(AR[0].img)}" alt="Capa do artigo ${AR[0].t}"></a>`:''}
   <div class="cf-b"><div style="display:flex;gap:12px;align-items:center">${tag('Último artigo')}<span class="lbl g">Direito</span></div><h2 class="h3"><a href="#artigo.${AR[0].id}">${AR[0].t}</a></h2>${AR[0].d?`<p class="body">${AR[0].d}</p>`:''}
   <div class="cf-f"><span class="sm">${AR[0].by||'Equipe EJUP'}${AR[0].min?` · ${AR[0].min} min de leitura`:''}</span>${btn('Ler artigo','navy',{s:1,go:'artigo.'+AR[0].id})}</div></div></article>`:''}
 </div></section>
@@ -558,6 +516,10 @@ function mount(p,arg){
  document.documentElement.classList.toggle('in-portal',['portal','prof','equipe'].includes(p));syncSess();
  const ttl=p==='formacao'?(F.find(x=>x.id===arg)||F[0]).t:p==='artigo'?(AR.find(x=>x.id===arg)||AR[0]).t:TITLES[p];
  document.title=p==='home'?TITLES.home:`${ttl||'EJUP'} · EJUP`;
+ /* descrição da página (o servidor já entrega a da primeira página; aqui segue a navegação) */
+ const un=t=>{const d=document.createElement('textarea');d.innerHTML=t||'';return d.value};
+ const desc=p==='formacao'?(F.find(x=>x.id===arg)||F[0]).d:p==='artigo'?((AR.find(x=>x.id===arg)||AR[0]).d||ttl):(PADRAO.SEO[p]||PADRAO.SEO.home)[1];
+ const md=$('meta[name="description"]');if(md&&desc)md.setAttribute('content',un(desc).replace(/\s+/g,' ').slice(0,180));
  const key={formacao:'formacoes',artigo:'coluna'}[p]||p;
  $$('[data-p]').forEach(a=>{const on=a.dataset.p===key;a.classList.toggle('on',on);on?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')});
  secs=$$('#app > section, #app > footer');hero=$('[data-hero]');pars=$$('[data-par]');prog=$('#prog');

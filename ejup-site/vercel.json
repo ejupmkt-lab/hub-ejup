@@ -90,6 +90,10 @@
     },
     "api/portal.js": {
       "maxDuration": 30
+    },
+    "api/pagina.js": {
+      "maxDuration": 10,
+      "includeFiles": "app.html"
     }
   },
   "rewrites": [
@@ -98,8 +102,16 @@
       "destination": "/minerva/index.html"
     },
     {
+      "source": "/sitemap.xml",
+      "destination": "/api/pagina?sitemap=1"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/api/pagina?robots=1"
+    },
+    {
       "source": "/((?!api/|minerva/|assets/|img/|vid/|fonts/|favicon\\.svg).*)",
-      "destination": "/index.html"
+      "destination": "/api/pagina?p=/$1"
     }
   ],
   "crons": [
