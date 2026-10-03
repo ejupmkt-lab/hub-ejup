@@ -43,7 +43,7 @@ export function metaPara(path, C, origin) {
   const seo = (k) => PADRAO.SEO[k];
   if (p === 'home') return { ...base, title: seo('home')[0], desc: seo('home')[1], jsonld: [organizacao(origin, C)] };
   if (ESTATICAS.has(p)) return { ...base, title: `${seo(p)[0]} · EJUP`, desc: seo(p)[1] };
-  if (PRIVADAS.has(p)) return { ...base, title: p === 'certificado' ? 'Certificado · EJUP' : 'Portal do Aluno · EJUP', desc: 'Acesso às formações, aulas e materiais da EJUP.', noindex: true };
+  if (PRIVADAS.has(p)) return { ...base, title: p === 'certificado' ? 'Certificado · EJUP' : { portal: 'Portal do Aluno · EJUP', prof: 'Área do Professor · EJUP', equipe: 'Área da Equipe · EJUP', criar: 'Criar conta · EJUP', recuperar: 'Recuperar senha · EJUP' }[p] || 'Entrar · EJUP', desc: 'Acesso às formações, aulas e materiais da EJUP.', noindex: true };
   if (p === 'formacao') {
     const f = C.F.find((x) => x.id === id);
     // item recém-criado pode ainda não estar no cache: a página abre, só não é indexada

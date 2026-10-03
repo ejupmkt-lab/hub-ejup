@@ -84,7 +84,7 @@ const pwField=(id,l,ac)=>`<label class="fl"><span>${l}</span><span class="pw"><i
 const auEmail=m=>m==='prof'?'E-mail cadastrado pela EJUP':m==='equipe'?'E-mail da equipe':'E-mail';
 function auth(m){const a=AUTH[m],k=accDe(m),pf=k!=='aluno';return `
 <section class="sec dark authp" data-hero>${orb('orb-b',{a0:-56,a1:-36,d:-120})}<div class="wrap auth">
- <div class="auth-m"><span class="tag gold swap" id="au-tag">${ACC[k][2]}</span><h1 class="d1 swap" id="au-h">${a.h}</h1><p class="lead swap" id="au-p">${a.p}</p><p class="lbl">Reconhecida por quem valoriza excelência</p></div>
+ <div class="auth-m"><span class="tag gold" id="au-tag">Acesso EJUP</span><h1 class="d1 swap" id="au-h">${a.h}</h1><p class="lead swap" id="au-p">${a.p}</p><p class="lbl">Reconhecida por quem valoriza excelência</p></div>
  <form class="card authc glow" id="au-f" novalidate data-mode="${m}">
   <div class="acc"><p class="lbl" id="au-acc-l">Tipo de acesso</p><div class="acc-g" role="radiogroup" aria-labelledby="au-acc-l">${Object.keys(ACC).map(x=>accOpt(x,x===k)).join('')}</div></div>
   <div class="fxc${pf?'':' on'}" id="au-sx"${pf?' inert':''}><div><div class="seg"><span class="seg-ind"></span><button type="button" data-mode="entrar"${m!=='criar'?' class="on"':''}>Entrar</button><button type="button" data-mode="criar"${m==='criar'?' class="on"':''}>Criar conta</button></div></div></div>
@@ -110,7 +110,7 @@ function setAuth(m){
  $$('[data-acc]',f).forEach(b=>{const on=b.dataset.acc===k;b.classList.toggle('on',on);b.setAttribute('aria-checked',on)});
  const sx=$('#au-sx');sx.classList.toggle('on',!pf);sx.toggleAttribute('inert',pf);googleBox(!pf);
  const swp=$$('.swap',f.parentElement);swp.forEach(x=>x.classList.add('x'));
- setTimeout(()=>{$('#au-tag').textContent=ACC[k][2];$('#au-h').innerHTML=a.h;$('#au-p').textContent=a.p;$('#au-t').innerHTML=`<h2 class="h3">${a.t}</h2><p class="body">${a.s}</p>`;$('#au-fg').hidden=m==='criar';swp.forEach(x=>x.classList.remove('x'))},RM?0:220);
+ setTimeout(()=>{$('#au-h').innerHTML=a.h;$('#au-p').textContent=a.p;$('#au-t').innerHTML=`<h2 class="h3">${a.t}</h2><p class="body">${a.s}</p>`;$('#au-fg').hidden=m==='criar';swp.forEach(x=>x.classList.remove('x'))},RM?0:220);
  const fx=$('#au-fx');fx.classList.toggle('on',m==='criar');fx.toggleAttribute('inert',m!=='criar');$('#au-tx').hidden=m!=='criar';
  $('#au-b').textContent=a.b;$('#au-q').textContent=a.q;$('#au-senha').setAttribute('autocomplete',m==='criar'?'new-password':'current-password');
  const o=$('#au-o');o.dataset.mode=a.o[0];o.textContent=a.o[1];
