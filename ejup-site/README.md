@@ -3,6 +3,13 @@
 Tudo que vai para a Vercel fica nesta pasta. Na Vercel: **Root Directory = `site`**,
 Framework **Other**, sem comando de build.
 
+## Identidade visual do site
+
+O site segue o arquivo do Figma "Apresentação · IDV do site" (fileKey `AnSK1oPgxtlYOG0p30Frtc`):
+Gotham em peso regular nos títulos, Instrument Serif Italic em ouro na frase de ênfase,
+botões em pílula, vidro, cantos amplos e o tom de apoio "papel". **Essas regras valem só para
+o site.** Todas as outras produções da EJUP seguem o MIV (ver `CLAUDE.md` na raiz).
+
 ## Variáveis de ambiente (Vercel → Settings → Environment Variables)
 
 | Variável | Para quê |
