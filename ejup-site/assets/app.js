@@ -121,7 +121,7 @@ const footer=cta=>`<footer class="sec deep foot">${orb('orb-foot',{arc:false,par
  <div class="foot-cols">
   <ul><li class="lbl">A escola</li><li><a href="#formacoes">Formações</a></li><li><a href="#professores">Professores</a></li><li><a href="#incompany">In company</a></li></ul>
   <ul><li class="lbl">Conteúdos</li><li><a href="#ejupcast">EJUPcast</a></li><li><a href="#coluna">Coluna Jurídica</a></li><li><a href="#coluna.newsletter">Newsletter</a></li></ul>
-  <ul><li class="lbl">Legal</li><li><a href="#termos">Termos de Uso</a></li><li><a href="#privacidade">Política de Privacidade</a></li></ul>
+  <ul><li class="lbl">Legal</li><li><a href="#certificado">Conferir certificado</a></li><li><a href="#termos">Termos de Uso</a></li><li><a href="#privacidade">Política de Privacidade</a></li></ul>
  </div></div></div></footer>`;
 const symAv=`<span class="sym">${SYM('')}</span>`;
 
@@ -362,6 +362,13 @@ incompany:()=>`
 </div></section>
 ${footer()}`,
 
+nao:()=>`
+<section class="sec dark hero" data-hero>${orb('orb-r',{a0:-60,a1:-20,d:200})}<div class="wrap hero-c">${tag('Página não encontrada','gold')}
+ <h1 class="d1 blur" data-r>Este caminho ${em('não existe.')}</h1>
+ <p class="lead" data-r>O endereço pode ter mudado, ou foi digitado com algum detalhe diferente. Daqui, alguns percursos possíveis.</p>
+ <div class="acts" data-r>${btn('Voltar ao início','gold',{go:'home'})}${btn('Ver formações','glass',{go:'formacoes',icon:false})}${btn('Ler a Coluna Jurídica','glass',{go:'coluna',icon:false})}</div></div></section>
+${footer()}`,
+
 descadastro:t=>{t=String(t||'').replace(/[^a-f0-9]/gi,'');return `
 <section class="sec light hero" data-hero><div class="wrap hero-c">${tag('Newsletter')}
  <h1 class="d1 blur" data-r>Sair ${em('da lista.')}</h1>
@@ -488,7 +495,7 @@ const closeModal=()=>{if(!modal.classList.contains('on'))return;modal.classList.
 let cur=null,secs=[],hero=null,pars=[],prog=null,spies=[],io,cio,vio;
 /* aceita caminho (/formacao/licenciamento) e o formato antigo com # (#formacao.licenciamento) */
 const parse=h=>{h=(h||'').replace(/^[#/]+/,'').replace(/\/+$/,'');if(!h)return ['home',''];const i=h.search(/[./]/);return i<0?[h,'']:[h.slice(0,i),h.slice(i+1)]};
-const TITLES={home:'EJUP · Educação Jurídica',escola:'A escola',formacoes:'Formações',formacao:'Formação',professores:'Professores',ejupcast:'EJUPcast',coluna:'Coluna Jurídica',artigo:'Artigo',incompany:'In company',privacidade:'Política de Privacidade',termos:'Termos de Uso',descadastro:'Newsletter',entrar:'Entrar',criar:'Criar conta',recuperar:'Recuperar senha',portal:'Portal do Aluno',prof:'Área do Professor',equipe:'Área da Equipe',certificado:'Certificado'};
+const TITLES={home:'EJUP · Educação Jurídica',escola:'A escola',formacoes:'Formações',formacao:'Formação',professores:'Professores',ejupcast:'EJUPcast',coluna:'Coluna Jurídica',artigo:'Artigo',incompany:'In company',privacidade:'Política de Privacidade',termos:'Termos de Uso',descadastro:'Newsletter',nao:'Página não encontrada',entrar:'Entrar',criar:'Criar conta',recuperar:'Recuperar senha',portal:'Portal do Aluno',prof:'Área do Professor',equipe:'Área da Equipe',certificado:'Certificado'};
 const SCR={};
 /* Portal do Aluno, Área do Professor e login ficam em /assets/portal.js, carregado só quando alguém vai até lá */
 const PORTAL=['entrar','criar','recuperar','portal','prof','equipe','certificado'];
@@ -497,15 +504,17 @@ const loadPortal=()=>portalJs||(portalJs=new Promise((ok,no)=>{const s=document.
 function go(tok,o={}){
  let [p,arg]=parse(tok);
  if(!PAGES[p]&&PORTAL.includes(p)){loadPortal().then(()=>go(tok,o),()=>toast('Não foi possível abrir o portal. Confira a conexão e tente de novo.'));return}
- let known=!!PAGES[p];if(!known){p='home';arg=''}
- const key=p+(arg?'.'+arg:'');
+ /* endereço que não existe (inclusive formação ou artigo removido): página 404, mantendo o endereço digitado */
+ const orig=toPath(p+(arg?'.'+arg:''));
+ let known=!!PAGES[p]&&!(p==='formacao'&&!F.some(x=>x.id===arg))&&!(p==='artigo'&&!AR.some(x=>x.id===arg));if(!known){p='nao';arg=''}
+ const key=known?p+(arg?'.'+arg:''):'nao:'+orig;
  setMenu(false);closeModal();
  if(key===cur){afterArg(p,arg)||scrollTo({top:0,behavior:RM?'auto':'smooth'});return}
  const back=o.push===false,y0=back?(SCR[key]||0):0;
  const inner=PAGES[p].sub&&cur&&parse(cur)[0]===p;
  if(cur)SCR[cur]=scrollY;
  cur=key;
- try{if(o.push!==false)history.pushState(null,'',toPath(key));else if(!known||location.hash)history.replaceState(null,'',toPath(key))}catch(e){}
+ try{const url=known?toPath(key):orig;if(o.push!==false)history.pushState(null,'',url);else if(location.hash&&known)history.replaceState(null,'',url)}catch(e){}
  if(inner){PAGES[p].sub(arg,y0);return}
  const swap=()=>{app.innerHTML=withImg(PAGES[p](arg));links(app);hydrate(app);mount(p,arg);scrollTo({top:y0,behavior:'instant'});frame();app.classList.remove('out');if(!o.instant)app.focus({preventScroll:true})};
  if(o.instant||RM){swap();return}

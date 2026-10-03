@@ -43,6 +43,7 @@ export function metaPara(path, C, origin) {
   const seo = (k) => PADRAO.SEO[k];
   if (p === 'home') return { ...base, title: seo('home')[0], desc: seo('home')[1], jsonld: [organizacao(origin, C)] };
   if (ESTATICAS.has(p)) return { ...base, title: `${seo(p)[0]} · EJUP`, desc: seo(p)[1] };
+  if (p === 'certificado' && !id) return { ...base, title: 'Conferir certificado · EJUP', desc: 'Confira a autenticidade de um certificado da EJUP pelo código que aparece no rodapé.' };
   if (PRIVADAS.has(p)) return { ...base, title: p === 'certificado' ? 'Certificado · EJUP' : { portal: 'Portal do Aluno · EJUP', prof: 'Área do Professor · EJUP', equipe: 'Área da Equipe · EJUP', descadastro: 'Newsletter · EJUP', criar: 'Criar conta · EJUP', recuperar: 'Recuperar senha · EJUP' }[p] || 'Entrar · EJUP', desc: 'Acesso às formações, aulas e materiais da EJUP.', noindex: true };
   if (p === 'formacao') {
     const f = C.F.find((x) => x.id === id);
@@ -93,7 +94,7 @@ export const render = (html, m) => html.replace(/<!--seo-->[\s\S]*?<!--\/seo-->/
 
 export function sitemap(C, origin) {
   const urls = ['/', ...[...ESTATICAS].filter((p) => p !== 'privacidade' && p !== 'termos').map((p) => '/' + p),
-    ...C.F.map((f) => `/formacao/${f.id}`), ...C.AR.map((a) => `/artigo/${a.id}`), '/minerva', '/privacidade', '/termos'];
+    ...C.F.map((f) => `/formacao/${f.id}`), ...C.AR.map((a) => `/artigo/${a.id}`), '/minerva', '/certificado', '/privacidade', '/termos'];
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${esc(origin + u)}</loc></url>`).join('\n')}\n</urlset>\n`;
 }
 

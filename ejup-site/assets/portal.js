@@ -197,8 +197,11 @@ async function recSubmit(f){
    CERTIFICADO PÚBLICO (conferência e PDF pela impressão do navegador)
    ====================================================================== */
 PAGES.certificado=()=>`<section class="sec dark authp cert-pub" data-hero>${orb('orb-b',{a0:-56,a1:-36,d:-120})}<div class="wrap" id="cp-w"><div class="okbox"><p class="sm">Conferindo o certificado…</p></div></div></section>`;
+const cpForm=v=>`<form id="cp-f" class="aiform cp-f" novalidate><label class="field"><input id="cp-c" placeholder="EJUP-XXXX-XXXX" aria-label="Código do certificado" autocomplete="off" autocapitalize="characters" value="${esc(v||'')}"></label>${btn('Conferir','gold',{s:1,type:'submit'})}</form><p class="err" id="cp-err" role="alert"></p>`;
+const normCod=v=>{const x=String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'');return x.length===12&&x.startsWith('EJUP')?`EJUP-${x.slice(4,8)}-${x.slice(8)}`:String(v||'').trim().toUpperCase()};
 PAGES.certificado.mount=async arg=>{
  const w=$('#cp-w'),codigo=(arg||'').toUpperCase();
+ if(!codigo){document.title='Conferir certificado · EJUP';w.innerHTML=`<div class="cp-h"><div>${tag('Certificados EJUP','gold')}<h1 class="h2s">Conferir ${em('um certificado.')}</h1><p class="lead">Digite o código que aparece no rodapé do certificado. A conferência mostra o nome, a formação, a carga horária e a data de conclusão.</p></div></div><div class="card pc glow cp-box">${cpForm()}</div>`;$('#cp-c').focus();return}
  try{const c=await api('certificado',{query:`&codigo=${encodeURIComponent(codigo)}`});
   w.innerHTML=`<div class="cp-h"><div>${tag('Certificado válido','gold')}<h1 class="h2s">Certificado ${em('de conclusão.')}</h1><p class="lead">Emitido pela EJUP · Educação Jurídica. Código de conferência <span style="white-space:nowrap">${esc(c.codigo)}</span>.</p></div>
    <div class="acts no-print">${btn('Baixar PDF','gold',{attr:'data-print'})}${btn('Copiar link de conferência','glass',{icon:false,attr:'data-copy'})}</div></div>
@@ -207,7 +210,7 @@ PAGES.certificado.mount=async arg=>{
     <div class="pc-h"><span class="sm">${c.concluida_em?dia(c.concluida_em):''}</span><span class="sm">Código ${esc(c.codigo)}</span></div></div></article>`;
   document.title=`Certificado ${c.codigo} · EJUP`;
   if(new URLSearchParams(location.search).get('pdf')==='1')setTimeout(()=>print(),400);
- }catch(e){w.innerHTML=`<div class="okbox"><span class="icb">${ic('shield',20)}</span><p class="h3">Certificado não encontrado.</p><p class="body">Confira o código. Ele tem o formato EJUP-XXXX-XXXX e aparece no rodapé do certificado.</p>${abtn('Voltar ao site','glass','/',{s:1})}</div>`}
+ }catch(e){w.innerHTML=`<div class="okbox"><span class="icb">${ic('shield',20)}</span><p class="h3">Certificado não encontrado.</p><p class="body">Confira o código. Ele tem o formato EJUP-XXXX-XXXX e aparece no rodapé do certificado.</p><div class="cp-box" style="width:100%;max-width:520px">${cpForm(codigo)}</div></div>`}
 };
 
 /* ======================================================================
@@ -931,6 +934,7 @@ document.addEventListener('submit',async e=>{
  const f=e.target;
  if(f.id==='au-f'){e.preventDefault();authSubmit(f);return}
  if(f.id==='rc-f1'||f.id==='rc-f3'){e.preventDefault();recSubmit(f);return}
+ if(f.id==='cp-f'){e.preventDefault();const c=normCod($('#cp-c').value);if(!/^EJUP-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(c)){say($('#cp-err'),'O código tem o formato EJUP-XXXX-XXXX.',true);$('#cp-c').focus();return}go('certificado/'+c);return}
  if(!inPortal())return;
  e.preventDefault();const b=$('button[type="submit"]',f),m=$('.msg',f);
  if(f.id==='p-sf'||f.id==='f-sf'){const q=$('input',f).value.trim();if(!q)return;if(f.id==='p-sf'){go('portal/busca/'+encodeURIComponent(q));return}

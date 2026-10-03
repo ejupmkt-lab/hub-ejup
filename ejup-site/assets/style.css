@@ -1015,3 +1015,5 @@ button.fq:hover,a.fq:hover{padding-left:6px}
 .chk{display:flex;gap:12px;align-items:flex-start;font-size:13px;line-height:1.5;color:var(--w82);cursor:pointer;padding-top:4px}.chk input{flex:none;width:18px;height:18px;margin-top:1px;accent-color:var(--ouro-400)}.chk a,.au-g .sm a{color:var(--ouro-400);text-decoration:underline;text-underline-offset:3px}.chk input.bad{outline:2px solid var(--erro);outline-offset:2px}
 .forgot[hidden],#au-tx[hidden]{display:none}
 .acc-g{grid-template-columns:repeat(3,minmax(0,1fr))}.acc-o{flex-direction:column;align-items:flex-start}@media (max-width:560px){.acc-g{grid-template-columns:minmax(0,1fr)}.acc-o{flex-direction:row;align-items:center}}
+.cp-box{max-width:560px}.cp-f{width:100%}.cp-f .field{flex:1}
+@media (max-width:1380px){.nav-acts>a[href="/minerva"],.nav-acts>a[href="minerva.html"]{display:none}}

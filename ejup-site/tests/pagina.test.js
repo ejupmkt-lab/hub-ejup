@@ -59,4 +59,8 @@ test('sitemap e robots', async () => {
   assert.doesNotMatch(r.body, /Disallow: \/professores/);
   assert.match(r.body, /Sitemap: https:\/\/ejup\.com\.br\/sitemap\.xml/);
   assert.equal(metaPara('/', conteudo([]), 'https://x').status, 200);
+  const cert = metaPara('/certificado', conteudo([]), 'https://x');
+  assert.equal(cert.noindex, false);
+  assert.match(cert.title, /Conferir certificado/);
+  assert.equal(metaPara('/certificado/EJUP-AAAA-BBBB', conteudo([]), 'https://x').noindex, true);
 });
