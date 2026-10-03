@@ -260,3 +260,26 @@ test('equipe: libera alunos em lote, edita formação, aula e banco da Minerva',
   const pl = (await p.call('plantao', { body: { curso: 'licenciamento', inicio: new Date(Date.now() + 86400000).toISOString(), link: 'javascript:alert(1)' } })).payload.plantao;
   assert.equal(pl.link, null);
 });
+
+test('conteúdo do site: equipe edita, site lê publicado, endereços validados', async () => {
+  const pub = browser();
+  const vazio = await pub.call('conteudo');
+  assert.equal(vazio.payload.vazio, true);
+  assert.match(vazio.headers['vercel-cdn-cache-control'], /max-age=60/);
+  assert.match(vazio.headers['cache-control'], /must-revalidate/);
+  const e = await logged('equipe@ejup.com.br', 'senha-equipe-1');
+  const ok = await e.call('eq-item', { body: { tipo: 'formacao', id: 'licenciamento', ordem: 1, dados: { t: 'Licenciamento <b>', img: 'curso1', checkout: 'https://pay.exemplo.com/x', profs: [{ id: 'leonardo-pivotto' }] } } });
+  assert.equal(ok.statusCode, 200);
+  await e.call('eq-item', { body: { tipo: 'faq', id: 'rascunho', publicado: false, dados: { q: 'Oculta?', a: 'Sim' } } });
+  assert.equal((await e.call('eq-item', { body: { tipo: 'formacao', id: 'x', dados: { checkout: 'javascript:alert(1)' } } })).statusCode, 400);
+  assert.equal((await e.call('eq-item', { body: { tipo: 'episodio', id: 'ep1', dados: { yt: 'https://youtube.com/watch?v=x' } } })).statusCode, 400);
+  assert.equal((await e.call('eq-item', { body: { tipo: 'outro', id: 'x', dados: {} } })).statusCode, 400);
+  const c = (await pub.call('conteudo')).payload;
+  assert.equal(c.vazio, false);
+  assert.equal(c.formacao[0].id, 'licenciamento');
+  assert.equal(c.formacao[0].t, 'Licenciamento <b>', 'texto puro: o site escapa ao exibir');
+  assert.equal(c.faq.length, 0, 'não publicado fica fora');
+  assert.equal((await e.call('equipe')).payload.site.length, 2);
+  const a = await logged('aluno@ejup.com.br', 'senha-aluno-1');
+  assert.equal((await a.call('eq-item', { body: { tipo: 'faq', id: 'x', dados: {} } })).statusCode, 403);
+});

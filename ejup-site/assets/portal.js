@@ -3,7 +3,7 @@
 (()=>{
 'use strict';
 const E=window.EJUP;if(!E)return;
-const {$,$$,RM,ic,btn,tag,em,orb,LOGO,F,LINKS,waMsg,okMail,toast,go,links,placeSeg,reveal,PAGES}=E;
+const {$,$$,RM,ic,btn,tag,em,orb,LOGO,LINKS,waMsg,okMail,toast,go,links,placeSeg,reveal,PAGES}=E;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/\p{M}/gu,'');
@@ -1108,5 +1108,67 @@ document.addEventListener('change',async e=>{
  const save=async(body,msg,undo)=>{try{const r=await api('eq-matricula',{body});const i=Q().matriculas.findIndex(m=>m.id===r.matricula.id);Object.assign(Q().matriculas[i],r.matricula);toast(msg)}catch(err){undo();toast(err.message)}};
  if(d.matPlano){const old=Q().matriculas.find(m=>m.id===+d.matPlano).plano;save({id:+d.matPlano,plano:t.value},`Plano alterado para ${PLANS[lvl(t.value)].n}.`,()=>{t.value=old});return}
  if(d.matAtiva){save({id:+d.matAtiva,ativa:t.checked},t.checked?'Acesso reativado.':'Acesso suspenso.',()=>{t.checked=!t.checked});return}
+});
+
+/* ----- Área da Equipe › Site: o que aparece nas páginas públicas ----- */
+const CATSEL=[['direito','Direito'],['power','Power Skills'],['negocios','Negócios & Inovação']];
+const SITE={
+ formacao:{n:'Formações',um:'formação',title:x=>x.t,sub:x=>[x.lb,x.preco].filter(Boolean).join(' · '),f:[
+  ['id','Endereço (ex.: licenciamento; o mesmo da formação no Portal)','id'],['t','Nome da formação'],['lb','Área (rótulo)'],['cat','Pilar','select',CATSEL],
+  ['d','Descrição curta','area'],['f','Etiquetas do cartão (uma por linha: 10 horas, Online…)','lines'],['fd','Etiquetas na página da formação (opcional, uma por linha)','lines'],
+  ['img','Capa (nome em img/, /img/arquivo.jpg ou https://)'],['alt','Descrição da capa (acessibilidade)'],
+  ['preco','Preço (ex.: R$ 649,90)'],['preco_de','Preço anterior, riscado (opcional)'],['parcelas','Parcelamento (ex.: ou 12x de R$ 65)'],['checkout','Link de pagamento (https://; vazio = WhatsApp)'],
+  ['sobre','Sobre o curso (parágrafos separados por uma linha em branco)','area'],['aprender','O que você vai aprender (um por linha)','lines'],
+  ['modulos','Módulos (um por linha: Título | descrição opcional)','mods'],['profs','Professores (um por linha: identificador do professor | papel opcional)','profs'],
+  ['incl','O que está incluído (opcional, um por linha)','lines'],['incompany','Formação in company (aparece na página In company)','check']]},
+ professor:{n:'Professores',um:'professor',title:x=>x.nome,sub:x=>x.cargo,f:[['id','Identificador (ex.: leonardo-pivotto)','id'],['nome','Nome'],['cargo','Cargo (ex.: Advogado e Consultor Ambiental)'],['foto','Retrato (nome em img/, /img/arquivo.jpg ou https://)'],['resumo','Resumo (cartões e páginas das formações)','area'],['bio','Biografia completa (parágrafos separados por linha em branco)','area']]},
+ artigo:{n:'Coluna Jurídica',um:'artigo',title:x=>x.t,sub:x=>[x.by,x.date].filter(Boolean).join(' · '),f:[['id','Endereço (ex.: multiportas)','id'],['t','Título'],['st','Título curto (lista da Home, opcional)'],['d','Linha fina','area'],['by','Autor'],['date','Data (ex.: 29 de setembro de 2026)'],['min','Minutos de leitura','num'],['img','Capa (nome em img/, /img/arquivo.jpg ou https://)'],['imgv','Capa vertical (opcional)'],['corpo','Texto (parágrafos separados por linha em branco; “## ” no início vira subtítulo e entra no índice)','area']]},
+ episodio:{n:'EJUPcast',um:'episódio',title:x=>x.t,sub:x=>x.m,f:[['id','Identificador (ex.: ep19)','id'],['n','Número do episódio','num'],['t','Título'],['m','Linha de apoio (ex.: Ep. 19 · 58 min)'],['d','Descrição','area'],['cat','Pilar','select',CATSEL],['img','Capa (nome em img/, /img/arquivo.jpg ou https://)'],['yt','Código do vídeo no YouTube (ex.: dQw4w9WgXcQ)']]},
+ faq:{n:'Perguntas frequentes',um:'pergunta',title:x=>x.q,sub:()=>'',f:[['id','Identificador','id'],['q','Pergunta'],['a','Resposta','area']]},
+ config:{n:'Links',um:'',title:()=>'Links do site',sub:()=>'WhatsApp, Instagram, YouTube, Spotify e mapa',f:[['id','Identificador','id'],['whatsapp','WhatsApp (https://wa.me/55…)'],['instagram','Instagram (https://…)'],['youtube','Canal no YouTube (https://…; vazio esconde os botões)'],['spotify','EJUPcast no Spotify (https://…; vazio esconde os botões)'],['mapa','Mapa do endereço (https://…)']]}
+};
+const STAB=Object.keys(SITE);
+/* textos que já estão no site (código), para importar para o banco */
+function padrao(tipo){const D=E.DEF;
+ const sl=t=>norm(t).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);
+ return {formacao:()=>D.F,professor:()=>D.PROF,artigo:()=>D.AR,episodio:()=>D.E.map(e=>({id:'ep'+e.n,...e})),faq:()=>D.FAQ.map(x=>({id:sl(x.q),...x})),config:()=>[{id:'links',...D.LINKS}]}[tipo]().map((x,i)=>({tipo,id:x.id,dados:x,ordem:(i+1)*10,publicado:true,padrao:true}));
+}
+const siteRows=tipo=>{const r=(Q().site||[]).filter(x=>x.tipo===tipo);return r.length?r:padrao(tipo)};
+const fieldVal=(x,[k,,t])=>{const v=x[k];if(t==='lines')return linhas(v);if(t==='mods')return (v||[]).map(m=>[m.t,m.d].filter(Boolean).join(' | ')).join('\n');if(t==='profs')return (v||[]).map(m=>[m.id,m.papel].filter(Boolean).join(' | ')).join('\n');return v??''};
+function itemForm(tipo,row,novo){const x={...row.dados,id:row.id};
+ return `<form class="pgf" data-eq-item="${tipo}" data-orig="${esc(novo?'':row.id)}" novalidate>${SITE[tipo].f.map(fd=>{const [k,l,t,o]=fd,v=fieldVal(x,fd),full=['area','lines','mods','profs'].includes(t)||k==='id'||k==='t'?' full':'';
+  if(t==='check')return `<label class="psw full"><span>${l}</span><input type="checkbox" name="${k}"${v?' checked':''}><i></i></label>`;
+  if(t==='select')return `<label class="fl"><span>${l}</span><select class="inp" name="${k}">${o.map(([a,b])=>`<option value="${a}"${a===v?' selected':''}>${b}</option>`).join('')}</select></label>`;
+  if(['area','lines','mods','profs'].includes(t))return `<label class="fl full"><span>${l}</span><textarea class="inp${k==='corpo'||k==='sobre'||k==='bio'?' tall':''}" name="${k}">${esc(v)}</textarea></label>`;
+  return `<label class="fl${full}"><span>${l}</span><input class="inp" name="${k}" ${t==='num'?'type="number" ':''}value="${esc(v)}"${t==='id'&&!novo?' readonly':''}></label>`}).join('')}
+  <label class="fl"><span>Ordem (menor aparece antes)</span><input class="inp" name="__ordem" type="number" value="${esc(row.ordem??0)}"></label>
+  <label class="psw"><span>Publicado no site</span><input type="checkbox" name="__pub"${row.publicado!==false?' checked':''}><i></i></label>
+  <p class="msg full" aria-live="polite"></p><div class="acts full">${btn(novo?'Criar':'Salvar','gold',{type:'submit',icon:false,s:1})}${!novo&&!row.padrao&&tipo!=='config'?btn('Excluir','line',{icon:false,s:1,attr:`data-item-del="${tipo}|${esc(row.id)}"`}):''}</div></form>`}
+function itemDados(f,tipo){const d={};SITE[tipo].f.forEach(([k,,t])=>{if(k==='id')return;const e=f.elements[k];if(!e)return;const v=e.type==='checkbox'?e.checked:e.value.trim();
+ if(t==='lines')d[k]=v.split('\n').map(x=>x.trim()).filter(Boolean);
+ else if(t==='mods')d[k]=v.split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(p=>p[0]).map(([t2,dd])=>dd?{t:t2,d:dd}:{t:t2});
+ else if(t==='profs')d[k]=v.split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(p=>p[0]).map(([id,papel])=>papel?{id,papel}:{id});
+ else if(t==='num')d[k]=Number(v)||0;else d[k]=v});return d}
+ENAV.push(['site','Site','screen']);ECR.site='Site';
+EV.site=()=>{const tipo=SITE[S.st]?S.st:'formacao',sp=SITE[tipo],rows=siteRows(tipo),pad=rows.some(r=>r.padrao),semTabela=Q().site===null;
+ return `${fhead(`O que aparece ${em('no site.')}`,'Formações, professores, Coluna Jurídica, EJUPcast, perguntas frequentes e links. As mudanças aparecem no site em até 1 minuto.')}
+ ${semTabela?`<article class="card pc dash" data-r><h2 class="h4">Falta criar a tabela do site</h2><p class="sm">Rode de novo o arquivo <strong>dev/supabase_portal.sql</strong> no SQL Editor do Supabase. Ele cria a tabela <strong>site_itens</strong> sem apagar nada.</p></article>`:''}
+ <div class="ptit mid" data-r><div class="chips eq-tabs">${STAB.map(k=>`<button type="button" class="chip sug${k===tipo?' on':''}" data-st="${k}">${SITE[k].n}</button>`).join('')}</div>${pad&&!semTabela?btn('Trazer o conteúdo atual para o banco','gold',{s:1,icon:false,attr:'data-site-import'}):''}</div>
+ ${pad?`<p class="sm" data-r>Estes são os textos que hoje estão no código do site. Para editar, primeiro traga o conteúdo atual para o banco (um clique, vale para todas as abas). Depois disso, o site passa a mostrar só o que estiver publicado aqui.</p>`:''}
+ ${!pad&&tipo!=='config'?`<article class="card pc glow" data-r><details class="eqd"><summary><span><strong>${ic('plus',14)} Novo ${sp.um==='formação'||sp.um==='pergunta'?'item':sp.um}</strong></span></summary>${itemForm(tipo,{dados:{},ordem:(rows.length+1)*10,publicado:true},true)}</details></article>`:''}
+ <article class="card pc" data-r>${rows.map(r=>{const x={...r.dados,id:r.id};return `<details class="eqd"><summary><span><strong>${esc(sp.title(x)||r.id)}</strong></span><span class="sm">${esc(sp.sub(x)||'')}${r.publicado===false?' · não publicado':''}</span></summary>${pad?`<fieldset disabled style="border:0;padding:0;margin:0;min-width:0">${itemForm(tipo,r,false)}</fieldset>`:itemForm(tipo,r,false)}</details>`}).join('')||'<p class="sm">Nada cadastrado.</p>'}</article>`};
+document.addEventListener('click',async e=>{
+ const t=e.target;if(S.area!=='equipe'||!t.closest||!t.closest('#pmain'))return;let x;
+ if((x=t.closest('[data-st]'))){S.st=x.dataset.st;eqRe();return}
+ if((x=t.closest('[data-site-import]'))){busy(x,true,'Importando…');try{for(const tipo of STAB){if((Q().site||[]).some(r=>r.tipo===tipo))continue;for(const r of padrao(tipo))await api('eq-item',{body:{tipo,id:r.id,dados:r.dados,ordem:r.ordem,publicado:true}})}S.eq=await api('equipe');eqRe();toast('Conteúdo atual trazido para o banco. Agora é só editar.')}catch(err){busy(x,false);toast(err.message)}return}
+ if((x=t.closest('[data-item-del]'))){const [tipo,id]=x.dataset.itemDel.split('|');if(!confirm('Excluir este item do site?'))return;try{await api('eq-item',{body:{tipo,id,remover:true}});S.eq=await api('equipe');eqRe();toast('Item excluído do site.')}catch(err){toast(err.message)}return}
+});
+document.addEventListener('submit',async e=>{
+ const f=e.target;if(S.area!=='equipe'||!f.matches||!f.matches('[data-eq-item]'))return;
+ const tipo=f.dataset.eqItem,b=$('button[type="submit"]',f),m=$('.msg',f),id=f.elements.id.value.trim();
+ if(!id){say(m,'Preencha o identificador.',true);f.elements.id.focus();return}
+ busy(b,true,'Salvando…');
+ try{await api('eq-item',{body:{tipo,id,dados:itemDados(f,tipo),ordem:Number(f.elements.__ordem.value)||0,publicado:f.elements.__pub.checked}});S.eq=await api('equipe');eqRe();toast('Salvo. O site mostra a mudança em até 1 minuto.')}
+ catch(err){busy(b,false);say(m,err.message,true)}
 });
 })();

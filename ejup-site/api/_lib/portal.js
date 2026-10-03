@@ -787,10 +787,11 @@ R.equipe = {
       ctx.sb.rest.get('matriculas', 'select=*&order=criado_em.desc&limit=3000'),
       ctx.sb.rest.get('minerva_respostas', 'select=*&order=ordem.asc'),
     ]);
+    const site = await ctx.sb.rest.get('site_itens', 'select=*&order=ordem.asc').catch(() => null);
     const emails = [...new Set(matriculas.map((m) => m.email))];
     const perfis = emails.length ? await ctx.sb.rest.get('perfis', `email=${inList(emails)}&select=email,nome`) : [];
     return {
-      perfil: publicPerfil(ctx.perfil), cursos, modulos, aulas, respostas,
+      perfil: publicPerfil(ctx.perfil), cursos, modulos, aulas, respostas, site,
       matriculas: matriculas.map((m) => ({ ...m, nome: perfis.find((p) => p.email === m.email)?.nome || null, conta: perfis.some((p) => p.email === m.email) })),
     };
   },
@@ -900,6 +901,55 @@ R['eq-resposta'] = {
   },
 };
 
+/* ----- conteúdo do site (vitrine): formações, professores, artigos, episódios, perguntas e links ----- */
+export const TIPOS = ['formacao', 'professor', 'artigo', 'episodio', 'faq', 'config'];
+const URL_KEYS = new Set(['img', 'imgv', 'foto', 'checkout', 'whatsapp', 'instagram', 'youtube', 'spotify', 'mapa']);
+// texto puro (o site escapa ao exibir); endereços só https://, /caminho ou nome de arquivo em img/
+function limpaDados(v, key = '', depth = 0) {
+  if (depth > 4) return null;
+  if (typeof v === 'string') {
+    const x = v.trim().slice(0, 30000);
+    if (URL_KEYS.has(key) && x && !/^(https:\/\/[^\s"'<>]+|\/[\w./-]+|[\w-]+)$/.test(x)) fail(400, `Endereço inválido em “${key}”: use https://, /img/arquivo.jpg ou o nome do arquivo.`);
+    if (key === 'yt' && x && !/^[\w-]{6,20}$/.test(x)) fail(400, 'O vídeo do YouTube deve ser só o código (ex.: dQw4w9WgXcQ).');
+    return x;
+  }
+  if (typeof v === 'number') return Number.isFinite(v) ? v : 0;
+  if (typeof v === 'boolean') return v;
+  if (Array.isArray(v)) return v.slice(0, 60).map((x) => limpaDados(x, key, depth + 1)).filter((x) => x !== null && x !== '');
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).slice(0, 40).map(([k, x]) => [str(k, 40), limpaDados(x, k, depth + 1)]));
+  return null;
+}
+
+R.conteudo = {
+  method: 'GET', publico: true,
+  // navegador sempre confere; a CDN da Vercel guarda por 60 s (edição aparece em até 1 minuto)
+  cache: { 'Cache-Control': 'public, max-age=0, must-revalidate', 'Vercel-CDN-Cache-Control': 'max-age=60, stale-while-revalidate=600' },
+  run: async (ctx) => {
+    let rows;
+    try { rows = await ctx.sb.rest.get('site_itens', 'publicado=is.true&select=tipo,id,dados,ordem&order=ordem.asc'); } catch { return { vazio: true }; }
+    const out = { vazio: !rows.length };
+    TIPOS.forEach((t) => { out[t] = rows.filter((r) => r.tipo === t).map((r) => ({ ...r.dados, id: r.id })); });
+    return out;
+  },
+};
+
+R['eq-item'] = {
+  method: 'POST', auth: true, limit: 200,
+  run: async (ctx, b) => {
+    requireEquipe(ctx);
+    const tipo = TIPOS.includes(b.tipo) ? b.tipo : fail(400, 'Tipo de conteúdo inválido.');
+    const id = slug(b.id);
+    if (!id) fail(400, 'Informe um identificador (ex.: licenciamento).');
+    if (b.remover) { await ctx.sb.rest.remove('site_itens', `tipo=eq.${tipo}&id=eq.${enc(id)}`); return { ok: true, removido: id }; }
+    const dados = limpaDados(b.dados && typeof b.dados === 'object' && !Array.isArray(b.dados) ? b.dados : {});
+    delete dados.id;
+    if (JSON.stringify(dados).length > 120000) fail(400, 'Conteúdo grande demais.');
+    const row = { tipo, id, dados, ordem: Math.round(Number(b.ordem) || 0), publicado: b.publicado !== false, atualizado_em: new Date(ctx.now()).toISOString() };
+    const [r] = await ctx.sb.rest.insert('site_itens', row, { upsert: true, onConflict: 'tipo,id' });
+    return { ok: true, item: r };
+  },
+};
+
 /* ----- tarefa diária (Vercel Cron): lembretes de estudo e resumo para professores ----- */
 R.cron = {
   method: 'GET', cron: true,
@@ -978,6 +1028,7 @@ export function createPortalHandler({ fetchImpl = fetch, env = process.env, now 
     try {
       if (route.auth) await requireUser(ctx);
       const out = await route.run(ctx, body);
+      if (route.cache) Object.entries(route.cache).forEach(([k, v]) => res.setHeader(k, v));
       return done(200, out);
     } catch (err) {
       if (err instanceof HttpError) return done(err.status, { error: err.message, ...(err.extra || {}) });

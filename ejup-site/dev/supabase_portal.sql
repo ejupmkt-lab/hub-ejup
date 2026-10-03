@@ -253,3 +253,16 @@ insert into public.minerva_respostas (id, pergunta, variacoes, palavras, respost
    array['acesso', 'aparece', 'comprei'],
    'O acesso é liberado pela equipe da EJUP no e-mail usado na inscrição. Se a formação não aparece, confira se entrou com esse e-mail ou fale com a equipe pelo WhatsApp 85 9 9271.4050.', 105, null, 'equipe', true)
 on conflict (id) do nothing;
+
+-- ---------- conteúdo do site (vitrine), editado na Área da Equipe ----------
+-- tipo: formacao, professor, artigo, episodio, faq ou config. Sem linhas, o site usa os textos que vêm no código.
+create table if not exists public.site_itens (
+  tipo text not null check (tipo in ('formacao', 'professor', 'artigo', 'episodio', 'faq', 'config')),
+  id text not null,
+  dados jsonb not null default '{}'::jsonb,
+  ordem int not null default 0,
+  publicado boolean not null default true,
+  atualizado_em timestamptz not null default now(),
+  primary key (tipo, id)
+);
+alter table public.site_itens enable row level security;

@@ -3,7 +3,7 @@
 import crypto from 'node:crypto';
 
 const clone = (x) => JSON.parse(JSON.stringify(x));
-const KEYS = { perfis: ['id'], cursos: ['id'], modulos: ['id'], aulas: ['id'], matriculas: ['id'], progresso: ['user_id', 'aula_id'], notas: ['user_id', 'aula_id'], duvidas: ['id'], mensagens: ['id'], plantoes: ['id'], mentorias: ['id'], minerva_log: ['id'], minerva_respostas: ['id'], leads: ['id'] };
+const KEYS = { perfis: ['id'], cursos: ['id'], modulos: ['id'], aulas: ['id'], matriculas: ['id'], progresso: ['user_id', 'aula_id'], notas: ['user_id', 'aula_id'], duvidas: ['id'], mensagens: ['id'], plantoes: ['id'], mentorias: ['id'], minerva_log: ['id'], minerva_respostas: ['id'], leads: ['id'], site_itens: ['tipo', 'id'] };
 const SERIAL = new Set(['matriculas', 'duvidas', 'mensagens', 'plantoes', 'mentorias', 'minerva_log', 'leads']);
 
 function splitTop(s) {

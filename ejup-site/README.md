@@ -36,11 +36,13 @@ o site.** Todas as outras produções da EJUP seguem o MIV (ver `CLAUDE.md` na r
 | `img/`, `vid/`, `fonts/` | Imagens, vídeos e Gotham (woff2) |
 | `vercel.json` | Rotas do site, `/minerva`, microfone, cache |
 
-Conteúdo (formações, episódios, artigos, FAQ) fica no topo de `assets/app.js`
-(`F`, `E`, `AR`, `FAQ`). Endereços externos ficam em `LINKS` (YouTube e Spotify estão
-vazios: os botões só aparecem quando forem preenchidos) e os links de pagamento em
-`CHECKOUT` (vazio = o botão "Adquirir agora" abre o WhatsApp citando a formação).
-Para tocar um episódio no site, preencha `yt` com o ID do vídeo no YouTube.
+**Conteúdo do site** (formações e suas páginas, professores, artigos da Coluna, episódios do
+EJUPcast, perguntas frequentes e links) é editado na **Área da Equipe → Site** e fica na tabela
+`site_itens`. Na primeira vez, clique em "Trazer o conteúdo atual para o banco". Sem banco ou sem
+itens, o site usa os textos de `assets/app.js` (`F`, `PROF`, `E`, `AR`, `FAQ`, `LINKS`). Edições
+aparecem em até 1 minuto (cache da Vercel). Detalhes: link de pagamento vazio = "Adquirir agora"
+abre o WhatsApp; YouTube/Spotify vazios escondem os botões; `yt` do episódio é o código do vídeo;
+no texto do artigo, linha em branco separa parágrafos e "## " cria subtítulo e item do índice.
 
 ## Minerva: banco de respostas
 
