@@ -18,7 +18,8 @@ test('grava a inscrição na newsletter no Supabase', async () => {
   const res = await call(h, { body: { tipo: 'newsletter', email: ' Ana@Exemplo.com ', nome: 'ignorado' } });
   assert.equal(res.statusCode, 200);
   assert.equal(seen.url, 'https://x.supabase.co/rest/v1/leads');
-  assert.equal(seen.init.headers.Authorization, 'Bearer chave');
+  assert.equal(seen.init.headers.apikey, 'chave');
+  assert.equal(seen.init.headers.Authorization, undefined);
   assert.deepEqual(JSON.parse(seen.init.body), { tipo: 'newsletter', email: 'ana@exemplo.com' });
 });
 

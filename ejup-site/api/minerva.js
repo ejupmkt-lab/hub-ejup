@@ -1,6 +1,7 @@
 import { buscar } from './_lib/busca.js';
 import RESPOSTAS_LOCAIS from './_lib/respostas.js';
 import { clientIp, rateLimit } from './_lib/ratelimit.js';
+import { authHeader } from './_lib/supabase.js';
 
 // A Minerva não usa IA: responde com o banco de perguntas e respostas da EJUP.
 // Fonte: tabela minerva_respostas no Supabase (SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY);
@@ -26,7 +27,7 @@ export function createHandler({ fetchImpl = fetch, env = process.env, now = Date
     if (cache.items && now() - cache.at < CACHE_MS) return cache.items;
     try {
       const r = await fetchImpl(`${url.replace(/\/$/, '')}/rest/v1/minerva_respostas?ativo=eq.true&select=id,pergunta,variacoes,palavras,resposta&order=ordem.asc`, {
-        headers: { apikey: key, Authorization: `Bearer ${key}` },
+        headers: { apikey: key, ...authHeader(key) },
       });
       if (!r.ok) throw new Error(String(r.status));
       const items = await r.json();

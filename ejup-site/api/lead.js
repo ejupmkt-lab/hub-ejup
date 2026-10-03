@@ -1,4 +1,5 @@
 import { clientIp, rateLimit } from './_lib/ratelimit.js';
+import { authHeader } from './_lib/supabase.js';
 
 // Recebe inscrições na newsletter e pedidos de proposta in company e grava na tabela
 // `leads` do Supabase (SQL em site/README.md). Chaves só nas variáveis de ambiente:
@@ -54,7 +55,7 @@ export function createHandler({ fetchImpl = fetch, env = process.env } = {}) {
     try {
       const r = await fetchImpl(`${url.replace(/\/$/, '')}/rest/v1/leads`, {
         method: 'POST',
-        headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        headers: { apikey: key, ...authHeader(key), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
         body: JSON.stringify(row),
       });
       // 409: e-mail já inscrito na newsletter — para quem se inscreve, está feito.
