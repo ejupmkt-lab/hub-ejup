@@ -87,10 +87,10 @@ em.s{font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.12em
 .stage{position:absolute;z-index:1;mix-blend-mode:screen;top:50%;left:72%;width:min(46vw,78vh,640px);aspect-ratio:1;transform:translate(-50%,-50%);transition:left .6s var(--ease),top .6s var(--ease),width .6s var(--ease)}
 .mnv{position:absolute;inset:0;animation:float var(--float-speed) ease-in-out infinite;cursor:pointer}
 .mnv-f{position:absolute;inset:0;transform:translate(calc(var(--px,0)*var(--tilt)),calc(var(--py,0)*var(--tilt)));transition:transform 1.4s var(--ease)}
-.mnv-f>img,.mnv-f>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.mnv-f>.on,.mnv-f>video{opacity:0}
+.mnv-f>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mnv-f>.on,.mnv-f>.va,.mnv-f>.vf{opacity:0}
 .mnv-f>img.on{transition:opacity 1.2s ease}
-.mnv-f>video{transition:opacity var(--swap,.35s) ease}
+.mnv-f>.va,.mnv-f>.vf{transition:opacity var(--swap,.35s) ease}
 .mnv.on .mnv-f>img.on,.mnv.va .va,.mnv.vf .vf{opacity:1}
 /* halo: segue o estado da Minerva */
 .mnv-h,.mnv-b{position:absolute;inset:0;margin:auto;width:var(--halo-size);height:var(--halo-size);border-radius:50%;pointer-events:none;z-index:3;
@@ -211,10 +211,10 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
     <div class="stage" aria-hidden="true">
       <div class="mnv" id="mnv" data-state="rest">
         <div class="mnv-f">
-          <img class="off" src="/minerva/repouso.jpg" alt="" width="1924" height="1076" decoding="async">
-          <img class="on" src="/minerva/aberta.jpg" alt="" width="1924" height="1076" decoding="async" loading="lazy">
-          <video class="va" muted playsinline preload="auto"></video>
-          <video class="vf" muted playsinline preload="auto"></video>
+          <img class="off" src="/minerva/repouso.jpg" alt="" width="720" height="720" decoding="async">
+          <img class="on" src="/minerva/aberta.jpg" alt="" width="720" height="720" decoding="async">
+          <img class="va" alt="" width="720" height="720">
+          <img class="vf" alt="" width="720" height="720">
           <i class="mnv-h"></i>
           <i class="mnv-b"></i>
         </div>
@@ -296,8 +296,8 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
 <script>
 const MINERVA_CONFIG = {
   endpoint: '/api/minerva',
-  videos: { abertura: '/minerva/abertura.mp4', fechamento: '/minerva/fechamento.mp4' },
-  speed: { abertura: 1, fechamento: 1 },   // velocidade de cada vídeo (1 = movimento original, 5 s)
+  // movimento da esfera: imagens animadas que tocam uma vez (abrir e fechar), 5 s cada
+  animations: { abertura: '/minerva/abertura.webp', fechamento: '/minerva/fechamento.webp', duration: 5040 },
   greeting: 'Sou a Minerva, a inteligência institucional da EJUP. Pergunte sobre a escola, sobre formação jurídica ou sobre um tema do Direito.',
 };
 
@@ -307,28 +307,40 @@ const MINERVA_CONFIG = {
   const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------- Minerva ----------
-     Estados: rest (fechada) → opening (abertura.mp4) → open (aberta, brilho pulsando)
-              → closing (fechamento.mp4) → rest. Pedidos que chegam no meio de uma
+     Estados: rest (fechada) → opening (abertura.webp) → open (aberta, brilho pulsando)
+              → closing (fechamento.webp) → rest. Pedidos que chegam no meio de uma
               animação entram na fila e são atendidos quando ela termina, sem saltos. */
   const m = $('#mnv'), va = $('.va'), vf = $('.vf');
-  const SPEED = Object.assign({ abertura: 1, fechamento: 1 }, MINERVA_CONFIG.speed);
+  const A = MINERVA_CONFIG.animations;
   const failed = { va: RM, vf: RM };
-  let state = 'rest', want = false, awake = false, guard = 0;
+  const blobs = {};
+  let state = 'rest', want = false, awake = false, timer = 0;
 
   const show = () => { m.dataset.state = state === 'rest' && awake ? 'awake' : state; };
-  const setState = (s) => { state = s; clearTimeout(guard); show(); };
+  const setState = (s) => { state = s; clearTimeout(timer); show(); };
   const slow = (on) => m.style.setProperty('--swap', on ? '1.2s' : '.35s');
-  // se o vídeo travar sem disparar "ended", segue em frente depois de um tempo
-  const watchdog = (fn) => { clearTimeout(guard); guard = setTimeout(fn, 9000); };
 
-  if (!RM) {
-    va.addEventListener('error', () => { failed.va = true; m.classList.remove('va'); }, { once: true });
-    vf.addEventListener('error', () => { failed.vf = true; }, { once: true });
-    va.addEventListener('loadeddata', () => { if (state === 'rest') m.classList.add('va'); }, { once: true });
-    va.src = MINERVA_CONFIG.videos.abertura;
+  // Baixa cada animação uma vez. Cada vez que ela toca, ganha um endereço novo
+  // (blob:), o que faz a imagem começar do primeiro quadro.
+  function load(key) {
+    if (RM || blobs[key]) return blobs[key];
+    blobs[key] = fetch(A[key]).then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
+      .catch(() => { failed[key === 'abertura' ? 'va' : 'vf'] = true; return null; });
+    return blobs[key];
   }
-  // O fechamento só começa a baixar quando a Minerva abre pela primeira vez.
-  const loadClose = () => { if (!RM && !vf.src) vf.src = MINERVA_CONFIG.videos.fechamento; };
+  function play(img, key, onShown) {
+    return load(key).then((blob) => {
+      if (!blob) throw new Error('sem animação');
+      if (img._url) URL.revokeObjectURL(img._url);
+      img._url = URL.createObjectURL(blob);
+      return new Promise((ok, fail) => {
+        img.onload = () => { img.onload = img.onerror = null; onShown(); ok(); };
+        img.onerror = () => { img.onload = img.onerror = null; fail(new Error('decodificação')); };
+        img.src = img._url;
+      });
+    });
+  }
+  if (!RM) load('abertura');
 
   function step() {
     if (state === 'rest' && want) startOpen();
@@ -343,19 +355,12 @@ const MINERVA_CONFIG = {
   }
 
   function startOpen() {
-    loadClose();
-    if (failed.va) { m.classList.add('on'); setState('open'); return step(); }
+    load('fechamento');
     setState('opening');
+    if (failed.va) { timer = setTimeout(opened, 400); return; }
     slow(false);
-    vf.onplaying = vf.onended = null;
-    vf.pause();
-    va.onended = opened;
-    va.addEventListener('playing', () => { m.classList.add('va'); m.classList.remove('vf'); }, { once: true });
-    va.playbackRate = SPEED.abertura;
-    va.currentTime = 0;
-    const p = va.play();
-    if (p) p.catch(() => { failed.va = true; opened(); });
-    watchdog(opened);
+    play(va, 'abertura', () => { m.classList.add('va'); m.classList.remove('vf'); clearTimeout(timer); timer = setTimeout(opened, A.duration); })
+      .catch(() => { failed.va = true; opened(); });
   }
 
   function rested() {
@@ -365,31 +370,24 @@ const MINERVA_CONFIG = {
   }
 
   function startClose() {
-    const fade = () => {
-      slow(true); va.pause(); m.classList.remove('va', 'vf', 'on');
-      setState('closing'); setTimeout(rested, 1200);
-    };
-    if (failed.va || !m.classList.contains('va')) { m.classList.remove('on'); setState('closing'); return void setTimeout(rested, 1200); }
-    if (failed.vf) return fade();
     setState('closing');
-    va.pause();
-    vf.onplaying = () => {
-      vf.onplaying = null;
+    // sem animação (ou com movimento reduzido): troca suave entre as imagens paradas
+    if (failed.va || failed.vf || !m.classList.contains('va')) {
+      slow(true); m.classList.remove('va', 'vf', 'on');
+      timer = setTimeout(rested, 1200);
+      return;
+    }
+    slow(false);
+    play(vf, 'fechamento', () => {
       m.classList.add('vf');
-      setTimeout(() => { m.classList.remove('on'); va.currentTime = 0; }, 400);
-    };
-    vf.onended = () => {
-      vf.onended = null;
-      va.currentTime = 0;
-      m.classList.add('va');
-      requestAnimationFrame(() => m.classList.remove('vf'));
-      rested();
-    };
-    vf.playbackRate = SPEED.fechamento;
-    vf.currentTime = 0;
-    const p = vf.play();
-    if (p) p.catch(() => { failed.vf = true; fade(); });
-    watchdog(() => { if (vf.onended) vf.onended(); });
+      setTimeout(() => { m.classList.remove('on', 'va'); }, 400);
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        // último quadro do fechamento = imagem de repouso
+        m.classList.remove('vf');
+        rested();
+      }, A.duration);
+    }).catch(() => { failed.vf = true; slow(true); m.classList.remove('va', 'vf', 'on'); timer = setTimeout(rested, 1200); });
   }
 
   const openMinerva = () => { want = true; step(); };

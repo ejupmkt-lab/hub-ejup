@@ -19,7 +19,7 @@
       ]
     },
     {
-      "source": "/minerva/(.*)\\.mp4",
+      "source": "/minerva/(.*)\\.(webp|jpg)",
       "headers": [
         {
           "key": "Cache-Control",

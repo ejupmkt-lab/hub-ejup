@@ -23,7 +23,7 @@ o site.** Todas as outras produções da EJUP seguem o MIV (ver `CLAUDE.md` na r
 | Caminho | O que é |
 |---|---|
 | `index.html`, `assets/app.js`, `assets/style.css` | Site: Home, A escola, Formações, Professores, EJUPcast, Coluna Jurídica, In company, Política de Privacidade. Rotas reais (`/escola`, `/formacao/licenciamento`…). |
-| `minerva/` | Página `/minerva`, vídeos e imagens da Minerva |
+| `minerva/` | Página `/minerva`; `abertura.webp` e `fechamento.webp` (movimento da esfera, tocam uma vez), `repouso.jpg` e `aberta.jpg` (estados parados) |
 | `api/minerva.js`, `api/_lib/prompt.js` | Endpoint e prompt da Minerva (20 req/min por IP) |
 | `api/lead.js` | Grava newsletter e pedidos in company no Supabase (5 envios/min por IP) |
 | `img/`, `vid/`, `fonts/` | Imagens, vídeos e Gotham (woff2) |
