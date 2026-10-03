@@ -320,25 +320,31 @@ const MINERVA_CONFIG = {
   const setState = (s) => { state = s; clearTimeout(timer); show(); };
   const slow = (on) => m.style.setProperty('--swap', on ? '1.2s' : '.35s');
 
-  // Baixa cada animação uma vez. Cada vez que ela toca, ganha um endereço novo
-  // (blob:), o que faz a imagem começar do primeiro quadro.
-  function load(key) {
-    if (RM || blobs[key]) return blobs[key];
-    blobs[key] = fetch(A[key]).then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
-      .catch(() => { failed[key === 'abertura' ? 'va' : 'vf'] = true; return null; });
-    return blobs[key];
+  // Toca a animação do começo. Tenta, em ordem: endereço blob: novo (o mais confiável
+  // para reiniciar), o próprio arquivo com um parâmetro novo e, por fim, o arquivo puro.
+  let plays = 0;
+  function attempt(img, url, onShown) {
+    return new Promise((ok, fail) => {
+      img.onload = () => { img.onload = img.onerror = null; onShown(); ok(); };
+      img.onerror = () => { img.onload = img.onerror = null; fail(new Error('imagem')); };
+      img.src = url;
+    });
   }
   function play(img, key, onShown) {
+    const n = ++plays;
     return load(key).then((blob) => {
-      if (!blob) throw new Error('sem animação');
+      if (!blob) throw new Error('sem blob');
       if (img._url) URL.revokeObjectURL(img._url);
       img._url = URL.createObjectURL(blob);
-      return new Promise((ok, fail) => {
-        img.onload = () => { img.onload = img.onerror = null; onShown(); ok(); };
-        img.onerror = () => { img.onload = img.onerror = null; fail(new Error('decodificação')); };
-        img.src = img._url;
-      });
-    });
+      return attempt(img, img._url, onShown);
+    }).catch(() => attempt(img, A[key] + '?p=' + n, onShown))
+      .catch(() => attempt(img, A[key], onShown));
+  }
+  // o arquivo em si não falha por causa do fetch: só desiste se a imagem não carregar
+  function load(key) {
+    if (RM) return Promise.resolve(null);
+    if (!blobs[key]) blobs[key] = fetch(A[key]).then((r) => (r.ok ? r.blob() : null)).catch(() => null);
+    return blobs[key];
   }
   if (!RM) load('abertura');
 
