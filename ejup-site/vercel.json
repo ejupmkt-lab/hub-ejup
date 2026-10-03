@@ -1,12 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/minerva",
-      "permanent": false
-    }
-  ],
   "headers": [
     {
       "source": "/minerva(.*)",
@@ -35,6 +28,15 @@
       ]
     },
     {
+      "source": "/(favicon.svg|minerva/.*\\.jpg)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
       "source": "/fonts/(.*)",
       "headers": [
         {
@@ -44,11 +46,24 @@
       ]
     },
     {
-      "source": "/(favicon.svg|minerva/.*\\.jpg)",
+      "source": "/(img|vid)/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
         }
       ]
     }
@@ -56,6 +71,19 @@
   "functions": {
     "api/minerva.js": {
       "maxDuration": 30
+    },
+    "api/lead.js": {
+      "maxDuration": 10
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/minerva",
+      "destination": "/minerva/index.html"
+    },
+    {
+      "source": "/((?!api/|minerva/|assets/|img/|vid/|fonts/|favicon\\.svg).*)",
+      "destination": "/index.html"
+    }
+  ]
 }

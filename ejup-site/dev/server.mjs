@@ -14,20 +14,20 @@ const mock = createHandler({ getModel: () => ({ beta: { messages: { create: asyn
   return { stop_reason: 'end_turn', content: [{ type: 'text', text: `Resposta de teste para: ${messages.at(-1).content}` }] };
 } } } }) });
 const api = process.env.MINERVA_MOCK ? mock : handler;
+const { default: leadHandler } = await import('../api/lead.js');
 
 http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
-  if (url.pathname === '/api/minerva') {
+  if (url.pathname === '/api/minerva' || url.pathname === '/api/lead') {
     let raw = ''; for await (const c of req) raw += c;
     try { req.body = JSON.parse(raw); } catch { req.body = raw; }
     res.status = (c) => { res.statusCode = c; return res; };
     res.json = (p) => { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(p)); return res; };
-    return api(req, res);
+    return url.pathname === '/api/lead' ? leadHandler(req, res) : api(req, res);
   }
-  if (url.pathname === '/') { res.writeHead(307, { Location: '/minerva' }); return res.end(); }
   let file = normalize(join(root, decodeURIComponent(url.pathname)));
   if (!file.startsWith(root) || /\/(api|dev|tests|node_modules)\//.test(file.slice(root.length - 1))) { res.writeHead(404); return res.end(); }
-  try { if ((await stat(file)).isDirectory()) file = join(file, 'index.html'); } catch { file += '.html'; }
+  try { if ((await stat(file)).isDirectory()) file = join(file, 'index.html'); } catch { file = extname(file) ? file : join(root, 'index.html'); }
   try {
     const data = await readFile(file);
     const type = types[extname(file)] || 'application/octet-stream';
@@ -40,4 +40,4 @@ http.createServer(async (req, res) => {
     res.writeHead(200, { 'Content-Type': type, 'Accept-Ranges': 'bytes', 'Content-Length': data.length });
     res.end(data);
   } catch { res.writeHead(404); res.end(); }
-}).listen(port, () => console.log(`Minerva em http://localhost:${port}/minerva${process.env.MINERVA_MOCK ? ' (mock)' : ''}`));
+}).listen(port, () => console.log(`Site em http://localhost:${port}/ · Minerva em /minerva${process.env.MINERVA_MOCK ? ' (mock)' : ''}`));
