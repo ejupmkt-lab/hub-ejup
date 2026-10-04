@@ -23,7 +23,7 @@ export const imagem = (u, origin) => {
 };
 
 const PRIVADAS = new Set(['portal', 'prof', 'equipe', 'entrar', 'criar', 'recuperar', 'certificado', 'descadastro']);
-const ESTATICAS = new Set(['escola', 'formacoes', 'professores', 'ejupcast', 'coluna', 'incompany', 'privacidade', 'termos']);
+const ESTATICAS = new Set(['escola', 'formacoes', 'professores', 'ejupcast', 'coluna', 'incompany', 'privacidade', 'termos', 'linkbio']);
 const preco = (s) => { const m = String(s || '').replace(/\./g, '').match(/(\d+)(?:,(\d{2}))?/); return m ? Number(`${m[1]}.${m[2] || '00'}`) : null; };
 
 function organizacao(origin, C) {
@@ -42,6 +42,17 @@ export function metaPara(path, C, origin) {
   const base = { url, image: imagem('ep18', origin), type: 'website', status: 200, noindex: false, jsonld: [] };
   const seo = (k) => PADRAO.SEO[k];
   if (p === 'home') return { ...base, title: seo('home')[0], desc: seo('home')[1], jsonld: [organizacao(origin, C)] };
+  if (p === 'ejupcast' && id) {
+    const e = C.E.find((x) => x.id === id);
+    if (!e) return { ...base, title: 'EJUPcast · EJUP', desc: seo('ejupcast')[1], noindex: true };
+    const ep = {
+      '@context': 'https://schema.org', '@type': 'PodcastEpisode', name: e.t, description: corta(e.txt || e.d, 300), url,
+      image: imagem(e.img, origin), inLanguage: 'pt-BR', ...(e.n ? { episodeNumber: e.n } : {}), ...(e.pub ? { datePublished: e.pub } : {}),
+      partOfSeries: { '@type': 'PodcastSeries', name: 'EJUPcast', url: origin + '/ejupcast' },
+      ...(e.yt ? { associatedMedia: { '@type': 'VideoObject', name: e.t, embedUrl: `https://www.youtube-nocookie.com/embed/${e.yt}`, thumbnailUrl: imagem(e.img, origin), ...(e.pub ? { uploadDate: e.pub } : {}) } } : {}),
+    };
+    return { ...base, title: `${e.t} · EJUPcast`, desc: corta(e.d || e.txt), image: imagem(e.img, origin), jsonld: [ep] };
+  }
   if (ESTATICAS.has(p)) return { ...base, title: `${seo(p)[0]} · EJUP`, desc: seo(p)[1] };
   if (p === 'certificado' && !id) return { ...base, title: 'Conferir certificado · EJUP', desc: 'Confira a autenticidade de um certificado da EJUP pelo código que aparece no rodapé.' };
   if (PRIVADAS.has(p)) return { ...base, title: p === 'certificado' ? 'Certificado · EJUP' : { portal: 'Portal do Aluno · EJUP', prof: 'Área do Professor · EJUP', equipe: 'Área da Equipe · EJUP', descadastro: 'Newsletter · EJUP', criar: 'Criar conta · EJUP', recuperar: 'Recuperar senha · EJUP' }[p] || 'Entrar · EJUP', desc: 'Acesso às formações, aulas e materiais da EJUP.', noindex: true };
@@ -64,7 +75,7 @@ export function metaPara(path, C, origin) {
     if (!a) return { ...base, title: 'Coluna Jurídica · EJUP', desc: seo('coluna')[1], noindex: true };
     const art = {
       '@context': 'https://schema.org', '@type': 'Article', headline: corta(a.t, 110), description: corta(a.d || a.t, 300), url,
-      image: imagem(a.img, origin), inLanguage: 'pt-BR', author: { '@type': a.by && a.by !== 'Equipe EJUP' ? 'Person' : 'Organization', name: a.by || 'Equipe EJUP' },
+      image: imagem(a.img, origin), inLanguage: 'pt-BR', ...(a.pub ? { datePublished: a.pub } : {}), author: { '@type': a.by && a.by !== 'Equipe EJUP' ? 'Person' : 'Organization', name: a.by || 'Equipe EJUP' },
       publisher: { '@type': 'Organization', name: 'EJUP — Educação Jurídica', logo: { '@type': 'ImageObject', url: `${origin}/favicon.svg` } },
     };
     return { ...base, title: `${a.t} · EJUP`, desc: corta(a.d || a.t), image: imagem(a.img, origin), type: 'article', jsonld: [art] };
@@ -93,9 +104,33 @@ export function cabecalho(m) {
 export const render = (html, m) => html.replace(/<!--seo-->[\s\S]*?<!--\/seo-->/, `<!--seo-->\n${cabecalho(m)}\n<!--/seo-->`);
 
 export function sitemap(C, origin) {
-  const urls = ['/', ...[...ESTATICAS].filter((p) => p !== 'privacidade' && p !== 'termos').map((p) => '/' + p),
-    ...C.F.map((f) => `/formacao/${f.id}`), ...C.AR.map((a) => `/artigo/${a.id}`), '/minerva', '/certificado', '/privacidade', '/termos'];
+  const urls = ['/', ...[...ESTATICAS].filter((p) => !['privacidade', 'termos', 'linkbio'].includes(p)).map((p) => '/' + p),
+    ...C.F.map((f) => `/formacao/${f.id}`), ...C.AR.map((a) => `/artigo/${a.id}`), ...C.E.filter((e) => e.id).map((e) => `/ejupcast/${e.id}`),
+    '/minerva', '/linkbio', '/certificado', '/privacidade', '/termos'];
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `  <url><loc>${esc(origin + u)}</loc></url>`).join('\n')}\n</urlset>\n`;
 }
 
 export const robots = (origin) => `User-agent: *\nAllow: /\nDisallow: /portal\nDisallow: /prof$\nDisallow: /prof/\nDisallow: /equipe\nDisallow: /api/\n\nSitemap: ${origin}/sitemap.xml\n`;
+
+// endereços do site anterior (ejup.com.br até 2026): continuam funcionando, com redirecionamento permanente
+const FORMACAO_ANTIGA = {
+  'marco-legal-licenciamento-ambiental': 'licenciamento', 'pareceres-tecnicos-ambientais': 'pareceres',
+  'corporativo-marco-legal-licenciamento-ambiental': 'equipes', 'corporativo-marco-legal-licenciamento-ambiental-v2': 'equipes',
+};
+const ARTIGO_CURTO = {
+  multiportas: 'sistema-multiportas-setor-eletrico', stf: 'eventual-responsabilizacao-ministros-stf',
+  policia: 'poder-policia-ambiental-municipal-licenciamento-simplificado', investigacao: 'legitimidade-investigacao-defensiva-processo-penal',
+};
+export function antigo(path) {
+  const segs = String(path || '/').replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
+  const [a = '', b = '', c = ''] = segs;
+  if (a === 'politica-de-privacidade') return '/privacidade';
+  if (a === 'auth') return '/entrar';
+  if (a === 'podcast') return b && b !== 'episodios' ? `/ejupcast/${b}` : '/ejupcast';
+  if (a === 'compartilhar' && b === 'ejupcast' && c) return `/ejupcast/${c}`;
+  if (a === 'coluna' && b === 'artigos') return '/coluna';
+  if (a === 'coluna' && b && b !== 'newsletter') return `/artigo/${b}`;
+  if (a === 'formacoes' && b) return FORMACAO_ANTIGA[b] ? `/formacao/${FORMACAO_ANTIGA[b]}` : '/formacoes';
+  if (a === 'artigo' && ARTIGO_CURTO[b]) return `/artigo/${ARTIGO_CURTO[b]}`;
+  return null;
+}

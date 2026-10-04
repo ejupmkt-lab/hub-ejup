@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { createSb } from './_lib/sb.js';
-import { conteudo, metaPara, render, sitemap, robots } from './_lib/seo.js';
+import { conteudo, metaPara, render, sitemap, robots, antigo } from './_lib/seo.js';
 
 // Entrega as páginas do site (todas usam o mesmo app.html) com título, descrição, imagem de prévia e
 // dados estruturados de cada endereço; também gera /sitemap.xml e /robots.txt.
@@ -31,6 +31,8 @@ export function createPaginaHandler({ fetchImpl = fetch, env = process.env, now 
     // navegador sempre confere; a CDN da Vercel guarda por 5 min
     res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     res.setHeader('Vercel-CDN-Cache-Control', 'max-age=300, stale-while-revalidate=86400');
+    const novo = !q.robots && !q.sitemap && antigo(String(q.p || '/'));
+    if (novo) { res.setHeader('Location', origin + novo); return res.status(301).send(''); }
     const C = conteudo(await itens());
     if (q.robots) { res.setHeader('Content-Type', 'text/plain; charset=utf-8'); return res.status(200).send(robots(origin)); }
     if (q.sitemap) { res.setHeader('Content-Type', 'application/xml; charset=utf-8'); return res.status(200).send(sitemap(C, origin)); }

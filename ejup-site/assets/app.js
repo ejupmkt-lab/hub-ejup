@@ -77,15 +77,38 @@ const waMsg=t=>LINKS.whatsapp+'?text='+encodeURIComponent(t);
 /* imagem: nome de arquivo em img/ (curso1) ou endereço completo (/img/x.jpg, https://…) */
 const src=(u,pad='ep18')=>/^(https?:|\/)/.test(u||'')?u:`img/${u||pad}.jpg`;
 const paras=t=>String(t||'').split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+/* texto dos artigos: parágrafos; "## " subtítulo (entra no índice); "### " intertítulo; listas "- " e "1. ";
+   "> " citação; tabela com "|"; **negrito**; [texto](https://… ou /caminho). O conteúdo do banco chega escapado. */
+const inl=t=>t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\[([^\]]+)\]\(((?:https:\/\/|\/)[^\s)]+)\)/g,(m,l,u)=>`<a href="${u}"${u[0]==='/'?'':' target="_blank" rel="noopener"'}>${l}</a>`);
+const semMd=t=>t.replace(/\*\*(.+?)\*\*/g,'$1');
+function texto(t){
+ const out=[],toc=[];let h=0;
+ const blocos=[];paras(t).forEach(b=>{const ls=b.split('\n');if(/^#{2,3} /.test(ls[0])&&ls.length>1){blocos.push(ls[0]);blocos.push(ls.slice(1).join('\n'))}else blocos.push(b)});
+ blocos.forEach(b=>{const ls=b.split('\n').map(l=>l.trim()).filter(Boolean);if(!ls.length)return;
+  if(/^## /.test(ls[0])){const x=ls[0].slice(3);toc.push(semMd(x));out.push(`<h2 class="h3" id="t-${h++}">${inl(x)}</h2>`);return}
+  if(/^### /.test(ls[0])){out.push(`<h3 class="h4">${inl(ls[0].slice(4))}</h3>`);return}
+  if(ls.every(l=>/^[-*] /.test(l))){out.push(`<ul>${ls.map(l=>`<li>${inl(l.slice(2))}</li>`).join('')}</ul>`);return}
+  if(ls.every(l=>/^\d+\. /.test(l))){out.push(`<ol>${ls.map(l=>`<li>${inl(l.replace(/^\d+\. /,''))}</li>`).join('')}</ol>`);return}
+  if(ls.every(l=>/^(>|&gt;) ?/.test(l))){out.push(`<blockquote>${inl(ls.map(l=>l.replace(/^(>|&gt;) ?/,'')).join(' '))}</blockquote>`);return}
+  if(ls.length>1&&ls.every(l=>/^\|.*\|$/.test(l))){const cel=l=>l.slice(1,-1).split('|').map(c=>inl(c.trim()));const rows=ls.filter(l=>!/^\|[\s:|-]+\|$/.test(l));
+   out.push(`<div class="art-tab" tabindex="0" role="region" aria-label="Tabela"><table><thead><tr>${cel(rows[0]).map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${rows.slice(1).map(r=>`<tr>${cel(r).map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`);return}
+  out.push(`<p>${inl(ls.join('<br>'))}</p>`)});
+ return {html:out.join('\n   '),toc};
+}
+/* textos completos dos artigos padrão: arquivo à parte, baixado só quando alguém abre um artigo */
+let textosP=null;
+const textos=()=>textosP||(textosP=import('/assets/artigos.js').then(m=>{const T=m.default||{};
+ AR.forEach(a=>{if(!a.corpo&&T[a.id])a.corpo=T[a.id]});DEF.AR.forEach(a=>{if(!a.corpo&&T[a.id])a.corpo=T[a.id]})}).catch(()=>{}));
 
 /* imagens embutidas na própria página, para não depender de arquivos externos */
 const IMG=new Proxy({},{get:(o,n)=>`/img/${String(n)}.jpg`});
 const VID={logo:'/vid/cast-logo.mp4',sub:'/vid/cast-subscribe.mp4',est:'/vid/estatuas.mp4'};
-const withImg=h=>h.replace(/"img\/(\w+)\.jpg/g,'"/img/$1.jpg');
+const withImg=h=>h.replace(/"img\/([\w-]+)\.jpg/g,'"/img/$1.jpg');
 const hydrate=root=>$$('video[data-vid]',root).forEach(v=>{const auto=v.hasAttribute('autoplay');if(RM&&auto){v.removeAttribute('autoplay');v.addEventListener('loadedmetadata',()=>{v.currentTime=+(v.dataset.poster||0)},{once:true})}v.src=VID[v.dataset.vid];v.removeAttribute('data-vid');if(auto&&!RM)v.play().catch(()=>{})});
 
 /* ---------- conteúdo ---------- */
 const CATS=[['todos','Todos'],['direito','Direito'],['power','Power Skills'],['negocios','Negócios & Inovação']];
+const CATL=c=>(CATS.find(([v])=>v===c)||CATS[1])[1];
 const copia=x=>JSON.parse(JSON.stringify(x));
 let F=copia(PADRAO.F),E=copia(PADRAO.E),AR=copia(PADRAO.AR),FAQ=copia(PADRAO.FAQ),PROF=copia(PADRAO.PROF);
 const FE=()=>F.find(f=>f.incompany)||F[F.length-1]||{f:[]};
@@ -100,12 +123,26 @@ const cardF=f=>`<article class="card cf glow" data-cat="${f.cat}" data-text="${f
  <a href="#formacao.${f.id}" class="cover" aria-label="${f.t}"><img src="${src(f.img,'curso1')}" alt="${f.alt||''}" loading="lazy"></a>
  <div class="cf-b"><p class="lbl g">${f.lb}</p><h3 class="h3"><a href="#formacao.${f.id}">${f.t}</a></h3><p class="body">${f.d}</p><div class="tags">${f.f.map(x=>tag(x)).join('')}</div>
  <div class="cf-f">${btn('Saiba mais','glass',{go:'formacao.'+f.id,s:1,icon:false})}${btn('Adquirir agora','gold',{s:1,attr:`data-buy="${f.id}"`})}</div></div></article>`;
-const cardE=e=>`<article class="ce" data-cat="${e.cat}" data-text="${e.t}" data-r>
+const cardE=(e,hid)=>`<article class="ce" data-cat="${e.cat}" data-text="${e.t} ${(e.conv||[]).join(' ')}" data-r${hid?' hidden data-extra':''}>
  <button class="cover thumb" data-modal="ep${e.n}" aria-label="Assistir: ${e.t}"><img src="${src(e.img)}" alt="" loading="lazy"><span class="play">${ic('play',20)}</span></button>
- <div class="ce-b"><p class="lbl g">${e.m}</p><h3 class="h3">${e.t}</h3><p class="body">${e.d}</p></div></article>`;
-const cardA=(a,hid)=>`<a href="#artigo.${a.id}" class="ca" data-cat="direito" data-text="${a.t} ${a.by}" data-r${hid?' hidden data-extra':''}>
+ <div class="ce-b"><p class="lbl g">${e.m}</p><h3 class="h3">${e.id?`<a href="#ejupcast.${e.id}">${e.t}</a>`:e.t}</h3><p class="body">${e.d}</p></div></article>`;
+const cardA=(a,hid)=>`<a href="#artigo.${a.id}" class="ca" data-cat="${a.cat||'direito'}" data-text="${a.t} ${a.by}" data-r${hid?' hidden data-extra':''}>
  ${a.img?`<span class="cover"><img src="${src(a.img)}" alt="" loading="lazy"></span>`:''}
- <span class="ca-b"><span class="lbl g">Direito</span><span class="h3">${a.t}</span>${a.d?`<span class="body">${a.d}</span>`:''}${a.by?`<span class="sm">${a.by} · ${a.min} min de leitura</span>`:''}</span></a>`;
+ <span class="ca-b"><span class="lbl g">${CATL(a.cat)}</span><span class="h3">${a.t}</span>${a.d?`<span class="body">${a.d}</span>`:''}${a.by?`<span class="sm">${a.by} · ${a.min} min de leitura</span>`:''}</span></a>`;
+/* página de um episódio: o vídeo só carrega do YouTube depois do clique (mais leve e sem rastreio antes do play) */
+const episodio=e=>{const i=E.indexOf(e),outros=[...E.slice(i+1),...E.slice(0,i)].slice(0,3);
+return `<section class="sec dark hero" data-hero>${orb('orb-r',{arc:false})}<div class="wrap stack">
+ <header class="ep-h"><nav class="crumb" aria-label="Você está em"><a href="#ejupcast">EJUPcast</a><span>/</span><span class="cur">${e.n?'Episódio '+e.n:'Episódio'}</span></nav>
+  <h1 class="h2 blur" data-r>${e.t}</h1><div class="tags">${tag(e.m)}${tag(CATL(e.cat))}${e.date?tag(e.date):''}</div></header>
+ <div class="ep-v" data-r>${e.yt?`<button class="ep-play" data-yt="${e.yt}" aria-label="Assistir: ${e.t}"><img src="${src(e.img)}" alt=""><span class="play">${ic('play',24)}</span></button>`:`<img src="${src(e.img)}" alt="">`}</div>
+ <div class="ep-b"><div class="ep-t">${paras(e.txt||e.d).map(x=>`<p class="lead">${x}</p>`).join('')}
+   ${(e.conv||[]).length?`<div class="ep-c"><p class="lbl g">${e.conv.length>1?'Convidados':'Convidado'}</p>${e.conv.map(x=>`<p class="h4">${x}</p>`).join('')}</div>`:''}</div>
+  <div class="ep-a"><div class="acts">${e.yt?`<a class="btn b-white s" href="https://www.youtube.com/watch?v=${e.yt}" target="_blank" rel="noopener"><span>Assistir no YouTube</span>${ic('ar',14)}</a>`:btn('Assistir no YouTube','white',{s:1,toast:T.yt})}${btn('Ouvir no Spotify','glass',{s:1,toast:T.sp})}</div>
+   <button class="sharel" data-copy>${ic('share',16)}<span>Copiar o link do episódio</span></button></div></div>
+</div></section>
+${outros.length?`<section class="sec dark flush"><div class="wrap stack"><div class="rule" style="padding-top:clamp(40px,5vw,64px)"><div class="head"><div class="hd"><p class="lbl">EJUPcast</p><h2 class="h2s" data-r>Outras ${em('conversas.')}</h2></div><div data-r>${btn('Ver todos os episódios','line',{go:'ejupcast'})}</div></div></div>
+ <div class="g3">${outros.map(x=>cardE(x)).join('')}</div></div></section>`:''}
+${footer()}`};
 const filters=(k,ph,on='todos')=>`<div class="filters" data-filter="${k}" data-r><div class="chips" role="group" aria-label="Filtrar por pilar">${CATS.map(([v,l])=>`<button class="chip${v===on?' on':''}" data-cat="${v}" aria-pressed="${v===on}">${l}</button>`).join('')}</div><label class="field">${ic('search',18)}<input id="q-${k}" type="search" placeholder="${ph}" aria-label="${ph}" autocomplete="off"></label></div>`;
 const empty=(k,t)=>`<div class="empty" id="empty-${k}" hidden><p class="h3">${t}</p><p class="body">Limpe a busca ou escolha outro pilar.</p></div>`;
 const banner=(l,t,p,o={})=>`<div class="panel banner dark glow ${o.cls||''}" data-r>${o.orb===false?'':orb('orb-card',{a0:110,a1:150,d:20})}<div class="tx-row">${o.pre||''}<div class="tx"><p class="lbl g">${l}</p><h2 class="h2s">${t}</h2>${p?`<p class="lead">${p}</p>`:''}${o.tags?`<div class="tags">${o.tags.map(x=>tag(x)).join('')}</div>`:''}</div></div>${o.act||btn('Fale com um consultor','gold',{go:'incompany.proposta'})}</div>`;
@@ -232,7 +269,7 @@ return `
 </div></section>
 ${footer()}`},
 
-ejupcast:()=>`
+ejupcast:id=>id?episodio(E.find(x=>x.id===id)||E[0]):`
 <section class="sec dark hero hero-cast" data-hero>${orb('orb-l',{arc:false})}<div class="wrap hero-2">
  <div class="hero-c">${CAST()}<p class="lbl g">O podcast da EJUP</p><h1 class="d1 blur" data-r>Conversas que ampliam ${em('seu repertório.')}</h1>
   <p class="lead" data-r>Diálogos com vozes que pensam o Direito, a liderança e a inovação com profundidade — para ouvir entre uma audiência e outra, ou no trânsito da próxima decisão importante.</p>
@@ -243,38 +280,51 @@ ejupcast:()=>`
 <section class="sec dark flush"><div class="wrap" style="display:grid;gap:40px">
  <div class="hd"><p class="lbl">Últimos episódios</p><h2 class="h2" data-r>Conversas que continuam ${em('depois do play.')}</h2></div>
  <div class="rule">${filters('e','Buscar por título ou tema…')}</div>
- <div class="g3 gridf" id="grid-e">${E.map(cardE).join('')}</div>${empty('e','Nenhum episódio encontrado.')}
- <div class="ctr" data-r>${btn('Carregar mais episódios','line',{icon:false,toast:T.more})}</div>
+ <div class="g3 gridf" id="grid-e">${E.map((e,i)=>cardE(e,i>8)).join('')}</div>${empty('e','Nenhum episódio encontrado.')}
+ <div class="ctr" data-r>${E.length>9?btn('Carregar mais episódios','line',{icon:false,attr:'data-more="e"'}):btn('Ver todos no YouTube','line',{icon:false,toast:T.more})}</div>
 </div></section>
 <section class="sec dark flush"><div class="wrap">${banner('Onde ouvir','Disponível no YouTube e no Spotify.','A porta de entrada pública da escola: conversas longas com profissionais que construíram trajetória no Direito, nos negócios e nas instituições.',{cls:'gold',orb:false,pre:CAST('sm'),act:`<div class="acts">${btn('Assistir no YouTube','white',{toast:T.yt})}${btn('Ouvir no Spotify','glass',{toast:T.sp})}</div>`})}</div></section>
 ${footer()}`,
+
+linkbio:()=>{const lk=(href,t,s,o={})=>`<a class="card lb-i${o.gold?' gold':''}" href="${href}"${/^https?:/.test(href)?' target="_blank" rel="noopener"':''} data-r>${o.img?`<span class="lb-img"><img src="${src(o.img)}" alt="" loading="lazy"></span>`:''}<span class="lb-t"><span class="h4">${t}</span>${s?`<span class="sm">${s}</span>`:''}</span>${ic('ar',16)}</a>`;
+ const ext=(k,t,s)=>LINKS[k]?lk(LINKS[k],t,s):'';
+ return `<section class="sec dark hero lb" data-hero>${orb('orb-l',{arc:false})}<div class="wrap lb-w">
+ <header class="lb-h" data-r><span class="lb-sym">${SYM('')}</span><p class="lbl g">@ejup.oficial</p><h1 class="h2s">Alma clássica, ${em('repertório contemporâneo.')}</h1><p class="body">Escola de educação jurídica continuada.</p></header>
+ <div class="lb-s"><p class="lbl">Formações e conteúdos</p>
+  ${F.filter(f=>!f.incompany).map(f=>lk('#formacao.'+f.id,f.t,[f.lb,f.preco].filter(Boolean).join(' · '),{img:f.img,gold:f===F[0]})).join('')}
+  ${E[0]?lk('#ejupcast.'+(E[0].id||''),'EJUPcast · '+E[0].t,E[0].m,{img:E[0].img}):''}
+  ${AR[0]?lk('#artigo.'+AR[0].id,'Coluna Jurídica · '+(AR[0].st||AR[0].t),AR[0].by||'',{img:AR[0].img}):''}
+  ${lk('#formacoes','Todas as formações','Conteúdo programático, carga horária e certificado')}</div>
+ <div class="lb-s"><p class="lbl">Canais</p>${ext('youtube','YouTube','EJUPcast completo, em vídeo')}${ext('spotify','Spotify','EJUPcast em áudio')}${ext('instagram','Instagram','@ejup.oficial')}${ext('linkedin','LinkedIn','EJUP — Educação Jurídica')}</div>
+ <div class="lb-s"><p class="lbl">Fale com a EJUP</p>${lk('#incompany','In company','Formações fechadas para escritórios, empresas e instituições')}${lk(waMsg('Olá, vim pelo link da bio da EJUP.'),'WhatsApp','(85) 99271-4050')}${lk('#coluna.newsletter','Newsletter','A Coluna Jurídica no seu e-mail, uma vez por semana')}${lk('#home','Site da EJUP','ejup.com.br')}</div>
+</div></section>`},
 
 coluna:()=>`
 <section class="sec light hero" data-hero>${orb('orb-l',{arc:false})}<div class="wrap hero-2">
  <div class="hero-c">${tag('Coluna EJUP')}<h1 class="d1 blur" data-r>Análises que constroem ${em('pensamento jurídico.')}</h1>
   <p class="lead" data-r>Ensaios, comentários e provocações de quem pensa o Direito com profundidade — e escreve para ser entendido.</p></div>
  ${AR[0]?`<article class="card cf" data-r>${AR[0].img?`<a href="#artigo.${AR[0].id}" class="cover" aria-label="${AR[0].t}"><img src="${src(AR[0].img)}" alt="Capa do artigo ${AR[0].t}"></a>`:''}
-  <div class="cf-b"><div style="display:flex;gap:12px;align-items:center">${tag('Último artigo')}<span class="lbl g">Direito</span></div><h2 class="h3"><a href="#artigo.${AR[0].id}">${AR[0].t}</a></h2>${AR[0].d?`<p class="body">${AR[0].d}</p>`:''}
+  <div class="cf-b"><div style="display:flex;gap:12px;align-items:center">${tag('Último artigo')}<span class="lbl g">${CATL(AR[0].cat)}</span></div><h2 class="h3"><a href="#artigo.${AR[0].id}">${AR[0].t}</a></h2>${AR[0].d?`<p class="body">${AR[0].d}</p>`:''}
   <div class="cf-f"><span class="sm">${AR[0].by||'Equipe EJUP'}${AR[0].min?` · ${AR[0].min} min de leitura`:''}</span>${btn('Ler artigo','navy',{s:1,go:'artigo.'+AR[0].id})}</div></div></article>`:''}
 </div></section>
 <section class="sec light flush"><div class="wrap stack">
  <div class="rule" style="padding-bottom:24px;border-bottom:1px solid var(--line)">${filters('a','Buscar por título, autor ou tema…')}</div>
- <div class="head"><div class="hd"><p class="lbl">Recém-publicados</p><h2 class="h2" data-r>Leituras para ${em('acompanhar agora.')}</h2></div><div data-r>${btn('Ver todas as publicações','lined',{attr:'data-more'})}</div></div>
+ <div class="head"><div class="hd"><p class="lbl">Recém-publicados</p><h2 class="h2" data-r>Leituras para ${em('acompanhar agora.')}</h2></div><div data-r>${btn('Ver todas as publicações','lined',{attr:'data-more="a"'})}</div></div>
  <div class="g3 gridf" id="grid-a">${AR.map((a,i)=>cardA(a,i>2)).join('')}</div>${empty('a','Nenhuma publicação encontrada.')}
 </div></section>
 <section class="sec light tight" id="newsletter"><div class="wrap">${newsBig('coluna')}</div></section>
 ${footer()}`,
 
-artigo:id=>{const a=AR.find(x=>x.id===id)||AR[0],blocks=paras(a.corpo),toc=blocks.filter(b=>b.startsWith('## ')).map(b=>b.slice(3));let h=0;
+artigo:id=>{const a=AR.find(x=>x.id===id)||AR[0],{html,toc}=texto(a.corpo);
 return `<div class="prog" id="prog"></div>
 <section class="sec light" style="padding-top:0"><div class="wrap stack">
- <header class="art-h"><nav class="crumb" aria-label="Você está em"><a href="#coluna">Coluna Jurídica</a><span>/</span><span class="cur">Direito</span></nav>
+ <header class="art-h"><nav class="crumb" aria-label="Você está em"><a href="#coluna">Coluna Jurídica</a><span>/</span><span class="cur">${CATL(a.cat)}</span></nav>
   <h1 class="d1 blur" data-r>${a.t}</h1>${a.d?`<p class="lead">${a.d}</p>`:''}
   <div class="meta"><div class="meta-a">${symAv}<div><p class="h4">${a.by||'Equipe EJUP'}</p><p class="sm">Educação Jurídica</p></div>${a.date?`<p class="sm">${a.date}${a.min?` · ${a.min} min de leitura`:''}</p>`:a.min?`<p class="sm">${a.min} min de leitura</p>`:''}</div>
    <div class="shr"><span class="sm">Compartilhar</span><button data-copy aria-label="Copiar link">${ic('link',18)}</button><button data-toast="${T.mail}" aria-label="Enviar por e-mail">${ic('mail',18)}</button><button data-copy aria-label="Compartilhar">${ic('share',18)}</button></div></div></header>
- ${blocks.length?`<div class="art">
+ ${html?`<div class="art">
   <div class="art-t">
-   ${blocks.map(b=>b.startsWith('## ')?`<h2 class="h3" id="t-${h++}">${b.slice(3)}</h2>`:`<p>${b}</p>`).join('\n   ')}
+   ${html}
    <div class="card by">${symAv}<div><p class="lbl g">Escrito por</p><p class="h3">${a.by||'Equipe EJUP'}</p><p class="body">Educação Jurídica</p></div></div>
   </div>
   <aside class="art-s">${a.imgv||a.img?`<img src="${src(a.imgv||a.img)}" alt="Capa do artigo ${a.t}" loading="lazy">`:''}
@@ -495,7 +545,7 @@ const closeModal=()=>{if(!modal.classList.contains('on'))return;modal.classList.
 let cur=null,secs=[],hero=null,pars=[],prog=null,spies=[],io,cio,vio;
 /* aceita caminho (/formacao/licenciamento) e o formato antigo com # (#formacao.licenciamento) */
 const parse=h=>{h=(h||'').replace(/^[#/]+/,'').replace(/\/+$/,'');if(!h)return ['home',''];const i=h.search(/[./]/);return i<0?[h,'']:[h.slice(0,i),h.slice(i+1)]};
-const TITLES={home:'EJUP · Educação Jurídica',escola:'A escola',formacoes:'Formações',formacao:'Formação',professores:'Professores',ejupcast:'EJUPcast',coluna:'Coluna Jurídica',artigo:'Artigo',incompany:'In company',privacidade:'Política de Privacidade',termos:'Termos de Uso',descadastro:'Newsletter',nao:'Página não encontrada',entrar:'Entrar',criar:'Criar conta',recuperar:'Recuperar senha',portal:'Portal do Aluno',prof:'Área do Professor',equipe:'Área da Equipe',certificado:'Certificado'};
+const TITLES={home:'EJUP · Educação Jurídica',escola:'A escola',formacoes:'Formações',formacao:'Formação',professores:'Professores',ejupcast:'EJUPcast',coluna:'Coluna Jurídica',artigo:'Artigo',incompany:'In company',linkbio:'Links da EJUP',privacidade:'Política de Privacidade',termos:'Termos de Uso',descadastro:'Newsletter',nao:'Página não encontrada',entrar:'Entrar',criar:'Criar conta',recuperar:'Recuperar senha',portal:'Portal do Aluno',prof:'Área do Professor',equipe:'Área da Equipe',certificado:'Certificado'};
 const SCR={};
 /* Portal do Aluno, Área do Professor e login ficam em /assets/portal.js, carregado só quando alguém vai até lá */
 const PORTAL=['entrar','criar','recuperar','portal','prof','equipe','certificado'];
@@ -506,7 +556,8 @@ function go(tok,o={}){
  if(!PAGES[p]&&PORTAL.includes(p)){loadPortal().then(()=>go(tok,o),()=>toast('Não foi possível abrir o portal. Confira a conexão e tente de novo.'));return}
  /* endereço que não existe (inclusive formação ou artigo removido): página 404, mantendo o endereço digitado */
  const orig=toPath(p+(arg?'.'+arg:''));
- let known=!!PAGES[p]&&!(p==='formacao'&&!F.some(x=>x.id===arg))&&!(p==='artigo'&&!AR.some(x=>x.id===arg));if(!known){p='nao';arg=''}
+ if(p==='artigo'&&!textosP&&AR.some(x=>!x.corpo)){textos().then(()=>go(tok,o));return}
+ let known=!!PAGES[p]&&!(p==='formacao'&&!F.some(x=>x.id===arg))&&!(p==='artigo'&&!AR.some(x=>x.id===arg))&&!(p==='ejupcast'&&arg&&!E.some(x=>x.id===arg))&&!(p==='linkbio'&&arg);if(!known){p='nao';arg=''}
  const key=known?p+(arg?'.'+arg:''):'nao:'+orig;
  setMenu(false);closeModal();
  if(key===cur){afterArg(p,arg)||scrollTo({top:0,behavior:RM?'auto':'smooth'});return}
@@ -528,13 +579,14 @@ function afterArg(p,arg){
 }
 function mount(p,arg){
  nav.classList.remove('hide');
- nav.classList.toggle('is-auth',['entrar','criar','recuperar','certificado'].includes(p));nav.classList.toggle('is-portal',['portal','prof','equipe'].includes(p));
+ nav.classList.toggle('is-auth',['entrar','criar','recuperar','certificado','linkbio'].includes(p));nav.classList.toggle('is-portal',['portal','prof','equipe'].includes(p));
  document.documentElement.classList.toggle('in-portal',['portal','prof','equipe'].includes(p));syncSess();
- const ttl=p==='formacao'?(F.find(x=>x.id===arg)||F[0]).t:p==='artigo'?(AR.find(x=>x.id===arg)||AR[0]).t:TITLES[p];
+ const ep=p==='ejupcast'&&arg?E.find(x=>x.id===arg):null;
+ const ttl=p==='formacao'?(F.find(x=>x.id===arg)||F[0]).t:p==='artigo'?(AR.find(x=>x.id===arg)||AR[0]).t:ep?ep.t:TITLES[p];
  document.title=p==='home'?TITLES.home:`${ttl||'EJUP'} · EJUP`;
  /* descrição da página (o servidor já entrega a da primeira página; aqui segue a navegação) */
  const un=t=>{const d=document.createElement('textarea');d.innerHTML=t||'';return d.value};
- const desc=p==='formacao'?(F.find(x=>x.id===arg)||F[0]).d:p==='artigo'?((AR.find(x=>x.id===arg)||AR[0]).d||ttl):(PADRAO.SEO[p]||PADRAO.SEO.home)[1];
+ const desc=p==='formacao'?(F.find(x=>x.id===arg)||F[0]).d:p==='artigo'?((AR.find(x=>x.id===arg)||AR[0]).d||ttl):ep?ep.d:(PADRAO.SEO[p]||PADRAO.SEO.home)[1];
  const md=$('meta[name="description"]');if(md&&desc)md.setAttribute('content',un(desc).replace(/\s+/g,' ').slice(0,180));
  const key={formacao:'formacoes',artigo:'coluna'}[p]||p;
  $$('[data-p]').forEach(a=>{const on=a.dataset.p===key;a.classList.toggle('on',on);on?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')});
@@ -591,7 +643,7 @@ document.fonts&&document.fonts.ready.then(()=>$$('.seg').forEach(placeSeg));
 /* ---------- filtros ---------- */
 function applyFilter(box,now){
  const k=box.dataset.filter,grid=$('#grid-'+k),cat=$('.chip.on',box).dataset.cat,q=norm($('input',box).value);
- const run=()=>{let n=0;[...grid.children].forEach(c=>{if(c.hasAttribute('data-extra'))return;const ok=(cat==='todos'||c.dataset.cat===cat)&&(!q||norm(c.dataset.text).includes(q));c.hidden=!ok;ok&&n++});
+ const run=()=>{let n=0;[...grid.children].forEach(c=>{if(c.hasAttribute('data-extra')&&cat==='todos'&&!q){c.hidden=true;return}const ok=(cat==='todos'||c.dataset.cat===cat)&&(!q||norm(c.dataset.text).includes(q));c.hidden=!ok;ok&&n++});
   $('#empty-'+k).hidden=n>0;grid.hidden=n===0;grid.classList.remove('out')};
  if(now){run();return}
  grid.classList.add('out');$$('[data-r]',grid).forEach(c=>c.removeAttribute('data-r'));setTimeout(run,220);
@@ -603,6 +655,8 @@ document.addEventListener('input',e=>{const box=e.target.closest('[data-filter]'
 /* ---------- arraste nos carrosséis ---------- */
 let dragged=false;
 function dragScroll(el){
+ /* faixa que rola de lado sem links dentro: entra na ordem do teclado para rolar com as setas */
+ if(!el.querySelector("a,button,input")&&!el.hasAttribute("tabindex"))el.tabIndex=0;
  if(el._d)return;el._d=1;let x0=0,s0=0,down=false;
  el.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||el.scrollWidth<=el.clientWidth)return;down=true;dragged=false;x0=e.clientX;s0=el.scrollLeft});
  addEventListener('pointermove',e=>{if(!down)return;const dx=e.clientX-x0;if(Math.abs(dx)>6){dragged=true;el.classList.add('dragging')}el.scrollLeft=s0-dx});
@@ -663,11 +717,12 @@ document.addEventListener('click',e=>{
  if(t===modal||t.closest('[data-close]')){closeModal();return}
  if(t.closest('[data-skip]')){modal._end&&modal._end();return}
  if((x=t.closest('[data-modal]'))){openModal(x.dataset.modal);return}
+ if((x=t.closest('[data-yt]'))){const f=document.createElement('iframe');f.src=`https://www.youtube-nocookie.com/embed/${x.dataset.yt}?autoplay=1&rel=0`;f.title=x.getAttribute('aria-label');f.allow='autoplay; encrypted-media; picture-in-picture';f.allowFullscreen=true;x.replaceWith(f);return}
  if((x=t.closest('[data-anchor]'))){const d=document.getElementById(x.dataset.anchor);if(x.dataset.tema){const i=$('#ic-tema');if(i)i.value=x.dataset.tema}d&&d.scrollIntoView({behavior:RM?'auto':'smooth',block:'start'});return}
  if((x=t.closest('[data-copy]'))){const ok=()=>toast('Link copiado.'),no=()=>toast('Não foi possível copiar o link aqui.');try{navigator.clipboard.writeText(location.href).then(ok,no)}catch(err){no()}return}
  if((x=t.closest('.faq-q,.mod-q'))){const it=x.parentElement,on=!it.classList.contains('on');$$(':scope > .on',it.parentElement).forEach(o=>{o.classList.remove('on');o.firstElementChild.setAttribute('aria-expanded','false')});it.classList.toggle('on',on);x.setAttribute('aria-expanded',on);return}
  if((x=t.closest('[data-filter] .chip'))){const box=x.closest('[data-filter]');$$('.chip',box).forEach(c=>{c.classList.toggle('on',c===x);c.setAttribute('aria-pressed',c===x)});applyFilter(box);return}
- if((x=t.closest('[data-more]'))){const g=$('#grid-a');$$('[data-extra]',g).forEach(c=>{c.removeAttribute('data-extra');c.hidden=false});x.hidden=true;applyFilter($('[data-filter="a"]'));return}
+ if((x=t.closest('[data-more]'))){const k=x.dataset.more||'a',g=$('#grid-'+k);$$('[data-extra]',g).forEach(c=>{c.removeAttribute('data-extra');c.hidden=false});x.hidden=true;applyFilter($(`[data-filter="${k}"]`));return}
  if((x=t.closest('.prof'))){setProf(x);return}
  if((x=t.closest('[data-ds]'))){const sair=x.dataset.ds==='sair',tk=x.dataset.t,p=$('#ds-p'),a=$('#ds-a');x.disabled=true;
   fetch(`/api/portal?r=news-${sair?'sair':'voltar'}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tk})}).then(r=>r.json().then(d=>({ok:r.ok,d})))
@@ -682,9 +737,9 @@ function aplicar(c){
  const L=k=>Array.isArray(c[k])&&c[k].length?c[k].map(escH):null;
  const f=L('formacao'),e=L('episodio'),a=L('artigo'),q=L('faq'),pr=L('professor');
  if(f)F=f;if(e)E=e;if(a)AR=a;if(q)FAQ=q.map(x=>[x.q,x.a]);if(pr)PROF=pr;
- const cfg=(c.config||[])[0];if(cfg)['whatsapp','instagram','youtube','spotify','mapa'].forEach(k=>{if(typeof cfg[k]==='string'&&(!cfg[k]||/^https:\/\//.test(cfg[k])))LINKS[k]=cfg[k]});
+ const cfg=(c.config||[])[0];if(cfg)['whatsapp','instagram','youtube','spotify','linkedin','mapa'].forEach(k=>{if(typeof cfg[k]==='string'&&(!cfg[k]||/^https:\/\//.test(cfg[k])))LINKS[k]=cfg[k]});
 }
-window.EJUP={TERMOS_VERSAO,$,$$,RM,ic,btn,tag,em,orb,LOGO,SYM,DEF,get F(){return F},LINKS,waMsg,okMail,toast,go,links,hydrate,withImg,placeSeg,reveal,syncSess,PAGES,TITLES,app,nav,cur:()=>cur};
+window.EJUP={textos,TERMOS_VERSAO,$,$$,RM,ic,btn,tag,em,orb,LOGO,SYM,DEF,get F(){return F},LINKS,waMsg,okMail,toast,go,links,hydrate,withImg,placeSeg,reveal,syncSess,PAGES,TITLES,app,nav,cur:()=>cur};
 addEventListener('popstate',()=>go(location.pathname,{push:false}));
 links(nav);links(menu);
 const inicio=()=>go(location.pathname==='/'&&location.hash.length>1?location.hash:location.pathname,{push:false,instant:true});

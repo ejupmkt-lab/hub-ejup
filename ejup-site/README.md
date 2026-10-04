@@ -37,7 +37,8 @@ o site.** Todas as outras produções da EJUP seguem o MIV (ver `CLAUDE.md` na r
 | `dev/fake-supabase.mjs` | Supabase em memória para os testes e para `npm run dev:portal` |
 | `img/`, `vid/`, `fonts/` | Imagens, vídeos e Gotham (woff2) |
 | `assets/padrao.js` | Textos padrão do site (formações, professores, artigos, episódios, perguntas, links) e títulos/descrições das páginas |
-| `api/pagina.js`, `api/_lib/seo.js` | Entrega cada página com título, descrição, imagem de prévia (WhatsApp, LinkedIn) e dados estruturados (Google); gera `/sitemap.xml` e `/robots.txt` |
+| `assets/artigos.js` | Texto completo dos artigos padrão da Coluna Jurídica, baixado só quando alguém abre um artigo |
+| `api/pagina.js`, `api/_lib/seo.js` | Entrega cada página com título, descrição, imagem de prévia (WhatsApp, LinkedIn) e dados estruturados (Google); gera `/sitemap.xml` e `/robots.txt`; redireciona (301) os endereços do site anterior: `/coluna/…` → `/artigo/…`, `/podcast/…` e `/compartilhar/ejupcast/…` → `/ejupcast/…`, `/formacoes/…` → `/formacao/…`, `/politica-de-privacidade` → `/privacidade` |
 | `vercel.json` | Rotas do site, `/minerva`, microfone, cache |
 
 **Conteúdo do site** (formações e suas páginas, professores, artigos da Coluna, episódios do

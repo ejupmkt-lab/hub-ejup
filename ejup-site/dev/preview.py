@@ -76,7 +76,10 @@ js = R('assets/app.js')
 # o conteúdo padrão vem de um módulo; na prévia ele entra embutido no próprio script
 padrao = re.sub(r'^//.*\n', '', R('assets/padrao.js'), flags=re.M).replace('export default', 'const PADRAO =', 1)
 js = must(js, "import PADRAO from '/assets/padrao.js';", padrao)
-js = must(js, "const withImg=h=>h.replace(/\"img\\/(\\w+)\\.jpg/g,'\"/img/$1.jpg');", "const withImg=h=>h;")
+js = must(js, "const withImg=h=>h.replace(/\"img\\/([\\w-]+)\\.jpg/g,'\"/img/$1.jpg');", "const withImg=h=>h;")
+# textos completos dos artigos: na prévia vêm embutidos
+artigos = re.sub(r'^//.*\n', '', R('assets/artigos.js'), flags=re.M).replace('export default', '', 1).strip().rstrip(';')
+js = must(js, "import('/assets/artigos.js')", 'Promise.resolve({default:' + artigos + '})')
 js = must(js, "const IMG=new Proxy({},{get:(o,n)=>`/img/${String(n)}.jpg`});", "const IMG=new Proxy({},{get:(o,n)=>`img/${String(n)}.jpg`});")
 js = must(js, "const VID={logo:'/vid/cast-logo.mp4',sub:'/vid/cast-subscribe.mp4',est:'/vid/estatuas.mp4'};", "const VID={logo:'vid/cast-logo.mp4',sub:'vid/cast-subscribe.mp4',est:'vid/estatuas.mp4'};")
 js = must(js, "const toPath=tok=>{const [p,a]=parse(tok);return p==='home'?'/':'/'+p+(a?'/'+a:'')};", "const toPath=tok=>{const [p,a]=parse(tok);return '#'+p+(a?'.'+a:'')};")

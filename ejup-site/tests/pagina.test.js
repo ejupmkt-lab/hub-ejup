@@ -23,7 +23,7 @@ test('cada página sai com título, descrição, imagem de prévia e endereço p
   assert.equal(ld.offers[0].price, '649.90');
   assert.equal(ld.offers[0].priceCurrency, 'BRL');
   assert.equal(f.headers['vercel-cdn-cache-control'], 'max-age=300, stale-while-revalidate=86400');
-  const a = await call(h, { p: '/artigo/multiportas' });
+  const a = await call(h, { p: '/artigo/sistema-multiportas-setor-eletrico' });
   assert.match(a.body, /og:type" content="article"/);
   const home = await call(h, { p: '/' });
   assert.match(home.body, /EducationalOrganization/);
@@ -63,4 +63,37 @@ test('sitemap e robots', async () => {
   assert.equal(cert.noindex, false);
   assert.match(cert.title, /Conferir certificado/);
   assert.equal(metaPara('/certificado/EJUP-AAAA-BBBB', conteudo([]), 'https://x').noindex, true);
+});
+
+test('endereços do site anterior redirecionam para os novos', async () => {
+  const h = createPaginaHandler({ env: {}, html: HTML });
+  const ir = async (p) => { const r = await call(h, { p }); return [r.statusCode, r.headers.location]; };
+  assert.deepEqual(await ir('/coluna/sistema-multiportas-setor-eletrico'), [301, 'https://ejup.com.br/artigo/sistema-multiportas-setor-eletrico']);
+  assert.deepEqual(await ir('/coluna/artigos'), [301, 'https://ejup.com.br/coluna']);
+  assert.deepEqual(await ir('/podcast'), [301, 'https://ejup.com.br/ejupcast']);
+  assert.deepEqual(await ir('/podcast/episodios'), [301, 'https://ejup.com.br/ejupcast']);
+  assert.deepEqual(await ir('/podcast/bastidores-defesa-criminal'), [301, 'https://ejup.com.br/ejupcast/bastidores-defesa-criminal']);
+  assert.deepEqual(await ir('/compartilhar/ejupcast/bastidores-defesa-criminal'), [301, 'https://ejup.com.br/ejupcast/bastidores-defesa-criminal']);
+  assert.deepEqual(await ir('/formacoes/marco-legal-licenciamento-ambiental'), [301, 'https://ejup.com.br/formacao/licenciamento']);
+  assert.deepEqual(await ir('/formacoes/corporativo-marco-legal-licenciamento-ambiental-v2'), [301, 'https://ejup.com.br/formacao/equipes']);
+  assert.deepEqual(await ir('/politica-de-privacidade'), [301, 'https://ejup.com.br/privacidade']);
+  assert.deepEqual(await ir('/artigo/multiportas'), [301, 'https://ejup.com.br/artigo/sistema-multiportas-setor-eletrico']);
+  // a âncora da newsletter na Coluna continua sendo página do site novo
+  assert.equal((await call(h, { p: '/coluna/newsletter' })).statusCode, 200);
+});
+
+test('cada episódio do EJUPcast tem página própria; /linkbio existe; sitemap traz episódios', async () => {
+  const h = createPaginaHandler({ env: {}, html: HTML });
+  const e = await call(h, { p: '/ejupcast/bastidores-defesa-criminal' });
+  assert.equal(e.statusCode, 200);
+  assert.match(e.body, /<title>Os Bastidores da Defesa Criminal · EJUPcast<\/title>/);
+  const ld = JSON.parse(e.body.match(/application\/ld\+json">(.*?)<\/script>/)[1]);
+  assert.equal(ld['@type'], 'PodcastEpisode');
+  assert.match(ld.associatedMedia.embedUrl, /youtube-nocookie\.com\/embed\//);
+  assert.match((await call(h, { p: '/ejupcast/nao-existe' })).body, /noindex/);
+  assert.match((await call(h, { p: '/linkbio' })).body, /<title>Links da EJUP · EJUP<\/title>/);
+  const sm = (await call(h, { sitemap: '1' })).body;
+  assert.match(sm, /\/ejupcast\/o-juiz-que-levou-a-inovacao-para-dentro-da-justica-federal</);
+  assert.match(sm, /\/artigo\/justica-militar-no-brasil-competencia-limites</);
+  assert.match(sm, /\/linkbio</);
 });
