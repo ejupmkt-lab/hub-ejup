@@ -85,8 +85,8 @@ em.s{font-family:var(--serif);font-style:italic;font-weight:400;font-size:1.12em
 
 /* Minerva: o contêiner usa mix-blend-mode screen, então o preto do vídeo some e só a luz aparece */
 .stage{position:absolute;z-index:1;mix-blend-mode:screen;top:50%;left:72%;width:min(46vw,78vh,640px);aspect-ratio:1;transform:translate(-50%,-50%);transition:left .6s var(--ease),top .6s var(--ease),width .6s var(--ease)}
-.mnv{position:absolute;inset:0;animation:float var(--float-speed) ease-in-out infinite;cursor:pointer}
-.mnv-f{position:absolute;inset:0;transform:translate(calc(var(--px,0)*var(--tilt)),calc(var(--py,0)*var(--tilt)));transition:transform 1.4s var(--ease)}
+.mnv{position:absolute;inset:0;animation:float var(--float-speed) ease-in-out infinite;cursor:pointer;will-change:transform}
+.mnv-f{position:absolute;inset:0;will-change:transform;transform:translate(calc(var(--px,0)*var(--tilt)),calc(var(--py,0)*var(--tilt)));transition:transform 1.4s var(--ease)}
 .mnv-f>img,.mnv-f>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .mnv-f>.on,.mnv-f>.va,.mnv-f>.vf{opacity:0}
 .mnv-f>img.on{transition:opacity 1.2s ease}
@@ -216,8 +216,8 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
     <div class="stage" aria-hidden="true">
       <div class="mnv" id="mnv" data-state="rest">
         <div class="mnv-f">
-          <img class="off" src="/minerva/repouso.jpg" alt="" width="1076" height="1076" decoding="async">
-          <img class="on" src="/minerva/aberta.jpg" alt="" width="1076" height="1076" decoding="async">
+          <img class="off" src="/minerva/repouso.jpg" alt="" width="1440" height="1440" decoding="async">
+          <img class="on" src="/minerva/aberta.jpg" alt="" width="1440" height="1440" decoding="async">
           <video class="va" muted playsinline preload="none" disablepictureinpicture disableremoteplayback tabindex="-1"></video>
           <video class="vf" muted playsinline preload="none" disablepictureinpicture disableremoteplayback tabindex="-1"></video>
           <i class="mnv-h"></i>
@@ -301,12 +301,13 @@ body.chat .panel{transform:none;visibility:visible;transition:transform .36s var
 <script>
 const MINERVA_CONFIG = {
   endpoint: '/api/minerva',
-  // movimento da esfera: vídeos curtos que tocam uma vez (abrir e fechar), 5 s cada.
-  // WebM (VP9) primeiro; MP4 (H.264) para os navegadores que não tocam WebM
+  // movimento da esfera: vídeos curtos a 60 quadros por segundo que tocam uma vez (abrir e fechar), 5 s cada.
+  // Dois tamanhos: 1440 px para telas grandes e retina, 900 px para celular. MP4 (H.264) primeiro,
+  // que todo aparelho decodifica no chip de vídeo; WebM (VP9) para navegadores sem H.264
   animations: {
-    abertura: ['/minerva/abertura.webm', '/minerva/abertura.mp4'],
-    fechamento: ['/minerva/fechamento.webm', '/minerva/fechamento.mp4'],
-    duration: 5040,
+    abertura: ['/minerva/abertura-{w}.mp4', '/minerva/abertura-{w}.webm'],
+    fechamento: ['/minerva/fechamento-{w}.mp4', '/minerva/fechamento-{w}.webm'],
+    duration: 5000,
   },
   // sem conversa, a esfera abre e fecha sozinha; pausa (ms) em cada estado antes de trocar
   idle: { fechada: 3000, aberta: 3000 },
@@ -339,10 +340,13 @@ const MINERVA_CONFIG = {
   // escolhe o formato que o navegador toca e começa a baixar
   function load(v, key) {
     if (RM || v.src) return;
-    const fmt = [].concat(A[key]).find((u) => v.canPlayType(/\.webm$/.test(u) ? 'video/webm; codecs="vp9"' : 'video/mp4; codecs="avc1.640028"'));
+    // tamanho: o que a esfera ocupa na tela vezes a densidade de pixels
+    const px = (m.getBoundingClientRect().width || 600) * (window.devicePixelRatio || 1);
+    const w = px > 960 ? 1440 : 900;
+    const fmt = [].concat(A[key]).find((u) => v.canPlayType(/\.webm$/.test(u) ? 'video/webm; codecs="vp9"' : 'video/mp4; codecs="avc1.640032"'));
     if (!fmt) return;
     v.preload = 'auto';
-    v.src = fmt;
+    v.src = fmt.replace('{w}', w);
   }
   // toca do começo; avisa quando o primeiro quadro está na tela e quando termina
   function play(v, key, onShown, onEnd) {
