@@ -58,11 +58,16 @@ Caso da dívida do município de Natal e o valor de 250 milhões; qualquer fala 
 
 Sistema das capas do artigo da ANEEL (versão linhas, aprovada): pílula, título
 com o trecho dourado em Light, subtítulo, coluna e tema, autoria
-("Dra. Rossana Fonseca") e botão nos verticais. Sem foto, pela regra do
-Roberto ("ou imagem ou a ilustração"), e porque não há retrato da Rossana de
-boca fechada no material.
+("Dra. Rossana Fonseca") e botão nos verticais.
 
-**Ilustração:** a frase de abertura do artigo ("o mesmo conflito, gerado pela
+**Foto (pedido do Victor, 05/10/2026):** a Rossana no EJUPcast #019
+(`fotos/rossana-ep19.jpg`, o mesmo frame do carrossel), de boca fechada e com
+sorriso leve, em cartão de cantos de 12 px. É o episódio em que o tema dos
+Centros de Inteligência aparece. Recorte de 720 px centrado nela, que termina
+antes do "ejup" da TV e deixa de fora a mão do Marco Bruno. Como é foto, a
+ilustração sai (regra do Roberto: "ou imagem ou a ilustração").
+
+**Versão só com ilustração** (`versao-ilustracao/`, `FOTO=0`): a frase de abertura do artigo ("o mesmo conflito, gerado pela
 mesma causa, chega aos tribunais em milhares de processos"). Uma grade de
 processos idênticos em traço de prata; os que nascem da mesma causa acendem em
 dourado e convergem a um ponto, "a causa de origem". Desenho em SVG, zero

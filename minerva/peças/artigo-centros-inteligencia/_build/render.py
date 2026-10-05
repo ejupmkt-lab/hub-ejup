@@ -3,7 +3,10 @@
 import pathlib
 from playwright.sync_api import sync_playwright
 
+import os
 OUT = pathlib.Path(__file__).resolve().parent.parent
+if os.environ.get("FOTO", "1") == "0":
+    OUT = OUT / "versao-ilustracao"
 CORTE_SITE = 512  # o site só mostra a faixa de cima da capa
 
 

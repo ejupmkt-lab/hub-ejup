@@ -10,7 +10,8 @@ que nascem da mesma causa acendem em dourado e convergem para um ponto só.
 
     python3 _build/gerar.py && python3 _build/render.py
 """
-import base64, pathlib, random
+import base64, io, os, pathlib, random
+from PIL import Image, ImageEnhance
 
 HERE = pathlib.Path(__file__).resolve().parent
 OUT = HERE.parent
@@ -32,6 +33,29 @@ def fontes():
 
 
 LOGO = b64(LOGOS / "ejup-horizontal-white.svg", "image/svg+xml")
+
+# Foto da autora: frame do EJUPcast #019 (boca fechada, sorriso leve).
+# FOTO=0 gera a versão só com a ilustração (versao-ilustracao/).
+COM_FOTO = os.environ.get("FOTO", "1") != "0"
+FOTO = OUT / "fotos" / "rossana-ep19.jpg"
+CENTRO_X, TOPO_Y = 495, 262        # centro do corpo dela e topo do cabelo no frame de 2000x1125
+
+
+def foto(w, h):
+    """Recorte do frame na proporção do cartão, com ela no centro."""
+    im = Image.open(FOTO).convert("RGB")
+    im = ImageEnhance.Color(im).enhance(.92)
+    # ela no centro (x 495) e o recorte termina antes do "ejup" da TV
+    # (x 862): 720 px de largura, em todos os formatos. Assim não entra
+    # letra cortada nem a mão do Marco Bruno, do outro lado da mesa.
+    largura = 720
+    altura = largura * h / w
+    x0 = max(0, min(im.width - largura, CENTRO_X - largura / 2))
+    y0 = max(0, min(im.height - altura, TOPO_Y - altura * .06))
+    im = im.crop((round(x0), round(y0), round(x0 + largura), round(y0 + altura))).resize((w * 2 // 2, h), Image.LANCZOS)
+    buf = io.BytesIO(); im.save(buf, "JPEG", quality=88)
+    return f'<div class="cartao" style="width:{w}px;height:{h}px;background-image:url(data:image/jpeg;base64,{base64.b64encode(buf.getvalue()).decode()})"></div>'
+
 
 ARTIGO = dict(
     titulo="Centros de Inteligência",
@@ -115,16 +139,19 @@ def cabecalho(cta=True):
 def capa_site():
     return f"""<div class="peca site" id="site">
   {cabecalho(cta=False)}
-  <div class="arte">{ilustracao(500)}</div>
+  <div class="arte">{foto(460, 440) if COM_FOTO else ilustracao(500)}</div>
   <img class="logo" src="{LOGO}" alt="EJUP">
 </div>"""
+
+
+CARTAO = {"story": (840, 640), "feed": (760, 470), "post": (760, 430)}
 
 
 def vertical(ident, largura):
     return f"""<div class="peca vert {ident}" id="{ident}">
   <div class="halo"></div>
   {cabecalho()}
-  <div class="arte">{ilustracao(largura)}</div>
+  <div class="arte">{foto(*CARTAO[ident]) if COM_FOTO else ilustracao(largura)}</div>
   <img class="logo" src="{LOGO}" alt="EJUP">
 </div>"""
 
@@ -217,6 +244,11 @@ body{background:#10151b;display:flex;flex-wrap:wrap;gap:28px;padding:28px;align-
 .post .halo{left:150px;top:680px;width:780px;height:520px}
 .post .logo{bottom:52px;height:38px}
 
+/* cartão com a foto da autora */
+.cartao{border-radius:12px;background-size:cover;background-position:center;
+  box-shadow:0 30px 60px rgba(3,28,55,.6),0 8px 18px rgba(3,28,55,.45),inset 0 0 0 1px rgba(209,211,212,.12)}
+.foto .site .arte{left:1044px;top:56px}
+.foto .story .arte{top:1040px}.foto .feed .arte{top:826px}.foto .post .arte{top:790px}
 /* ilustração mais alta que as linhas da ANEEL: posições próprias, sem tocar o logo */
 .story .arte{top:1050px}.story .logo{bottom:120px}
 .story .halo{left:140px;top:1000px;width:800px;height:640px}
@@ -231,8 +263,8 @@ def main():
     pecas = [capa_site(), vertical("story", 720), vertical("feed", 560), vertical("post", 520)]
     html = (f'<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
             f'<title>Artigo Centros de Inteligência</title><style>{fontes()}{CSS}</style></head>'
-            f'<body class="linhas">{"".join(pecas)}</body></html>')
-    (OUT / "pecas.html").write_text(html, encoding="utf-8")
+            f'<body class="linhas{" foto" if COM_FOTO else ""}">{"".join(pecas)}</body></html>')
+    (OUT / ("pecas.html" if COM_FOTO else "versao-ilustracao/pecas.html")).write_text(html, encoding="utf-8")
     print(f"gerado: pecas.html ({len(pecas)} peças)")
 
 
