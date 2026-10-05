@@ -24,7 +24,7 @@ DEST = HERE / "foto-tratada.webp"
 
 ALTURA = 2100
 FADE_BASE = 0.09                       # recortada: a base
-FADE_DIR = 0.16                        # e a borda direita, onde a manga foi cortada
+FADE_DIR = 0.10                        # e as laterais onde o corpo encosta na borda
 FADE_INTEIRA = {"esq": .20, "dir": .12, "topo": .06, "base": .16}
 
 
@@ -74,9 +74,13 @@ def main() -> None:
     a = im.getchannel("A")
     if recortada:
         faixa(a, int(ALTURA * FADE_BASE), "y", False)
-        # o ensaio corta a manga direita na borda do quadro: esfuma esse lado
-        # para o braço sumir no navy em vez de terminar numa linha reta
-        faixa(a, int(im.width * FADE_DIR), "x", False)
+        # onde o ensaio cortou o corpo na borda do quadro (manga, cabelo,
+        # ombro), esfuma esse lado para não terminar numa linha reta
+        w, h = a.size
+        for lado, caixa, eixo, ini in (("esq", (0, 0, 3, h), "x", True),
+                                       ("dir", (w - 3, 0, w, h), "x", False)):
+            if a.crop(caixa).getextrema()[1] > 200:
+                faixa(a, int(w * FADE_DIR), eixo, ini)
     else:
         for lado, eixo, ini in (("esq", "x", True), ("dir", "x", False),
                                 ("topo", "y", True), ("base", "y", False)):
