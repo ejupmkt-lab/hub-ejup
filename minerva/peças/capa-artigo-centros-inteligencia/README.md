@@ -39,6 +39,7 @@ leve aquecimento (vermelho +4%, azul -5%) antes de entrar na capa, e o
 esfumado lateral caiu de 16% para 10%. Testei também o close frontal de blazer
 ("Fotos Profissionais-15"): ficou só o rosto, grande demais, e foi descartado.
 
-**A confirmar:** o cargo "Advogada e apresentadora do EJUPcast" (montado a
-partir do próprio artigo e do papel dela no podcast; trocar em `ARTIGO` se
-ela usa outra assinatura) e a categoria "Gestão judiciária".
+**Aprovada pelo Victor (05/10/2026):** a foto de frente, de blazer, na mesa.
+Cargo confirmado por ele: "Advogada e sócia da EJUP".
+
+**A confirmar:** a categoria "Gestão judiciária".

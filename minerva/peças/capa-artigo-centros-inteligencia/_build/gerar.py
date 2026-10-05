@@ -33,7 +33,7 @@ ARTIGO = {
     "coluna": "Coluna jurídica",
     "tema": "Gestão judiciária",
     "autor": "Dra. Rossana Fonseca",
-    "cargo": "Advogada e apresentadora do EJUPcast",
+    "cargo": "Advogada e sócia da EJUP",
 }
 
 FORMATOS = [("horizontal", "fmt-h", 1600, 900),
