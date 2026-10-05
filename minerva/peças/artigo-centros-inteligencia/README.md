@@ -60,12 +60,13 @@ Sistema das capas do artigo da ANEEL (versão linhas, aprovada): pílula, títul
 com o trecho dourado em Light, subtítulo, coluna e tema, autoria
 ("Dra. Rossana Fonseca") e botão nos verticais.
 
-**Foto (pedido do Victor, 05/10/2026):** a Rossana no EJUPcast #019
-(`fotos/rossana-ep19.jpg`, o mesmo frame do carrossel), de boca fechada e com
-sorriso leve, em cartão de cantos de 12 px. É o episódio em que o tema dos
-Centros de Inteligência aparece. Recorte de 720 px centrado nela, que termina
-antes do "ejup" da TV e deixa de fora a mão do Marco Bruno. Como é foto, a
-ilustração sai (regra do Roberto: "ou imagem ou a ilustração").
+**Foto (05/10/2026):** ensaio profissional da Dra. Rossana, diante da estante
+de livros ("Dra. Rossana - Fotos Profissionais-2.jpg", Drive da Panda Design;
+cópia de 2400 px em `fotos/`). O primeiro teste usou um frame do EJUPcast #019
+e foi reprovado pelo Victor ("essa foto tá ruim dela"). Boca fechada, ela
+centrada no cartão, rosto um pouco acima do meio. A estante entra no mapa
+imagético (biblioteca, leitura). Como é foto, a ilustração sai (regra do
+Roberto: "ou imagem ou a ilustração").
 
 **Versão só com ilustração** (`versao-ilustracao/`, `FOTO=0`): a frase de abertura do artigo ("o mesmo conflito, gerado pela
 mesma causa, chega aos tribunais em milhares de processos"). Uma grade de

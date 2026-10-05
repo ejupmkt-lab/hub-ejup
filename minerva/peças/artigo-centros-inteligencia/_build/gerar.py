@@ -34,24 +34,23 @@ def fontes():
 
 LOGO = b64(LOGOS / "ejup-horizontal-white.svg", "image/svg+xml")
 
-# Foto da autora: frame do EJUPcast #019 (boca fechada, sorriso leve).
+# Foto da autora: ensaio profissional da Dra. Rossana (Drive, pasta da
+# Panda Design, "Dra. Rossana - Fotos Profissionais-2.jpg"), diante da
+# estante de livros. Boca fechada, olhar firme, ela no centro do quadro.
 # FOTO=0 gera a versão só com a ilustração (versao-ilustracao/).
 COM_FOTO = os.environ.get("FOTO", "1") != "0"
-FOTO = OUT / "fotos" / "rossana-ep19.jpg"
-CENTRO_X, TOPO_Y = 495, 262        # centro do corpo dela e topo do cabelo no frame de 2000x1125
+FOTO = OUT / "fotos" / "rossana-profissional-2.jpg"
+CENTRO_X, ROSTO_Y = 1200, 1000     # centro dela e altura do rosto, no arquivo de 2400x3596
 
 
 def foto(w, h):
     """Recorte do frame na proporção do cartão, com ela no centro."""
     im = Image.open(FOTO).convert("RGB")
-    im = ImageEnhance.Color(im).enhance(.92)
-    # ela no centro (x 495) e o recorte termina antes do "ejup" da TV
-    # (x 862): 720 px de largura, em todos os formatos. Assim não entra
-    # letra cortada nem a mão do Marco Bruno, do outro lado da mesa.
-    largura = 720
+    im = ImageEnhance.Color(im).enhance(.96)
+    largura = 2100 if w / h < 1.2 else 2400
     altura = largura * h / w
     x0 = max(0, min(im.width - largura, CENTRO_X - largura / 2))
-    y0 = max(0, min(im.height - altura, TOPO_Y - altura * .06))
+    y0 = max(0, min(im.height - altura, ROSTO_Y - altura * .42))   # rosto um pouco acima do meio
     im = im.crop((round(x0), round(y0), round(x0 + largura), round(y0 + altura))).resize((w * 2 // 2, h), Image.LANCZOS)
     buf = io.BytesIO(); im.save(buf, "JPEG", quality=88)
     return f'<div class="cartao" style="width:{w}px;height:{h}px;background-image:url(data:image/jpeg;base64,{base64.b64encode(buf.getvalue()).decode()})"></div>'
@@ -144,7 +143,7 @@ def capa_site():
 </div>"""
 
 
-CARTAO = {"story": (840, 640), "feed": (760, 470), "post": (760, 430)}
+CARTAO = {"story": (840, 640), "feed": (640, 480), "post": (600, 450)}
 
 
 def vertical(ident, largura):
