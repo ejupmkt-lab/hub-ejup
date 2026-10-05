@@ -16,8 +16,18 @@ Também saem as versões `-limpa` (sem retrato e sem logo) e `-bg` (só fundo).
 
     python3 _build/tratar_foto.py && python3 _build/gerar.py && python3 _build/render.py
 
-**Foto:** "Dra. Rossana - Fotos Profissionais-2.jpg" (ensaio da Panda Design,
-Drive), a da estante de livros. Recorte com rembg (modelo isnet-general-use);
+**Foto (versão atual):** "Dra. Rossana - Fotos Profissionais-21.jpg" (ensaio
+da Panda Design, Drive): de frente, blazer, apoiada na mesa de vidro, olhando
+para a câmera. Recortada do topo até antes das mãos (sem a mesa e o reflexo),
+com luz +8%, saturação +12% e leve aquecimento. O tamanho do retrato no
+horizontal e no story foi reduzido no `template.html` porque esta foto é mais
+larga que a do Leonardo.
+
+A foto da estante ("Fotos Profissionais-2") foi reprovada duas vezes: a cor
+original deixava a Rossana "como alma penada" e o ângulo, mesmo com cor
+corrigida, "parece camisa de saudade". O histórico abaixo é dela.
+
+**Foto anterior:** "Dra. Rossana - Fotos Profissionais-2.jpg", a da estante de livros. Recorte com rembg (modelo isnet-general-use);
 `foto.png` fica fora do versionamento, `_build/foto-tratada.webp` é o que vai
 embutido. O ensaio corta a manga direita na borda, então a lateral que encosta
 na borda é esfumada (`FADE_DIR`, 10%). Boca fechada.
