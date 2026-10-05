@@ -45,3 +45,29 @@ Reestruturado em 02/10/2026 conforme o documento "Recomendações para reestrutu
 
 ## Fora do artigo de propósito
 Caso da dívida do município de Natal e o valor de 250 milhões; qualquer fala do episódio nos parágrafos; números de notas técnicas e de tribunais com centro.
+
+## Capas (05/10/2026)
+`python3 _build/gerar.py && python3 _build/render.py`
+
+| arquivo | tamanho | uso |
+|---|---|---|
+| `capa-site-1600x900.png` | 1600×900 | coluna jurídica do site (conteúdo até 496 px; o site mostra 512) |
+| `story-1080x1920.png` | 1080×1920 | stories |
+| `feed-1080x1440.png` | 1080×1440 | feed (3:4) |
+| `post-1080x1350.png` | 1080×1350 | feed (4:5) |
+
+Sistema das capas do artigo da ANEEL (versão linhas, aprovada): pílula, título
+com o trecho dourado em Light, subtítulo, coluna e tema, autoria
+("Dra. Rossana Fonseca") e botão nos verticais. Sem foto, pela regra do
+Roberto ("ou imagem ou a ilustração"), e porque não há retrato da Rossana de
+boca fechada no material.
+
+**Ilustração:** a frase de abertura do artigo ("o mesmo conflito, gerado pela
+mesma causa, chega aos tribunais em milhares de processos"). Uma grade de
+processos idênticos em traço de prata; os que nascem da mesma causa acendem em
+dourado e convergem a um ponto, "a causa de origem". Desenho em SVG, zero
+crédito do Higgsfield.
+
+**A confirmar:** o rótulo de tema "Gestão judiciária" foi escolha minha
+(o artigo trata de gestão de demandas e precedentes); trocar em `ARTIGO`, em
+`_build/gerar.py`, se o site usar outra categoria.
