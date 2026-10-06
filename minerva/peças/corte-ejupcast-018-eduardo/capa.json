@@ -1,14 +1,30 @@
 {
   "foto": "material/duo-conversa.webp",
-  "foco": [580, 400],
+  "foco": [
+    580,
+    400
+  ],
   "escala": 0.78,
   "linhas": [
-    {"texto": "Máquina", "estilo": "it"},
-    {"faixa": true},
-    {"texto": "ou", "estilo": "bk", "janela": "direita"},
-    {"texto": "juízo?", "estilo": "it"}
+    {
+      "texto": "Máquina",
+      "estilo": "it"
+    },
+    {
+      "faixa": true
+    },
+    {
+      "texto": "ou",
+      "estilo": "bk",
+      "janela": "direita"
+    },
+    {
+      "texto": "juízo?",
+      "estilo": "it"
+    }
   ],
   "nome": "Eduardo Pacheco",
   "episodio": "EJUPcast #18",
-  "saida": "capa-1080x1920.png"
+  "saida": "capa-1080x1920.png",
+  "reels": true
 }

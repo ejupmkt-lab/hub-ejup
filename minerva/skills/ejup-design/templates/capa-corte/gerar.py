@@ -24,7 +24,8 @@ capa.json:
   "nome": "Dra. Rossana Fonseca",
   "episodio": "EJUPcast #18",
   "apoio": "A primeira lição do curso de Direito, e a que muita gente",   # opcional
-  "apoio_destaque": "esqueceu."
+  "apoio_destaque": "esqueceu.",
+  "reels": true                          # opcional: preenche a tela de reels
 }
 estilo: "it" = Book itálico · "bk" = Black. O título encolhe sozinho se não couber.
 Tudo o que importa fica dentro do recorte 3:4 da grade do Instagram (y 240 a 1680).
@@ -70,6 +71,16 @@ def grao(w=540, h=960):
 
 ARCOS = ('<svg class="arcos" viewBox="0 0 1080 1920"><g fill="none" stroke="#d1d3d4" stroke-width="70" opacity=".42">'
          '<path d="M-200 760 C 200 210, 700 0, 1300 120"/><path d="M-160 2160 C 300 1560, 800 1560, 1300 1310"/></g></svg>')
+
+
+# "reels": true ocupa a tela 9:16 inteira: faixas mais altas e fio maior, com
+# o bloco preenchendo o recorte da grade (y 330 a 1680) em vez de boiar no meio
+REELS = """
+.row.so{height:224px} .row.larga{height:500px;margin:14px 0 22px} .row.curta{height:250px}
+.row.curta .faixa{margin:22px 0}
+.rodape{margin-top:52px;padding-top:30px}
+.nome,.ep{font-size:30px}
+"""
 
 
 def linha(l):
@@ -124,6 +135,7 @@ body{{width:1080px;height:1920px;font-family:'Gotham',Montserrat,sans-serif}}
 .ep{{font-weight:300;font-size:24px;color:#5f6062}}
 .apoio{{font-weight:300;font-size:40px;line-height:1.3;color:#414042;margin-top:30px}}
 .apoio em{{font-style:italic;color:#9b6b26}}
+{REELS if c.get("reels") else ""}
 </style></head><body><section class="s">
 {ARCOS}
 {selo()}

@@ -1,14 +1,30 @@
 {
   "foto": "material/frame-1.6.1.jpg",
-  "foco": [2830, 860],
+  "foco": [
+    2830,
+    860
+  ],
   "escala": 0.55,
   "linhas": [
-    {"texto": "Berkeley", "estilo": "it"},
-    {"faixa": true},
-    {"texto": "e o", "estilo": "bk", "janela": "direita"},
-    {"texto": "Nobel", "estilo": "it"}
+    {
+      "texto": "Berkeley",
+      "estilo": "it"
+    },
+    {
+      "faixa": true
+    },
+    {
+      "texto": "e o",
+      "estilo": "bk",
+      "janela": "direita"
+    },
+    {
+      "texto": "Nobel",
+      "estilo": "it"
+    }
   ],
   "nome": "Marco Bruno",
   "episodio": "EJUPcast #19",
-  "saida": "capa-1080x1920.png"
+  "saida": "capa-1080x1920.png",
+  "reels": true
 }

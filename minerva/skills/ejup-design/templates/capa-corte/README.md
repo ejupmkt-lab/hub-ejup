@@ -19,3 +19,8 @@ da grade (y 240 a 1680).
 
 O formato do `capa.json` está no topo de `gerar.py`. Exemplos:
 `peças/corte-ejupcast-018-rossana/padrao/` e `peças/corte-ejupcast-019-exemplo/`.
+
+**Modo reels (06/10/2026):** com `"reels": true` no `capa.json`, as faixas
+ficam mais altas e o bloco ocupa a tela 9:16 inteira, dentro do recorte da
+grade. Pedido do Victor para as capas de reels ("ajuste o tamanho da capa, é
+pra reels"). Usado nos cortes do #18 (Eduardo) e do #19 (Harvard, Berkeley).
