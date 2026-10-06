@@ -2,7 +2,7 @@
 
 `python3 _build/gerar.py && python3 _build/render.py`
 
-Quadro 2 do Dr. Jarbas Bezerra (`peças/quadros-dr-jarbas/roteiros.md`). Telas em `telas/tela-01..08.png`, visão geral em `visualizacao-completa.png`, legenda em `legenda.md`.
+Quadro 2 do Dr. Jarbas Bezerra (versão anterior de quadros, substituída pelos roteiros de 06/10/2026 em `peças/roteiros-dr-jarbas-gravacao`). Telas em `telas/tela-01..08.png`, visão geral em `visualizacao-completa.png`, legenda em `legenda.md`.
 
 1. Capa: "Como exercer o direito de petição", com a folha protocolada.
 2. Um direito de todos: o texto do art. 5º, XXXIV, a, da Constituição.
