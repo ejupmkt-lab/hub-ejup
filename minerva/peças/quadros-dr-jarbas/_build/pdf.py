@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Gera os PDFs do Em Ordem ep. 1: teleprompter (texto grande) e roteiro de gravação."""
-import html, pathlib, re
+import html, pathlib, re, sys
 from playwright.sync_api import sync_playwright
 
 HERE = pathlib.Path(__file__).resolve().parent
 OUT = HERE.parent
+EP = sys.argv[1] if len(sys.argv) > 1 else "ep01"
+NUM = int(EP[2:])
 FONTS = (HERE.parents[2] / "skills" / "ejup-design" / "assets" / "fonts").as_uri()
 
 FACE = f'''
@@ -16,7 +18,7 @@ FACE = f'''
 
 
 def teleprompter():
-    blocos = (OUT / "teleprompter-em-ordem-ep01.txt").read_text().strip().split("\n\n")
+    blocos = (OUT / f"teleprompter-em-ordem-{EP}.txt").read_text().strip().split("\n\n")
     corpo = "".join("<div class='b'>" + "".join(f"<p>{html.escape(l)}</p>" for l in b.split("\n")) + "</div>" for b in blocos)
     return f'''<!doctype html><html lang="pt-BR"><meta charset="utf-8"><style>{FACE}
 @page{{size:A4;margin:22mm 20mm}}
@@ -24,7 +26,7 @@ body{{font-family:Gotham,Montserrat,sans-serif;color:#0d131a;font-weight:400}}
 h1{{font-weight:900;font-size:15pt;letter-spacing:-.01em;margin-bottom:6mm}}
 .b{{margin-bottom:11mm;break-inside:avoid}}
 .b p{{font-size:25pt;line-height:1.38;font-weight:400;margin-bottom:3mm}}
-</style><h1>Em Ordem · Episódio 1 · Teleprompter</h1>{corpo}</html>'''
+</style><h1>Em Ordem · Episódio {NUM} · Teleprompter</h1>{corpo}</html>'''
 
 
 def md_para_html(md):
@@ -52,7 +54,7 @@ def md_para_html(md):
 
 
 def roteiro():
-    corpo = md_para_html((OUT / "roteiro-gravacao-em-ordem-ep01.md").read_text())
+    corpo = md_para_html((OUT / f"roteiro-gravacao-em-ordem-{EP}.md").read_text())
     return f'''<!doctype html><html lang="pt-BR"><meta charset="utf-8"><style>{FACE}
 @page{{size:A4;margin:20mm 18mm}}
 body{{font-family:Gotham,Montserrat,sans-serif;color:#0d131a;font-weight:300;font-size:10.5pt;line-height:1.5}}
@@ -66,7 +68,7 @@ b{{font-weight:500}} code{{font-family:inherit;background:#eef0f1;padding:0 1.5m
 def main():
     with sync_playwright() as p:
         b = p.chromium.launch(executable_path="/opt/pw-browsers/chromium")
-        for nome, h in (("teleprompter-em-ordem-ep01.pdf", teleprompter()), ("roteiro-gravacao-em-ordem-ep01.pdf", roteiro())):
+        for nome, h in ((f"teleprompter-em-ordem-{EP}.pdf", teleprompter()), (f"roteiro-gravacao-em-ordem-{EP}.pdf", roteiro())):
             arq = OUT / "_build" / (nome + ".html")
             arq.write_text(h)
             pg = b.new_page()
