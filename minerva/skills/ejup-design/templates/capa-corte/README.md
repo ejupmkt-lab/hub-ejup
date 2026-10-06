@@ -30,3 +30,10 @@ sai em **1080x1440 (3:4)**, com `"feed": true` no `capa.json`, para aparecer
 certa na grade. Regra do Victor: "é pra capa do reels, mas pra ficar do
 tamanho certo tem que ser no tamanho de post do feed". O modo `reels` (9:16)
 fica só para quando for pedida a tela cheia.
+
+**Correção (06/10/2026): capa de reels = `"grade": true`.** Subir a arte em
+1080x1440 não funciona: o Instagram estica a capa para 9:16 e a grade do perfil
+corta as laterais e o topo (print do Victor, "ta ficando assim"). O formato
+certo é 1080x1920 com a composição do feed (selo, título, faixas, fio) inteira
+dentro de y 240 a 1680, que é exatamente o que a grade mostra; acima e abaixo
+fica só o fundo. Na tela cheia a capa aparece inteira; na grade, sem corte.

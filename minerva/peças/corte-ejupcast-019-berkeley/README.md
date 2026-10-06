@@ -1,4 +1,4 @@
-# Corte EJUPcast #19 · Marco Bruno · "A cidade de 120 mil habitantes com Prêmios Nobel" · capa de reels 1080x1440
+# Corte EJUPcast #19 · Marco Bruno · "A cidade de 120 mil habitantes com Prêmios Nobel" · capa de reels 1080x1920 (arte 3:4 no recorte da grade)
 
 **Título da capa:** Berkeley e o Nobel.
 Padrão das capas de corte (`skills/ejup-design/templates/capa-corte/`), igual ao

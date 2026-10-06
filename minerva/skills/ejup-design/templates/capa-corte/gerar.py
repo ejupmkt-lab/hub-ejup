@@ -26,7 +26,8 @@ capa.json:
   "apoio": "A primeira lição do curso de Direito, e a que muita gente",   # opcional
   "apoio_destaque": "esqueceu.",
   "reels": true,                         # opcional: preenche a tela de reels 9:16
-  "feed": true                           # opcional: 1080x1440 (3:4), capa de reels no tamanho do feed
+  "feed": true,                          # opcional: 1080x1440 (3:4), arte avulsa no tamanho do feed
+  "grade": true                          # capa de reels: 1080x1920 com a arte 3:4 no recorte da grade
 }
 estilo: "it" = Book itálico · "bk" = Black. O título encolhe sozinho se não couber.
 Tudo o que importa fica dentro do recorte 3:4 da grade do Instagram (y 240 a 1680).
@@ -110,10 +111,16 @@ def main(cfg_path):
     # "feed": true gera 1080x1440 (3:4, o tamanho do post do feed): a capa do
     # reels que o Victor sobe para aparecer certa na grade
     feed = c.get("feed")
+    # "grade": true gera 1080x1920 com a composição do feed (3:4) inteira no
+    # recorte que a grade do perfil mostra (y 240 a 1680). É o formato certo da
+    # capa de reels: a tela cheia mostra tudo e a grade não corta nada.
+    grade = c.get("grade")
     H = 1440 if feed else 1920
     TOPO, BASE = (300, 1390) if feed else (330, 1680)   # área do bloco
     SELO = 60 if feed else 100
-    arcos = ARCOS.replace('viewBox="0 0 1080 1920"', 'viewBox="0 0 1080 1920" preserveAspectRatio="none"')
+    if grade:
+        TOPO, BASE, SELO = 300 + 240, 1390 + 240, 60 + 240
+    arcos = ARCOS if not feed else ARCOS.replace('viewBox="0 0 1080 1920"', 'viewBox="0 0 1080 1920" preserveAspectRatio="none"')
     html = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
 {fontes()}
 *{{box-sizing:border-box;margin:0}}
