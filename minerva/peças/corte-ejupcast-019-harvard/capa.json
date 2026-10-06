@@ -25,6 +25,6 @@
   ],
   "nome": "Marco Bruno",
   "episodio": "EJUPcast #19",
-  "saida": "capa-1080x1920.png",
-  "reels": true
+  "saida": "capa-1080x1440.png",
+  "feed": true
 }

@@ -1,4 +1,4 @@
-# Corte EJUPcast #18 · Eduardo Pacheco · IA na advocacia · capa 1080x1920
+# Corte EJUPcast #18 · Eduardo Pacheco · IA na advocacia · capa de reels 1080x1440
 
 **Título da capa:** Máquina ou juízo?
 Padrão das capas de corte (`skills/ejup-design/templates/capa-corte/`), sem linha

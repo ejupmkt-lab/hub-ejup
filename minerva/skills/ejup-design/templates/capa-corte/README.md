@@ -24,3 +24,9 @@ O formato do `capa.json` está no topo de `gerar.py`. Exemplos:
 ficam mais altas e o bloco ocupa a tela 9:16 inteira, dentro do recorte da
 grade. Pedido do Victor para as capas de reels ("ajuste o tamanho da capa, é
 pra reels"). Usado nos cortes do #18 (Eduardo) e do #19 (Harvard, Berkeley).
+
+**Capa de reels no tamanho do feed (06/10/2026):** a capa que sobe no reels
+sai em **1080x1440 (3:4)**, com `"feed": true` no `capa.json`, para aparecer
+certa na grade. Regra do Victor: "é pra capa do reels, mas pra ficar do
+tamanho certo tem que ser no tamanho de post do feed". O modo `reels` (9:16)
+fica só para quando for pedida a tela cheia.

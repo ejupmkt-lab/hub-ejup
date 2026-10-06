@@ -1,4 +1,4 @@
-# Corte EJUPcast #19 · Marco Bruno · "Harvard, criação e a imperfeição" · capa 1080x1920
+# Corte EJUPcast #19 · Marco Bruno · "Harvard, criação e a imperfeição" · capa de reels 1080x1440
 
 **Título da capa:** Criação e imperfeição.
 Padrão das capas de corte (`skills/ejup-design/templates/capa-corte/`), no
