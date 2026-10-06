@@ -1,7 +1,7 @@
 {
-  "foto": "material/frame-1.10.1.jpg",
-  "foco": [1990, 760],
-  "escala": 0.40,
+  "foto": "material/frame-1.6.1.jpg",
+  "foco": [2830, 860],
+  "escala": 0.55,
   "linhas": [
     {"texto": "Berkeley", "estilo": "it"},
     {"faixa": true},
