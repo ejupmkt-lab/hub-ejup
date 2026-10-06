@@ -23,7 +23,7 @@ capa.json:
   ],
   "nome": "Dra. Rossana Fonseca",
   "episodio": "EJUPcast #18",
-  "apoio": "A primeira lição do curso de Direito, e a que muita gente",
+  "apoio": "A primeira lição do curso de Direito, e a que muita gente",   # opcional
   "apoio_destaque": "esqueceu."
 }
 estilo: "it" = Book itálico · "bk" = Black. O título encolhe sozinho se não couber.
@@ -130,18 +130,22 @@ body{{width:1080px;height:1920px;font-family:'Gotham',Montserrat,sans-serif}}
 <div class="bloco">
 {linhas}
 <div class="rodape"><p class="nome">{c["nome"]}</p><p class="ep">{c["episodio"]}</p></div>
-<p class="apoio">{c["apoio"]} <em>{c.get("apoio_destaque", "")}</em></p>
+{f'<p class="apoio">{c["apoio"]} <em>{c.get("apoio_destaque", "")}</em></p>' if c.get("apoio") else ""}
 </div>
 <div class="grao"></div>
 </section>
 <script>
+// mede só depois que a Gotham carregou: com a fonte de reserva o título cabe e depois estoura
+document.fonts.ready.then(() => {{
 const s = document.querySelector('.s'), bloco = document.querySelector('.bloco');
 // o título encolhe por igual até toda linha com janela deixar ao menos 180px de foto
 let fs = 206;
+// fim real do texto (o retângulo do <p> não acusa o estouro de uma palavra longa)
+const fim = el => {{ const g = document.createRange(); g.selectNodeContents(el); return g.getBoundingClientRect().right; }};
 const cabe = () => [...document.querySelectorAll('.row')].every(r => {{
   const f = r.querySelector('.faixa'); const t = r.querySelector('.t');
   return (!f || r.classList.contains('larga') || f.getBoundingClientRect().width >= 180) &&
-         (!t || t.getBoundingClientRect().right <= r.getBoundingClientRect().right + 1);
+         (!t || fim(t) <= r.getBoundingClientRect().right + 1);
 }});
 while (!cabe() && fs > 120) {{ fs -= 4; s.style.setProperty('--fs', fs + 'px'); }}
 // bloco centrado na área entre o selo e o fim do recorte 3:4 da grade (y 330 a 1680)
@@ -163,6 +167,7 @@ L = Math.min(U.x, Math.max(U.r - PW, L)); T = Math.min(U.y, Math.max(U.b - PH, T
 fs_.forEach(a => {{ a.f.style.backgroundSize = PW + 'px auto';
   a.f.style.backgroundPosition = (L - a.x) + 'px ' + (T - a.y) + 'px'; }});
 document.body.dataset.pronto = fs;
+}});
 </script></body></html>"""
     saida = base / c.get("saida", "capa.png")
     (base / "capa.html").write_text(html, encoding="utf-8")

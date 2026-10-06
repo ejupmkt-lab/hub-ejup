@@ -1,0 +1,14 @@
+{
+  "foto": "material/frame-1.10.1.jpg",
+  "foco": [1990, 760],
+  "escala": 0.40,
+  "linhas": [
+    {"texto": "Berkeley", "estilo": "it"},
+    {"faixa": true},
+    {"texto": "e o", "estilo": "bk", "janela": "direita"},
+    {"texto": "Nobel", "estilo": "it"}
+  ],
+  "nome": "Marco Bruno",
+  "episodio": "EJUPcast #19",
+  "saida": "capa-1080x1920.png"
+}
