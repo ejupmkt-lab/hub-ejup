@@ -62,3 +62,9 @@ esverdeado e o recorte mal feito.
     python3 _build/recortar_hd.py original.jpg recorte.png birefnet-portrait
     python3 _build/corrigir_cor.py recorte.png foto.png
     python3 _build/tratar_foto.py && python3 _build/gerar.py && python3 _build/render.py
+
+## LinkedIn (08/10/2026)
+Dois formatos novos no mesmo gerador: `capa-linkedin.png` (1200x627, imagem
+horizontal do post, texto à esquerda e retrato à direita) e
+`capa-linkedinv.png` (1080x1350, 4:5, ocupa mais tela no feed do celular).
+Legenda em `legenda-linkedin.md`.

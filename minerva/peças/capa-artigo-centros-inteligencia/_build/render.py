@@ -60,7 +60,8 @@ def main() -> None:
         for m in page.evaluate(MEDIR):
             base = m["fmt"].split("-")[0]
             esperado = {"horizontal": (1600, 900), "story": (1080, 1920),
-                        "feed": (1080, 1440)}[base]
+                        "feed": (1080, 1440), "linkedin": (1200, 627),
+                        "linkedinv": (1080, 1350)}[base]
             if (m["w"], m["h"]) != esperado:
                 problemas.append(f"{m['fmt']}: {m['w']}×{m['h']} ≠ "
                                  f"{esperado[0]}×{esperado[1]}")
@@ -70,7 +71,7 @@ def main() -> None:
                     f"corta em {CORTE_H}px — some {m['textoFim']-CORTE_H}px")
             # no story e no feed o retrato entra por baixo do texto; se o
             # topo dele sobe acima da última linha, a foto passa por trás
-            if (base in ("story", "feed") and m["fotoTopo"] is not None
+            if (base in ("story", "feed", "linkedinv") and m["fotoTopo"] is not None
                     and m["fotoTopo"] < m["textoFim"]):
                 problemas.append(
                     f"{m['fmt']}: o retrato começa em {m['fotoTopo']}px e o "

@@ -38,7 +38,9 @@ ARTIGO = {
 
 FORMATOS = [("horizontal", "fmt-h", 1600, 900),
             ("story", "fmt-v", 1080, 1920),
-            ("feed", "fmt-f", 1080, 1440)]
+            ("feed", "fmt-f", 1080, 1440),
+            ("linkedin", "fmt-l", 1200, 627),      # post com imagem horizontal no LinkedIn (1,91:1)
+            ("linkedinv", "fmt-p", 1080, 1350)]    # post vertical no LinkedIn (4:5), ocupa mais tela no feed
 
 ICONE_COLUNA = ('<svg viewBox="0 0 24 24" fill="none" stroke="#f0b855" '
                 'stroke-width="1.8" stroke-linecap="round">'
