@@ -28,8 +28,8 @@ def foto(nome):
 
 # 1 capa (foto)
 t1 = tela("navy fotot", '''
+  <div class="sel"><i></i><div><small>Artigo de</small><b>Dra. Rossana Fonseca</b><span>Coluna jurídica EJUP</span></div></div>
   <h1><span class="l">Por que o mesmo conflito</span><br><em>volta aos tribunais</em><br><span class="l">milhares de vezes?</span></h1>
-  <div class="eyebrow">Artigo da Dra. Rossana<span>Coluna jurídica EJUP</span></div>
   <p class="sub">Os Centros de Inteligência do Judiciário e as demandas repetitivas</p>
   <div class="deslize">Deslize para entender <i>→</i></div>
 ''', LOGO_B, foto("capa.jpg"))
@@ -153,9 +153,17 @@ h2{{font-weight:900;font-size:80px;line-height:1.05;letter-spacing:-.03em;margin
 .fotot .conteudo{{justify-content:flex-end;top:100px}}
 .fotot h1{{font-weight:900;font-size:92px;line-height:1.03;letter-spacing:-.03em}}
 .fotot h1 .l{{font-weight:300;letter-spacing:-.01em;font-size:66px}}
+.sel{{position:absolute;left:0;top:10px;display:flex;gap:30px;align-items:stretch}}
+.sel i{{width:5px;background:var(--gold)}}
+.sel div{{display:flex;flex-direction:column;gap:8px}}
+.sel small{{font-weight:500;font-size:24px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}}
+.sel b{{font-weight:900;font-size:60px;letter-spacing:-.02em;line-height:1}}
+.sel span{{font-weight:300;font-size:30px;color:var(--silver)}}
+.fotot:not(.cta)::after{{content:"";position:absolute;left:0;right:0;top:0;height:460px;background:linear-gradient(to bottom,rgba(3,28,55,.9),rgba(3,28,55,0));pointer-events:none}}
+.fotot .conteudo{{z-index:2}}
 .eyebrow{{margin-top:38px;font-weight:500;font-size:26px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}}
 .eyebrow span{{display:block;margin-top:8px;font-weight:300;font-size:30px;letter-spacing:0;text-transform:none;color:var(--silver)}}
-.sub{{font-weight:300;font-size:38px;line-height:1.35;color:var(--silver);margin-top:26px}}
+.sub{{font-weight:300;font-size:38px;line-height:1.35;color:var(--silver);margin-top:34px}}
 .deslize{{align-self:flex-start;margin-top:40px;background:var(--gold);color:var(--ink);font-weight:700;font-size:26px;letter-spacing:.12em;text-transform:uppercase;padding:18px 34px;border-radius:4px}}
 .deslize i{{font-style:normal;margin-left:10px}}
 /* lista numerada */
