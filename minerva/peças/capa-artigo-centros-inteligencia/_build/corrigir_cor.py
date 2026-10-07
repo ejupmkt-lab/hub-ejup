@@ -22,7 +22,11 @@ A -= sombra * np.clip(A, None, 0) * 0.8
 B -= sombra * np.clip(B - 3, 0, None) * 0.6
 lab = np.dstack([L, A, B])
 rgb2 = np.clip(cv2.cvtColor(lab, cv2.COLOR_LAB2RGB), 0, 1)
-# leve ganho de luz e contraste, sem aquecer
-rgb2 = np.clip((rgb2 - 0.5) * 1.04 + 0.5 + 0.02, 0, 1)
+# exposição: a versão de 07/10 ficou superexposta ("ta muito superexposto").
+# Baixa os meios-tons (gama) e segura as altas luzes (blusa e mechas claras)
+# para recuperar textura, sem escurecer as sombras além do original.
+rgb2 = rgb2 ** 1.18
+alta = np.clip((rgb2 - 0.62) / 0.38, 0, 1)
+rgb2 = rgb2 - alta ** 2 * 0.07
 o = Image.fromarray((rgb2 * 255 + .5).astype(np.uint8)); o.putalpha(Image.fromarray(a))
 o.save(out)

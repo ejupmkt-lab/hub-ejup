@@ -57,7 +57,7 @@ esverdeado e o recorte mal feito.
 3. **Cor:** `_build/corrigir_cor.py`, em Lab. Tira o amarelo e o verde das altas
    luzes pouco saturadas (blusa de 211/201/167 para 212/209/201), leva o cabelo
    do verde-oliva para o dourado (a* sobe onde está baixo e b* é alto) e
-   neutraliza as sombras esverdeadas. O aquecimento aplicado antes saiu.
+   neutraliza as sombras esverdeadas. O aquecimento aplicado antes saiu. Exposição corrigida no mesmo dia ("ta muito superexposto"): gama 1,18 nos meios-tons e compressão das altas luzes (blusa de 212 para 192, mantendo o branco neutro).
 
     python3 _build/recortar_hd.py original.jpg recorte.png birefnet-portrait
     python3 _build/corrigir_cor.py recorte.png foto.png
