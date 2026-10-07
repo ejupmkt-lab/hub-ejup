@@ -40,7 +40,7 @@ PESSOAS = {
                    rotulo="Mensagem de Vorcaro, segundo a PF, no dia da prisão",
                    frase="“Conseguiu ter notícia ou bloquear?”",
                    fonte_frase="Moraes nega ter recebido e nega relação com Vorcaro · Fontes: Agência Pública, Metrópoles"),
-    "viviane": dict(foto="novas/viviane.jpg", caixa=(.0, .0, 1.0), nome="Viviane Barci de Moraes",
+    "viviane": dict(foto="viviane.jpg", caixa=(.0, .0, 1.0), nome="Viviane Barci de Moraes",
                     papel="Advogada, mulher do ministro Alexandre de Moraes. Segundo o relatório da PF, o escritório dela tinha contrato com o Banco Master.",
                     credito="Foto: Lula Oficial, agosto de 2022 (CC BY-SA 4.0)"),
     "gilmar": dict(foto="gilmar.png", caixa=(.0, .0, 1.0), nome="Gilmar Mendes",
@@ -98,7 +98,10 @@ def legenda(p):
         return linhas + [atual]
 
     y = 300 if "frase" not in p else 210
-    d.text((x0, y), p["nome"], font=fonte("Black", 66), fill=(255, 255, 255, 255))
+    fn = fonte("Black", 66)
+    while d.textlength(p["nome"], font=fn) > larg:
+        fn = fonte("Black", fn.size - 2)
+    d.text((x0, y + (66 - fn.size) // 2), p["nome"], font=fn, fill=(255, 255, 255, 255))
     y += 92
     d.rectangle((x0, y, x0 + 70, y + 3), fill=(240, 184, 85, 255))
     y += 30
