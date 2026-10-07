@@ -17,6 +17,6 @@ Siga a EJUP para acompanhar a revisão da Resolução 349 e os desdobramentos do
 #ejup #direito #centrosdeinteligencia #cnj #demandasrepetitivas #judiciario #processocivil
 
 ---
-Crédito das fotos: antigo edifício do STF, hoje Centro Cultural da Justiça Federal. Núcleo de digitalização / IMS, domínio público (Wikimedia Commons).
+Crédito das fotos: capa, antigo edifício do STF (Núcleo de digitalização / IMS, domínio público); última tela, galeria de arquivo (General Services Administration / NARA, domínio público). Fonte: Wikimedia Commons.
 
 [conferir antes de publicar] #019 e o nome do convidado; segunda fonte de categoria diferente (doutrina ou pesquisa) para a tela 3; a hashtag de processo civil só se a área estiver no briefing. Publicação depende da aprovação de Roberto Pivotto.

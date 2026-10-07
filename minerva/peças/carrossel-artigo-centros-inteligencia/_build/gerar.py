@@ -32,7 +32,7 @@ t1 = tela("navy fotot", '''
   <div class="eyebrow">Artigo da Dra. Rossana<span>Coluna jurídica EJUP</span></div>
   <p class="sub">Os Centros de Inteligência do Judiciário e as demandas repetitivas</p>
   <div class="deslize">Deslize para entender <i>→</i></div>
-''', LOGO_B, foto("fecho.jpg"))
+''', LOGO_B, foto("capa.jpg"))
 
 # 2 papel: a cena
 t2 = tela("papel", '''
@@ -123,7 +123,7 @@ t10 = tela("navy fotot cta", f'''
   <p class="corpo">O tema também foi conversa no EJUPcast #019, com o juiz federal Marco Bruno Miranda Clementino.</p>
   <div class="botao">Link na bio</div>
   <div class="assin"><b>Alma clássica, <em>repertório contemporâneo.</em></b><span>@ejup.oficial</span></div>
-''', LOGO_B, foto("capa.jpg"))
+''', LOGO_B, foto("fecho.jpg"))
 
 CSS = f'''
 @font-face{{font-family:Gotham;src:url("{FONTS}/Gotham-Light.otf");font-weight:300}}
@@ -202,6 +202,7 @@ h2{{font-weight:900;font-size:80px;line-height:1.05;letter-spacing:-.03em;margin
 .grade span{{display:block;font-weight:300;font-size:31px;line-height:1.4}}
 /* CTA */
 .cta .conteudo{{justify-content:flex-end}}
+.cta .corpo{{text-align:left}}
 .cta .simb{{width:120px;margin-bottom:46px}}
 .botao{{align-self:flex-start;margin-top:44px;background:var(--gold);color:var(--ink);font-weight:700;font-size:30px;letter-spacing:.12em;text-transform:uppercase;padding:22px 40px;border-radius:4px}}
 .assin{{margin-top:50px;border-top:2px solid rgba(209,211,212,.25);padding-top:26px;display:flex;flex-direction:column;gap:8px}}
