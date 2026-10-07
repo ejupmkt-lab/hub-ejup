@@ -10,6 +10,8 @@ O artigo completo traz o desenvolvimento do tema com as fontes. O link está na 
 
 O assunto também foi conversa no EJUPcast #019, com o juiz federal Marco Bruno Miranda Clementino.
 
+Artigo da Dra. Rossana.
+
 Siga a EJUP para acompanhar a revisão da Resolução 349 e os desdobramentos do tema.
 
 #ejup #direito #centrosdeinteligencia #cnj #demandasrepetitivas #judiciario #processocivil
