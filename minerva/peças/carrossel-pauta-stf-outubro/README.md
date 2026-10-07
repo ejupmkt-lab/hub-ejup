@@ -2,7 +2,7 @@
 
 `python3 _build/gerar.py && python3 _build/render.py`
 
-Versão de 07/10/2026 (segunda versão: título pedido pela equipe e layout de pôster). Telas em `telas/`, visão geral em `visualizacao-completa.png`, legenda em `legenda.md`.
+Versão de 07/10/2026 (terceira versão: a segunda, de pôster, foi considerada infantil; esta é editorial). Telas em `telas/`, visão geral em `visualizacao-completa.png`, legenda em `legenda.md`.
 
 1. Capa: "5 julgamentos do STF para acompanhar em outubro", com o 5 gigante e as quatro datas.
 2. Crédito presumido de ICMS no PIS/Cofins (RE 835.818, Tema 843), 7 e 8/10.
@@ -17,7 +17,10 @@ Versão de 07/10/2026 (segunda versão: título pedido pela equipe e layout de p
 Um por frente de impacto: tributário, transporte e economia digital, saúde e autonomia, dados e investigação, previdência. Ficaram de fora, mas aparecem na tela 7, Funrural, liberdade de imprensa, porte de arma de guardas municipais e insalubridade de terceirizados.
 
 ## Design
-Layout de pôster: numeral gigante do julgamento, data em pílula, pergunta como título e ficha com o resumo. Fundos alternados (tinta, papel, navy, aço) e anéis concêntricos ao fundo.
+Layout editorial: pergunta como título em Black, texto justificado e rodapé em formato de ficha de processo (Quando, Processo), com filetes. Numeral só em contorno, sangrando pela borda, como marcador discreto. Fotografia da parede do plenário do STF em duotone (navy, aço, prata) na capa e no fecho, recortada sem pessoas e sem símbolo religioso. Fundos alternados (tinta, papel, navy, aço). Sem pílulas, círculos nem formas decorativas.
+
+## Foto
+Sessão plenária do STF, 09/04/2026, Antonio Augusto e Gustavo Moreno/STF (atribuição), via Wikimedia Commons: commons.wikimedia.org/wiki/File:2026-04-09_-_Sessão_plenária_do_STF_04.jpg. Recorte da parede com os nichos em arco, acima da bancada. Crédito está na legenda. Tratamento em `fotos/` (capa.jpg e fecho.jpg).
 
 ## Fontes (item 21)
 - STF, "Confira destaques da pauta do Plenário para outubro" (https://noticias.stf.jus.br/postsnoticias/confira-destaques-da-pauta-do-plenario-para-outubro/), lida pela republicação do IBDP de 06/10/2026.

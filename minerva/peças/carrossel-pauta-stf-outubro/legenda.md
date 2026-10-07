@@ -11,3 +11,5 @@ O presidente do STF, ministro Edson Fachin, divulgou a pauta do Plenário para o
 A pauta pode mudar com pedidos de vista e de destaque. Confira no site do STF antes de planejar uma sustentação ou uma petição.
 
 Salve para consultar durante o mês e envie a quem acompanha o Supremo. Qual julgamento você vai acompanhar?
+
+Foto: sessão plenária do STF, 09/04/2026 (Antonio Augusto e Gustavo Moreno/STF), via Wikimedia Commons.
