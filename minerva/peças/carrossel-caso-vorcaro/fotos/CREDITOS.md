@@ -27,3 +27,13 @@ lado a lado com o original: rosto preservado em Toffoli, Moraes e Gilmar
 (`*-ia.png`). A foto do Mendonça foi barrada pelo filtro de conteúdo do
 Higgsfield (falso positivo) e **não foi cobrada**; ela segue com o
 tratamento em código. Gasto real: 3 créditos (413,25 → 410,25).
+
+## Viviane Barci de Moraes (07/10/2026)
+
+| Pessoa | Arquivo no Commons | Autor | Licença |
+|---|---|---|---|
+| Viviane Barci de Moraes | Alexandre_de_Moraes_and_Viviane_Barci,_August_2022_(cropped).jpg | Lula Oficial | CC BY-SA 4.0 |
+
+Usada no vídeo individual de A Sala ep. 01, por pedido do Victor. Ela não é
+agente pública: o vídeo só repete o que o relatório da PF diz, com a fonte, e
+passa pela revisão jurídica do episódio.
