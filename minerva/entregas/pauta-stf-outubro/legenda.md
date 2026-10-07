@@ -1,8 +1,12 @@
-# Legenda · A pauta do STF em outubro
+# Legenda · 5 julgamentos do STF para acompanhar em outubro
 
-O presidente do STF, ministro Edson Fachin, divulgou a pauta do Plenário para outubro. São quatro semanas de julgamentos, concentrados nas quartas-feiras, com as quintas reservadas para processos remanescentes.
+O presidente do STF, ministro Edson Fachin, divulgou a pauta do Plenário para outubro. Separamos cinco julgamentos para acompanhar de perto:
 
-Em 7 e 8 de outubro, créditos presumidos de ICMS na base do PIS/Cofins (Tema 843) e expurgos inflacionários em depósitos judiciais (Tema 1.016). Em 14 e 15, o caso Buser, o Funrural e a liberdade de imprensa. Em 21 e 22, a recusa a tratamento médico e o acesso a dados sigilosos em investigações. Em 28 e 29, a Reforma da Previdência e os servidores.
+1. Crédito presumido de ICMS na base do PIS/Cofins (7 e 8 de outubro, Tema 843).
+2. O circuito fechado no fretamento por aplicativo, caso Buser (14 e 15).
+3. O direito de adulto capaz recusar tratamento médico (21 e 22).
+4. Quando polícia e Ministério Público precisam de ordem judicial para acessar dados (21 e 22).
+5. A contribuição progressiva dos servidores federais (28 e 29, Tema 1.226).
 
 A pauta pode mudar com pedidos de vista e de destaque. Confira no site do STF antes de planejar uma sustentação ou uma petição.
 
