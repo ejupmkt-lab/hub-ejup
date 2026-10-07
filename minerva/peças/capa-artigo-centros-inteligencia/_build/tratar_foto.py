@@ -86,7 +86,8 @@ def main() -> None:
                                 ("topo", "y", True), ("base", "y", False)):
             n = int((im.width if eixo == "x" else ALTURA) * FADE_INTEIRA[lado])
             faixa(a, n, eixo, ini)
-    im.putalpha(a.filter(ImageFilter.GaussianBlur(4 if recortada else 6)))
+    # recorte fino (BiRefNet + matting): só um desfoque mínimo, para não amolecer os fios
+    im.putalpha(a.filter(ImageFilter.GaussianBlur(1.2 if recortada else 6)))
 
     im.save(DEST, "WEBP", quality=90, method=6)
     print(f"{DEST.name}: {im.size[0]}×{im.size[1]}, "

@@ -43,3 +43,22 @@ esfumado lateral caiu de 16% para 10%. Testei também o close frontal de blazer
 Cargo confirmado por ele: "Advogada e sócia da EJUP".
 
 **A confirmar:** a categoria "Gestão judiciária".
+
+## Refinamento da foto (07/10/2026)
+Pedido do Victor: manter a foto, mas os brancos estavam amarelados, o cabelo
+esverdeado e o recorte mal feito.
+
+1. **Original em resolução cheia** (7360x4912, pelo link de miniatura do Drive
+   em tamanho máximo; o download direto pela API recusa arquivos acima de 10 MB).
+2. **Recorte novo:** `_build/recortar_hd.py` com o modelo BiRefNet (retrato) e
+   refinamento por *alpha matting*, a 2600 px de altura. Os fios soltos do
+   cabelo ficam preservados; o desfoque da borda no `tratar_foto.py` caiu de 4
+   para 1,2 px.
+3. **Cor:** `_build/corrigir_cor.py`, em Lab. Tira o amarelo e o verde das altas
+   luzes pouco saturadas (blusa de 211/201/167 para 212/209/201), leva o cabelo
+   do verde-oliva para o dourado (a* sobe onde está baixo e b* é alto) e
+   neutraliza as sombras esverdeadas. O aquecimento aplicado antes saiu. Exposição corrigida no mesmo dia ("ta muito superexposto"): gama 1,18 nos meios-tons e compressão das altas luzes (blusa de 212 para 192, mantendo o branco neutro).
+
+    python3 _build/recortar_hd.py original.jpg recorte.png birefnet-portrait
+    python3 _build/corrigir_cor.py recorte.png foto.png
+    python3 _build/tratar_foto.py && python3 _build/gerar.py && python3 _build/render.py

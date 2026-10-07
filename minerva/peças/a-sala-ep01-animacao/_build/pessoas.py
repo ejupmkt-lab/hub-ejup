@@ -35,8 +35,14 @@ PESSOAS = {
                      papel="Relator do caso depois da saída de Toffoli. Confirma a reunião de 2025 com Vorcaro.",
                      credito="Foto: Rosinei Coutinho/STF"),
     "moraes": dict(foto="moraes.png", caixa=(.12, .0, .76), nome="Alexandre de Moraes",
-                   papel="Citado no relatório da PF de setembro de 2026. Nega qualquer relação com Vorcaro.",
-                   credito="Foto: Isac Nóbrega/PR (CC BY 2.0)"),
+                   papel="Ministro do STF. Citado no relatório da PF de setembro de 2026.",
+                   credito="Foto: Isac Nóbrega/PR (CC BY 2.0)",
+                   rotulo="Mensagem de Vorcaro, segundo a PF, no dia da prisão",
+                   frase="“Conseguiu ter notícia ou bloquear?”",
+                   fonte_frase="Moraes nega ter recebido e nega relação com Vorcaro · Fontes: Agência Pública, Metrópoles"),
+    "viviane": dict(foto="novas/viviane.jpg", caixa=(.0, .0, 1.0), nome="Viviane Barci de Moraes",
+                    papel="Advogada, mulher do ministro Alexandre de Moraes. Segundo o relatório da PF, o escritório dela tinha contrato com o Banco Master.",
+                    credito="Foto: Lula Oficial, agosto de 2022 (CC BY-SA 4.0)"),
     "gilmar": dict(foto="gilmar.png", caixa=(.0, .0, 1.0), nome="Gilmar Mendes",
                    papel="Ministro do Supremo Tribunal Federal.",
                    credito="Foto: Alejandro Zambrana/Secom/TSE",
@@ -98,17 +104,22 @@ def legenda(p):
     y += 30
     for l in quebra(p["papel"], fonte("Light", 32), larg):
         d.text((x0, y), l, font=fonte("Light", 32), fill=(209, 211, 212, 255)); y += 44
+    y_frase = None
     if "frase" in p:
         y += 40
+        y_frase = y - 10
+        if "rotulo" in p:
+            d.text((x0, y), p["rotulo"].upper(), font=fonte("Medium", 19), fill=(209, 211, 212, 230)); y += 40
         for l in quebra(p["frase"], fonte("Black", 60), larg):
             d.text((x0, y), l, font=fonte("Black", 60), fill=(240, 184, 85, 255)); y += 68
         y += 14
-        d.text((x0, y), p["fonte_frase"], font=fonte("Book", 22), fill=(209, 211, 212, 220))
+        for l in quebra(p["fonte_frase"], fonte("Book", 22), larg):
+            d.text((x0, y), l, font=fonte("Book", 22), fill=(209, 211, 212, 220)); y += 30
     d.text((x0, H - 96), p["credito"], font=fonte("Book", 20), fill=(209, 211, 212, 200))
     a = np.asarray(im).astype(np.float32) / 255
     # sombra macia para o texto ler sobre o papel pardo
     sombra = cv2.GaussianBlur(a[..., 3], (0, 0), 14) * .75
-    return a[..., :3], a[..., 3], sombra
+    return a[..., :3], a[..., 3], sombra, y_frase
 
 
 def preparar(chave, p):
@@ -166,7 +177,7 @@ def render(chave):
     dur = 7.0 if "frase" in p else 6.0
     c = Cena(nome, dur)
     foco_que_acende(c, c.elipse(.33, .40, .17, .30, pena=.8), .3, 1.4, forca=.3)
-    cor, alfa, sombra = legenda(p)
+    cor, alfa, sombra, y_frase = legenda(p)
     t_frase = 2.2
 
     def texto(t, img, conv):
@@ -181,7 +192,7 @@ def render(chave):
         if "frase" in p:
             kf = janela(t, t_frase, t_frase + .8)
             corte = np.ones((H, 1), np.float32)
-            corte[470:] = kf
+            corte[y_frase:] = kf
             a = a * corte
         img = img * (1 - (sombra * k)[..., None]) + 0
         return img * (1 - a[..., None]) + cor * a[..., None]

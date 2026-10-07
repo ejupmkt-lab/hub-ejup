@@ -5,6 +5,7 @@ Roteiro: `docs/formatos/a-sala-ep01-caso-master.md`.
 - **Vídeo**: o arquivo começa a rodar na fala indicada.
   - Clipes de ação: `clipes-final/` (5 s cada).
   - Telas animadas: `entrega/telas-animadas/` (6 s cada).
+- **Pessoas**: `entrega/pessoas/` (6 s; o do Gilmar 7 s), ficha com foto, nome, papel e crédito.
 - **Cartela**: tela estática de `peças/a-sala-ep01-telas/telas/tela-NN.png`.
   - Fica na tela enquanto a fala dura.
 
@@ -25,7 +26,7 @@ Roteiro: `docs/formatos/a-sala-ep01-caso-master.md`.
 | Fala | Imagem |
 |---|---|
 | "Primeiro, os personagens." | cartela 02 (quadro de personagens) |
-| "Daniel Vorcaro. Dono do Banco Master…" | vídeo `tela-06` (ficha com a foto de Vorcaro) |
+| "Daniel Vorcaro. Dono do Banco Master…" | vídeo `pessoas/vorcaro` (ou `tela-06`) |
 | "O Banco Central… fechou o Master e assumiu o controle do que sobrou." | vídeo `07-liquidacao` (a chave muda de mão) |
 | "O nome técnico disso é liquidação extrajudicial. Pensa numa intervenção…" | cartela 03 (Liquidação extrajudicial) |
 | "A Polícia Federal… No mesmo dia em que o banco foi fechado, prendeu Vorcaro…" | vídeo `tela-08` (avião, data, PF) |
@@ -54,12 +55,12 @@ Roteiro: `docs/formatos/a-sala-ep01-caso-master.md`.
 | "Até aqui, seria um caso de banco…" | cartela 11 |
 | "E aqui entram três nomes." | vídeo `tela-04` de novo (os três porta-retratos) |
 | "Relator é o ministro que conduz o processo." | cartela 12 (Relator) |
-| Bloco Dias Toffoli | cartela 14 (ficha Toffoli) |
-| "O caso foi sorteado para o ministro André Mendonça…" | cartela 15 (ficha Mendonça) |
+| "O primeiro relator do caso no Supremo foi o ministro Dias Toffoli." | vídeo `pessoas/toffoli`, depois cartela 14 |
+| "O caso foi sorteado para o ministro André Mendonça…" | vídeo `pessoas/mendonca`, depois cartela 15 |
 | "Em março de 2025, antes de virar relator, Mendonça se encontrou com Vorcaro…" | cartela 13 (linha do tempo) |
-| "O terceiro nome veio no relatório da Polícia Federal…" | cartela 16 (ficha Moraes) |
+| "…mulher do ministro Alexandre de Moraes…" | vídeo `pessoas/moraes`, depois cartela 16 |
 | "Uma delas é do dia da prisão: 'conseguiu ter notícia ou bloquear?'" | cartela 17 (a mensagem) |
-| "…o ministro Gilmar Mendes disse numa sessão…" | cartela 18 |
+| "…o ministro Gilmar Mendes disse numa sessão… 'até a máfia tem ética'." | vídeo `pessoas/gilmar` (7 s, com a frase); cartela 18 se quiser segurar mais |
 
 ## Parte 4 · O que a lei diz
 
