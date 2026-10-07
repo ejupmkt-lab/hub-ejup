@@ -6,11 +6,9 @@ Uma cobrança indevida repetida em escala, uma norma com duas leituras, um contr
 
 Neste carrossel você vê o que são esses centros, como funciona a nota técnica, de onde a rede surgiu e em que ela se distingue do IRDR e dos recursos repetitivos. Vê também o que a revisão da Resolução CNJ nº 349/2020, em curso em 2026, significa para quem advoga.
 
-Artigo da Dra. Rossana Fonseca. O texto completo desenvolve cada ponto com as fontes, e o link está na bio.
+A Dra. Rossana Fonseca desenvolve cada ponto, com as fontes, no artigo completo. O link está na bio. O tema também passou pelo EJUPcast #019, na conversa com o juiz federal Marco Bruno Miranda Clementino.
 
-O tema também foi conversa no EJUPcast #019, com o juiz federal Marco Bruno Miranda Clementino.
-
-Siga a EJUP para acompanhar a revisão da Resolução 349 e o que ela traz para a prática.
+A revisão da Resolução 349 segue em curso no CNJ. Siga a EJUP para não perder o que mudar.
 
 #ejup #direito #centrosdeinteligencia #cnj #demandasrepetitivas #judiciario
 
