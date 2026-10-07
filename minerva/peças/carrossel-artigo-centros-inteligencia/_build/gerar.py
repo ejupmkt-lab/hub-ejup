@@ -29,7 +29,7 @@ def foto(nome):
 # 1 capa (foto)
 t1 = tela("navy fotot", '''
   <h1><span class="l">Por que o mesmo conflito</span><br><em>volta aos tribunais</em><br><span class="l">milhares de vezes?</span></h1>
-  <div class="eyebrow">Artigo da Dra. Rossana<span>Coluna jurídica EJUP</span></div>
+  <div class="eyebrow">Artigo da Dra. Rossana Fonseca<span>Coluna jurídica EJUP</span></div>
   <p class="sub">Os Centros de Inteligência do Judiciário e as demandas repetitivas</p>
   <div class="deslize">Deslize para entender <i>→</i></div>
 ''', LOGO_B, foto("capa.jpg"))

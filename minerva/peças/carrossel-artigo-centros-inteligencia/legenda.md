@@ -10,7 +10,7 @@ O artigo completo traz o desenvolvimento do tema com as fontes. O link está na 
 
 O assunto também foi conversa no EJUPcast #019, com o juiz federal Marco Bruno Miranda Clementino.
 
-Artigo da Dra. Rossana.
+Artigo da Dra. Rossana Fonseca.
 
 Siga a EJUP para acompanhar a revisão da Resolução 349 e os desdobramentos do tema.
 
