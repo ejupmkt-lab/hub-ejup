@@ -24,7 +24,10 @@ capa.json:
   "nome": "Dra. Rossana Fonseca",
   "episodio": "EJUPcast #18",
   "apoio": "A primeira lição do curso de Direito, e a que muita gente",   # opcional
-  "apoio_destaque": "esqueceu."
+  "apoio_destaque": "esqueceu.",
+  "reels": true,                         # opcional: preenche a tela de reels 9:16
+  "feed": true,                          # opcional: 1080x1440 (3:4), arte avulsa no tamanho do feed
+  "grade": true                          # capa de reels: 1080x1920 com a arte 3:4 no recorte da grade
 }
 estilo: "it" = Book itálico · "bk" = Black. O título encolhe sozinho se não couber.
 Tudo o que importa fica dentro do recorte 3:4 da grade do Instagram (y 240 a 1680).
@@ -72,6 +75,16 @@ ARCOS = ('<svg class="arcos" viewBox="0 0 1080 1920"><g fill="none" stroke="#d1d
          '<path d="M-200 760 C 200 210, 700 0, 1300 120"/><path d="M-160 2160 C 300 1560, 800 1560, 1300 1310"/></g></svg>')
 
 
+# "reels": true ocupa a tela 9:16 inteira: faixas mais altas e fio maior, com
+# o bloco preenchendo o recorte da grade (y 330 a 1680) em vez de boiar no meio
+REELS = """
+.row.so{height:224px} .row.larga{height:500px;margin:14px 0 22px} .row.curta{height:250px}
+.row.curta .faixa{margin:22px 0}
+.rodape{margin-top:52px;padding-top:30px}
+.nome,.ep{font-size:30px}
+"""
+
+
 def linha(l):
     if l.get("faixa"):
         return '<div class="row larga"><div class="faixa principal"></div></div>'
@@ -95,15 +108,28 @@ def main(cfg_path):
     esc = c.get("escala", .72)
     fw = foto.width * esc
     linhas = "\n".join(linha(l) for l in c["linhas"])
+    # "feed": true gera 1080x1440 (3:4, o tamanho do post do feed): a capa do
+    # reels que o Victor sobe para aparecer certa na grade
+    feed = c.get("feed")
+    # "grade": true gera 1080x1920 com a composição do feed (3:4) inteira no
+    # recorte que a grade do perfil mostra (y 240 a 1680). É o formato certo da
+    # capa de reels: a tela cheia mostra tudo e a grade não corta nada.
+    grade = c.get("grade")
+    H = 1440 if feed else 1920
+    TOPO, BASE = (300, 1390) if feed else (330, 1680)   # área do bloco
+    SELO = 60 if feed else 100
+    if grade:
+        TOPO, BASE, SELO = 300 + 240, 1390 + 240, 60 + 240
+    arcos = ARCOS if not feed else ARCOS.replace('viewBox="0 0 1080 1920"', 'viewBox="0 0 1080 1920" preserveAspectRatio="none"')
     html = f"""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>
 {fontes()}
 *{{box-sizing:border-box;margin:0}}
-body{{width:1080px;height:1920px;font-family:'Gotham',Montserrat,sans-serif}}
-.s{{position:relative;width:1080px;height:1920px;overflow:hidden;color:#031c37;
+body{{width:1080px;height:{H}px;font-family:'Gotham',Montserrat,sans-serif}}
+.s{{position:relative;width:1080px;height:{H}px;overflow:hidden;color:#031c37;
   background:radial-gradient(90% 60% at 50% 40%,#f3f1ec 0%,#ecebe7 60%,#e4e2dd 100%)}}
 .arcos,.grao{{position:absolute;inset:0}}
 .grao{{background:url({grao()});background-size:540px 960px;mix-blend-mode:overlay;opacity:.18}}
-.selo{{position:absolute;left:50%;top:100px;transform:translateX(-50%)}}
+.selo{{position:absolute;left:50%;top:{SELO}px;transform:translateX(-50%)}}
 .aro{{position:absolute;inset:0;width:100%;height:100%}}
 .marca{{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}}
 .marca>div{{display:flex;align-items:flex-end;gap:5px}}
@@ -124,8 +150,9 @@ body{{width:1080px;height:1920px;font-family:'Gotham',Montserrat,sans-serif}}
 .ep{{font-weight:300;font-size:24px;color:#5f6062}}
 .apoio{{font-weight:300;font-size:40px;line-height:1.3;color:#414042;margin-top:30px}}
 .apoio em{{font-style:italic;color:#9b6b26}}
+{REELS if c.get("reels") else ""}
 </style></head><body><section class="s">
-{ARCOS}
+{arcos}
 {selo()}
 <div class="bloco">
 {linhas}
@@ -150,7 +177,7 @@ const cabe = () => [...document.querySelectorAll('.row')].every(r => {{
 while (!cabe() && fs > 120) {{ fs -= 4; s.style.setProperty('--fs', fs + 'px'); }}
 // bloco centrado na área entre o selo e o fim do recorte 3:4 da grade (y 330 a 1680)
 const h = bloco.getBoundingClientRect().height;
-bloco.style.top = Math.round(330 + Math.max(0, (1680 - 330 - h) / 2)) + 'px';
+bloco.style.top = Math.round({TOPO} + Math.max(0, ({BASE} - {TOPO} - h) / 2)) + 'px';
 // janelas para a mesma foto: o foco cai no centro da faixa larga (ou da primeira janela),
 // e a foto sempre cobre todas as janelas (sobe a escala e trava o deslocamento se preciso)
 const sr = s.getBoundingClientRect();
@@ -173,7 +200,7 @@ document.body.dataset.pronto = fs;
     (base / "capa.html").write_text(html, encoding="utf-8")
     with sync_playwright() as p:
         b = p.chromium.launch(executable_path="/opt/pw-browsers/chromium")
-        pg = b.new_page(viewport={"width": 1080, "height": 1920})
+        pg = b.new_page(viewport={"width": 1080, "height": H})
         pg.goto((base / "capa.html").as_uri()); pg.wait_for_selector("body[data-pronto]")
         pg.wait_for_timeout(400)
         print("título em", pg.evaluate("document.body.dataset.pronto"), "px")
