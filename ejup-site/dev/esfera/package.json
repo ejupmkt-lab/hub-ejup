@@ -1,0 +1,6 @@
+{
+  "name": "ejup-esfera",
+  "private": true,
+  "description": "Gera /minerva/esfera.js (esfera da Minerva em WebGL). Rodar: npm install && node build.mjs",
+  "devDependencies": { "three": "0.170.0", "esbuild": "0.24.0" }
+}

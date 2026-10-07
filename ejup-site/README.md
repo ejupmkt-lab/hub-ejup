@@ -28,7 +28,7 @@ o site.** Todas as outras produções da EJUP seguem o MIV (ver `CLAUDE.md` na r
 | Caminho | O que é |
 |---|---|
 | `app.html`, `assets/app.js`, `assets/style.css` | Site: Home, A escola, Formações, Professores, EJUPcast, Coluna Jurídica, In company, Política de Privacidade. Rotas reais (`/escola`, `/formacao/licenciamento`…). |
-| `minerva/` | Página `/minerva`; `abertura-*` e `fechamento-*` (movimento da esfera a 60 quadros/s, em 1440 px e 900 px, MP4 e WebM; tocam uma vez), `repouso.jpg` e `aberta.jpg` (estados parados) |
+| `minerva/` | Página `/minerva`; `esfera.js` (a esfera desenhada em 3D no navegador, nítida em qualquer tela; fonte em `dev/esfera/`, gerada com `cd dev/esfera && npm install && node build.mjs`), `repouso.jpg` e `aberta.jpg` (estados parados) |
 | `api/minerva.js`, `api/_lib/busca.js` | Minerva sem IA: busca a pergunta cadastrada mais parecida e devolve a resposta (20 req/min por IP) |
 | `api/_lib/respostas.js` | Respostas iniciais da Minerva; reserva quando o Supabase não estiver configurado |
 | `api/lead.js` | Grava newsletter e pedidos in company no Supabase (5 envios/min por IP) |

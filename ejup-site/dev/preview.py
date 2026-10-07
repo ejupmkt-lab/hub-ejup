@@ -121,6 +121,8 @@ m = inline_fonts(m)
 m = re.sub(r'<link rel="preload" href="/fonts/[^>]+>\n', '', m)
 m = must(m, '<link rel="icon" href="/favicon.svg" type="image/svg+xml">\n', '')
 m = m.replace('"/minerva/', '"minerva/').replace("'/minerva/", "'minerva/")
+# import() precisa de caminho relativo explícito
+m = must(m, "esfera: 'minerva/esfera.js'", "esfera: './minerva/esfera.js'")
 m = must(m, '<a class="logo" href="/"', '<a class="logo" href="index.html"')
 m = must(m, '<a class="mail" href="/">', '<a class="mail" href="index.html">')
 m = must(m, '<script>document.documentElement.classList.add(\'js\')</script>', SHIM + '\n' + BADGE + "\n<script>document.documentElement.classList.add('js')</script>")
@@ -129,6 +131,6 @@ open(os.path.join(out, 'minerva.html'), 'w', encoding='utf-8').write(m)
 for d in ['img', 'vid']:
     shutil.copytree(os.path.join(here, d), os.path.join(out, d), dirs_exist_ok=True)
 os.makedirs(os.path.join(out, 'minerva'), exist_ok=True)
-for f in [f'{n}-{w}.{x}' for n in ('abertura', 'fechamento') for w in (1440, 900) for x in ('mp4', 'webm')] + [ 'repouso.jpg', 'aberta.jpg', 'repouso-p.jpg', 'aberta-p.jpg']:
+for f in ['esfera.js',  'repouso.jpg', 'aberta.jpg', 'repouso-p.jpg', 'aberta-p.jpg']:
     shutil.copy(os.path.join(here, 'minerva', f), os.path.join(out, 'minerva', f))
 print('prévia em', out)
