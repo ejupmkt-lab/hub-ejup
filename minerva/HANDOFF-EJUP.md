@@ -409,3 +409,13 @@ Victor (crédito do Higgsfield só com aviso, sem rótulo no alto, sem colagem),
 retorno do Roberto (aprovou o sistema do cartão do EJUPcast #018), peças novas
 (STF, A Sala, caso Vorcaro, EJUPcast #018, capa do corte da Rossana), a vinheta e
 o logo de A Sala, o padrão de edição do EJUPcast e as pendências.
+
+## 19. Estratégia comercial com a Nova Gestão (08/10/2026)
+
+Registrada em `docs/minerva/estrategia-2026-10-08-nova-gestao.md`: quem é quem
+(Beto é o Roberto, CEO; Léo é o Leonardo, financeiro e gestão; Arthur é o
+consultor da Nova Gestão), diagnóstico do modelo atual, a tese do hub, o
+programa-piloto proposto, a conta, o funil, o calendário até a banca de
+07/04/2027, os donos por frente, o que muda no conteúdo e a base legal
+conferida. Documento vivo para os sócios e o consultor: "Plano de Rota EJUP"
+(Claude Docs do Victor).
