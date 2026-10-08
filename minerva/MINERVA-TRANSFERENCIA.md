@@ -654,7 +654,7 @@ A formação da EJUP se organiza em três pilares. **Esta informação não est�
 - **Victor "Pivoto" Barroso** — marketing da EJUP. É quem conduz este trabalho.
 - **Anna (@annacnevss) e Gabi (@gabid.rocha)** — entraram no marketing em agosto/2026. São o público das duas aulas da imersão.
 - **Roberto Pivotto** — sócio. Pediu prática real, manteve o CTA "eu quero" e quer o Dia 1 amarrado à estratégia do perfil dele.
-- **Dr. Jarbas Bezerra** — sócio, **juiz educador**. O martelo, na marca pessoal dele, é biografia — não decoração. É a exceção que derrubou a proibição absoluta do objeto.
+- **Dr. Jarbas Bezerra** — **cliente** da EJUP (não é sócio; correção de 08/10/2026), **juiz educador**. O martelo, na marca pessoal dele, é biografia — não decoração. É a exceção que derrubou a proibição absoluta do objeto.
 
 **Papel das duas no EJUPcast — ponto que já foi corrigido uma vez:** elas **não conduzem** o podcast. Elas pesquisam o convidado e escrevem o **roteiro de perguntas que vai para a mão do host**, com anotações de condução. Durante a gravação, o trabalho delas é a **marcação em tempo real** (minuto, tema, por que serve).
 
@@ -1176,7 +1176,7 @@ doutrina, canal especializado, profissional de referência).
 - Leonardo Pivotto: sócio-fundador da EJUP e da EIX CORE. Autor do artigo "O
   poder de polícia ambiental municipal: eficácia do licenciamento ambiental
   simplificado".
-- Dr. Jarbas Bezerra: sócio, juiz educador. Na marca pessoal dele o martelo
+- Dr. Jarbas Bezerra: cliente da EJUP, juiz educador. Na marca pessoal dele o martelo
   é biografia, e por isso a exceção à proibição do objeto.
 - Rossana: personagem da escola, citada como marca pessoal nos boards
   futuros. Função e sobrenome não estão na base.

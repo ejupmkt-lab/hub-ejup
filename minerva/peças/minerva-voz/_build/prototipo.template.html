@@ -186,7 +186,7 @@ setInterval(() => { if (fase === 'falando' && micAnalisador && medir(micAnalisad
 function pararDemo(){ if (demoTimer){ clearInterval(demoTimer); demoTimer = null; } }
 $('#demo').addEventListener('click', () => {
   pararDemo(); pararVoz(); ctl?.abort(); pararReconhecimento(); ligada = false; erro('');
-  const frase = 'Victor conduz a operação: marketing, audiovisual e a agência. Roberto e Leonardo são sócios, e Roberto é o gate humano de publicação. O doutor Jarbas é sócio e juiz educador. Anna e Gabi entraram no marketing em agosto.';
+  const frase = 'Victor conduz a operação: marketing, audiovisual e a agência. Roberto e Leonardo são sócios, e Roberto é o gate humano de publicação. Rossana Fonseca é sócia, na frente institucional e jurídica. Anna e Gabi entraram no marketing em agosto.';
   let passo = 0, i = 0;
   voceEl.hidden = false; voceEl.textContent = 'Minerva, quem é quem na EJUP?'; elaEl.textContent = ''; dica.textContent = '';
   setFase('ouvindo');

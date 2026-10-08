@@ -135,22 +135,27 @@ doutrina, canal especializado, profissional de referência).
 - Victor "Pivoto" Barroso: Diretoria de Operações. Marketing, audiovisual
   (EJUPcast, O Código, canais futuros) e a Agência. É quem conduz a produção
   com a Minerva. E-mail: victorbarrosoc@gmail.com.
-- Roberto Pivotto: sócio. Gate humano de publicação. Pede prática real,
-  manteve o CTA "eu quero", tem estratégia de perfil pessoal em andamento.
-  Foi com Leonardo ao Startup Summit 2026 em Florianópolis.
-- Leonardo Pivotto: sócio-fundador da EJUP e da EIX CORE. Autor do artigo "O
+- Roberto Pivotto ("Beto" nas reuniões): sócio e CEO, articula o time.
+  Também é sócio da EIX CORE.
+  Gate humano de publicação. Pede prática real, manteve o CTA "eu quero",
+  tem estratégia de perfil pessoal em andamento. Foi com Leonardo ao Startup
+  Summit 2026 em Florianópolis.
+- Leonardo Pivotto ("Léo"): sócio-fundador da EJUP e da EIX CORE. Cuida do
+  financeiro e da gestão. Autor do artigo "O
   poder de polícia ambiental municipal: eficácia do licenciamento ambiental
   simplificado".
-- Dr. Jarbas Bezerra: sócio, juiz educador. Na marca pessoal dele o martelo
+- Dr. Jarbas Bezerra: cliente da EJUP (não é sócio), juiz educador. Na marca pessoal dele o martelo
   é biografia, e por isso a exceção à proibição do objeto.
-- Rossana: personagem da escola, citada como marca pessoal nos boards
-  futuros. Função e sobrenome não estão na base.
+- Rossana Fonseca: sócia, frente institucional e jurídica, em São Paulo.
+  Citada como marca pessoal nos boards futuros.
+- Arthur: consultor da Nova Gestão, consultoria comercial contratada em
+  outubro de 2026.
 - Anna (@annacnevss) e Gabi (@gabid.rocha): entraram no marketing em agosto
   de 2026. No EJUPcast pesquisam o convidado, escrevem o roteiro de perguntas
   para o host e fazem a marcação em tempo real (minuto, tema, por que serve).
   Elas não conduzem o podcast.
-- Rhuan: designer humano da Agência, executa peças estáticas no fluxo do
-  squad.
+- Designer humano da Agência: vaga a definir. O Rhuan não ocupa mais a
+  função (08/10/2026). Enquanto isso, a Minerva fecha a peça estática.
 - Thiago Praxedes de Vasconcelos e Thiago de Moura Correia: advogados,
   autores do artigo "A legitimidade da investigação defensiva no processo
   penal" (capa produzida para a coluna do site).
@@ -161,6 +166,7 @@ doutrina, canal especializado, profissional de referência).
   Mapeados e ainda não gravados: Nicácio Carvalho (ex-presidente da Comissão
   da Jovem Advocacia, pilar Direito) e Rodrigo Romão (diretor do IMD, pilar
   Negócios e inovação).
+- Sócios da EJUP: Roberto, Leonardo, Rossana e Victor.
 - Ecossistema: EJUP Experts, EJUP Qórum, EIX CORE/XCore. Existem na
   arquitetura interna e só aparecem em comunicação com autorização.
 
@@ -177,6 +183,30 @@ episódio equilibrado cobre vários. Hook não é isca: se a pessoa parar no hoo
 e não assistir ao resto, ela ainda levou algo verdadeiro. Esteira de produção:
 transcrever (Manus) → marcar (humano + IA) → derivar (IA) → revisar (humano)
 → publicar (agenda).
+
+## ESTRATÉGIA COMERCIAL (sprint até 17/12/2026)
+
+Registro completo em `docs/minerva/estrategia-2026-10-08-nova-gestao.md` e no
+documento vivo "Plano de Rota EJUP" (Claude Docs do Victor). Tudo é proposta
+até os quatro sócios decidirem.
+
+- Diagnóstico: a receita veio de serviço (Sebraetec, podcast); a escola
+  produz autoridade sem produto para onde levar; foco disperso.
+- Tese: a EJUP como porta de entrada educacional de um hub de negócios com
+  base jurídica. Formação, modelagem do negócio, aceleração por seleção.
+- Produto de entrada proposto: programa-piloto pago de 8 semanas, presencial,
+  turma de 8 a 12 advogados com 5 anos ou mais de prática ou sócios de
+  escritório, seleção por entrevista, banca no fim. Curso livre; pós só com
+  instituição credenciada.
+- Escada: conteúdo gratuito, workshop, piloto, trilha longa, aceleração.
+- Calendário: pesquisa até 22/10, oferta até 05/11, workshops às quintas de
+  12/11 a 03/12, pré-venda até 10/12, decisão em 17/12 (8 ou mais matrículas
+  com sinal abre a turma), piloto de 17/02 a 07/04/2027.
+- Conteúdo: cerca de metade na tese do produto, um terço em autoridade
+  jurídica, o resto em bastidor. Todo EJUPcast termina apontando o workshop
+  ou a pré-reserva. Sem promessa de ganho, sem cashback em peça, "pós" só
+  depois do convênio. EIX CORE autorizada como caso público do método
+  (Leonardo e Roberto são sócios dela), com a EJUP acima na peça.
 
 ## IDENTIDADE VISUAL (o que é lei)
 
@@ -296,6 +326,10 @@ quando o domínio estiver bloqueado. Skills disponíveis: banana (imagem por
 IA), playwright-mcp, critique-*, manual-video-editor, pdf, docx, xlsx, pptx.
 
 ## PENDÊNCIAS CONHECIDAS
+
+Estratégia: decisão dos sócios sobre produto, persona e régua da casa; mapa
+de dores por persona pedido pelo Arthur; 15 a 20 entrevistas; composição da
+sociedade (a saída de antigos integrantes) encaminhada pelos sócios.
 
 Dia 2 da imersão sem PDF. Rótulos do app Edits não conferidos. Grafia
 Serquiz/Cerquiz e Fusion Clinic não confirmadas. DDD do telefone. Roberto ia

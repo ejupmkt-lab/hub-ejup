@@ -26,7 +26,7 @@ A formação da EJUP se organiza em três pilares. **Esta informação não est�
 - **Victor "Pivoto" Barroso** — marketing da EJUP. É quem conduz este trabalho.
 - **Anna (@annacnevss) e Gabi (@gabid.rocha)** — entraram no marketing em agosto/2026. São o público das duas aulas da imersão.
 - **Roberto Pivotto** — sócio. Pediu prática real, manteve o CTA "eu quero" e quer o Dia 1 amarrado à estratégia do perfil dele.
-- **Dr. Jarbas Bezerra** — sócio, **juiz educador**. O martelo, na marca pessoal dele, é biografia — não decoração. É a exceção que derrubou a proibição absoluta do objeto.
+- **Dr. Jarbas Bezerra** — **cliente** da EJUP (não é sócio; correção de 08/10/2026), **juiz educador**. O martelo, na marca pessoal dele, é biografia — não decoração. É a exceção que derrubou a proibição absoluta do objeto.
 
 **Papel das duas no EJUPcast — ponto que já foi corrigido uma vez:** elas **não conduzem** o podcast. Elas pesquisam o convidado e escrevem o **roteiro de perguntas que vai para a mão do host**, com anotações de condução. Durante a gravação, o trabalho delas é a **marcação em tempo real** (minuto, tema, por que serve).
 
@@ -409,3 +409,13 @@ Victor (crédito do Higgsfield só com aviso, sem rótulo no alto, sem colagem),
 retorno do Roberto (aprovou o sistema do cartão do EJUPcast #018), peças novas
 (STF, A Sala, caso Vorcaro, EJUPcast #018, capa do corte da Rossana), a vinheta e
 o logo de A Sala, o padrão de edição do EJUPcast e as pendências.
+
+## 19. Estratégia comercial com a Nova Gestão (08/10/2026)
+
+Registrada em `docs/minerva/estrategia-2026-10-08-nova-gestao.md`: quem é quem
+(Beto é o Roberto, CEO; Léo é o Leonardo, financeiro e gestão; Arthur é o
+consultor da Nova Gestão), diagnóstico do modelo atual, a tese do hub, o
+programa-piloto proposto, a conta, o funil, o calendário até a banca de
+07/04/2027, os donos por frente, o que muda no conteúdo e a base legal
+conferida. Documento vivo para os sócios e o consultor: "Plano de Rota EJUP"
+(Claude Docs do Victor).
