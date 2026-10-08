@@ -22,18 +22,17 @@ antes de produzir peça, roteiro ou conteúdo.
 | Nome na reunião | Quem é | Papel |
 |---|---|---|
 | Arthur | Consultor da **Nova Gestão**, consultoria comercial contratada | Conduz a estruturação comercial. Haverá novas reuniões |
-| **Beto** | **Roberto Pivotto** (mesma pessoa) | CEO. Articula o time e apresenta a visão de hub e aceleradora. Segue como gate humano de publicação |
+| **Beto** | **Roberto Pivotto** (mesma pessoa) | CEO. Articula o time e apresenta a visão de hub e aceleradora. Sócio da EIX CORE. Segue como gate humano de publicação |
 | Léo | Leonardo Pivotto | Financeiro e gestão, formulação do negócio. Sócio-fundador da EIX CORE |
 | Rossana | Rossana Fonseca | Institucional e jurídico, em São Paulo |
 | Victor | Victor Barroso | Audiovisual, produção e operação. Conduz o trabalho com a Minerva e o Maestro |
 
 A reunião fala em "vocês quatro" (Roberto, Leonardo, Rossana, Victor).
-**Gileno, citado na reunião, não faz parte da equipe** (correção do Victor,
-08/10/2026): não aparece como professor, condutor de semana nem dono de frente.
-**A confirmar com o Victor:** o Dr. Jarbas Bezerra aparece como sócio na base
-da marca e não foi citado; o CLAUDE.md §8 cita o Rhuan como designer da
-Agência, e a composição da Agência precisa ser confirmada. Não alterar o
-CLAUDE.md sem a palavra do Victor.
+**Correções do Victor (08/10/2026):** os sócios da EJUP são os quatro acima.
+O Dr. Jarbas Bezerra é **cliente**, e não sócio. O Rhuan não ocupa mais a
+função de designer da Agência (CLAUDE.md §8 atualizado). **Gileno e Gustavo,
+citados na reunião, não fazem parte da equipe**: não aparecem como professor,
+condutor de semana nem dono de frente.
 
 ## 2. Diagnóstico: o modelo de hoje
 
@@ -118,11 +117,9 @@ participação e decisão.
   fundadores de negócios jurídicos e parceiros (Sebrae, IMD, OAB). Todo
   episódio termina apontando o workshop ou a lista de pré-reserva.
 - **Página de pré-reserva** com programa, datas, seleção e preço.
-- **Minerva como orientadora do portal do aluno:** o carrossel e a seção do
-  site já estão prontos (`peças/minerva-divulgacao/`), e a divulgação espera o
-  programa existir, porque a peça convida para algo que ainda não está à venda.
-- **EIX CORE como caso público:** só com autorização registrada (CLAUDE.md
-  §7). Falta o registro; pedido a Leonardo e Victor.
+- **EIX CORE como caso público do método: autorizada.** Leonardo e Roberto
+  são sócios dela (Victor, 08/10/2026; registro no CLAUDE.md §10). Na peça, a
+  EJUP aparece como a escola e a EIX CORE como o caso.
 - O pilar **Negócios e inovação** passa a protagonista; Direito e Power
   Skills sustentam o programa por dentro.
 - A frase de corte do manifesto vira processo seletivo: turma pequena,
@@ -162,7 +159,7 @@ Sebraetec. Conferir antes de qualquer peça que dependa deles.
 - Benchmark: Link School, Kaizen, Amentoria e MLS.
 - Os dez pontos de risco ao advogado e ao contador (Rossana).
 - Caixa dos últimos seis meses e contrato da casa (Leonardo).
-- Composição da sociedade confirmada.
+- Saída de antigos integrantes formalizada pelos sócios.
 - Para a próxima reunião com a Nova Gestão: as perguntas ao Arthur estão no
   documento vivo (modelo financeiro do piloto, estrutura mínima para quatro
   sócios, processo comercial, indicadores semanais, remuneração de

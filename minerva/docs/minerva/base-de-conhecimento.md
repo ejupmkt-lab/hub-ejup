@@ -136,6 +136,7 @@ doutrina, canal especializado, profissional de referência).
   (EJUPcast, O Código, canais futuros) e a Agência. É quem conduz a produção
   com a Minerva. E-mail: victorbarrosoc@gmail.com.
 - Roberto Pivotto ("Beto" nas reuniões): sócio e CEO, articula o time.
+  Também é sócio da EIX CORE.
   Gate humano de publicação. Pede prática real, manteve o CTA "eu quero",
   tem estratégia de perfil pessoal em andamento. Foi com Leonardo ao Startup
   Summit 2026 em Florianópolis.
@@ -143,7 +144,7 @@ doutrina, canal especializado, profissional de referência).
   financeiro e da gestão. Autor do artigo "O
   poder de polícia ambiental municipal: eficácia do licenciamento ambiental
   simplificado".
-- Dr. Jarbas Bezerra: sócio, juiz educador. Na marca pessoal dele o martelo
+- Dr. Jarbas Bezerra: cliente da EJUP (não é sócio), juiz educador. Na marca pessoal dele o martelo
   é biografia, e por isso a exceção à proibição do objeto.
 - Rossana Fonseca: sócia, frente institucional e jurídica, em São Paulo.
   Citada como marca pessoal nos boards futuros.
@@ -153,8 +154,8 @@ doutrina, canal especializado, profissional de referência).
   de 2026. No EJUPcast pesquisam o convidado, escrevem o roteiro de perguntas
   para o host e fazem a marcação em tempo real (minuto, tema, por que serve).
   Elas não conduzem o podcast.
-- Rhuan: designer humano da Agência, executa peças estáticas no fluxo do
-  squad.
+- Designer humano da Agência: vaga a definir. O Rhuan não ocupa mais a
+  função (08/10/2026). Enquanto isso, a Minerva fecha a peça estática.
 - Thiago Praxedes de Vasconcelos e Thiago de Moura Correia: advogados,
   autores do artigo "A legitimidade da investigação defensiva no processo
   penal" (capa produzida para a coluna do site).
@@ -165,6 +166,7 @@ doutrina, canal especializado, profissional de referência).
   Mapeados e ainda não gravados: Nicácio Carvalho (ex-presidente da Comissão
   da Jovem Advocacia, pilar Direito) e Rodrigo Romão (diretor do IMD, pilar
   Negócios e inovação).
+- Sócios da EJUP: Roberto, Leonardo, Rossana e Victor.
 - Ecossistema: EJUP Experts, EJUP Qórum, EIX CORE/XCore. Existem na
   arquitetura interna e só aparecem em comunicação com autorização.
 
@@ -203,8 +205,8 @@ até os quatro sócios decidirem.
 - Conteúdo: cerca de metade na tese do produto, um terço em autoridade
   jurídica, o resto em bastidor. Todo EJUPcast termina apontando o workshop
   ou a pré-reserva. Sem promessa de ganho, sem cashback em peça, "pós" só
-  depois do convênio. EIX CORE em público só com autorização registrada.
-  Divulgação da Minerva no portal espera o programa existir.
+  depois do convênio. EIX CORE autorizada como caso público do método
+  (Leonardo e Roberto são sócios dela), com a EJUP acima na peça.
 
 ## IDENTIDADE VISUAL (o que é lei)
 
@@ -327,7 +329,7 @@ IA), playwright-mcp, critique-*, manual-video-editor, pdf, docx, xlsx, pptx.
 
 Estratégia: decisão dos sócios sobre produto, persona e régua da casa; mapa
 de dores por persona pedido pelo Arthur; 15 a 20 entrevistas; composição da
-sociedade a confirmar (Dr. Jarbas não foi citado na reunião de 08/10).
+sociedade (a saída de antigos integrantes) encaminhada pelos sócios.
 
 Dia 2 da imersão sem PDF. Rótulos do app Edits não conferidos. Grafia
 Serquiz/Cerquiz e Fusion Clinic não confirmadas. DDD do telefone. Roberto ia

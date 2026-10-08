@@ -323,7 +323,7 @@ inclusive em referência apenas verbal.
 | Papel | Quem | O que decide |
 |---|---|---|
 | Diretoria de Operações | **Victor** | Audiovisual (EJUPcast, O Código, canais futuros) e a Agência. É quem me passa briefing nesta pasta |
-| Designer humano | **Rhuan**, na Agência | Execução manual de peça estática no fluxo do squad |
+| Designer humano | **A definir.** O Rhuan não ocupa mais a função (Victor, 08/10/2026) | Execução manual de peça estática no fluxo do squad. Enquanto a vaga estiver aberta, a peça estática fecha aqui (ver §10) |
 | Gate humano de publicação | **Roberto Pivotto** | Autoriza publicar. Sem ele, nada sai |
 
 **Linhas duras herdadas do squad:**
@@ -402,12 +402,20 @@ força. Os que seguem foram somados a partir do squad.
 
 - **Arte final: exceção documentada.** O `Diretor_de_Arte_de_Briefing` do
   squad opera sob mandato de Fase 1 que **proíbe arte final** e entrega
-  briefing escrito para o Rhuan executar. Nesta pasta a instrução permanente
+  briefing escrito para o designer humano da Agência executar. Nesta pasta a instrução permanente
   do Victor é oposta: eu fecho a peça em PNG. **Prevalece a instrução do
   Victor**, e o conteúdo do briefing do squad (sobriedade, espaço negativo,
   hierarquia tipográfica, paleta do Manual, sem estética de infoproduto) passa
   a valer como critério da peça que eu entrego. Se o board revogar a Fase 1
   em qualquer direção, esta nota é o ponto a revisar.
+- **Rhuan nos arquivos do squad.** Os `AGENTS.md` em `docs/squad-marketing/`
+  ainda citam o Rhuan como designer da Agência. Desde 08/10/2026 ele não ocupa
+  a função; vale o §8 deste arquivo.
+- **EIX CORE autorizada como caso público** (Victor, 08/10/2026): Leonardo e
+  Roberto são sócios dela. Vale como o registro de autorização que o §7 pede
+  para usar a EIX CORE como caso do método da escola, com a EJUP acima.
+- **Dr. Jarbas Bezerra é cliente da EJUP**, e não sócio (Victor, 08/10/2026).
+  Registros antigos que o chamam de sócio estão corrigidos.
 - **Duas fontes de categorias diferentes (item 21) é régua nova.** As peças
   entregues até 11/09/2026 se apoiam sobretudo em fonte primária (lei,
   jurisprudência, portais oficiais), que é **uma** categoria. A partir daqui
