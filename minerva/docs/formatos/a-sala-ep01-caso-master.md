@@ -13,26 +13,17 @@ citado.
 
 ## Aviso de abertura (antes da primeira fala)
 
-Texto branco sobre fundo escuro, Gotham Light, centralizado, sem logo e sem
-música alta. Entra e sai em fade. Cerca de 4 segundos por tela.
+Uma tela só (decisão do Victor, 08/10/2026). Texto branco sobre fundo escuro,
+Gotham Light, centralizado, sem logo e sem música alta. Entra e sai em fade.
+Cerca de 8 segundos.
 
-**Versão completa (YouTube), três telas:**
-
-1. Este episódio foi construído a partir de reportagens da imprensa, de
-   documentos públicos e da legislação brasileira.
-2. As informações refletem o que era público até [DATA DA PUBLICAÇÃO]. O caso
-   segue em investigação e pode mudar.
-3. Citar um nome significa relatar o que foi publicado. Ninguém citado neste
-   episódio foi condenado, e a Constituição garante a presunção de inocência
-   (art. 5º, LVII).
-
-Rodapé da última tela, menor: *As fontes estão na descrição do episódio.*
-
-**Versão curta (Reels e cortes), uma tela:**
-
-> Baseado em reportagens da imprensa, documentos públicos e na legislação,
-> com informações disponíveis até [DATA]. Ninguém citado foi condenado.
-> Fontes na descrição.
+> Este episódio se baseia em reportagens da imprensa, em documentos públicos
+> e na legislação brasileira, com informações disponíveis até [DATA].
+>
+> Os nomes citados aparecem nessas fontes. Ninguém foi condenado, e a
+> Constituição garante a presunção de inocência.
+>
+> *Fontes na descrição do episódio.* (rodapé, menor)
 
 **Antes de usar:** conferir no dia da publicação se continua verdade que
 ninguém citado foi condenado; trocar as fontes da Wikipédia da tabela por
