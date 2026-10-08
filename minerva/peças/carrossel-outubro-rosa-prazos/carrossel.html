@@ -11,7 +11,7 @@ body{background:#222;font-family:Gotham,Montserrat,sans-serif;-webkit-font-smoot
 .navy{background:var(--navy)} .ink{background:var(--ink)}
 .papel{background:linear-gradient(160deg,#f8f6f1,#eeeae1);color:var(--graphite)}
 .conteudo{position:absolute;left:96px;right:96px;top:100px;bottom:230px;display:flex;flex-direction:column;justify-content:center;z-index:2}
-.logo{position:absolute;left:0;right:0;bottom:80px;display:flex;justify-content:center}
+.logo{position:absolute;left:0;right:0;bottom:80px;display:flex;justify-content:center;z-index:3}
 .logo svg{height:54px;width:auto}
 em{font-style:normal;color:var(--gold)} .papel em{color:var(--bronze)}
 .eyebrow{font-weight:500;font-size:26px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:26px}
@@ -31,11 +31,13 @@ h2{font-weight:900;font-size:68px;line-height:1.06;letter-spacing:-.03em;margin-
 .papel .eyebrow{color:var(--navy)}
 .papel .fonte{color:var(--graphite);opacity:.9}
 .laco{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+.foto{position:absolute;left:0;top:0;width:100%;height:1120px;background:url("file:///home/user/EJUPMinerva/pe%C3%A7as/carrossel-outubro-rosa-prazos/fotos/capa.jpg") 0 0/auto 1120px no-repeat;z-index:0}
+.scrim{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(74,23,64,0) 26%,rgba(74,23,64,.8) 47%,#4a1740 70%);z-index:1}
 /* capa */
-.capa .conteudo{justify-content:center}
-.gigante{font-weight:900;font-size:250px;line-height:.95;letter-spacing:-.045em;color:var(--gold)}
-.capa h1{max-width:700px;font-weight:900;font-size:60px;line-height:1.08;letter-spacing:-.025em;margin-top:18px}
-.sub{font-weight:300;font-size:34px;line-height:1.4;color:var(--silver);margin-top:34px;max-width:640px}
+.capa .conteudo{justify-content:flex-end;top:60px;bottom:200px}
+.gigante{font-weight:900;font-size:230px;line-height:.95;letter-spacing:-.045em;color:var(--gold)}
+.capa h1{font-weight:900;font-size:58px;line-height:1.08;letter-spacing:-.025em;margin-top:18px}
+.sub{font-weight:300;font-size:34px;line-height:1.4;color:var(--silver);margin-top:28px}
 .deslize{align-self:flex-start;margin-top:44px;background:var(--gold);color:var(--ink);font-weight:700;font-size:26px;letter-spacing:.12em;text-transform:uppercase;padding:18px 34px;border-radius:4px}
 .deslize i{font-style:normal;margin-left:10px}
 .num{position:absolute;right:-50px;bottom:140px;font-weight:900;font-size:520px;line-height:1;color:transparent;-webkit-text-stroke:3px rgba(209,211,212,.12);letter-spacing:-.04em;z-index:1}
@@ -91,16 +93,7 @@ h2{font-weight:900;font-size:68px;line-height:1.06;letter-spacing:-.03em;margin-
 .cta .corpo{color:var(--silver);font-size:34px}
 .assin{margin-top:56px;border-top:2px solid rgba(209,211,212,.25);padding-top:26px;display:flex;flex-direction:column;gap:8px}
 .assin b{font-weight:900;font-size:34px} .assin span{font-weight:300;font-size:28px;color:var(--silver)}
-</style></head><body><section class="s navy capa"><svg class="laco" viewBox="0 0 1080 1440" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd1e1"/><stop offset=".45" stop-color="#f08cb0"/><stop offset="1" stop-color="#b8386f"/></linearGradient>
-<filter id="gl" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter>
-</defs>
-<g transform="translate(410 -200) scale(.95) rotate(10 540 700)">
-<path d="M380 1020 C470 900 520 780 540 700 C600 600 700 450 690 300 C680 160 520 130 430 200 C350 270 430 480 540 700 C560 780 610 900 700 1020" fill="none" stroke="#f08cb0" stroke-width="96" stroke-linecap="round" stroke-linejoin="round" opacity=".55" filter="url(#gl)"/>
-<path d="M380 1020 C470 900 520 780 540 700 C600 600 700 450 690 300 C680 160 520 130 430 200 C350 270 430 480 540 700 C560 780 610 900 700 1020" fill="none" stroke="url(#g1)" stroke-width="84" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
-<path d="M380 1020 C470 900 520 780 540 700 C600 600 700 450 690 300 C680 160 520 130 430 200 C350 270 430 480 540 700 C560 780 610 900 700 1020" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".5" transform="translate(-14 -14)"/>
-</g></svg><div class="conteudo">
+</style></head><body><section class="s navy capa"><div class="foto"></div><div class="scrim"></div><div class="conteudo">
   <div class="eyebrow">19 de outubro · Câncer de mama</div>
   <div class="gigante">78.610</div>
   <h1>novos casos de câncer de mama <em>por ano</em> no Brasil</h1>

@@ -23,3 +23,5 @@ Conteúdo informativo, sem orientação a caso individual.
 - Menos de 10% de reconstrução imediata: INCA, via resumo.
 - Segunda fonte de categoria diferente (item 21): os estudos acima servem, depois de abertos na origem.
 - Publicação depende da aprovação de Roberto Pivotto.
+
+Crédito da foto da capa: Miguel Á. Padriñán, Pexels (licença gratuita, sem exigência de atribuição). Tratamento em duotone rosa.

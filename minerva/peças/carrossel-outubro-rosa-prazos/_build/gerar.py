@@ -45,7 +45,7 @@ t1 = tela("navy capa", '''
   <h1>novos casos de câncer de mama <em>por ano</em> no Brasil</h1>
   <p class="sub">Estimativa do INCA para 2026 a 2028. Os números, os prazos que a lei fixa e a distância entre os dois.</p>
   <div class="deslize">Deslize <i>→</i></div>
-''', LOGO_B, LACO)
+''', LOGO_B, '<div class="foto"></div><div class="scrim"></div>')
 
 # 2 panorama
 t2 = tela("papel", f'''
@@ -141,7 +141,7 @@ body{{background:#222;font-family:Gotham,Montserrat,sans-serif;-webkit-font-smoo
 .navy{{background:var(--navy)}} .ink{{background:var(--ink)}}
 .papel{{background:linear-gradient(160deg,#f8f6f1,#eeeae1);color:var(--graphite)}}
 .conteudo{{position:absolute;left:96px;right:96px;top:100px;bottom:230px;display:flex;flex-direction:column;justify-content:center;z-index:2}}
-.logo{{position:absolute;left:0;right:0;bottom:80px;display:flex;justify-content:center}}
+.logo{{position:absolute;left:0;right:0;bottom:80px;display:flex;justify-content:center;z-index:3}}
 .logo svg{{height:54px;width:auto}}
 em{{font-style:normal;color:var(--gold)}} .papel em{{color:var(--bronze)}}
 .eyebrow{{font-weight:500;font-size:26px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:26px}}
@@ -161,11 +161,13 @@ h2{{font-weight:900;font-size:68px;line-height:1.06;letter-spacing:-.03em;margin
 .papel .eyebrow{{color:var(--navy)}}
 .papel .fonte{{color:var(--graphite);opacity:.9}}
 .laco{{position:absolute;inset:0;width:100%;height:100%;z-index:1}}
+.foto{{position:absolute;left:0;top:0;width:100%;height:1120px;background:url("{(OUT / 'fotos' / 'capa.jpg').as_uri()}") 0 0/auto 1120px no-repeat;z-index:0}}
+.scrim{{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(74,23,64,0) 26%,rgba(74,23,64,.8) 47%,#4a1740 70%);z-index:1}}
 /* capa */
-.capa .conteudo{{justify-content:center}}
-.gigante{{font-weight:900;font-size:250px;line-height:.95;letter-spacing:-.045em;color:var(--gold)}}
-.capa h1{{max-width:700px;font-weight:900;font-size:60px;line-height:1.08;letter-spacing:-.025em;margin-top:18px}}
-.sub{{font-weight:300;font-size:34px;line-height:1.4;color:var(--silver);margin-top:34px;max-width:640px}}
+.capa .conteudo{{justify-content:flex-end;top:60px;bottom:200px}}
+.gigante{{font-weight:900;font-size:230px;line-height:.95;letter-spacing:-.045em;color:var(--gold)}}
+.capa h1{{font-weight:900;font-size:58px;line-height:1.08;letter-spacing:-.025em;margin-top:18px}}
+.sub{{font-weight:300;font-size:34px;line-height:1.4;color:var(--silver);margin-top:28px}}
 .deslize{{align-self:flex-start;margin-top:44px;background:var(--gold);color:var(--ink);font-weight:700;font-size:26px;letter-spacing:.12em;text-transform:uppercase;padding:18px 34px;border-radius:4px}}
 .deslize i{{font-style:normal;margin-left:10px}}
 .num{{position:absolute;right:-50px;bottom:140px;font-weight:900;font-size:520px;line-height:1;color:transparent;-webkit-text-stroke:3px rgba(209,211,212,.12);letter-spacing:-.04em;z-index:1}}
