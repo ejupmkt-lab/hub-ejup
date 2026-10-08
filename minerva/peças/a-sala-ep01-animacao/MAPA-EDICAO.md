@@ -9,6 +9,11 @@ Roteiro: `docs/formatos/a-sala-ep01-caso-master.md`.
 - **Cartela**: tela estática de `peças/a-sala-ep01-telas/telas/tela-NN.png`.
   - Fica na tela enquanto a fala dura.
 
+## Aviso de abertura (antes de tudo, cerca de 8 s)
+
+Tela escura, texto branco em Gotham Light, centralizado. Texto em
+`docs/formatos/a-sala-ep01-caso-master.md`, seção "Aviso de abertura".
+
 ## Abertura fria
 
 | Fala do Roberto | Imagem |
@@ -30,7 +35,7 @@ Roteiro: `docs/formatos/a-sala-ep01-caso-master.md`.
 | "O Banco Central… fechou o Master e assumiu o controle do que sobrou." | vídeo `07-liquidacao` (a chave muda de mão) |
 | "O nome técnico disso é liquidação extrajudicial. Pensa numa intervenção…" | cartela 03 (Liquidação extrajudicial) |
 | "A Polícia Federal… No mesmo dia em que o banco foi fechado, prendeu Vorcaro…" | vídeo `tela-08` (avião, data, PF) |
-| "Segundo a PF, ele estava de saída do país." | cartela 04 (18.11.2025) |
+| "Segundo a PF, ele estava de saída do país." | cartela 04 (18.11.2025) + **rodapé novo, 4 s:** "Vorcaro nega que tentava fugir. A defesa diz que a viagem tinha sido informada antes." · Fontes: Diário de Pernambuco e Trademap, 30.09.2026 |
 | "E um milhão e seiscentas mil pessoas…" | volta à cartela 02, ou Roberto na câmera |
 
 ## Parte 2 · A isca
@@ -60,6 +65,7 @@ Roteiro: `docs/formatos/a-sala-ep01-caso-master.md`.
 | "Em março de 2025, antes de virar relator, Mendonça se encontrou com Vorcaro…" | cartela 13 (linha do tempo) |
 | "…mulher do ministro Alexandre de Moraes…" | vídeo `pessoas/moraes`, depois cartela 16 |
 | "Uma delas é do dia da prisão: 'conseguiu ter notícia ou bloquear?'" | cartela 17 (a mensagem) |
+| "Moraes nega qualquer relação… As respostas do outro lado nunca foram encontradas." | segue a cartela 17 + **rodapé novo, 5 s:** "A PGR pediu ao STF a anulação deste relatório da PF. O julgamento está suspenso desde 15.09.2026, sem decisão." · Fontes: Congresso em Foco, Migalhas |
 | "…o ministro Gilmar Mendes disse numa sessão… 'até a máfia tem ética'." | vídeo `pessoas/gilmar` (7 s, com a frase); cartela 18 se quiser segurar mais |
 
 ## Parte 4 · O que a lei diz

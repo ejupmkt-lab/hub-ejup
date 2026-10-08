@@ -278,15 +278,18 @@ O caso está em andamento. **Reconferir tudo no dia da gravação.**
 |---|---|
 | Liquidação do Master e prisão de Vorcaro em Guarulhos, 18/11/2025, operação Compliance Zero | [JOTA](https://www.jota.info/tributos-e-empresas/mercado/banco-central-decreta-liquidacao-do-banco-master-e-pf-prende-daniel-vorcaro-dono-do-banco) · [CNN Brasil](https://www.cnnbrasil.com.br/economia/money/macroeconomia/vorcaro-preso-relembre-crise-que-levou-a-liquidacao-do-banco-master/) |
 | Cerca de 1,6 milhão de credores; maior acionamento do FGC | [CNN Brasil](https://www.cnnbrasil.com.br/economia/money/macroeconomia/caso-master-relembre-a-liquidacao-do-banco-que-envolve-bc-stf-e-tcu/) · [Transparência Internacional Brasil](https://transparenciainternacional.org.br/posts/o-caso-master/) |
-| CDB acima do mercado; recursos em fundos com papéis de empresas em crise | [Wikipédia, com referências](https://pt.wikipedia.org/wiki/Esc%C3%A2ndalo_do_Banco_Master) |
+| CDB acima do mercado | [Agência Pública](https://apublica.org/2026/03/banco-master-a-reconstrucao-completa-de-como-uma-fraude-capturou-a-republica/) · [BBC News Brasil via O Povo](https://www.opovo.com.br/agencia/bbc/2026/01/27/o-que-se-sabe-ate-agora-sobre-crise-do-banco-master-e-o-que-falta-descobrir.html) |
+| Recursos em fundos ligados ao banco | [Metrópoles](https://www.metropoles.com/sao-paulo/master-repassou-r-36-bilhoes-em-dividas-para-gestora-investigada) · [Times Brasil](https://timesbrasil.com.br/brasil/banco-master-movimentou-r-36-bilhoes-em-creditos-para-fundos-da-reag/) |
 | Regras do FGC | [InfoMoney](https://www.infomoney.com.br/minhas-financas/qual-e-o-valor-maximo-garantido-pelo-fgc-veja-as-regras/) · regulamento em fgc.org.br |
-| Toffoli deixa a relatoria em 12/02/2026; sorteio de Mendonça | [Wikipédia, Caso Master no STF](https://pt.wikipedia.org/wiki/Caso_Master_no_Supremo_Tribunal_Federal) · confirmar no portal do STF |
-| Nova prisão em março de 2026, estrutura para vigiar e intimidar desafetos, referendo da Segunda Turma | [Wikipédia, Caso Master no STF](https://pt.wikipedia.org/wiki/Caso_Master_no_Supremo_Tribunal_Federal) · [CNN Brasil](https://www.cnnbrasil.com.br/economia/money/macroeconomia/caso-master-relembre-a-liquidacao-do-banco-que-envolve-bc-stf-e-tcu/) |
+| Toffoli deixa a relatoria em 12/02/2026; sorteio de Mendonça | [O Povo](https://mais.opovo.com.br/jornal/politica/2026/02/12/toffoli-deixa-caso-master-apos-pf-apontar-mencoes-a-ele-nocelular-de-banqueiro.html) · [Jornal do Brasil](https://www.jb.com.br/brasil/justica/2026/02/amp/1058656-stf-distribui-inquerito-do-banco-master-para-andre-mendonca-por-sorteio.html) |
+| Nova prisão em março de 2026, estrutura para vigiar e intimidar desafetos, referendo da Segunda Turma | [Mercado & Consumo](https://mercadoeconsumo.com.br/04/03/2026/economia/pf-cumpre-prisao-de-vorcaro-por-ordem-de-mendonca-em-nova-fase-de-operacao-sobre-banco-master/) · [BandNews FM](https://www.band.com.br/bandnews-fm/noticias/por-unanimidade-2-turma-do-stf-mantem-prisao-de-daniel-vorcaro-202603202151) · [CNN Brasil](https://www.cnnbrasil.com.br/economia/money/macroeconomia/caso-master-relembre-a-liquidacao-do-banco-que-envolve-bc-stf-e-tcu/) |
 | Reunião Mendonça e Vorcaro em 14/03/2025, Instituto Iter; resposta de Mendonça | [Agência Pública](https://apublica.org/2026/09/analise-as-revelacoes-sobre-master-vorcaro-moraes-e-mendonca/) |
 | Contrato do escritório de Viviane Barci de Moraes; mensagens atribuídas pela PF; negativa de Moraes | [Agência Pública](https://apublica.org/2026/09/analise-as-revelacoes-sobre-master-vorcaro-moraes-e-mendonca/) · [Metrópoles](https://www.metropoles.com/brasil/10-meses-apos-liquidacao-master-faz-stf-entrar-em-guerra-e-afeta-eleicao) |
-| "Até a máfia tem ética", Gilmar Mendes | Metrópoles, Terra (verificado na capa da coluna jurídica) |
+| "Até a máfia tem ética", Gilmar Mendes, sessão de 15/09/2026 | [O Hoje](https://ohoje.com/2026/09/15/ate-a-mafia-tem-etica-diz-gilmar-mendes-durante-julgamento-do-caso-master/) · [O Povo](https://mais.opovo.com.br/colunistas/regina-ribeiro/2026/09/15/perolas-da-sessao-do-stf-mafia-mentira-falta-de-nocao.html) · Metrópoles, Terra |
 | Impedimento e suspeição | Código de Processo Penal, arts. 252 e 254 |
 | Competência para julgar ministro do STF | CF, art. 102, I, "b" · CF, art. 52, II |
+
+Texto pronto para a descrição do vídeo: `peças/a-sala-ep01-animacao/descricao-fontes.txt`.
 
 **Divergências entre fontes, resolvidas no texto:** o valor do contrato
 aparece como R$ 129 mi e R$ 131 mi (o roteiro diz "cerca de R$ 130 milhões");
