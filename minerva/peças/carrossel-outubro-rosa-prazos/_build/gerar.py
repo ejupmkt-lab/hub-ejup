@@ -13,7 +13,7 @@ def svg(nome):
 
 
 LOGO_B = svg("ejup-horizontal-white.svg")
-LOGO_N = svg("ejup-horizontal-navy.svg")
+LOGO_N = svg("ejup-horizontal-navy.svg").replace("#031c37", "#4a1740").replace("#031C37", "#4a1740")
 SIMB = svg("ejup-symbol-gold.svg")
 
 
@@ -121,7 +121,7 @@ CSS = f'''
 @font-face{{font-family:Gotham;src:url("{FONTS}/Gotham-Medium.otf");font-weight:500}}
 @font-face{{font-family:Gotham;src:url("{FONTS}/Gotham-Bold.otf");font-weight:700}}
 @font-face{{font-family:Gotham;src:url("{FONTS}/Gotham-Black.otf");font-weight:900}}
-:root{{--ink:#0d131a;--navy:#031c37;--steel:#304557;--silver:#d1d3d4;--bronze:#9b6b26;--gold:#f0b855;--graphite:#414042}}
+:root{{--ink:#0d131a;--navy:#4a1740;--steel:#304557;--silver:#d1d3d4;--bronze:#9b6b26;--gold:#f0b855;--graphite:#414042}}
 *{{box-sizing:border-box;margin:0;padding:0}}
 body{{background:#222;font-family:Gotham,Montserrat,sans-serif;-webkit-font-smoothing:antialiased}}
 .s{{position:relative;width:1080px;height:1440px;margin:0 0 40px;overflow:hidden;color:#fff}}
@@ -140,10 +140,10 @@ h2{{font-weight:900;font-size:68px;line-height:1.06;letter-spacing:-.03em;margin
 .fonte{{margin-top:34px;font-weight:300;font-size:24px;line-height:1.35;color:var(--silver);opacity:.85}}
 .papel .fonte{{color:var(--graphite);opacity:.8}}
 
-/* Outubro Rosa: exceção temática, rosa em degradê que esfuma no navy da marca */
-.navy{{background:radial-gradient(circle at 100% 0%,rgba(226,110,155,.55),transparent 55%),linear-gradient(170deg,#8f2a57 0%,#5a1f4a 30%,#031c37 74%)}}
-.navy.capa{{background:radial-gradient(circle at 100% 0%,rgba(226,110,155,.6),transparent 60%),linear-gradient(165deg,#9a2f60 0%,#5a1f4a 34%,#031c37 78%)}}
-.ink{{background:radial-gradient(circle at 0% 100%,rgba(226,110,155,.5),transparent 55%),linear-gradient(190deg,#0d131a 38%,#4d1a43 70%,#8f2a57 100%)}}
+/* Outubro Rosa: exceção temática, rosa em degradê que esfuma em vinho, sem navy */
+.navy{{background:radial-gradient(circle at 100% 0%,rgba(240,130,175,.5),transparent 55%),linear-gradient(170deg,#9a2f60 0%,#74254f 38%,#4a1740 100%)}}
+.navy.capa{{background:radial-gradient(circle at 100% 0%,rgba(240,130,175,.55),transparent 60%),linear-gradient(165deg,#a33466 0%,#74254f 40%,#45153c 100%)}}
+.ink{{background:radial-gradient(circle at 0% 100%,rgba(240,130,175,.45),transparent 55%),linear-gradient(190deg,#2e1029 30%,#5e1f4a 72%,#8f2a57 100%)}}
 .papel{{background:radial-gradient(circle at 100% 0%,#f0aec6 0%,transparent 62%),linear-gradient(160deg,#f6d3de 0%,#f8f6f1 58%,#eeeae1 100%)}}
 .papel .eyebrow{{color:var(--navy)}}
 .papel .fonte{{color:var(--graphite);opacity:.9}}
@@ -189,7 +189,7 @@ h2{{font-weight:900;font-size:68px;line-height:1.06;letter-spacing:-.03em;margin
 /* colunas */
 .cols{{display:flex;gap:60px;align-items:flex-end;height:420px;margin:6px 0 34px;padding:0 20px;border-bottom:3px solid rgba(48,69,87,.4)}}
 .col{{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;position:relative}}
-.col .bar{{background:var(--steel);display:flex;align-items:flex-start;justify-content:center;padding-top:20px}}
+.col .bar{{background:#9a5b7e;display:flex;align-items:flex-start;justify-content:center;padding-top:20px}}
 .col .bar.b2{{background:var(--navy)}}
 .col .bar b{{font-weight:900;font-size:76px;color:#fff;letter-spacing:-.03em}}
 .col span{{position:absolute;bottom:-62px;left:0;right:0;text-align:center;font-weight:500;font-size:30px;color:var(--navy)}}
