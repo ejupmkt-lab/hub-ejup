@@ -9,8 +9,9 @@ Cada episódio é uma tabela em três colunas: IMAGEM, FALA e LETTERING. A fala 
 a mesma do teleprompter (o script confere frase a frase com o gerar.py e para
 se divergir). Palavras entre ** ** são as de ênfase na leitura.
 
-Saída: Roteiro_Tecnico_Dr_Jarbas_19-10.pdf (páginas em imagem, abre em
-qualquer leitor), aqui e em entregas/.
+Saída: Roteiros_Dr_Jarbas_19-10.pdf, só os quatro roteiros (páginas em imagem,
+abre em qualquer leitor), aqui e em entregas/. Capa, ordem do dia e direção de
+fotografia continuam no código, fora do PDF, por pedido do Victor.
 """
 import html, importlib.util, pathlib, re, shutil
 from playwright.sync_api import sync_playwright
@@ -22,7 +23,7 @@ spec = importlib.util.spec_from_file_location("gerar", HERE / "gerar.py")
 g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
 FONTS = (RAIZ / "skills/ejup-design/assets/fonts").as_uri()
 LOGO = (RAIZ / "skills/ejup-design/assets/logo/ejup-horizontal-navy.svg").read_text()
-NOME_ARQ = "Roteiro_Tecnico_Dr_Jarbas_19-10.pdf"
+NOME_ARQ = "Roteiros_Dr_Jarbas_19-10.pdf"
 
 PM = "PM"
 PP = "PP"
@@ -280,6 +281,7 @@ def pagina_ep(k):
 <div class="meta">{html.escape(L["nome"])}<br>cerca de {round(dur)} s · teleprompter/{k}.txt</div></div>
 <table><colgroup><col style="width:25%"><col style="width:47%"><col style="width:28%"></colgroup>
 <thead><tr><th>Imagem</th><th>Fala</th><th>Lettering</th></tr></thead><tbody>{linhas}</tbody></table>
+<p class="legenda">PM: plano médio. PP: primeiro plano, com aproximação na edição. Negrito na fala: palavra de ênfase. Tempos estimados em leitura calma.</p>
 </section>'''
 
 
@@ -300,7 +302,8 @@ def pagina_final():
 
 def main():
     confere()
-    corpo = capa() + pagina_locacao("A") + pagina_ep("A1") + pagina_ep("A2") + pagina_locacao("B") + pagina_ep("B1") + pagina_ep("B2") + pagina_final()
+    # pedido do Victor (08/10): só os roteiros, sem capa, ordem do dia e direção de fotografia
+    corpo = pagina_ep("A1") + pagina_ep("A2") + pagina_ep("B1") + pagina_ep("B2")
     doc = f'<!doctype html><html lang="pt-BR"><meta charset="utf-8"><style>{CSS}</style><body>{corpo}</body></html>'
     arq = HERE / "roteiro_tecnico.html"; arq.write_text(doc)
     vetor = HERE / "roteiro_tecnico_vetor.pdf"
