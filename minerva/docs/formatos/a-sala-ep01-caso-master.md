@@ -11,6 +11,43 @@ citado.
 
 ---
 
+## Aviso de abertura (antes da primeira fala)
+
+Uma tela só (decisão do Victor, 08/10/2026). Texto branco sobre fundo escuro,
+Gotham Light, centralizado, sem logo e sem música alta. Entra e sai em fade.
+Cerca de 8 segundos.
+
+> Este episódio se baseia em reportagens da imprensa, em documentos públicos
+> e na legislação brasileira, com informações disponíveis até 8 de outubro
+> de 2026.
+>
+> Os nomes citados aparecem nessas fontes. Ninguém foi condenado pela Justiça
+> neste caso, e a Constituição garante a presunção de inocência.
+>
+> *Fontes na descrição do episódio.* (rodapé, menor)
+
+**Antes de usar:** conferir no dia da publicação se continua verdade que
+ninguém citado foi condenado; trocar as fontes da Wikipédia da tabela por
+fonte primária (portal do STF) ou por imprensa; incluir a posição da defesa
+de Vorcaro, que ainda não está no roteiro.
+
+**Checagem de 08/10/2026 (publicação prevista para 09/10):**
+- Nenhuma condenação criminal de Vorcaro encontrada. Existe uma condenação
+  **administrativa** da CVM, de 08/09/2026: multa de R$ 20 milhões por fraude
+  no fundo Brazil Realty (BZLI11), de 2018, com recurso ao CRSFN
+  ([Seu Dinheiro](https://www.seudinheiro.com/2026/economia/daniel-vorcaro-e-condenado-por-fraude-pela-primeira-vez-e-tera-que-pagar-r-20-milhoes-em-multa-mas-nao-pelo-motivo-que-voce-pensa-davs/)).
+  Por isso o aviso diz "pela Justiça neste caso".
+- Em 30/09/2026, Vorcaro voltou a negar à PF o plano de fuga; a defesa diz
+  que a viagem foi informada antes
+  ([Diário de Pernambuco](https://www.diariodepernambuco.com.br/politica/2026/09/11725389-vorcaro-volta-a-negar-a-pf-a-existencia-de-grupo-de-intimidacao-e-de-plano-de-fuga.html)).
+  A fala "Segundo a PF, ele estava de saída do país" pede o "Ele nega".
+- Em 01/09/2026, a PGR pediu ao ministro Mendonça a nulidade do relatório da
+  PF sobre as mensagens de Vorcaro com autoridades, Moraes incluído (Pet
+  16.662). Mendonça levou o material ao Plenário, sem decisão até aqui, e
+  Moraes não foi incluído formalmente como investigado
+  ([Congresso em Foco](https://www.congressoemfoco.com.br/conteudo/121871/pgr-pede-nulidade-de-relatorio-sobre-mensagens-de-moraes-e-vorcaro)).
+  A mensagem "Conseguiu ter notícia ou bloquear?" vem desse relatório.
+
 ## Cenário e objetos sobre a mesa
 
 A Sala como gravada: parede escura, cortiça laranja com o papel do símbolo da
