@@ -28,6 +28,8 @@ antes de produzir peça, roteiro ou conteúdo.
 | Victor | Victor Barroso | Audiovisual, produção e operação. Conduz o trabalho com a Minerva e o Maestro |
 
 A reunião fala em "vocês quatro" (Roberto, Leonardo, Rossana, Victor).
+**Gileno, citado na reunião, não faz parte da equipe** (correção do Victor,
+08/10/2026): não aparece como professor, condutor de semana nem dono de frente.
 **A confirmar com o Victor:** o Dr. Jarbas Bezerra aparece como sócio na base
 da marca e não foi citado; o CLAUDE.md §8 cita o Rhuan como designer da
 Agência, e a composição da Agência precisa ser confirmada. Não alterar o
