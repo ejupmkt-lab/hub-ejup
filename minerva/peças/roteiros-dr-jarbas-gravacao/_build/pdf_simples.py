@@ -14,8 +14,8 @@ CSS = f'''{g.FACE}
 html,body{{background:#fff}}
 body{{width:794px;height:1123px;padding:64px 76px;font-family:Gotham,Montserrat,sans-serif;color:#0d131a}}
 h1{{font-weight:900;font-size:17px;letter-spacing:-.005em;margin-bottom:34px;color:#031c37;border-bottom:2px solid #031c37;padding-bottom:12px}}
-.b{{margin-bottom:19px}}
-.b p{{font-size:21px;line-height:1.32;margin-bottom:6px}}'''
+.b{{margin-bottom:24px}}
+.b p{{font-size:23px;line-height:1.46;margin-bottom:6px}}'''
 
 
 def pagina(q, n):

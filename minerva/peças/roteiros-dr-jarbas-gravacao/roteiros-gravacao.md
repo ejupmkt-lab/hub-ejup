@@ -30,14 +30,14 @@ Gravar por quadro, na ordem abaixo. Um take extra do fecho (aviso e convite à p
 
 ## Episódio 1 · A solidão da decisão
 **Base:** Experiência de quase 28 anos na magistratura militar (proposta, roteiro 07)
-**Duração estimada:** 54 segundos, em leitura calma (126 palavras). **Arquivo do teleprompter:** `teleprompter/A1.txt`.
+**Duração estimada:** 64 segundos, em leitura calma (149 palavras). **Arquivo do teleprompter:** `teleprompter/A1.txt`.
 
 **Tempos**
-- **0:00 a 0:08** · GANCHO (19 palavras)
-- **0:08 a 0:14** · ABERTURA (14 palavras)
-- **0:14 a 0:41** · CORPO (65 palavras)
-- **0:41 a 0:48** · SÍNTESE (14 palavras)
-- **0:48 a 0:54** · FECHO (14 palavras)
+- **0:00 a 0:10** · GANCHO (23 palavras)
+- **0:10 a 0:16** · ABERTURA (14 palavras)
+- **0:16 a 0:47** · CORPO (75 palavras)
+- **0:47 a 0:55** · SÍNTESE (18 palavras)
+- **0:55 a 1:03** · FECHO (19 palavras)
 
 **Em tela (aplicar na edição, sem ler no teleprompter)**
 - Abertura: letreiro "O Que o Processo Não Mostra" por 2 s.
@@ -53,14 +53,14 @@ Gravar por quadro, na ordem abaixo. Um take extra do fecho (aviso e convite à p
 
 ## Episódio 2 · Por que educar antes de julgar
 **Base:** Educação cidadã, PROBEC e Dia Estadual da Educação Cívica (proposta, roteiro 11)
-**Duração estimada:** 60 segundos, em leitura calma (139 palavras). **Arquivo do teleprompter:** `teleprompter/A2.txt`.
+**Duração estimada:** 63 segundos, em leitura calma (148 palavras). **Arquivo do teleprompter:** `teleprompter/A2.txt`.
 
 **Tempos**
 - **0:00 a 0:09** · GANCHO (21 palavras)
 - **0:09 a 0:15** · ABERTURA (14 palavras)
-- **0:15 a 0:44** · CORPO (69 palavras)
-- **0:44 a 0:53** · SÍNTESE (21 palavras)
-- **0:53 a 0:59** · FECHO (14 palavras)
+- **0:15 a 0:45** · CORPO (72 palavras)
+- **0:45 a 0:54** · SÍNTESE (22 palavras)
+- **0:54 a 1:03** · FECHO (19 palavras)
 
 **Em tela (aplicar na edição, sem ler no teleprompter)**
 - Abertura: letreiro "O Que o Processo Não Mostra" por 2 s.
@@ -78,14 +78,14 @@ Gravar por quadro, na ordem abaixo. Um take extra do fecho (aviso e convite à p
 
 ## Episódio 3 · A Justiça Militar como especialidade
 **Base:** Direito Penal Militar aplicado (proposta, roteiro 12)
-**Duração estimada:** 60 segundos, em leitura calma (140 palavras). **Arquivo do teleprompter:** `teleprompter/A3.txt`.
+**Duração estimada:** 64 segundos, em leitura calma (149 palavras). **Arquivo do teleprompter:** `teleprompter/A3.txt`.
 
 **Tempos**
 - **0:00 a 0:08** · GANCHO (19 palavras)
 - **0:08 a 0:14** · ABERTURA (14 palavras)
-- **0:14 a 0:47** · CORPO (79 palavras)
-- **0:47 a 0:54** · SÍNTESE (16 palavras)
-- **0:54 a 1:00** · FECHO (12 palavras)
+- **0:14 a 0:48** · CORPO (83 palavras)
+- **0:48 a 0:57** · SÍNTESE (19 palavras)
+- **0:57 a 1:03** · FECHO (14 palavras)
 
 **Em tela (aplicar na edição, sem ler no teleprompter)**
 - Abertura: letreiro "O Que o Processo Não Mostra" por 2 s.
@@ -104,15 +104,15 @@ Gravar por quadro, na ordem abaixo. Um take extra do fecho (aviso e convite à p
 
 ## Episódio 1 · Hierarquia e a ordem manifestamente ilegal
 **Base:** Prevenção para militares e forças de segurança, CPM art. 38 (proposta, roteiro 08)
-**Duração estimada:** 62 segundos, em leitura calma (143 palavras). **Arquivo do teleprompter:** `teleprompter/B1.txt`.
+**Duração estimada:** 65 segundos, em leitura calma (150 palavras). **Arquivo do teleprompter:** `teleprompter/B1.txt`.
 
 **Tempos**
 - **0:00 a 0:09** · GANCHO (22 palavras)
 - **0:09 a 0:15** · ABERTURA (12 palavras)
-- **0:15 a 0:39** · CORPO (59 palavras)
-- **0:39 a 0:48** · EXPERIÊNCIA (19 palavras)
-- **0:48 a 0:56** · SÍNTESE (18 palavras)
-- **0:56 a 1:02** · FECHO (13 palavras)
+- **0:15 a 0:40** · CORPO (60 palavras)
+- **0:40 a 0:48** · EXPERIÊNCIA (19 palavras)
+- **0:48 a 0:58** · SÍNTESE (22 palavras)
+- **0:58 a 1:04** · FECHO (15 palavras)
 
 **Em tela (aplicar na edição, sem ler no teleprompter)**
 - Abertura: letreiro "Antes da Consequência" por 2 s.
@@ -129,14 +129,14 @@ Gravar por quadro, na ordem abaixo. Um take extra do fecho (aviso e convite à p
 
 ## Episódio 2 · Rigor de comando e arbítrio pessoal
 **Base:** Gestão institucional e prevenção no CPM (proposta, roteiro 10)
-**Duração estimada:** 58 segundos, em leitura calma (136 palavras). **Arquivo do teleprompter:** `teleprompter/B2.txt`.
+**Duração estimada:** 60 segundos, em leitura calma (139 palavras). **Arquivo do teleprompter:** `teleprompter/B2.txt`.
 
 **Tempos**
-- **0:00 a 0:10** · GANCHO (23 palavras)
-- **0:10 a 0:15** · ABERTURA (12 palavras)
-- **0:15 a 0:42** · CORPO (64 palavras)
-- **0:42 a 0:52** · SÍNTESE (24 palavras)
-- **0:52 a 0:58** · FECHO (13 palavras)
+- **0:00 a 0:09** · GANCHO (21 palavras)
+- **0:09 a 0:14** · ABERTURA (12 palavras)
+- **0:14 a 0:42** · CORPO (66 palavras)
+- **0:42 a 0:52** · SÍNTESE (25 palavras)
+- **0:52 a 0:59** · FECHO (15 palavras)
 
 **Em tela (aplicar na edição, sem ler no teleprompter)**
 - Abertura: letreiro "Antes da Consequência" por 2 s.
@@ -154,15 +154,15 @@ Gravar por quadro, na ordem abaixo. Um take extra do fecho (aviso e convite à p
 
 ## Episódio 3 · Antes de publicar: o militar nas redes sociais
 **Base:** Prevenção, CPM art. 166 (proposta nova, tema da pauta)
-**Duração estimada:** 63 segundos, em leitura calma (145 palavras). **Arquivo do teleprompter:** `teleprompter/B3.txt`.
+**Duração estimada:** 65 segundos, em leitura calma (151 palavras). **Arquivo do teleprompter:** `teleprompter/B3.txt`.
 
 **Tempos**
 - **0:00 a 0:06** · GANCHO (13 palavras)
 - **0:06 a 0:11** · ABERTURA (12 palavras)
-- **0:11 a 0:41** · CORPO (73 palavras)
-- **0:41 a 0:52** · PREVENTIVO (24 palavras)
-- **0:52 a 0:56** · SÍNTESE (10 palavras)
-- **0:56 a 1:02** · FECHO (13 palavras)
+- **0:11 a 0:42** · CORPO (75 palavras)
+- **0:42 a 0:52** · PREVENTIVO (24 palavras)
+- **0:52 a 0:58** · SÍNTESE (12 palavras)
+- **0:58 a 1:05** · FECHO (15 palavras)
 
 **Em tela (aplicar na edição, sem ler no teleprompter)**
 - Abertura: letreiro "Antes da Consequência" por 2 s.
