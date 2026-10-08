@@ -161,7 +161,7 @@ h2{{font-weight:900;font-size:68px;line-height:1.06;letter-spacing:-.03em;margin
 .papel .eyebrow{{color:var(--navy)}}
 .papel .fonte{{color:var(--graphite);opacity:.9}}
 .laco{{position:absolute;inset:0;width:100%;height:100%;z-index:1}}
-.foto{{position:absolute;left:0;top:0;width:100%;height:1120px;background:url("{(OUT / 'fotos' / 'capa.jpg').as_uri()}") 0 0/auto 1120px no-repeat;z-index:0}}
+.foto{{position:absolute;left:0;top:0;width:100%;height:1120px;background:url("{(OUT / 'fotos' / 'capa.jpg').as_uri()}") 0 0/1080px 1120px no-repeat;z-index:0}}
 .scrim{{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(74,23,64,0) 26%,rgba(74,23,64,.8) 47%,#4a1740 70%);z-index:1}}
 /* capa */
 .capa .conteudo{{justify-content:flex-end;top:60px;bottom:200px}}
