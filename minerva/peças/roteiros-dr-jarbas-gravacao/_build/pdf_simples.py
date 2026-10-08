@@ -28,7 +28,7 @@ from PIL import Image
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path="/opt/pw-browsers/chromium")
     for q in ("A", "B"):
-        for n in (1, 2):
+        for n in (1, 2, 3):
             arq = HERE / "tmp.html"; arq.write_text(pagina(q, n))
             pg = b.new_page(viewport={"width": 794, "height": 1123}, device_scale_factor=2)
             pg.goto(arq.as_uri()); pg.wait_for_timeout(800)
