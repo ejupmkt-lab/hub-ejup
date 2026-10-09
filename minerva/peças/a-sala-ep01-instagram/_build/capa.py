@@ -36,23 +36,26 @@ HTML = f"""<html><head><meta charset="utf-8"><style>
 @font-face{{font-family:G;font-weight:900;src:url(data:font/otf;base64,{f('Black')})}}
 *{{margin:0;box-sizing:border-box}}
 body{{width:1080px;height:1920px;position:relative;overflow:hidden;font-family:G;color:#fff;background:#020a14}}
-.foto{{position:absolute;left:0;top:30px;width:1080px;height:1910px;background:url({FOTO}) center/cover}}
+.foto{{position:absolute;left:0;top:-150px;width:1080px;height:1910px;background:url({FOTO}) center/cover}}
 .veu{{position:absolute;inset:0;background:
-  linear-gradient(180deg,#020a14 0%,rgba(2,10,20,.4) 7%,rgba(2,10,20,0) 18%,rgba(2,10,20,0) 50%,rgba(2,10,20,.55) 60%,rgba(2,10,20,.85) 70%,#020a14 84%),
-  radial-gradient(80% 50% at 50% 40%,rgba(2,10,20,0) 55%,rgba(2,10,20,.7) 100%)}}
+  linear-gradient(180deg,#020a14 0%,rgba(2,10,20,.35) 6%,rgba(2,10,20,0) 16%,rgba(2,10,20,0) 36%,rgba(2,10,20,.3) 46%,rgba(2,10,20,.4) 62%,rgba(2,10,20,.7) 78%,#020a14 92%),
+  radial-gradient(80% 50% at 50% 35%,rgba(2,10,20,0) 55%,rgba(2,10,20,.7) 100%)}}
+.foco{{position:absolute;left:-80px;right:-80px;top:700px;height:560px;background:radial-gradient(50% 50% at 50% 50%,rgba(2,10,20,.75) 0%,rgba(2,10,20,.4) 55%,rgba(2,10,20,0) 100%)}}
 .grao{{position:absolute;inset:0;opacity:.15;mix-blend-mode:overlay}}
-.titulo{{position:absolute;left:0;right:0;top:1150px;text-align:center;text-shadow:0 6px 40px rgba(0,0,0,.85)}}
+.bloco{{position:absolute;left:0;right:0;top:0;height:1920px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:70px;padding-top:40px}}
+.titulo{{text-align:center;text-shadow:0 6px 40px rgba(0,0,0,.85)}}
 .titulo p{{font-weight:900;font-size:150px;line-height:.96;letter-spacing:.02em;text-transform:uppercase;padding-left:.02em}}
 .titulo p + p{{color:#f0b855}}
-.sala{{position:absolute;left:0;right:0;top:1520px;display:flex;justify-content:center}}
 .sala img{{width:250px;display:block;opacity:.95}}
 .ejup{{position:absolute;left:0;right:0;bottom:76px;display:flex;justify-content:center}}
 .ejup svg{{height:40px;width:auto;opacity:.8}}
 </style></head><body>
-<div class="foto"></div><div class="veu"></div>
+<div class="foto"></div><div class="veu"></div><div class="foco"></div>
 <svg class="grao" width="1080" height="1920"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="9"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>
-<div class="titulo"><p>O caso</p><p>Vorcaro</p></div>
-<div class="sala"><img src="{LOGO_SALA}"></div>
+<div class="bloco">
+  <div class="titulo"><p>O caso</p><p>Vorcaro</p></div>
+  <div class="sala"><img src="{LOGO_SALA}"></div>
+</div>
 <div class="ejup">{LOGO_EJUP}</div>
 </body></html>"""
 
