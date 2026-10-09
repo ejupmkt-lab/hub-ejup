@@ -1,58 +1,56 @@
-# Briefing · Post do Dia dos Professores · EJUP
+# Briefing · Post do Dia dos Professores · EJUP (versão 2)
 
 ## 1. Dados da peça
 - **Data de publicação:** quinta-feira, 15/10/2026 (Dia do Professor).
 - **Canal:** Instagram @ejup.oficial. Se houver tempo, story com a mesma arte.
-- **Formato sugerido:** post único, 1080 x 1440 px. Alternativa: carrossel de 3 telas, se quiserem citar professores da escola.
-- **Aprovação:** Roberto Pivotto, antes de qualquer publicação. Entrega da arte e da legenda até 14/10.
+- **Formato:** post único, 1080 x 1440 px. Alternativa: carrossel de 3 telas.
+- **Aprovação:** Roberto Pivotto, antes de qualquer publicação. Entrega até 14/10.
 
 ## 2. Objetivo
-Homenagear os professores sem tom de data comemorativa genérica, e reforçar o que a EJUP defende: formação com profundidade, em que o professor é quem sustenta o tempo do estudo.
+Homenagear todos os professores, de qualquer escola e de qualquer época, a partir de uma ideia que todo jurista e todo profissional reconhece: ninguém chega onde chegou sem alguém que ensinou. O post não fala da EJUP nem de professores específicos. A marca assina como quem defende o tempo do estudo.
 
-**Atributo de percepção:** profundidade e autoridade silenciosa. **Quem protagoniza:** o professor, como fonte da formação. **A EJUP aparece como guia**, sem posar de protagonista.
+**Atributo de percepção:** profundidade e tradição viva. **Quem protagoniza:** o professor e o profissional que foi aluno dele. **A EJUP aparece como guia**, só na assinatura.
 
-## 3. Ideia central (recomendada)
-**"A profundidade tem professor."**
-A formação jurídica de alto nível se constrói com quem dedicou anos de estudo e de prática para que outro jurista possa começar de um patamar mais alto. O post agradece a esse trabalho sem adjetivo de vitrine.
+## 3. Ideia central
+**Todo percurso tem um professor, e quem ensina forma quem vai ensinar.**
+Todo jurista, todo profissional, chegou aonde chegou porque alguém lhe ensinou. E esse alguém também teve os seus professores, numa cadeia em que cada geração forma a seguinte. É por essa cadeia que o conhecimento atravessa o tempo, e ela mostra por que o ensino sustenta tudo o que vem depois.
 
-Duas alternativas, se preferirem:
-- **"O tempo do estudo tem quem o conduza."** Mais próxima do "Defendemos o tempo do estudo" que a EJUP já usa.
-- **Citação de um professor da escola**, com autorização, sobre o que é ensinar. Funciona só se houver a frase e a permissão.
+Títulos possíveis:
+1. **Todo percurso tem um professor.** (recomendado)
+2. **Quem ensina forma quem vai ensinar.**
+3. **Todo jurista foi aluno de alguém.**
 
-## 4. Texto proposto para a arte
-- **Título:** A profundidade tem professor.
-- **Apoio:** Em cada formação da EJUP, alguém dedicou anos de estudo e de prática para que outro jurista comece de um patamar mais alto.
+## 4. Texto da arte
+- **Título:** Todo percurso tem um professor.
+- **Apoio:** Todo jurista, todo profissional, chegou onde chegou porque alguém lhe ensinou. E quem ensina forma quem vai ensinar.
 - **Fecho:** Feliz Dia dos Professores.
 - **Assinatura:** Alma clássica, repertório contemporâneo. @ejup.oficial
 
 ## 5. Legenda (rascunho)
-Todo jurista que chega a um patamar mais alto passou antes por alguém que o ensinou a estudar com critério. Os professores da EJUP dedicam anos de estudo e de prática para que outros profissionais comecem a travessia de onde eles chegaram.
+Todo jurista que chegou a algum lugar teve um professor. Alguém que explicou a primeira lei, corrigiu a primeira peça, mostrou como se lê um acórdão com calma. E esse professor também teve os seus, numa cadeia em que cada geração ensina a seguinte.
 
-Defendemos o tempo do estudo, e ele só existe com quem ensina. Nosso agradecimento aos professores que formam a escola e a quem já os teve como mestres.
+Professores formam profissionais e formam outros professores, e é por essa cadeia que o conhecimento atravessa o tempo. Defendemos o tempo do estudo, e ele só existe com quem ensina.
 
-Siga a EJUP para acompanhar as aulas e os conteúdos dos nossos professores.
+Feliz Dia dos Professores a quem ensina e a quem já foi ensinado. Siga a EJUP para acompanhar os conteúdos de formação jurídica.
 
 #ejup #diadoprofessor #formacaojuridica #professores #direito
 
 ## 6. Direção visual
-- **Paleta:** só as 8 cores da marca. Fundo navy ou tinta, dourado para o título e o acento, prata para o apoio. Sem rosa nem cor temática.
-- **Tipografia:** Gotham. Título em Black, apoio em Light, rótulo em Medium, caixa alta, espaçado.
-- **Composição:** tipográfica, com muito espaço vazio. É a opção mais segura e a mais próxima da marca.
-- **Imagem, se houver (em ordem de preferência):**
-  1. Nenhuma, só tipografia.
-  2. Foto real de aula, auditório ou bancada de gravação da EJUP, com autorização de quem aparece, em duotone navy.
-  3. Estantes de biblioteca em duotone navy (já existe uma foto CC0 no repositório).
+- **Paleta:** só as 8 cores da marca. Fundo navy, título em dourado, apoio em prata ou branco. Sem rosa nem cor temática.
+- **Tipografia:** Gotham. Título em Black, apoio em Light, assinatura em Medium.
+- **Composição:** tipográfica, com muito espaço vazio.
+- **Elemento gráfico (opcional):** um fio fino dourado ligando quatro pontos em sequência, como a cadeia de quem ensina e de quem aprende. É o dispositivo que nasce da própria ideia, sem ícone nem ilustração.
+- **Imagem:** nenhuma é a primeira escolha. Se quiserem uma, estantes de biblioteca em duotone navy (já há uma foto CC0 no repositório).
 - **Evitar:** maçã, lousa com giz, canetas coloridas, estética de ensino infantil, balões, emoji, efeito de brilho.
 
 ## 7. Cuidados
-- **Pessoas:** só citar o nome ou usar a imagem de um professor com autorização verificada. Nomes dos professores da EJUP a incluir: **a definir**. Se o Dr. Jarbas entrar, ele é cliente da EJUP, e não sócio.
-- **Tom:** frases afirmativas, sem a figura "não é X, é Y", sem travessão entre palavras, sem hipérbole ("os melhores professores do Brasil") e sem comparação com outras escolas.
-- **Sem venda:** é uma homenagem, sem chamada para curso nem oferta.
-- **Dados da data (opcional):** a origem do 15 de outubro remete a uma lei de 15/10/1827 de Dom Pedro I sobre as escolas de primeiras letras, e a data foi oficializada pelo Decreto nº 52.682, de 14/10/1963. Se quiserem citar, é preciso conferir os dois textos oficiais antes. Não recomendo citar nesta peça.
-- **Calendário:** não é feriado nacional, e sim feriado escolar.
+- Sem nome nem imagem de pessoa real, o que dispensa autorização de imagem.
+- Frases afirmativas, sem a figura "não é X, é Y", sem travessão entre palavras, sem hipérbole e sem comparação com outras escolas.
+- Sem venda: é uma homenagem, sem chamada para curso nem oferta.
+- A origem da data (lei de 15/10/1827 e Decreto nº 52.682, de 1963) não entra no post. Se quiserem citar, conferir os textos oficiais antes.
+- O 15 de outubro é feriado escolar, e não feriado nacional.
 
-## 8. Em aberto, para o Victor ou o Roberto decidirem
-1. Post só com tipografia, ou com foto de professor da escola?
-2. Se houver foto, quais professores aparecem e quem autoriza?
-3. A frase da arte pode ser em nome da EJUP ("Defendemos...") ou querem a voz de um professor?
-4. Preferem o título "A profundidade tem professor." ou uma das alternativas?
+## 8. Em aberto
+1. Post único ou carrossel de 3 telas (1. "Todo jurista foi aluno de alguém." 2. "E quem ensina forma quem vai ensinar." 3. Feliz Dia dos Professores)?
+2. Com ou sem o fio dourado, ou só tipografia?
+3. Qual dos três títulos?
