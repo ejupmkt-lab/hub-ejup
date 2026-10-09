@@ -17,8 +17,12 @@ SOMBRA, LUZ = (2, 12, 24), (150, 172, 194)
 PLACA = {
     "manet": ("manet-maximiliano.jpg", (70, 70, 3820, 2940)),
     "goya": ("goya-no-se-puede-mirar.jpg", (880, 645, 2805, 1890)),
-    "hogarth": ("hogarth-tyburn.jpg", (190, 170, 3500, 2095)),
+    "hogarth": ("hogarth-tyburn.jpg", (200, 180, 3450, 2090)),
+    "venda-a": ("higgsfield-venda-a.png", None),
+    "venda-b": ("higgsfield-venda-b.png", None),
 }
+# imagem gerada (Higgsfield): só esfria a cor, sem virar gravura
+GERADAS = {"venda-a", "venda-b"}
 
 # nome → (placa, janela em fração x0,y0,x1,y1 da placa, largura, altura)
 USOS = {
@@ -36,6 +40,10 @@ USOS = {
     "fundo-hogarth-a": ("hogarth", (0.00, 0.10, 0.55, 1.00), 1080, 1440),
     "fundo-hogarth-b": ("hogarth", (0.45, 0.00, 1.00, 1.00), 1080, 1440),
     "fundo-goya": ("goya", (0.05, 0.00, 0.85, 1.00), 1080, 1440),
+    # versão 3
+    "capa-venda": ("venda-a", (0.00, 0.00, 1.00, 1.00), 1080, 1440),
+    "faixa-venda": ("venda-b", (0.00, 0.02, 1.00, 0.52), 1080, 600),
+    "panorama": ("hogarth", (0.00, 0.00, 1.00, 0.66), 2160, 620),
 }
 # versão clara (traço navy sobre papel), para as telas de fundo papel
 CLARAS = {"fundo-manet-a", "fundo-hogarth-a", "fundo-goya"}
@@ -58,10 +66,17 @@ def recortar(im, jan, w, h):
 
 def main():
     DEST.mkdir(exist_ok=True)
-    placas = {k: Image.open(FOTOS / arq).convert("RGB").crop(box) for k, (arq, box) in PLACA.items()}
+    placas = {}
+    for k, (arq, box) in PLACA.items():
+        im = Image.open(FOTOS / arq).convert("RGB")
+        placas[k] = im.crop(box) if box else im
     for nome, (pl, jan, w, h) in USOS.items():
         rec = recortar(placas[pl], jan, w, h)
-        variantes = [(nome, tingir(rec))]
+        if pl in GERADAS:
+            duo = ImageOps.colorize(ImageOps.grayscale(rec), black=(1, 8, 18), white=(222, 230, 238))
+            variantes = [(nome, Image.blend(rec, duo, 0.45))]
+        else:
+            variantes = [(nome, tingir(rec))]
         if nome in CLARAS:
             variantes.append((nome + "-claro", tingir(rec, PAPEL, (3, 28, 55))))
         for n, out in variantes:

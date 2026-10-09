@@ -1,35 +1,43 @@
-# Carrossel · A lei brasileira também prevê fuzilamento · 16 telas 1080x1440
+# Carrossel · A Constituição brasileira admite a pena de morte · 15 telas 1080x1440
 
 `python3 _build/tratar_fotos.py && python3 _build/gerar.py && python3 _build/render.py`
 
-Versão 2 de 09/10/2026. A primeira, de 9 telas só tipográficas, voltou: sem
-imagem e com texto demais. Esta usa gravuras clássicas de fundo em todas as
-telas e no máximo duas frases por tela. Telas em `telas/`, visão geral em
+Versão 3 de 09/10/2026. Histórico: a v1 (9 telas tipográficas) voltou por falta
+de imagem e excesso de texto; a v2 (16 telas com gravuras) pediu mais gráficos,
+ganchos e uma capa mais forte. Telas em `telas/`, visão geral em
 `visualizacao-completa.png`, legenda em `legenda.md`.
 
-1. Capa: "A lei brasileira também prevê fuzilamento" sobre Manet.
-2. Os EUA marcaram um fuzilamento para 3 de dezembro (Fort Hood, 13 mortos).
-3. O Pentágono anunciou que vai transmitir; primeira execução militar desde 1961.
-4. E no Brasil? A exceção está na mesma frase.
-5. CF, art. 5º, XLVII, em citação.
-6. Quem declara a guerra (CF, art. 84, XIX).
-7. CPM, art. 56, em citação.
-8. Só para crimes de guerra: a traição (art. 355).
-9. A sentença vai ao Presidente: sete dias, indulto ou comutação (CPM, art. 57).
-10. O rito (CPPM, arts. 707 e 708).
-11. Uma emenda poderia ampliar? Cláusula pétrea (CF, art. 60, §4º, IV).
-12. O compromisso internacional (Decreto 2.754/1998).
-13. Por séculos, a execução teve plateia (Hogarth, 1747).
-14. O Direito moderno tirou a pena do palco (Foucault).
-15. ONU: transmitir equivale a executar em público (Goya).
-16. Fecho: "Onde termina a publicidade da pena e começa o espetáculo?"
+1. Capa: "A Constituição brasileira admite a pena de morte." Imagem gerada no
+   Higgsfield: venda de pano sobre a Constituição aberta (a venda da Justiça e a
+   do condenado, CPPM art. 707).
+2. A notícia: os EUA marcaram um fuzilamento para 3 de dezembro.
+3. Gráfico: 65 anos sem execução militar nos EUA (1961 a 2026).
+4. "salvo": a exceção inteira em uma palavra (CF, art. 5º, XLVII).
+5. Diagrama: guerra declarada exige Presidente e Congresso (CF, art. 84, XIX).
+6. CPM, art. 56, em citação.
+7. Só crimes militares em tempo de guerra: a traição (art. 355).
+8. Gráfico: sete dias entre a sentença e a execução, janela para indulto (CPM, art. 57).
+9. O rito em quatro itens (CPPM, arts. 707 e 708), com a venda no alto.
+10. Quadro Brasil x EUA.
+11. Cláusula pétrea e Decreto 2.754/1998.
+12 e 13. Linha do tempo "Da praça à tela", que atravessa as duas telas sobre a
+   gravura de Hogarth: 1747, 1757, 1961, 2026.
+14. ONU, sobre Goya.
+15. Fecho com a venda, espelhando a capa.
+
+Cada tela termina com um gancho para a seguinte ("Há 65 anos isso não
+acontecia →", "E no Brasil? →", "Quem declara a guerra? →"...).
+
+## Imagem gerada (Higgsfield)
+Aprovada pelo Victor em 09/10/2026: GPT Image 2.5, qualidade alta, 2K, 3:4,
+2 variações, 2,75 créditos (saldo antes: 235,41). Usadas: variação A na capa e
+no fecho, variação B na faixa da tela 9. Arquivos em `fotos/higgsfield-venda-*.png`.
+A legenda informa que a capa foi gerada com IA.
 
 ## Design
-Gravuras de Manet, Goya e Hogarth, em duotone navy. Telas de imagem cheia (capa,
-ONU, fecho), telas com a gravura em faixa no alto, e telas de texto com a gravura
-como marca d'água. Nenhuma fotografia de pessoa real, nenhuma arma em primeiro
-plano, nenhuma contagem para 3 de dezembro. Crédito de cada obra na própria tela.
-Detalhes das imagens em `fotos/CREDITOS.md`.
+Gravuras de Manet, Goya e Hogarth em duotone navy (detalhes em
+`fotos/CREDITOS.md`). Nenhuma fotografia de pessoa real, nenhuma arma em
+primeiro plano, nenhuma contagem para 3 de dezembro.
 
 ## Fontes (itens 20 e 21)
 Imprensa:
