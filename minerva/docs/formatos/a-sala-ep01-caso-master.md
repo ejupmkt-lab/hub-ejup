@@ -48,6 +48,24 @@ de Vorcaro, que ainda não está no roteiro.
   ([Congresso em Foco](https://www.congressoemfoco.com.br/conteudo/121871/pgr-pede-nulidade-de-relatorio-sobre-mensagens-de-moraes-e-vorcaro)).
   A mensagem "Conseguiu ter notícia ou bloquear?" vem desse relatório.
 
+**Checagem de 09/10/2026 (dia da publicação):** nada do que o episódio
+afirma mudou. Aviso e rodapés seguem valendo sem ajuste.
+- Vorcaro segue preso, sem condenação e sem denúncia formal da PGR
+  ([Brasil 247, 08/10](https://www.brasil247.com/brasilia/preso-daniel-vorcaro-negocia-entrevista-sobre-o-caso-banco-master/)).
+- O julgamento sobre Moraes segue suspenso desde 15/09 por pedido de vista
+  do ministro Flávio Dino, com prazo de até 90 dias
+  ([Congresso em Foco](https://www.congressoemfoco.com.br/noticia/122245/julgamento-do-caso-moraes-vorcaro-no-stf-e-adiado-apos-pedido-de-vista) ·
+  [Itatiaia](https://www.itatiaia.com.br/politica/pedido-de-vista-de-dino-pode-adiar-julgamento-sobre-moraes-no-stf-ate-dezembro/)).
+- **Fica fora do episódio, de propósito:** mensagens sobre tentativa de
+  aproximação com Lula, via Guido Mantega e Walfrido Warde
+  ([Gazeta do Povo, 08/10](https://www.gazetadopovo.com.br/republica/mensagens-revelam-que-banqueiro-tentou-nova-aproximacao-com-lula-e-moraes/)).
+  É nome novo, fora do recorte do STF, e sai na semana do segundo turno.
+  Também ficam fora a entrevista que Vorcaro negocia com emissoras e a
+  delação, sobre a qual as fontes divergem (Brasil 247 diz que ele negocia
+  com a PGR; [CNN Brasil](https://www.cnnbrasil.com.br/politica/vorcaro-apresenta-nova-proposta-de-delacao-entenda-a-cronologia-do-caso/)
+  e [CartaCapital](https://www.cartacapital.com.br/justica/pgr-rejeita-nova-proposta-de-delacao-de-daniel-vorcaro/)
+  registram a rejeição das duas propostas, a segunda em 15/06).
+
 ## Cenário e objetos sobre a mesa
 
 A Sala como gravada: parede escura, cortiça laranja com o papel do símbolo da

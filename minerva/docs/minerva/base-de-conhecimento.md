@@ -144,7 +144,16 @@ doutrina, canal especializado, profissional de referência).
   financeiro e da gestão. Autor do artigo "O
   poder de polícia ambiental municipal: eficácia do licenciamento ambiental
   simplificado".
-- Dr. Jarbas Bezerra: cliente da EJUP (não é sócio), juiz educador. Na marca pessoal dele o martelo
+- Dr. Jarbas Bezerra (Jarbas Antonio da Silva Bezerra): cliente da EJUP (não é sócio). Juiz emérito,
+  na magistratura do RN desde 1990, área penal militar; professor da UFRN (Direito Público) e da Escola
+  Superior da Magistratura desde 1995; doutor em Educação pela UFRN (2022), tese "A cidadania como
+  Ciência"; criador da TEJUC (Teoria Jurídica Universal da Cidadania); idealizador do Probec e, com a
+  advogada Lígia Limeira, do Setembro Cidadão (2013). Posse na magistratura em 27/12/1990; juiz da
+  Corte do TRE/RN de 2006 a 2008. Livros sobre cidadania: "A Cidadania como Ciência" (Editora Idearte)
+  e "Cidadania: a Ciência das Ciências" (30/09/2026); também "Propaganda Eleitoral: história das
+  eleições no Brasil". Marca: Instituto Professor Jarbas Bezerra ("Justiça, Educação e Cidadania").
+  Espaço Jarbas Bezerra em Natal (CCAB Petrópolis): gabinete vermelho, sala de madeira com Têmis,
+  cadeiras antigas e A Calúnia de Apeles, sala Educação e Cidadania. Defende a cidadania como ciência. Na marca pessoal dele o martelo
   é biografia, e por isso a exceção à proibição do objeto.
 - Rossana Fonseca: sócia, frente institucional e jurídica, em São Paulo.
   Citada como marca pessoal nos boards futuros.

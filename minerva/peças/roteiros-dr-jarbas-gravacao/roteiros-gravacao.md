@@ -26,55 +26,74 @@ Gravar por quadro, na ordem abaixo. Um take extra do fecho (aviso e convite à p
 - Tirei afirmações sem apoio verificável: "a receita certa para a improcedência das defesas" (A3), "o comandante respondendo por abuso de autoridade" (B2) e "esvaziar as varas criminais de amanhã" (A2).
 - B3 é novo, porque o art. 166 do CPM é tema recorrente de dúvida entre militares e rende um episódio útil.
 
+## Versão 3 (09/10/2026): quatro vídeos individuais
+- Pedido do Victor: sem nome de quadro, sem apresentação de quadro e sem gancho para o próximo episódio. Cada vídeo fica de pé sozinho, com gancho, autoridade, informação prática para a área jurídica e CTA. Linguagem sem juridiquês; o aviso educativo vai só no lettering.
+- Textos, lettering e legendas em `_build/videos_v3.py`. O PDF de gravação é `Roteiros_Dr_Jarbas_19-10.pdf`.
+
+## Versão 2 (08/10/2026): A1, A2, B1 e B2 reescritos
+- Pedido do Victor: tirar a cara de IA e o senso comum. As máximas genéricas ("Quem decide carrega essa soma", "Firmeza e método andam juntos") saíram.
+- Cada episódio agora entrega uma informação que só quem conhece a Justiça Militar por dentro tem: o Conselho de Justiça e a sessão secreta (A1), o prazo de oito dias da deserção (A2), o militar entre os arts. 163 e 38 do CPM (B1) e a leitura do STF sobre o habeas corpus na punição disciplinar (B2).
+- Os relatos pessoais novos estão marcados em "Conferir antes de gravar". O Dr. Jarbas confirma ou troca por palavras dele.
+- O Planalto estava fora do ar em 08/10/2026. Os artigos novos foram confirmados em fontes secundárias e precisam de conferência final no Planalto.
+
 # Quadro · O Que o Processo Não Mostra
 
-## Episódio 1 · A solidão da decisão
-**Base:** Experiência de quase 28 anos na magistratura militar (proposta, roteiro 07)
-**Duração estimada:** 64 segundos, em leitura calma (149 palavras). **Arquivo do teleprompter:** `teleprompter/A1.txt`.
+## Episódio 1 · Cidadania tem método
+**Base:** Vídeo individual 1 (versão de 09/10/2026, sem quadro) · Locação 1 · gabinete vermelho, sentado à mesa
+**Duração estimada:** 68 segundos, em leitura calma (159 palavras). **Arquivo do teleprompter:** `teleprompter/A1.txt`.
 
 **Tempos**
-- **0:00 a 0:10** · GANCHO (23 palavras)
-- **0:10 a 0:16** · ABERTURA (14 palavras)
-- **0:16 a 0:47** · CORPO (75 palavras)
-- **0:47 a 0:55** · SÍNTESE (18 palavras)
-- **0:55 a 1:03** · FECHO (19 palavras)
+- **0:00 a 0:08** · GANCHO (19 palavras)
+- **0:08 a 0:17** · AUTORIDADE (21 palavras)
+- **0:17 a 0:34** · CONTEÚDO (40 palavras)
+- **0:34 a 0:54** · VIRADA (48 palavras)
+- **0:54 a 1:07** · CTA (31 palavras)
 
 **Em tela (aplicar na edição, sem ler no teleprompter)**
-- Abertura: letreiro "O Que o Processo Não Mostra" por 2 s.
-- Corpo: a expressão "a soma" não vai em tela; deixar a imagem respirar.
-- Fecho: aviso "Reflexão geral, sem relação com processo real".
+- Em "Pergunte a um advogado o…": O que é cidadania?
+- Em "Eu passei anos estudando essa…": Jarbas Bezerra · [título a confirmar]
+- Em "A conclusão é que cidadania…": Cidadania como ciência
+- Em "Ela tem objeto próprio, fundamentos,…": objeto · fundamentos · princípios · método
+- Em "Comenta aqui: qual direito você…": Livros · A Cidadania como Ciência e Cidadania: a Ciência das Ciências · Conteúdo educativo, sem orientação individual
 
-**Câmera B:** Mãos sobre a mesa de madeira, a caneta ao lado, lombadas da estante em foco suave.
+**Câmera B:** Sem câmera B: o vídeo inteiro é o Dr. Jarbas falando para a câmera.
 
 **Conferir antes de gravar**
-- "Quase vinte e oito anos" e "Vara Criminal Militar" vêm da proposta. Dr. Jarbas confirma os números e o nome da vara antes de gravar.
+- Doutorado em Educação pela UFRN (2022), tese "A cidadania como Ciência": perfil do docente no SIGAA/UFRN.
+- Tese do livro (objeto próprio, fundamentos, princípios e método; diálogo com Direito, educação, saúde e economia): Tribuna do Norte, lançamento de 30/09/2026.
+- "Dois livros": o primeiro, A Cidadania como Ciência (Editora Idearte), confirmado pela capa nas fotos do escritório; o novo é Cidadania: a Ciência das Ciências, lançado em 30/09/2026.
+- Título exato do livro novo: Tribuna do Norte grafa "Cidadania - a Ciência das Ciências". Dr. Jarbas confirma a grafia para o lettering.
 
-**Legenda sugerida:** O processo reúne artigos de lei, laudos e depoimentos. A solidão de quem decide fica de fora dos autos. Uma reflexão sobre julgar com serenidade e dentro da legalidade. Reflexão geral, sem relação com processo real.
+**Legenda sugerida:** Cidadania costuma ser lembrada como uma lista de direitos e deveres. Na tese de doutorado em Educação (UFRN, 2022) e nos livros que vieram dela, a cidadania é tratada como ciência: objeto próprio, fundamentos, princípios e método. Para quem é da área jurídica, a pergunta muda: a pessoa sabe exercer os direitos que tem? Livro novo: Cidadania: a Ciência das Ciências. Conteúdo educativo, sem orientação individual.
 
-## Episódio 2 · Por que educar antes de julgar
-**Base:** Educação cidadã, PROBEC e Dia Estadual da Educação Cívica (proposta, roteiro 11)
-**Duração estimada:** 63 segundos, em leitura calma (148 palavras). **Arquivo do teleprompter:** `teleprompter/A2.txt`.
+## Episódio 2 · A lei que mudou a escola em julho
+**Base:** Vídeo individual 2 (versão de 09/10/2026, sem quadro) · Locação 1 · gabinete vermelho, sentado à mesa
+**Duração estimada:** 71 segundos, em leitura calma (167 palavras). **Arquivo do teleprompter:** `teleprompter/A2.txt`.
 
 **Tempos**
 - **0:00 a 0:09** · GANCHO (21 palavras)
-- **0:09 a 0:15** · ABERTURA (14 palavras)
-- **0:15 a 0:45** · CORPO (72 palavras)
-- **0:45 a 0:54** · SÍNTESE (22 palavras)
-- **0:54 a 1:03** · FECHO (19 palavras)
+- **0:09 a 0:37** · CONTEÚDO (69 palavras)
+- **0:37 a 0:47** · AUTORIDADE (23 palavras)
+- **0:47 a 1:01** · VIRADA (33 palavras)
+- **1:01 a 1:10** · CTA (21 palavras)
 
 **Em tela (aplicar na edição, sem ler no teleprompter)**
-- Abertura: letreiro "O Que o Processo Não Mostra" por 2 s.
-- Quando falar do Probec: logotipo do programa, se houver autorização de uso.
-- Fecho: aviso "Reflexão pessoal, sem relação com processo real".
+- Em "Em julho, uma lei mudou…": Lei nº 15.468/2026
+- Em "A Lei quinze mil quatrocentos…": LDB, art. 26 · educação política e cidadania
+- Em "Ele entra no estudo da…": Lei nº 15.467/2026 · primeira semana de maio
+- Em "Só que a lei não…": Séries e formação de professores: a regulamentar
+- Em "Eu defendo isso desde dois…": Jarbas Bezerra · [título a confirmar]
+- Em "Se você é da área…": Salve e envie para um professor · Conteúdo educativo, sem orientação individual
 
-**Câmera B:** Livros e publicações do programa sobre a mesa, se existirem em cena; mãos virando uma página.
+**Câmera B:** Sem câmera B: o vídeo inteiro é o Dr. Jarbas falando para a câmera.
 
 **Conferir antes de gravar**
-- Lei Complementar estadual nº 494/2013, que instituiu o Dia Estadual da Educação Cívica em 10 de setembro: confirmada em notícia da Assembleia Legislativa do RN, mas o texto da lei precisa ser conferido na fonte.
-- A frase "ajudei a criar o Probec" respeita que o programa foi idealizado com a advogada Lígia Limeira, segundo a Assembleia. Dr. Jarbas decide se cita a coautoria.
-- "Vi muitos jovens militares..." é relato dele, mantido do roteiro 11 da proposta. Sem caso, nome ou local.
+- Lei nº 15.468, de 13/07/2026 (PL 4.088/2023): inclui o § 9º-B no art. 26 da LDB; componente obrigatório no estudo da realidade social e política; não define séries nem formação docente (Câmara dos Deputados, Senado Notícias, Atlas Público). Conferir o texto no Planalto.
+- Lei nº 15.467/2026 (PL 162/2024): Semana Nacional da Ética e da Cidadania na primeira semana de maio (Senado Notícias, 15/07/2026). Conferir no Planalto.
+- Setembro Cidadão idealizado por Jarbas Bezerra e Lígia Limeira em 2013 no RN: coluna de Simone Silva, Agora RN, 17/07/2026. Dr. Jarbas confirma e decide como citar a coautora.
+- O vídeo não diz que a lei federal nasceu da ideia dele; diz só que ele defende o tema desde 2013.
 
-**Legenda sugerida:** A caneta do juiz chega depois do fato. Por isso a educação cidadã também faz parte do ofício. Uma reflexão sobre o Probec e o Dia Estadual da Educação Cívica. Reflexão pessoal, sem relação com processo real.
+**Legenda sugerida:** A Lei nº 15.468/2026 colocou a educação política e os direitos da cidadania entre os conteúdos obrigatórios da educação básica (LDB, art. 26). A Lei nº 15.467/2026 criou a Semana Nacional da Ética e da Cidadania, na primeira semana de maio. A lei não diz quem vai ensinar, e a área jurídica tem muito a contribuir. Salve e envie para um professor. Conteúdo educativo, sem orientação individual.
 
 ## Episódio 3 · A Justiça Militar como especialidade
 **Base:** Direito Penal Militar aplicado (proposta, roteiro 12)
@@ -102,55 +121,63 @@ Gravar por quadro, na ordem abaixo. Um take extra do fecho (aviso e convite à p
 
 # Quadro · Antes da Consequência
 
-## Episódio 1 · Hierarquia e a ordem manifestamente ilegal
-**Base:** Prevenção para militares e forças de segurança, CPM art. 38 (proposta, roteiro 08)
-**Duração estimada:** 65 segundos, em leitura calma (150 palavras). **Arquivo do teleprompter:** `teleprompter/B1.txt`.
+## Episódio 1 · O juiz que pode perder a votação
+**Base:** Vídeo individual 3 (versão de 09/10/2026, sem quadro) · Locação 2 · sala de madeira, Têmis e cadeiras antigas
+**Duração estimada:** 69 segundos, em leitura calma (163 palavras). **Arquivo do teleprompter:** `teleprompter/B1.txt`.
 
 **Tempos**
-- **0:00 a 0:09** · GANCHO (22 palavras)
-- **0:09 a 0:15** · ABERTURA (12 palavras)
-- **0:15 a 0:40** · CORPO (60 palavras)
-- **0:40 a 0:48** · EXPERIÊNCIA (19 palavras)
-- **0:48 a 0:58** · SÍNTESE (22 palavras)
-- **0:58 a 1:04** · FECHO (15 palavras)
+- **0:00 a 0:10** · GANCHO (23 palavras)
+- **0:10 a 0:16** · AUTORIDADE (15 palavras)
+- **0:16 a 0:34** · CONTEÚDO (43 palavras)
+- **0:34 a 0:57** · VIRADA (55 palavras)
+- **0:57 a 1:09** · CTA (27 palavras)
 
 **Em tela (aplicar na edição, sem ler no teleprompter)**
-- Abertura: letreiro "Antes da Consequência" por 2 s.
-- Primeira frase do corpo: "Código Penal Militar, art. 38"; destacar "manifestamente criminoso".
-- Fecho: aviso "Conteúdo educativo, sem orientação individual".
+- Em "Tem um julgamento no Brasil…": O juiz pode perder a votação
+- Em "É a Justiça Militar dos…": Jarbas Bezerra · [título a confirmar]
+- Em "Na maior parte dos crimes…": 1 juiz + 4 oficiais · Constituição, art. 125, § 5º
+- Em "Depois que acusação e defesa…": Votação a portas fechadas · CPPM, art. 434
+- Em "Cita súmula, cita doutrina, usa…": Grafismo: cinco cadeiras, uma acesa
+- Em "Se você advoga ou quer…": Salve e envie para um colega · Conteúdo educativo, sem orientação individual
 
-**Câmera B:** Código Penal Militar aberto no art. 38, em plano diagonal; mão marcando a linha com a caneta.
+**Câmera B:** Sem câmera B: o vídeo inteiro é o Dr. Jarbas falando para a câmera.
 
 **Conferir antes de gravar**
-- Art. 38 do CPM, alínea b e §§ 1º e 2º (redação do § 2º dada pela Lei nº 14.688/2023), conferido no Planalto em 06/10/2026.
-- "Vi carreiras interrompidas..." é relato dele, mantido da proposta. Sem caso, nome ou local.
+- CF, art. 125, § 5º (EC 45/2004): o Conselho de Justiça, presidido pelo juiz de direito, julga os crimes militares, salvo os cometidos contra civis (juiz sozinho) e os dolosos contra a vida de civil (júri, § 4º). Por isso o vídeo diz "a maior parte". Conferir no Planalto.
+- CPPM, art. 434: o Conselho delibera em sessão secreta. Confirmado em fonte secundária; conferir no Planalto.
+- "Quatro oficiais da própria polícia ou do corpo de bombeiros" e "não precisam ser formadas em Direito": composição do Conselho no RN. Dr. Jarbas confirma.
+- "Eu julguei ali por quase vinte e oito anos": o SIGAA registra magistratura desde 1990; o tempo na Justiça Militar vem da proposta. Dr. Jarbas confirma.
 
-**Legenda sugerida:** Hierarquia tem limite na lei: ordem manifestamente criminosa não protege quem a cumpre. O que diz o art. 38 do Código Penal Militar. Conteúdo educativo, sem orientação individual.
+**Legenda sugerida:** Na Justiça Militar dos estados, a maior parte dos crimes é julgada por cinco pessoas: o juiz e quatro oficiais. Eles votam a portas fechadas e vale a maioria (CF, art. 125; CPPM, art. 434). Para quem advoga ali, isso muda a forma de defender. Salve e envie para quem atua na área. Conteúdo educativo, sem orientação individual.
 
-## Episódio 2 · Rigor de comando e arbítrio pessoal
-**Base:** Gestão institucional e prevenção no CPM (proposta, roteiro 10)
-**Duração estimada:** 60 segundos, em leitura calma (139 palavras). **Arquivo do teleprompter:** `teleprompter/B2.txt`.
+## Episódio 2 · O que a lei diz que é de graça
+**Base:** Vídeo individual 4 (versão de 09/10/2026, sem quadro) · Locação 2 · sala de madeira, Têmis e cadeiras antigas
+**Duração estimada:** 69 segundos, em leitura calma (162 palavras). **Arquivo do teleprompter:** `teleprompter/B2.txt`.
 
 **Tempos**
-- **0:00 a 0:09** · GANCHO (21 palavras)
-- **0:09 a 0:14** · ABERTURA (12 palavras)
-- **0:14 a 0:42** · CORPO (66 palavras)
-- **0:42 a 0:52** · SÍNTESE (25 palavras)
-- **0:52 a 0:59** · FECHO (15 palavras)
+- **0:00 a 0:10** · GANCHO (24 palavras)
+- **0:10 a 0:16** · AUTORIDADE (14 palavras)
+- **0:16 a 0:50** · CONTEÚDO (82 palavras)
+- **0:50 a 1:00** · VIRADA (23 palavras)
+- **1:00 a 1:08** · CTA (19 palavras)
 
 **Em tela (aplicar na edição, sem ler no teleprompter)**
-- Abertura: letreiro "Antes da Consequência" por 2 s.
-- Quando citar o inciso: "Constituição, art. 5º, LV".
-- Fecho: aviso "Conteúdo educativo, sem orientação individual".
+- Em "Certidão de nascimento, pedido de…": De graça, por lei
+- Em "Trabalho com educação cidadã desde…": Jarbas Bezerra · [título a confirmar]
+- Em "A Constituição manda a lei…": Constituição, art. 5º, LXXVII · Lei nº 9.265/1996
+- Em "Estão na lista os atos…": Lei nº 9.265/1996, art. 1º, I a V
+- Em "E também o registro de…": art. 1º, VI e VII (Leis 9.534/1997 e 13.977/2020)
+- Em "Salva esse vídeo para ter…": Salve para consultar · Conteúdo educativo, sem orientação individual
 
-**Câmera B:** Constituição aberta no art. 5º, inciso LV; mão virando para a página do inciso.
+**Câmera B:** Sem câmera B: o vídeo inteiro é o Dr. Jarbas falando para a câmera.
 
 **Conferir antes de gravar**
-- Art. 5º, LV, da Constituição, conferido no Planalto em 06/10/2026.
-- "O procedimento fica sujeito à anulação" e "a conduta do comandante pode ser examinada" são cuidadosas. A proposta dizia que o comandante responderia por abuso de autoridade, o que depende do caso e da lei aplicável. [revisão jurídica]
-- "Na minha experiência" mantém o tom pessoal da proposta. Sem caso, nome ou local.
+- CF, art. 5º, LXXVII, e Lei nº 9.265/1996, art. 1º, I a VII, com as inclusões das Leis nº 9.534/1997 e nº 13.977/2020: conferidos no Planalto em 06/10/2026 (carrossel Cidadania em Prática 2). Reconferir a versão vigente.
+- "Os atos para votar" resume o inciso I (atos que capacitam ao exercício da soberania popular, art. 14 da CF). Revisor jurídico confirma o resumo.
+- "Desde dois mil e treze" e "essa lei sempre surpreende" são a experiência dele. Dr. Jarbas confirma.
+- O vídeo não promete gratuidade em todo caso; manda conferir a lei e o órgão.
 
-**Legenda sugerida:** Rigor de comando e arbítrio pessoal não se confundem. O contraditório e a ampla defesa valem também no processo administrativo (CF, art. 5º, LV). Conteúdo educativo, sem orientação individual.
+**Legenda sugerida:** A Constituição garante a gratuidade dos atos necessários ao exercício da cidadania, na forma da lei (art. 5º, LXXVII). A Lei nº 9.265/1996 lista esses atos, e a lista cresceu com as Leis nº 9.534/1997 e nº 13.977/2020. Antes de pagar por um deles, confira a lei na versão atual e o órgão responsável. Salve para consultar. Conteúdo educativo, sem orientação individual.
 
 ## Episódio 3 · Antes de publicar: o militar nas redes sociais
 **Base:** Prevenção, CPM art. 166 (proposta nova, tema da pauta)
