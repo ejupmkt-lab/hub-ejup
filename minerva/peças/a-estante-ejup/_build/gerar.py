@@ -202,7 +202,57 @@ PROJETO_AMARO = {
     ],
 }
 
-EDICOES = {e["pasta"]: e for e in (TRIBOS, ZERO_A_UM, PROJETO_AMARO)}
+# Os Mandamentos do Advogado: o trilho vai do I ao X, os dez mandamentos, e
+# avança pelos quatro verbos que o story 4 junta: estudar, pensar, lutar e ter
+# paciência (1º, 2º, 4º e 7º mandamentos de Couture).
+MANDAMENTOS = {
+    "pasta": "mandamentos-do-advogado",
+    "escala": ["ESTUDAR", "PENSAR", "LUTAR", "PACIÊNCIA"],
+    "extremos": ("I", "X"),
+    "cabecalho": False,
+    "teto": 124,
+    "titulo": "Os Mandamentos do Advogado",
+    "autor": "EDUARDO J. COUTURE",
+    "sobre": "Dez preceitos curtos do processualista uruguaio sobre o exercício da advocacia.",
+    "stories": [
+        {
+            "titulo": ("Se o Direito muda o tempo todo, <b>o que sustenta "
+                       "quem advoga?</b>"),
+            "corpo": ["A indicação de leitura de hoje é <b>“Os Mandamentos do "
+                      "Advogado”</b>, de Eduardo J. Couture."],
+            "livro": True,
+            "pilula": "Avance",
+        },
+        {
+            "titulo": ("O Direito se aprende estudando, mas <b>se exerce "
+                       "pensando.</b>"),
+            "corpo": [
+                "Dez preceitos curtos reúnem o que a prática pede: estudo, "
+                "trabalho, luta, lealdade e <b>paciência</b>.",
+            ],
+        },
+        {
+            "titulo": "Defendemos o estudo <b>como percurso.</b>",
+            "corpo": [
+                "O primeiro mandamento diz: “Estuda. O Direito se transforma "
+                "constantemente. Se não acompanhas seus passos, serás cada dia "
+                "um pouco menos advogado.”",
+                "A prática pede critério para escolher a luta e paciência para "
+                "esperar o resultado. <b>É o que a formação sustenta.</b>",
+            ],
+        },
+        {
+            "titulo": ("Estudar, pensar, lutar e ter paciência: <b>quatro verbos "
+                       "para uma carreira inteira.</b>"),
+            "corpo": [],
+            "pergunta": "Qual mandamento você mais precisa reler hoje? "
+                        "Responda no direct.",
+            "slogan": "Alma clássica, repertório contemporâneo.",
+        },
+    ],
+}
+
+EDICOES = {e["pasta"]: e for e in (TRIBOS, ZERO_A_UM, PROJETO_AMARO, MANDAMENTOS)}
 
 
 def fontes() -> str:
