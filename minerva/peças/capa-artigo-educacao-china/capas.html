@@ -200,12 +200,16 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;align-items:flex-start;
    mede onde a foto caiu e põe o centro do halo no ponto (FX, FY) da imagem */
 (function () {
   const FX = 0.497, FY = 0.30;   // centro da cabeça, em fração da foto tratada
+  const DH = 0.62;               // diâmetro do halo, em fração da altura do retrato
   document.querySelectorAll('.cover').forEach(s => {
     const img = s.querySelector('.foto img'), h = s.querySelector('.halo');
     if (!img || !h || !img.offsetParent) return;
     const centrar = () => {
       const sr = s.getBoundingClientRect(), r = img.getBoundingClientRect();
-      const d = h.getBoundingClientRect().width;
+      // o tamanho também segue o retrato: mesmo diâmetro em relação à cabeça
+      // em todos os formatos (antes cada formato tinha um valor fixo)
+      const d = r.height * DH;
+      h.style.width = h.style.height = d + 'px';
       h.style.left = (r.left - sr.left + r.width * FX - d / 2) + 'px';
       h.style.top = (r.top - sr.top + r.height * FY - d / 2) + 'px';
     };
