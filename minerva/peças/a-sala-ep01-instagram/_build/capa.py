@@ -46,7 +46,7 @@ body{{width:1080px;height:1920px;position:relative;overflow:hidden;font-family:G
 .titulo{{text-align:center;text-shadow:0 6px 40px rgba(0,0,0,.85)}}
 .titulo p{{font-weight:900;font-size:150px;line-height:.96;letter-spacing:.02em;text-transform:uppercase;padding-left:.02em}}
 .titulo p + p{{color:#f0b855}}
-.sala img{{width:250px;display:block;opacity:.95}}
+.sala img{{width:340px;display:block;opacity:.95}}
 .ejup{{position:absolute;left:0;right:0;bottom:76px;display:flex;justify-content:center}}
 .ejup svg{{height:40px;width:auto;opacity:.8}}
 </style></head><body>
