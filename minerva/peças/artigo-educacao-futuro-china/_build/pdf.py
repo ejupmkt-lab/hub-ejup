@@ -11,7 +11,10 @@ HERE = pathlib.Path(__file__).resolve().parent
 OUT = HERE.parent
 DS = HERE.parents[2] / "skills" / "ejup-design" / "assets"
 FONTS = (DS / "fonts").as_uri()
-md = (OUT / "artigo.md").read_text()
+import sys
+ARQ = sys.argv[1] if len(sys.argv) > 1 else "artigo.md"
+PDF = sys.argv[2] if len(sys.argv) > 2 else "Artigo_A_educacao_do_futuro_esta_em_curso_caso_da_China.pdf"
+md = (OUT / ARQ).read_text()
 md = re.sub(r'<!--.*?-->\s*', '', md, flags=re.S)
 body = markdown.markdown(md, extensions=["extra"]) if markdown else None
 if body is None:
@@ -34,7 +37,8 @@ p{{margin:0 0 3.2mm;text-align:justify;hyphens:auto;orphans:3;widows:3}}
 strong{{font-weight:700;color:#031c37}}
 ul{{margin:0 0 4mm;padding-left:5mm}} li{{margin-bottom:1.6mm;text-align:justify;hyphens:auto}}
 a{{color:#9b6b26;text-decoration:none;border-bottom:.2mm solid #9b6b26}}
-h1+p{{font-weight:400;font-size:11.5pt}}
+h1+p{{font-weight:300;font-size:11.5pt;font-style:italic;color:#414042}}
+h1+p em{{font-style:italic}}
 '''
 doc = f'<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>A educação do futuro está em curso</title><style>{CSS}</style></head><body><div class="logo">{logo}</div>{body}</body></html>'
 (OUT / "artigo.html").write_text(doc)
@@ -43,7 +47,7 @@ with sync_playwright() as p:
     pg = b.new_page()
     pg.goto((OUT / "artigo.html").as_uri())
     pg.wait_for_timeout(800)
-    pg.pdf(path=str(OUT / "Artigo_A_educacao_do_futuro_esta_em_curso_caso_da_China.pdf"), format="A4", print_background=True, display_header_footer=True,
+    pg.pdf(path=str(OUT / PDF), format="A4", print_background=True, display_header_footer=True,
            header_template="<span></span>",
            footer_template='<div style="width:100%;font-size:8px;color:#5f6062;text-align:center;font-family:sans-serif"><span class="pageNumber"></span> / <span class="totalPages"></span></div>',
            margin={"top": "22mm", "bottom": "22mm", "left": "20mm", "right": "20mm"})
