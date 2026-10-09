@@ -1,26 +1,43 @@
-# Carrossel · A lei brasileira também prevê fuzilamento · 9 telas 1080x1440
+# Carrossel · A Constituição brasileira admite a pena de morte · 15 telas 1080x1440
 
-`python3 _build/gerar.py && python3 _build/render.py`
+`python3 _build/tratar_fotos.py && python3 _build/gerar.py && python3 _build/render.py`
 
-Versão de 09/10/2026. Pauta do Victor, a partir da notícia do fuzilamento marcado
-pelos EUA. Telas em `telas/`, visão geral em `visualizacao-completa.png`, legenda
-em `legenda.md`.
+Versão 3 de 09/10/2026. Histórico: a v1 (9 telas tipográficas) voltou por falta
+de imagem e excesso de texto; a v2 (16 telas com gravuras) pediu mais gráficos,
+ganchos e uma capa mais forte. Telas em `telas/`, visão geral em
+`visualizacao-completa.png`, legenda em `legenda.md`.
 
-1. Capa: "A lei brasileira também prevê fuzilamento", com o inciso XLVII em contorno.
-2. O caso americano: Nidal Hasan, Fort Hood, aprovação presidencial, transmissão anunciada.
-3. CF, art. 5º, XLVII: a proibição e a exceção na mesma linha; art. 84, XIX.
-4. CPM, art. 56: fuzilamento; Livro II, traição (art. 355).
-5. CPM, art. 57: comunicação ao Presidente e sete dias; CF, art. 84, XII.
-6. CPPM, arts. 707 e 708: o rito e a ata com duas testemunhas.
-7. CF, art. 60, §4º, IV, e Decreto 2.754/1998: a exceção tem limite fixo.
-8. Foucault e a ONU: a pena saiu do palco.
-9. Fecho: "Onde termina a publicidade da pena e começa o espetáculo?"
+1. Capa: "A Constituição brasileira admite a pena de morte." Imagem gerada no
+   Higgsfield: venda de pano sobre a Constituição aberta (a venda da Justiça e a
+   do condenado, CPPM art. 707).
+2. A notícia: os EUA marcaram um fuzilamento para 3 de dezembro.
+3. Gráfico: 65 anos sem execução militar nos EUA (1961 a 2026).
+4. "salvo": a exceção inteira em uma palavra (CF, art. 5º, XLVII).
+5. Diagrama: guerra declarada exige Presidente e Congresso (CF, art. 84, XIX).
+6. CPM, art. 56, em citação.
+7. Só crimes militares em tempo de guerra: a traição (art. 355).
+8. Gráfico: sete dias entre a sentença e a execução, janela para indulto (CPM, art. 57).
+9. O rito em quatro itens (CPPM, arts. 707 e 708), com a venda no alto.
+10. Quadro Brasil x EUA.
+11. Cláusula pétrea e Decreto 2.754/1998.
+12 e 13. Linha do tempo "Da praça à tela", que atravessa as duas telas sobre a
+   gravura de Hogarth: 1747, 1757, 1961, 2026.
+14. ONU, sobre Goya.
+15. Fecho com a venda, espelhando a capa.
+
+Sem etiqueta (eyebrow) acima dos títulos, a pedido do Victor (09/10/2026): a referência da lei entra no próprio texto. Cada tela termina com um gancho para a seguinte ("Há 65 anos isso não
+acontecia →", "E no Brasil? →", "Quem declara a guerra? →"...).
+
+## Imagem gerada (Higgsfield)
+Aprovada pelo Victor em 09/10/2026: GPT Image 2.5, qualidade alta, 2K, 3:4,
+2 variações, 2,75 créditos (saldo antes: 235,41). Usadas: variação A na capa e
+no fecho, variação B na faixa da tela 9. Arquivos em `fotos/higgsfield-venda-*.png`.
+A legenda informa que a capa foi gerada com IA.
 
 ## Design
-Tipográfico, sem fotografia: nada de arma, pelotão, condenado ou contagem para
-3 de dezembro. O texto da lei é a imagem: citação em Gotham Book com filete de
-acento, eyebrow com o dispositivo, numeral do artigo em contorno ao fundo. Fundos
-alternados (navy, tinta, papel, aço). Títulos com quebra balanceada.
+Gravuras de Manet, Goya e Hogarth em duotone navy (detalhes em
+`fotos/CREDITOS.md`). Nenhuma fotografia de pessoa real, nenhuma arma em
+primeiro plano, nenhuma contagem para 3 de dezembro.
 
 ## Fontes (itens 20 e 21)
 Imprensa:
