@@ -38,9 +38,37 @@ Gravar por quadro, na ordem abaixo. Um take extra do fecho (aviso e convite à p
 
 # Quadro · O Que o Processo Não Mostra
 
-## Episódio 1 · O juiz que pode perder a votação
+## Episódio 1 · Cidadania tem método
 **Base:** Vídeo individual 1 (versão de 09/10/2026, sem quadro) · Locação 1 · gabinete, sentado à mesa
-**Duração estimada:** 69 segundos, em leitura calma (163 palavras). **Arquivo do teleprompter:** `teleprompter/A1.txt`.
+**Duração estimada:** 68 segundos, em leitura calma (159 palavras). **Arquivo do teleprompter:** `teleprompter/A1.txt`.
+
+**Tempos**
+- **0:00 a 0:08** · GANCHO (19 palavras)
+- **0:08 a 0:17** · AUTORIDADE (21 palavras)
+- **0:17 a 0:34** · CONTEÚDO (40 palavras)
+- **0:34 a 0:54** · VIRADA (48 palavras)
+- **0:54 a 1:07** · CTA (31 palavras)
+
+**Em tela (aplicar na edição, sem ler no teleprompter)**
+- Em "Pergunte a um advogado o…": O que é cidadania?
+- Em "Eu passei anos estudando essa…": Jarbas Bezerra · [título a confirmar]
+- Em "A conclusão é que cidadania…": Cidadania como ciência
+- Em "Ela tem objeto próprio, fundamentos,…": objeto · fundamentos · princípios · método
+- Em "Comenta aqui: qual direito você…": Livro · Cidadania: a Ciência das Ciências · Conteúdo educativo, sem orientação individual
+
+**Câmera B:** Sem câmera B: o vídeo inteiro é o Dr. Jarbas falando para a câmera.
+
+**Conferir antes de gravar**
+- Doutorado em Educação pela UFRN (2022), tese "A cidadania como Ciência": perfil do docente no SIGAA/UFRN.
+- Tese do livro (objeto próprio, fundamentos, princípios e método; diálogo com Direito, educação, saúde e economia): Tribuna do Norte, lançamento de 30/09/2026.
+- "Dois livros": a coluna de Simone Silva (Agora RN, 02/10/2026) diz que o novo é a segunda obra dele sobre cidadania. Dr. Jarbas confirma o título do primeiro.
+- Título exato do livro novo: Tribuna do Norte grafa "Cidadania - a Ciência das Ciências". Dr. Jarbas confirma a grafia para o lettering.
+
+**Legenda sugerida:** Cidadania costuma ser lembrada como uma lista de direitos e deveres. Na tese de doutorado em Educação (UFRN, 2022) e nos livros que vieram dela, a cidadania é tratada como ciência: objeto próprio, fundamentos, princípios e método. Para quem é da área jurídica, a pergunta muda: a pessoa sabe exercer os direitos que tem? Livro novo: Cidadania: a Ciência das Ciências. Conteúdo educativo, sem orientação individual.
+
+## Episódio 2 · O juiz que pode perder a votação
+**Base:** Vídeo individual 2 (versão de 09/10/2026, sem quadro) · Locação 1 · gabinete, sentado à mesa
+**Duração estimada:** 69 segundos, em leitura calma (163 palavras). **Arquivo do teleprompter:** `teleprompter/A2.txt`.
 
 **Tempos**
 - **0:00 a 0:10** · GANCHO (23 palavras)
@@ -60,45 +88,12 @@ Gravar por quadro, na ordem abaixo. Um take extra do fecho (aviso e convite à p
 **Câmera B:** Sem câmera B: o vídeo inteiro é o Dr. Jarbas falando para a câmera.
 
 **Conferir antes de gravar**
-- CF, art. 125, § 5º (EC 45/2004): o Conselho de Justiça, presidido pelo juiz de direito, julga os crimes militares, salvo os cometidos contra civis (juiz sozinho) e os dolosos contra a vida de civil (júri, § 4º). Por isso o vídeo diz "a maior parte". Conferir no Planalto (fora do ar em 08/10).
+- CF, art. 125, § 5º (EC 45/2004): o Conselho de Justiça, presidido pelo juiz de direito, julga os crimes militares, salvo os cometidos contra civis (juiz sozinho) e os dolosos contra a vida de civil (júri, § 4º). Por isso o vídeo diz "a maior parte". Conferir no Planalto.
 - CPPM, art. 434: o Conselho delibera em sessão secreta. Confirmado em fonte secundária; conferir no Planalto.
-- "Quatro oficiais da própria polícia ou do corpo de bombeiros": composição do Conselho no RN pela lei de organização judiciária. Dr. Jarbas confirma.
-- "Não precisam ser formadas em Direito": os juízes militares são oficiais, sem exigência de formação jurídica. Dr. Jarbas confirma a frase.
-- "Eu julguei ali por quase vinte e oito anos": Dr. Jarbas confirma tempo e forma de dizer.
+- "Quatro oficiais da própria polícia ou do corpo de bombeiros" e "não precisam ser formadas em Direito": composição do Conselho no RN. Dr. Jarbas confirma.
+- "Eu julguei ali por quase vinte e oito anos": o SIGAA registra magistratura desde 1990; o tempo na Justiça Militar vem da proposta. Dr. Jarbas confirma.
 
-**Legenda sugerida:** Na Justiça Militar dos estados, a maior parte dos crimes é julgada por cinco pessoas: o juiz e quatro oficiais. Eles votam a portas fechadas e vale a maioria (CF, art. 125; CPPM, art. 434). Para quem advoga ali, isso muda tudo na forma de defender. Salve e envie para quem atua na área. Conteúdo educativo, sem orientação individual.
-
-## Episódio 2 · Oito dias
-**Base:** Vídeo individual 2 (versão de 09/10/2026, sem quadro) · Locação 1 · gabinete, sentado à mesa
-**Duração estimada:** 71 segundos, em leitura calma (163 palavras). **Arquivo do teleprompter:** `teleprompter/A2.txt`.
-
-**Tempos**
-- **0:00 a 0:09** · GANCHO (22 palavras)
-- **0:09 a 0:16** · CONTEÚDO (14 palavras)
-- **0:16 a 0:24** · AUTORIDADE (18 palavras)
-- **0:24 a 0:31** · CONTEÚDO (16 palavras)
-- **0:31 a 0:52** · VIRADA (51 palavras)
-- **0:52 a 1:02** · AUTORIDADE (24 palavras)
-- **1:02 a 1:10** · CTA (18 palavras)
-
-**Em tela (aplicar na edição, sem ler no teleprompter)**
-- Em "Um militar sai do quartel…": 8 dias
-- Em "É a deserção. A pena…": Deserção · Código Penal Militar, art. 187
-- Em "Em quase vinte e oito…": Jarbas Bezerra · [título a confirmar]
-- Em "Para quem advoga, o primeiro…": Data da saída · data da volta
-- Em "E tem um detalhe que…": Apresentação voluntária · CPM, art. 189, I
-- Em "Foi por ver tanta gente…": Probec · Programa Brasileiro de Educação Cidadã
-- Em "Se você advoga para militares,…": Envie para quem precisa saber · Conteúdo educativo, sem orientação individual
-
-**Câmera B:** Sem câmera B: o vídeo inteiro é o Dr. Jarbas falando para a câmera.
-
-**Conferir antes de gravar**
-- CPM, art. 187 (deserção: ausência sem licença por mais de oito dias; detenção de seis meses a dois anos) e art. 189, I (apresentação voluntária em até oito dias após a consumação: pena diminuída de metade). Confirmados em fontes secundárias; conferir no Planalto.
-- "Volta em oito dias: o problema é disciplinar" é simplificação para o vídeo; ausência menor pode ter outras consequências conforme o regulamento. Revisor jurídico confirma.
-- "Vi muitos jovens descobrirem essa conta na frente do juiz" e "voltavam no nono dia" são relato dele. Dr. Jarbas confirma.
-- Probec: autorização para citar e coautoria (o programa foi idealizado com a advogada Lígia Limeira, segundo a Assembleia). Dr. Jarbas decide.
-
-**Legenda sugerida:** Até oito dias fora do quartel sem autorização, o problema é disciplinar. Do nono dia em diante, é deserção: crime com pena de seis meses a dois anos de detenção (CPM, art. 187). E quem se apresenta por conta própria em até oito dias depois disso tem a pena reduzida pela metade (CPM, art. 189, I). Envie para quem precisa saber. Conteúdo educativo, sem orientação individual.
+**Legenda sugerida:** Na Justiça Militar dos estados, a maior parte dos crimes é julgada por cinco pessoas: o juiz e quatro oficiais. Eles votam a portas fechadas e vale a maioria (CF, art. 125; CPPM, art. 434). Para quem advoga ali, isso muda a forma de defender. Salve e envie para quem atua na área. Conteúdo educativo, sem orientação individual.
 
 ## Episódio 3 · A Justiça Militar como especialidade
 **Base:** Direito Penal Militar aplicado (proposta, roteiro 12)
@@ -126,65 +121,63 @@ Gravar por quadro, na ordem abaixo. Um take extra do fecho (aviso e convite à p
 
 # Quadro · Antes da Consequência
 
-## Episódio 1 · Obedecer também pode dar condenação
+## Episódio 1 · A lei que mudou a escola em julho
 **Base:** Vídeo individual 3 (versão de 09/10/2026, sem quadro) · Locação 2 · em pé, parede neutra
-**Duração estimada:** 68 segundos, em leitura calma (161 palavras). **Arquivo do teleprompter:** `teleprompter/B1.txt`.
+**Duração estimada:** 71 segundos, em leitura calma (167 palavras). **Arquivo do teleprompter:** `teleprompter/B1.txt`.
 
 **Tempos**
-- **0:00 a 0:07** · GANCHO (16 palavras)
-- **0:07 a 0:15** · AUTORIDADE (18 palavras)
-- **0:15 a 0:36** · CONTEÚDO (52 palavras)
-- **0:36 a 1:02** · VIRADA (62 palavras)
-- **1:02 a 1:08** · CTA (13 palavras)
+- **0:00 a 0:09** · GANCHO (21 palavras)
+- **0:09 a 0:37** · CONTEÚDO (69 palavras)
+- **0:37 a 0:47** · AUTORIDADE (23 palavras)
+- **0:47 a 1:01** · VIRADA (33 palavras)
+- **1:01 a 1:10** · CTA (21 palavras)
 
 **Em tela (aplicar na edição, sem ler no teleprompter)**
-- Em "O militar que recusa uma…": Recusar ou cumprir?
-- Em "Eu julguei crimes militares por…": Jarbas Bezerra · [título a confirmar]
-- Em "Recusar ordem de serviço do…": Recusa de obediência · Código Penal Militar, art. 163
-- Em "Cumprir a ordem protege o…": Código Penal Militar, art. 38
-- Em "Quando a ordem é para…": 1. ordem manifestamente criminosa · 2. excesso
-- Em "Repare no claramente. A lei…": "Claramente"
-- Em "Se você atua na área…": Salve para consultar · Conteúdo educativo, sem orientação individual
+- Em "Em julho, uma lei mudou…": Lei nº 15.468/2026
+- Em "A Lei quinze mil quatrocentos…": LDB, art. 26 · educação política e cidadania
+- Em "Ele entra no estudo da…": Lei nº 15.467/2026 · primeira semana de maio
+- Em "Só que a lei não…": Séries e formação de professores: a regulamentar
+- Em "Eu defendo isso desde dois…": Jarbas Bezerra · [título a confirmar]
+- Em "Se você é da área…": Salve e envie para um professor · Conteúdo educativo, sem orientação individual
 
 **Câmera B:** Sem câmera B: o vídeo inteiro é o Dr. Jarbas falando para a câmera.
 
 **Conferir antes de gravar**
-- CPM, art. 38, alínea b e § 2º ("é punível também o inferior"; redação do § 2º dada pela Lei nº 14.688/2023), conferido no Planalto em 06/10/2026.
-- CPM, art. 163 (recusa de obediência; detenção de um a dois anos, se o fato não constitui crime mais grave). Confirmado em fontes secundárias; conferir no Planalto.
-- "Claramente criminoso" traduz o "manifestamente criminoso" da lei; o lettering mostra o termo legal. Revisor jurídico confirma a tradução.
-- "Eu julguei crimes militares por quase vinte e oito anos": Dr. Jarbas confirma.
+- Lei nº 15.468, de 13/07/2026 (PL 4.088/2023): inclui o § 9º-B no art. 26 da LDB; componente obrigatório no estudo da realidade social e política; não define séries nem formação docente (Câmara dos Deputados, Senado Notícias, Atlas Público). Conferir o texto no Planalto.
+- Lei nº 15.467/2026 (PL 162/2024): Semana Nacional da Ética e da Cidadania na primeira semana de maio (Senado Notícias, 15/07/2026). Conferir no Planalto.
+- Setembro Cidadão idealizado por Jarbas Bezerra e Lígia Limeira em 2013 no RN: coluna de Simone Silva, Agora RN, 17/07/2026. Dr. Jarbas confirma e decide como citar a coautora.
+- O vídeo não diz que a lei federal nasceu da ideia dele; diz só que ele defende o tema desde 2013.
 
-**Legenda sugerida:** Recusar ordem de serviço é crime (CPM, art. 163). Cumprir também pode ser, quando a ordem é claramente criminosa ou quando há excesso na execução (CPM, art. 38). Na defesa, a pergunta que costuma decidir é como a ordem foi cumprida. Salve para consultar. Conteúdo educativo, sem orientação individual.
+**Legenda sugerida:** A Lei nº 15.468/2026 colocou a educação política e os direitos da cidadania entre os conteúdos obrigatórios da educação básica (LDB, art. 26). A Lei nº 15.467/2026 criou a Semana Nacional da Ética e da Cidadania, na primeira semana de maio. A lei não diz quem vai ensinar, e a área jurídica tem muito a contribuir. Salve e envie para um professor. Conteúdo educativo, sem orientação individual.
 
-## Episódio 2 · A frase que todo mundo lê pela metade
+## Episódio 2 · O que a lei diz que é de graça
 **Base:** Vídeo individual 4 (versão de 09/10/2026, sem quadro) · Locação 2 · em pé, parede neutra
-**Duração estimada:** 69 segundos, em leitura calma (161 palavras). **Arquivo do teleprompter:** `teleprompter/B2.txt`.
+**Duração estimada:** 69 segundos, em leitura calma (162 palavras). **Arquivo do teleprompter:** `teleprompter/B2.txt`.
 
 **Tempos**
-- **0:00 a 0:10** · GANCHO (23 palavras)
-- **0:10 a 0:14** · AUTORIDADE (10 palavras)
-- **0:14 a 0:36** · CONTEÚDO (53 palavras)
-- **0:36 a 0:51** · AUTORIDADE (34 palavras)
-- **0:51 a 0:56** · VIRADA (11 palavras)
-- **0:56 a 1:09** · CTA (30 palavras)
+- **0:00 a 0:10** · GANCHO (24 palavras)
+- **0:10 a 0:16** · AUTORIDADE (14 palavras)
+- **0:16 a 0:50** · CONTEÚDO (82 palavras)
+- **0:50 a 1:00** · VIRADA (23 palavras)
+- **1:00 a 1:08** · CTA (19 palavras)
 
 **Em tela (aplicar na edição, sem ler no teleprompter)**
-- Em "A Constituição diz que não…": Lida pela metade · Constituição, art. 142, § 2º
-- Em "Passei quase vinte e oito…": Jarbas Bezerra · [título a confirmar]
-- Em "O Supremo já decidiu como…": STF, RE 338.840
-- Em "O juiz olha se quem…": autoridade · ligação com o serviço · punição cabível
-- Em "Na minha mesa, a punição…": Direito de defesa · Constituição, art. 5º, LV
-- Em "Se você atende militares, salva…": Salve e envie · Conteúdo educativo, sem orientação individual
+- Em "Certidão de nascimento, pedido de…": De graça, por lei
+- Em "Trabalho com educação cidadã desde…": Jarbas Bezerra · [título a confirmar]
+- Em "A Constituição manda a lei…": Constituição, art. 5º, LXXVII · Lei nº 9.265/1996
+- Em "Estão na lista os atos…": Lei nº 9.265/1996, art. 1º, I a V
+- Em "E também o registro de…": art. 1º, VI e VII (Leis 9.534/1997 e 13.977/2020)
+- Em "Salva esse vídeo para ter…": Salve para consultar · Conteúdo educativo, sem orientação individual
 
 **Câmera B:** Sem câmera B: o vídeo inteiro é o Dr. Jarbas falando para a câmera.
 
 **Conferir antes de gravar**
-- CF, art. 142, § 2º, e art. 5º, LV. Conferir no Planalto.
-- STF, RE 338.840, 2ª Turma, Rel. Min. Ellen Gracie, 19/08/2003: o exame alcança os pressupostos de legalidade (hierarquia, poder disciplinar, ato ligado à função, pena susceptível de aplicação disciplinar). No vídeo, hierarquia e poder disciplinar viram "autoridade". Conferir a ementa no portal do STF.
-- "A punição que caía quase sempre caía pela forma" é experiência dele. Dr. Jarbas confirma.
-- Revisão jurídica: o texto fala do controle de legalidade em geral, sem prometer anulação a ninguém.
+- CF, art. 5º, LXXVII, e Lei nº 9.265/1996, art. 1º, I a VII, com as inclusões das Leis nº 9.534/1997 e nº 13.977/2020: conferidos no Planalto em 06/10/2026 (carrossel Cidadania em Prática 2). Reconferir a versão vigente.
+- "Os atos para votar" resume o inciso I (atos que capacitam ao exercício da soberania popular, art. 14 da CF). Revisor jurídico confirma o resumo.
+- "Desde dois mil e treze" e "essa lei sempre surpreende" são a experiência dele. Dr. Jarbas confirma.
+- O vídeo não promete gratuidade em todo caso; manda conferir a lei e o órgão.
 
-**Legenda sugerida:** "Não caberá habeas corpus em relação a punições disciplinares militares" (CF, art. 142, § 2º). Para o STF, a justiça da punição fica com o comando e a legalidade fica com o juiz (RE 338.840). Na prática, os erros de forma são os que mais derrubam punições. Salve e envie para quem atende militares. Conteúdo educativo, sem orientação individual.
+**Legenda sugerida:** A Constituição garante a gratuidade dos atos necessários ao exercício da cidadania, na forma da lei (art. 5º, LXXVII). A Lei nº 9.265/1996 lista esses atos, e a lista cresceu com as Leis nº 9.534/1997 e nº 13.977/2020. Antes de pagar por um deles, confira a lei na versão atual e o órgão responsável. Salve para consultar. Conteúdo educativo, sem orientação individual.
 
 ## Episódio 3 · Antes de publicar: o militar nas redes sociais
 **Base:** Prevenção, CPM art. 166 (proposta nova, tema da pauta)
