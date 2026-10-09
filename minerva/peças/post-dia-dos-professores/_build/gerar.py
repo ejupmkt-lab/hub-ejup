@@ -39,8 +39,8 @@ html,body{{background:#10151b}}
 .titulo{{white-space:nowrap;font-size:100px;line-height:1.02;letter-spacing:-.03em;font-weight:300}}
 .titulo b{{display:block;font-weight:900;letter-spacing:-.035em}}
 .regua{{width:96px;height:2px;background:var(--bronze);margin:56px 0 50px}}
-.apoio{{font-weight:300;font-size:38px;line-height:1.42;color:var(--graphite);max-width:780px}}
-.apoio b{{display:block;font-weight:700;color:var(--navy);margin-top:12px}}
+.apoio{{text-wrap:balance;font-weight:300;font-size:38px;line-height:1.42;color:var(--graphite);max-width:860px}}
+.apoio b{{font-weight:700;color:var(--navy);white-space:nowrap}}
 .cadeia{{position:absolute;left:120px;right:120px;top:835px;height:190px;display:flex;align-items:flex-end;justify-content:center;gap:0}}
 .cadeia::before{{content:"";position:absolute;left:0;right:0;bottom:82px;height:1px;background:linear-gradient(90deg,rgba(3,28,55,0),rgba(3,28,55,.35) 22%,rgba(3,28,55,.35) 78%,rgba(3,28,55,0))}}
 .no{{position:relative;margin:0 34px;flex:none;display:flex;align-items:center;justify-content:center;transform:translateY(0)}}
@@ -53,9 +53,9 @@ html,body{{background:#10151b}}
 html = f'''<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Dia dos Professores · EJUP</title><style>{CSS}</style></head><body>
 <div class="post"><div class="moldura"><i></i><i></i><i></i><i></i></div>
 <div class="miolo"><h1 class="titulo">Todo percurso<b>tem um professor.</b></h1><div class="regua"></div>
-<p class="apoio">Todo jurista, todo profissional, chegou onde chegou porque alguém lhe ensinou.<b>E quem ensina forma quem vai ensinar.</b></p></div>
+<p class="apoio">A EJUP deseja um <b>feliz Dia dos Professores</b> a todos que dedicam suas vidas a formar pessoas.</p></div>
 <div class="cadeia">{simbolos}</div>
-<div class="data">15 de outubro · Dia do Professor</div>
+<div class="data">15 de outubro</div>
 <div class="rodape">{LOGO}</div></div></body></html>'''
 (OUT / "post-dia-dos-professores.html").write_text(html)
 print("ok")

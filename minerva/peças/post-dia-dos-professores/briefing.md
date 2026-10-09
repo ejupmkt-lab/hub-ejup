@@ -22,7 +22,7 @@
 ## 4. Texto da arte
 - **Chip:** EJUP · DIA DO PROFESSOR
 - **Título:** Todo percurso (Black, branco) / tem um professor. (Light, dourado)
-- **Apoio:** Todo jurista, todo profissional, chegou onde chegou porque alguém lhe ensinou. E quem ensina forma quem vai ensinar.
+- **Apoio:** A EJUP deseja um feliz Dia dos Professores a todos que dedicam suas vidas a formar pessoas.
 - **Linha de dados:** 15 de outubro · Homenagem a quem ensina
 - **Elemento central:** quatro anéis dourados encadeados, cada um maior que o anterior, o último saindo da tela, com halo dourado atrás.
 - **Logo** branco centralizado na base.
@@ -34,7 +34,7 @@ Esse professor também teve os seus, numa cadeia em que cada geração forma a s
 
 É a mesma lógica que sustenta a formação que defendemos aqui. Aprender é um percurso que se acumula, e ele só existe porque alguém, em algum momento, dedicou tempo a ensinar.
 
-Feliz Dia dos Professores a quem ensina e a quem já foi ensinado.
+A EJUP deseja um feliz Dia dos Professores a todos que dedicam suas vidas a formar pessoas.
 
 Para conhecer a EJUP, o link do site está na bio.
 
