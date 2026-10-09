@@ -32,6 +32,7 @@ f = lambda n: base64.b64encode((FON / f"Gotham-{n}.otf").read_bytes()).decode()
 
 HTML = f"""<html><head><meta charset="utf-8"><style>
 @font-face{{font-family:G;font-weight:300;src:url(data:font/otf;base64,{f('Light')})}}
+@font-face{{font-family:G;font-weight:400;src:url(data:font/otf;base64,{f('Book')})}}
 @font-face{{font-family:G;font-weight:900;src:url(data:font/otf;base64,{f('Black')})}}
 *{{margin:0;box-sizing:border-box}}
 body{{width:1080px;height:1920px;position:relative;overflow:hidden;font-family:G;color:#fff;background:#020a14}}
@@ -42,10 +43,10 @@ body{{width:1080px;height:1920px;position:relative;overflow:hidden;font-family:G
 .foco{{position:absolute;left:-60px;right:-60px;top:780px;height:520px;background:radial-gradient(50% 50% at 50% 50%,rgba(2,10,20,.72) 0%,rgba(2,10,20,.38) 55%,rgba(2,10,20,0) 100%)}}
 .grao{{position:absolute;inset:0;opacity:.16;mix-blend-mode:overlay}}
 .bloco{{position:absolute;left:0;right:0;top:90px;height:1920px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:46px}}
-.tag{{font-weight:300;font-size:40px;letter-spacing:.34em;text-transform:uppercase;color:#e6e9ee;padding-left:.34em;text-shadow:0 2px 24px rgba(0,0,0,.9)}}
+.tag{{font-weight:400;font-size:40px;letter-spacing:.3em;text-transform:uppercase;color:#e6e9ee;padding-left:.34em;text-shadow:0 2px 24px rgba(0,0,0,.9)}}
 .tag b{{font-weight:900;color:#f0b855;letter-spacing:.3em}}
 .sala img{{width:620px;display:block;filter:drop-shadow(0 6px 34px rgba(0,0,0,.85))}}
-.estreia{{position:absolute;left:0;right:0;top:1560px;text-align:center;font-weight:300;font-size:28px;letter-spacing:.42em;text-transform:uppercase;color:#c9ced6;padding-left:.42em}}
+.estreia{{position:absolute;left:0;right:0;top:1560px;text-align:center;font-weight:400;font-size:28px;letter-spacing:.38em;text-transform:uppercase;color:#c9ced6;padding-left:.42em}}
 .estreia b{{font-weight:900;color:#fff}}
 .ejup{{position:absolute;left:0;right:0;bottom:76px;display:flex;justify-content:center}}
 .ejup svg{{height:44px;width:auto;opacity:.85}}
