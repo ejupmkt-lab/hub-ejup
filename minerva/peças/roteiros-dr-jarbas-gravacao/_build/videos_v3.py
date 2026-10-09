@@ -116,46 +116,46 @@ def blocos(k):
     return out
 
 
-# Enquadramento vertical 9:16 e B-roll por trecho (pedido do Victor, 09/10/2026).
-# O B-roll entra por cima da fala, com o áudio dele seguindo.
+# Enquadramento vertical 9:16 por trecho (pedido do Victor, 09/10/2026). Sem B-roll:
+# não há tempo de gravar no dia; o vídeo é só ele falando.
 IMAGEM_9x16 = {
  "A1": [
   "PP vertical. Sentado à mesa, câmera na altura dos olhos, do outro lado da mesa. Cabeça no terço de cima, estante alta ao fundo (Têmis e corujas). Livro A Cidadania como Ciência em pé no canto da mesa, acima dos 20% de baixo. Vitrine de carteiras fora de quadro.",
-  "PM. B-roll (2 s): as duas capas lado a lado sobre a mesa, vistas de cima; a mão dele pousa o livro novo.",
+  "PM.",
   "PP. Pausa curta antes da frase.",
-  "PM. Contar os quatro pontos com a mão na altura do peito, para caber no quadro vertical. B-roll (2 s): páginas do livro sendo folheadas.",
-  "PM. B-roll (3 s): movimento lento de baixo para cima na estante (globo, corujas, Vade Mecum).",
+  "PM. Contar os quatro pontos com a mão na altura do peito, para caber no quadro vertical.",
+  "PM.",
   "PP.",
-  "PM. B-roll (2 s): a Sala Educação e Cidadania, mesa em U vazia, plano vertical do fundo da sala.",
-  "PM. Olhar na lente até o fim. B-roll opcional (1 s) no nome do livro: a capa do livro novo em close.",
+  "PM.",
+  "PM. Olhar na lente até o fim.",
  ],
  "A2": [
   "PP vertical. Câmera do outro lado da mesa: um painel de recortes de jornal (já é vertical) atrás do ombro dele. Cabeça no terço de cima. Gravata diferente da do vídeo 1.",
-  "PM. B-roll (2 s): a mesa em U da Sala Educação e Cidadania vista de cima, como uma sala de aula.",
+  "PM.",
   "PM.",
   "PP.",
-  "PM. B-roll (2 s): detalhe dos recortes de jornal e do Diário Oficial emoldurado na Sala Educação e Cidadania.",
+  "PM.",
   "PP. Pausa curta antes da frase.",
-  "PM. B-roll (2 s): os logos do Instituto Professor Jarbas Bezerra e do Probec na parede, um de cada vez, sem o retrato da homenageada no quadro.",
+  "PM.",
   "PM. Olhar na lente até o fim.",
  ],
  "B1": [
   "PP vertical. Sentado numa das cadeiras antigas: o encosto alto emoldura a cabeça. Câmera um pouco abaixo dos olhos. Olhar firme, sem sorriso. Crucifixo fora de quadro, se a opção for neutralidade.",
-  "PM aberto, dos joelhos para cima: a parte de baixo de A Calúnia de Apeles aparece acima da cabeça. B-roll (2 s): a foto da posse, 27 de dezembro de 1990, e a toga emoldurada.",
-  "PM. B-roll (2 s): as duas cadeiras antigas lado a lado e o detalhe do couro lavrado.",
-  "PP. B-roll (1 s): a porta da sala se fechando, se houver porta no ambiente.",
+  "PM aberto, dos joelhos para cima: a parte de baixo de A Calúnia de Apeles aparece acima da cabeça.",
+  "PM.",
+  "PP.",
   "PP. Pausa curta antes da frase.",
-  "PM. B-roll (2 s): detalhe de A Calúnia de Apeles, o rei com orelhas de burro ouvindo dois conselheiros.",
+  "PM.",
   "PP. Segurar 1 s de silêncio depois da frase.",
   "PM. Tom de conversa, olhar na lente até o fim.",
  ],
  "B2": [
   "PP vertical. Em pé, a Têmis de olhos vendados atrás do ombro dele, o rosto da estátua na altura da cabeça. Parede de madeira ao fundo. Gravata diferente da do vídeo 3.",
   "PM, do peito para cima, com a balança da Têmis ao lado.",
-  "PM. B-roll (2 s): a balança da Têmis em close, de baixo para cima.",
+  "PM.",
   "PM. Contar os itens com a mão na altura do peito; o lettering da lista entra item a item.",
   "PP.",
-  "PM. B-roll (2 s): o Vade Mecum na estante do gabinete e a mão marcando uma página.",
+  "PM.",
   "PM. Olhar na lente até o fim.",
  ],
 }

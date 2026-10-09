@@ -231,7 +231,7 @@ def pagina_ep(k):
 <div class="meta">cerca de {round(dur)} s<br>teleprompter/{k}.txt</div></div>
 <table><colgroup><col style="width:31%"><col style="width:44%"><col style="width:25%"></colgroup>
 <thead><tr><th>Imagem</th><th>Fala</th><th>Lettering</th></tr></thead><tbody>{linhas}</tbody></table>
-<p class="legenda">Vertical 9:16, gravado em 4K na vertical. Cabeça no terço de cima; nada importante nos 14% de cima nem nos 20% de baixo da tela. PM: plano médio. PP: primeiro plano, com aproximação na edição. B-roll entra por cima da fala, com o áudio dele seguindo. Negrito na fala: palavra de ênfase. Tempos estimados em leitura calma.</p>
+<p class="legenda">Vertical 9:16, gravado em 4K na vertical. Cabeça no terço de cima; nada importante nos 14% de cima nem nos 20% de baixo da tela. PM: plano médio. PP: primeiro plano, com aproximação na edição. Negrito na fala: palavra de ênfase. Tempos estimados em leitura calma.</p>
 </section>'''
 
 
