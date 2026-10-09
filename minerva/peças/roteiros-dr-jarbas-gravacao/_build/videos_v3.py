@@ -18,31 +18,34 @@ Cada trecho: (bloco, imagem, fala, lettering).
 """
 
 AVISO = "Conteúdo educativo, sem orientação individual"
+# as duas locações no Espaço Jarbas Bezerra (fotos de 09/10/2026)
+LOC1 = "Locação 1 · gabinete vermelho, sentado à mesa"
+LOC2 = "Locação 2 · sala de madeira, Têmis e cadeiras antigas"
 
 VIDEOS = {
  "A1": dict(
-  num=1, titulo="Cidadania tem método", local="Locação 1 · gabinete, sentado à mesa",
+  num=1, titulo="Cidadania tem método", local=LOC1,
   seg=[
-   ("GANCHO", "PP. Olhar firme na lente.", "Pergunte a um advogado o que é cidadania. A resposta quase sempre é **uma lista** de direitos e deveres.", "O que é cidadania?"),
+   ("GANCHO", "PP. Sentado à mesa do gabinete vermelho, estante com a Têmis e as corujas ao fundo. Livro A Cidadania como Ciência em pé sobre a mesa, capa para a câmera. Fora de quadro: a vitrine de carteiras, que mostra números de documentos.", "Pergunte a um advogado o que é cidadania. A resposta quase sempre é **uma lista** de direitos e deveres.", "O que é cidadania?"),
    ("AUTORIDADE", "PM.", "Eu passei anos estudando essa pergunta. Ela virou minha tese de doutorado em Educação, na UFRN, e hoje são **dois livros**.", "Jarbas Bezerra · [título a confirmar]"),
    ("CONTEÚDO", "PP. Pausa curta antes da frase.", "A conclusão é que cidadania é uma **ciência**.", "Cidadania como ciência"),
    ("CONTEÚDO", "PM. Contar os quatro pontos com a mão.", "Ela tem objeto próprio, fundamentos, princípios e **método**, como qualquer outro campo do conhecimento.", "objeto · fundamentos · princípios · método"),
    ("CONTEÚDO", "PM.", "E ela conversa com todos eles: com o Direito, com a educação, com a saúde, com a economia.", ""),
    ("VIRADA", "PP.", "Para quem é da área jurídica, isso muda a pergunta. Ela passa a ser se a pessoa **sabe exercer** os direitos que tem.", ""),
    ("VIRADA", "PM.", "Direito que a pessoa desconhece fica no papel. É ali que a cidadania pede **educação**, e é ali que o jurista tem trabalho a fazer.", ""),
-   ("CTA", "PM. Olhar na lente até o fim.", "Comenta aqui: qual direito você vê as pessoas deixarem de usar por não saber que têm? E, se quiser ir fundo, o livro novo se chama **Cidadania: a Ciência das Ciências**.", "Livro · Cidadania: a Ciência das Ciências · " + AVISO),
+   ("CTA", "PM. Olhar na lente até o fim.", "Comenta aqui: qual direito você vê as pessoas deixarem de usar por não saber que têm? E, se quiser ir fundo, o livro novo se chama **Cidadania: a Ciência das Ciências**.", "Livros · A Cidadania como Ciência e Cidadania: a Ciência das Ciências · " + AVISO),
   ],
   legenda="Cidadania costuma ser lembrada como uma lista de direitos e deveres. Na tese de doutorado em Educação (UFRN, 2022) e nos livros que vieram dela, a cidadania é tratada como ciência: objeto próprio, fundamentos, princípios e método. Para quem é da área jurídica, a pergunta muda: a pessoa sabe exercer os direitos que tem? Livro novo: Cidadania: a Ciência das Ciências. " + AVISO + ".",
   conferir=[
    "Doutorado em Educação pela UFRN (2022), tese \"A cidadania como Ciência\": perfil do docente no SIGAA/UFRN.",
    "Tese do livro (objeto próprio, fundamentos, princípios e método; diálogo com Direito, educação, saúde e economia): Tribuna do Norte, lançamento de 30/09/2026.",
-   "\"Dois livros\": a coluna de Simone Silva (Agora RN, 02/10/2026) diz que o novo é a segunda obra dele sobre cidadania. Dr. Jarbas confirma o título do primeiro.",
+   "\"Dois livros\": o primeiro, A Cidadania como Ciência (Editora Idearte), confirmado pela capa nas fotos do escritório; o novo é Cidadania: a Ciência das Ciências, lançado em 30/09/2026.",
    "Título exato do livro novo: Tribuna do Norte grafa \"Cidadania - a Ciência das Ciências\". Dr. Jarbas confirma a grafia para o lettering.",
   ]),
- "A2": dict(
-  num=2, titulo="O juiz que pode perder a votação", local="Locação 1 · gabinete, sentado à mesa",
+ "B1": dict(
+  num=3, titulo="O juiz que pode perder a votação", local=LOC2,
   seg=[
-   ("GANCHO", "PP. Olhar firme na lente, sem sorriso.", "Tem um julgamento no Brasil em que o juiz pode **perder a votação** para quatro pessoas que não precisam ser formadas em Direito.", "O juiz pode perder a votação"),
+   ("GANCHO", "PP. Sentado numa das cadeiras antigas de couro, A Calúnia de Apeles (Botticelli) acima dele. Olhar firme, sem sorriso. Crucifixo fora de quadro, se a opção for neutralidade.", "Tem um julgamento no Brasil em que o juiz pode **perder a votação** para quatro pessoas que não precisam ser formadas em Direito.", "O juiz pode perder a votação"),
    ("AUTORIDADE", "PM.", "É a Justiça Militar dos estados. Eu julguei ali por **quase vinte e oito anos**.", "Jarbas Bezerra · [título a confirmar]"),
    ("CONTEÚDO", "PM.", "Na maior parte dos crimes militares, quem decide é um grupo de cinco: o juiz e **quatro oficiais** da própria polícia ou do corpo de bombeiros.", "1 juiz + 4 oficiais · Constituição, art. 125, § 5º"),
    ("CONTEÚDO", "PP.", "Depois que acusação e defesa falam, a porta fecha. Os cinco discutem sozinhos, e vale a **maioria**.", "Votação a portas fechadas · CPPM, art. 434"),
@@ -58,10 +61,10 @@ VIDEOS = {
    "\"Quatro oficiais da própria polícia ou do corpo de bombeiros\" e \"não precisam ser formadas em Direito\": composição do Conselho no RN. Dr. Jarbas confirma.",
    "\"Eu julguei ali por quase vinte e oito anos\": o SIGAA registra magistratura desde 1990; o tempo na Justiça Militar vem da proposta. Dr. Jarbas confirma.",
   ]),
- "B1": dict(
-  num=3, titulo="A lei que mudou a escola em julho", local="Locação 2 · em pé, parede neutra",
+ "A2": dict(
+  num=2, titulo="A lei que mudou a escola em julho", local=LOC1,
   seg=[
-   ("GANCHO", "PP. Olhar firme na lente.", "Em julho, uma lei mudou o que **toda escola do Brasil** precisa ensinar. E abriu uma porta para a área jurídica.", "Lei nº 15.468/2026"),
+   ("GANCHO", "PP. Gabinete vermelho, câmera do outro lado da mesa: os painéis de recortes de jornal ao fundo. Gravata diferente da do vídeo 1.", "Em julho, uma lei mudou o que **toda escola do Brasil** precisa ensinar. E abriu uma porta para a área jurídica.", "Lei nº 15.468/2026"),
    ("CONTEÚDO", "PM.", "A Lei quinze mil quatrocentos e sessenta e oito colocou a **educação política e os direitos da cidadania** entre os conteúdos obrigatórios da educação básica.", "LDB, art. 26 · educação política e cidadania"),
    ("CONTEÚDO", "PM.", "Ele entra no estudo da realidade social e política. No mesmo dia, outra lei criou a **Semana Nacional da Ética e da Cidadania**, em maio.", "Lei nº 15.467/2026 · primeira semana de maio"),
    ("CONTEÚDO", "PP.", "Só que a lei não diz em que série isso entra, nem **quem vai ensinar**. Isso fica para regulamentação.", "Séries e formação de professores: a regulamentar"),
@@ -78,9 +81,9 @@ VIDEOS = {
    "O vídeo não diz que a lei federal nasceu da ideia dele; diz só que ele defende o tema desde 2013.",
   ]),
  "B2": dict(
-  num=4, titulo="O que a lei diz que é de graça", local="Locação 2 · em pé, parede neutra",
+  num=4, titulo="O que a lei diz que é de graça", local=LOC2,
   seg=[
-   ("GANCHO", "PP. Olhar firme na lente.", "Certidão de nascimento, pedido de informação ao poder público, petição em defesa de um direito. A lei diz que tudo isso é **de graça**.", "De graça, por lei"),
+   ("GANCHO", "PP. Em pé ao lado da Têmis de olhos vendados, parede de madeira ao fundo. Gravata diferente da do vídeo 3.", "Certidão de nascimento, pedido de informação ao poder público, petição em defesa de um direito. A lei diz que tudo isso é **de graça**.", "De graça, por lei"),
    ("AUTORIDADE", "PM.", "Trabalho com educação cidadã desde dois mil e treze, e essa lei **sempre surpreende**.", "Jarbas Bezerra · [título a confirmar]"),
    ("CONTEÚDO", "PM.", "A Constituição manda a lei dizer quais atos de cidadania são gratuitos. A lei é a nove mil duzentos e sessenta e cinco, de mil novecentos e noventa e seis.", "Constituição, art. 5º, LXXVII · Lei nº 9.265/1996"),
    ("CONTEÚDO", "PM. Contar os itens com a mão.", "Estão na lista os atos para votar, o alistamento militar, os pedidos de informação ao poder público para se defender ou denunciar irregularidade, e as petições em defesa de direitos.", "Lei nº 9.265/1996, art. 1º, I a V"),

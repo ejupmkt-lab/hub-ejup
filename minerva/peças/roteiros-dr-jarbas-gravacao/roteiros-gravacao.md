@@ -39,7 +39,7 @@ Gravar por quadro, na ordem abaixo. Um take extra do fecho (aviso e convite à p
 # Quadro · O Que o Processo Não Mostra
 
 ## Episódio 1 · Cidadania tem método
-**Base:** Vídeo individual 1 (versão de 09/10/2026, sem quadro) · Locação 1 · gabinete, sentado à mesa
+**Base:** Vídeo individual 1 (versão de 09/10/2026, sem quadro) · Locação 1 · gabinete vermelho, sentado à mesa
 **Duração estimada:** 68 segundos, em leitura calma (159 palavras). **Arquivo do teleprompter:** `teleprompter/A1.txt`.
 
 **Tempos**
@@ -54,46 +54,46 @@ Gravar por quadro, na ordem abaixo. Um take extra do fecho (aviso e convite à p
 - Em "Eu passei anos estudando essa…": Jarbas Bezerra · [título a confirmar]
 - Em "A conclusão é que cidadania…": Cidadania como ciência
 - Em "Ela tem objeto próprio, fundamentos,…": objeto · fundamentos · princípios · método
-- Em "Comenta aqui: qual direito você…": Livro · Cidadania: a Ciência das Ciências · Conteúdo educativo, sem orientação individual
+- Em "Comenta aqui: qual direito você…": Livros · A Cidadania como Ciência e Cidadania: a Ciência das Ciências · Conteúdo educativo, sem orientação individual
 
 **Câmera B:** Sem câmera B: o vídeo inteiro é o Dr. Jarbas falando para a câmera.
 
 **Conferir antes de gravar**
 - Doutorado em Educação pela UFRN (2022), tese "A cidadania como Ciência": perfil do docente no SIGAA/UFRN.
 - Tese do livro (objeto próprio, fundamentos, princípios e método; diálogo com Direito, educação, saúde e economia): Tribuna do Norte, lançamento de 30/09/2026.
-- "Dois livros": a coluna de Simone Silva (Agora RN, 02/10/2026) diz que o novo é a segunda obra dele sobre cidadania. Dr. Jarbas confirma o título do primeiro.
+- "Dois livros": o primeiro, A Cidadania como Ciência (Editora Idearte), confirmado pela capa nas fotos do escritório; o novo é Cidadania: a Ciência das Ciências, lançado em 30/09/2026.
 - Título exato do livro novo: Tribuna do Norte grafa "Cidadania - a Ciência das Ciências". Dr. Jarbas confirma a grafia para o lettering.
 
 **Legenda sugerida:** Cidadania costuma ser lembrada como uma lista de direitos e deveres. Na tese de doutorado em Educação (UFRN, 2022) e nos livros que vieram dela, a cidadania é tratada como ciência: objeto próprio, fundamentos, princípios e método. Para quem é da área jurídica, a pergunta muda: a pessoa sabe exercer os direitos que tem? Livro novo: Cidadania: a Ciência das Ciências. Conteúdo educativo, sem orientação individual.
 
-## Episódio 2 · O juiz que pode perder a votação
-**Base:** Vídeo individual 2 (versão de 09/10/2026, sem quadro) · Locação 1 · gabinete, sentado à mesa
-**Duração estimada:** 69 segundos, em leitura calma (163 palavras). **Arquivo do teleprompter:** `teleprompter/A2.txt`.
+## Episódio 2 · A lei que mudou a escola em julho
+**Base:** Vídeo individual 2 (versão de 09/10/2026, sem quadro) · Locação 1 · gabinete vermelho, sentado à mesa
+**Duração estimada:** 71 segundos, em leitura calma (167 palavras). **Arquivo do teleprompter:** `teleprompter/A2.txt`.
 
 **Tempos**
-- **0:00 a 0:10** · GANCHO (23 palavras)
-- **0:10 a 0:16** · AUTORIDADE (15 palavras)
-- **0:16 a 0:34** · CONTEÚDO (43 palavras)
-- **0:34 a 0:57** · VIRADA (55 palavras)
-- **0:57 a 1:09** · CTA (27 palavras)
+- **0:00 a 0:09** · GANCHO (21 palavras)
+- **0:09 a 0:37** · CONTEÚDO (69 palavras)
+- **0:37 a 0:47** · AUTORIDADE (23 palavras)
+- **0:47 a 1:01** · VIRADA (33 palavras)
+- **1:01 a 1:10** · CTA (21 palavras)
 
 **Em tela (aplicar na edição, sem ler no teleprompter)**
-- Em "Tem um julgamento no Brasil…": O juiz pode perder a votação
-- Em "É a Justiça Militar dos…": Jarbas Bezerra · [título a confirmar]
-- Em "Na maior parte dos crimes…": 1 juiz + 4 oficiais · Constituição, art. 125, § 5º
-- Em "Depois que acusação e defesa…": Votação a portas fechadas · CPPM, art. 434
-- Em "Cita súmula, cita doutrina, usa…": Grafismo: cinco cadeiras, uma acesa
-- Em "Se você advoga ou quer…": Salve e envie para um colega · Conteúdo educativo, sem orientação individual
+- Em "Em julho, uma lei mudou…": Lei nº 15.468/2026
+- Em "A Lei quinze mil quatrocentos…": LDB, art. 26 · educação política e cidadania
+- Em "Ele entra no estudo da…": Lei nº 15.467/2026 · primeira semana de maio
+- Em "Só que a lei não…": Séries e formação de professores: a regulamentar
+- Em "Eu defendo isso desde dois…": Jarbas Bezerra · [título a confirmar]
+- Em "Se você é da área…": Salve e envie para um professor · Conteúdo educativo, sem orientação individual
 
 **Câmera B:** Sem câmera B: o vídeo inteiro é o Dr. Jarbas falando para a câmera.
 
 **Conferir antes de gravar**
-- CF, art. 125, § 5º (EC 45/2004): o Conselho de Justiça, presidido pelo juiz de direito, julga os crimes militares, salvo os cometidos contra civis (juiz sozinho) e os dolosos contra a vida de civil (júri, § 4º). Por isso o vídeo diz "a maior parte". Conferir no Planalto.
-- CPPM, art. 434: o Conselho delibera em sessão secreta. Confirmado em fonte secundária; conferir no Planalto.
-- "Quatro oficiais da própria polícia ou do corpo de bombeiros" e "não precisam ser formadas em Direito": composição do Conselho no RN. Dr. Jarbas confirma.
-- "Eu julguei ali por quase vinte e oito anos": o SIGAA registra magistratura desde 1990; o tempo na Justiça Militar vem da proposta. Dr. Jarbas confirma.
+- Lei nº 15.468, de 13/07/2026 (PL 4.088/2023): inclui o § 9º-B no art. 26 da LDB; componente obrigatório no estudo da realidade social e política; não define séries nem formação docente (Câmara dos Deputados, Senado Notícias, Atlas Público). Conferir o texto no Planalto.
+- Lei nº 15.467/2026 (PL 162/2024): Semana Nacional da Ética e da Cidadania na primeira semana de maio (Senado Notícias, 15/07/2026). Conferir no Planalto.
+- Setembro Cidadão idealizado por Jarbas Bezerra e Lígia Limeira em 2013 no RN: coluna de Simone Silva, Agora RN, 17/07/2026. Dr. Jarbas confirma e decide como citar a coautora.
+- O vídeo não diz que a lei federal nasceu da ideia dele; diz só que ele defende o tema desde 2013.
 
-**Legenda sugerida:** Na Justiça Militar dos estados, a maior parte dos crimes é julgada por cinco pessoas: o juiz e quatro oficiais. Eles votam a portas fechadas e vale a maioria (CF, art. 125; CPPM, art. 434). Para quem advoga ali, isso muda a forma de defender. Salve e envie para quem atua na área. Conteúdo educativo, sem orientação individual.
+**Legenda sugerida:** A Lei nº 15.468/2026 colocou a educação política e os direitos da cidadania entre os conteúdos obrigatórios da educação básica (LDB, art. 26). A Lei nº 15.467/2026 criou a Semana Nacional da Ética e da Cidadania, na primeira semana de maio. A lei não diz quem vai ensinar, e a área jurídica tem muito a contribuir. Salve e envie para um professor. Conteúdo educativo, sem orientação individual.
 
 ## Episódio 3 · A Justiça Militar como especialidade
 **Base:** Direito Penal Militar aplicado (proposta, roteiro 12)
@@ -121,37 +121,37 @@ Gravar por quadro, na ordem abaixo. Um take extra do fecho (aviso e convite à p
 
 # Quadro · Antes da Consequência
 
-## Episódio 1 · A lei que mudou a escola em julho
-**Base:** Vídeo individual 3 (versão de 09/10/2026, sem quadro) · Locação 2 · em pé, parede neutra
-**Duração estimada:** 71 segundos, em leitura calma (167 palavras). **Arquivo do teleprompter:** `teleprompter/B1.txt`.
+## Episódio 1 · O juiz que pode perder a votação
+**Base:** Vídeo individual 3 (versão de 09/10/2026, sem quadro) · Locação 2 · sala de madeira, Têmis e cadeiras antigas
+**Duração estimada:** 69 segundos, em leitura calma (163 palavras). **Arquivo do teleprompter:** `teleprompter/B1.txt`.
 
 **Tempos**
-- **0:00 a 0:09** · GANCHO (21 palavras)
-- **0:09 a 0:37** · CONTEÚDO (69 palavras)
-- **0:37 a 0:47** · AUTORIDADE (23 palavras)
-- **0:47 a 1:01** · VIRADA (33 palavras)
-- **1:01 a 1:10** · CTA (21 palavras)
+- **0:00 a 0:10** · GANCHO (23 palavras)
+- **0:10 a 0:16** · AUTORIDADE (15 palavras)
+- **0:16 a 0:34** · CONTEÚDO (43 palavras)
+- **0:34 a 0:57** · VIRADA (55 palavras)
+- **0:57 a 1:09** · CTA (27 palavras)
 
 **Em tela (aplicar na edição, sem ler no teleprompter)**
-- Em "Em julho, uma lei mudou…": Lei nº 15.468/2026
-- Em "A Lei quinze mil quatrocentos…": LDB, art. 26 · educação política e cidadania
-- Em "Ele entra no estudo da…": Lei nº 15.467/2026 · primeira semana de maio
-- Em "Só que a lei não…": Séries e formação de professores: a regulamentar
-- Em "Eu defendo isso desde dois…": Jarbas Bezerra · [título a confirmar]
-- Em "Se você é da área…": Salve e envie para um professor · Conteúdo educativo, sem orientação individual
+- Em "Tem um julgamento no Brasil…": O juiz pode perder a votação
+- Em "É a Justiça Militar dos…": Jarbas Bezerra · [título a confirmar]
+- Em "Na maior parte dos crimes…": 1 juiz + 4 oficiais · Constituição, art. 125, § 5º
+- Em "Depois que acusação e defesa…": Votação a portas fechadas · CPPM, art. 434
+- Em "Cita súmula, cita doutrina, usa…": Grafismo: cinco cadeiras, uma acesa
+- Em "Se você advoga ou quer…": Salve e envie para um colega · Conteúdo educativo, sem orientação individual
 
 **Câmera B:** Sem câmera B: o vídeo inteiro é o Dr. Jarbas falando para a câmera.
 
 **Conferir antes de gravar**
-- Lei nº 15.468, de 13/07/2026 (PL 4.088/2023): inclui o § 9º-B no art. 26 da LDB; componente obrigatório no estudo da realidade social e política; não define séries nem formação docente (Câmara dos Deputados, Senado Notícias, Atlas Público). Conferir o texto no Planalto.
-- Lei nº 15.467/2026 (PL 162/2024): Semana Nacional da Ética e da Cidadania na primeira semana de maio (Senado Notícias, 15/07/2026). Conferir no Planalto.
-- Setembro Cidadão idealizado por Jarbas Bezerra e Lígia Limeira em 2013 no RN: coluna de Simone Silva, Agora RN, 17/07/2026. Dr. Jarbas confirma e decide como citar a coautora.
-- O vídeo não diz que a lei federal nasceu da ideia dele; diz só que ele defende o tema desde 2013.
+- CF, art. 125, § 5º (EC 45/2004): o Conselho de Justiça, presidido pelo juiz de direito, julga os crimes militares, salvo os cometidos contra civis (juiz sozinho) e os dolosos contra a vida de civil (júri, § 4º). Por isso o vídeo diz "a maior parte". Conferir no Planalto.
+- CPPM, art. 434: o Conselho delibera em sessão secreta. Confirmado em fonte secundária; conferir no Planalto.
+- "Quatro oficiais da própria polícia ou do corpo de bombeiros" e "não precisam ser formadas em Direito": composição do Conselho no RN. Dr. Jarbas confirma.
+- "Eu julguei ali por quase vinte e oito anos": o SIGAA registra magistratura desde 1990; o tempo na Justiça Militar vem da proposta. Dr. Jarbas confirma.
 
-**Legenda sugerida:** A Lei nº 15.468/2026 colocou a educação política e os direitos da cidadania entre os conteúdos obrigatórios da educação básica (LDB, art. 26). A Lei nº 15.467/2026 criou a Semana Nacional da Ética e da Cidadania, na primeira semana de maio. A lei não diz quem vai ensinar, e a área jurídica tem muito a contribuir. Salve e envie para um professor. Conteúdo educativo, sem orientação individual.
+**Legenda sugerida:** Na Justiça Militar dos estados, a maior parte dos crimes é julgada por cinco pessoas: o juiz e quatro oficiais. Eles votam a portas fechadas e vale a maioria (CF, art. 125; CPPM, art. 434). Para quem advoga ali, isso muda a forma de defender. Salve e envie para quem atua na área. Conteúdo educativo, sem orientação individual.
 
 ## Episódio 2 · O que a lei diz que é de graça
-**Base:** Vídeo individual 4 (versão de 09/10/2026, sem quadro) · Locação 2 · em pé, parede neutra
+**Base:** Vídeo individual 4 (versão de 09/10/2026, sem quadro) · Locação 2 · sala de madeira, Têmis e cadeiras antigas
 **Duração estimada:** 69 segundos, em leitura calma (162 palavras). **Arquivo do teleprompter:** `teleprompter/B2.txt`.
 
 **Tempos**
