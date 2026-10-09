@@ -144,8 +144,8 @@ def bloco(s):
         p.append(f'<p class="fecho">{s["fecho"]}</p>')
     if s.get("autoria"):
         nome, cargo = s["autoria"]
-        p.append(f'<div class="autoria"><div class="rosto"><img src="{rosto()}" alt=""></div>'
-                 f'<p class="quem">{nome}<span>{cargo}</span></p></div>')
+        # sem foto do autor na capa (Victor, 09/10/2026): só nome e cargo
+        p.append(f'<div class="autoria"><p class="quem">{nome}<span>{cargo}</span></p></div>')
     if s.get("pilula"):
         p.append(f'<div class="pilula"><i>&rarr;</i><span>{_html.escape(s["pilula"])}</span></div>')
     ancora = "abaixo" if s.get("foto") else "meio"

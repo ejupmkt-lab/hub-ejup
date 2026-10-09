@@ -9,7 +9,7 @@ de carrossel que fazemos, com fotos, alternância de cor de fundo":
   texto no terço inferior; cor natural, sem duotone azul;
 - telas de papel (2, 4, 6) com anel (30%), cartões e lista numerada em bronze;
 - título de pesos mistos, corpo justificado, sem rótulo de seção;
-- capa com autoria (rosto do Roberto em círculo) e pílula "Arraste".
+- capa com autoria (nome e cargo, sem foto do Roberto) e pílula "Arraste".
 
 Fotos e créditos em `fotos/CREDITOS.md` (Pexels). Briefing e legenda em
 `peças/capa-artigo-educacao-china/briefing-carrossel.md`.
