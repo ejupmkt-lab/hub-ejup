@@ -8,4 +8,6 @@ Conhecer a exceção ajuda a entender a regra. Onde termina a publicidade da pen
 
 Salve o carrossel para consultar os dispositivos e siga a EJUP para acompanhar os próximos conteúdos.
 
+Imagens: Édouard Manet, A execução de Maximiliano (1868); Francisco de Goya, Não se pode olhar (c. 1810); William Hogarth, Execução em Tyburn (1747). Acervo aberto do Metropolitan Museum of Art.
+
 Fontes: Constituição Federal, arts. 5º, XLVII, 60, §4º, IV, e 84, XII e XIX; Decreto-Lei 1.001/1969 (Código Penal Militar), arts. 56, 57 e 355; Decreto-Lei 1.002/1969 (Código de Processo Penal Militar), arts. 707 e 708; Decreto 2.754/1998; Michel Foucault, Vigiar e Punir (1975); Euronews, Stars and Stripes e Al Jazeera (6 a 9/10/2026).
