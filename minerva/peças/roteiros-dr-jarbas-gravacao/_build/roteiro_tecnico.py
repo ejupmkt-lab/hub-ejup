@@ -165,10 +165,10 @@ h3{{font-weight:500;font-size:8pt;letter-spacing:.14em;text-transform:uppercase;
 .ficha .k{{font-weight:500;font-size:7.8pt;letter-spacing:.1em;text-transform:uppercase;color:#304557;padding-top:2.6mm}}
 table{{width:100%;border-collapse:collapse;table-layout:fixed}}
 th{{font-weight:500;font-size:7.6pt;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:#031c37;text-align:left;padding:2.2mm 2.6mm}}
-td{{vertical-align:top;padding:1.9mm 2.6mm;border-bottom:.6px solid #d1d3d4}}
+td{{vertical-align:top;padding:1.6mm 2.4mm;border-bottom:.6px solid #d1d3d4}}
 tr{{break-inside:avoid}}
-td.img{{font-size:8.4pt;color:#304557}} td.img .t{{display:block;font-weight:500;color:#9b6b26;font-size:7.8pt;letter-spacing:.06em;margin-bottom:.8mm}}
-td.fala{{font-size:10.3pt;line-height:1.4}} td.fala b{{font-weight:700;color:#031c37}}
+td.img{{font-size:8pt;line-height:1.38;color:#304557}} td.img .t{{display:block;font-weight:500;color:#9b6b26;font-size:7.8pt;letter-spacing:.06em;margin-bottom:.8mm}}
+td.fala{{font-size:10pt;line-height:1.38}} td.fala b{{font-weight:700;color:#031c37}}
 td.gc{{font-size:8.4pt;color:#414042}} td.gc .nada{{color:#9a9b9d}}
 .cab{{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1.5px solid #031c37;padding-bottom:3mm;margin-bottom:4mm}}
 .cab .meta{{text-align:right;font-size:8pt;color:#304557;line-height:1.5}}
@@ -229,9 +229,9 @@ def pagina_ep(k):
     return f'''<section>
 <div class="cab"><div><p class="eyebrow">Vídeo {g.V3.VIDEOS[k]["num"]} · {html.escape(g.V3.VIDEOS[k]["local"])}</p><h2>{html.escape(ep["titulo"])}</h2></div>
 <div class="meta">cerca de {round(dur)} s<br>teleprompter/{k}.txt</div></div>
-<table><colgroup><col style="width:25%"><col style="width:47%"><col style="width:28%"></colgroup>
+<table><colgroup><col style="width:31%"><col style="width:44%"><col style="width:25%"></colgroup>
 <thead><tr><th>Imagem</th><th>Fala</th><th>Lettering</th></tr></thead><tbody>{linhas}</tbody></table>
-<p class="legenda">PM: plano médio. PP: primeiro plano, com aproximação na edição. Negrito na fala: palavra de ênfase. Tempos estimados em leitura calma.</p>
+<p class="legenda">Vertical 9:16, gravado em 4K na vertical. Cabeça no terço de cima; nada importante nos 14% de cima nem nos 20% de baixo da tela. PM: plano médio. PP: primeiro plano, com aproximação na edição. B-roll entra por cima da fala, com o áudio dele seguindo. Negrito na fala: palavra de ênfase. Tempos estimados em leitura calma.</p>
 </section>'''
 
 
