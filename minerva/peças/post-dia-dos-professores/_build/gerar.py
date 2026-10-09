@@ -36,7 +36,7 @@ html,body{{background:#10151b}}
 .moldura i:nth-child(3){{left:-1px;bottom:-1px;border-bottom-width:2px;border-left-width:2px}}
 .moldura i:nth-child(4){{right:-1px;bottom:-1px;border-bottom-width:2px;border-right-width:2px}}
 .miolo{{position:absolute;left:80px;right:80px;top:215px;display:flex;flex-direction:column;align-items:center;text-align:center}}
-.titulo{{white-space:nowrap;font-size:100px;line-height:1.02;letter-spacing:-.03em;font-weight:300}}
+.titulo{{white-space:nowrap;font-size:74px;line-height:1.02;letter-spacing:-.03em;font-weight:300}}
 .titulo b{{display:block;font-weight:900;letter-spacing:-.035em}}
 .regua{{width:96px;height:2px;background:var(--bronze);margin:56px 0 50px}}
 .apoio{{text-wrap:balance;font-weight:300;font-size:38px;line-height:1.42;color:var(--graphite);max-width:860px}}
@@ -52,7 +52,7 @@ html,body{{background:#10151b}}
 '''
 html = f'''<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Dia dos Professores · EJUP</title><style>{CSS}</style></head><body>
 <div class="post"><div class="moldura"><i></i><i></i><i></i><i></i></div>
-<div class="miolo"><h1 class="titulo">Todo percurso<b>tem um professor.</b></h1><div class="regua"></div>
+<div class="miolo"><h1 class="titulo">Todo percurso começa<b>com alguém que ensina.</b></h1><div class="regua"></div>
 <p class="apoio">A EJUP deseja um <b>feliz Dia dos Professores</b> a todos que dedicam suas vidas a formar pessoas.</p></div>
 <div class="cadeia">{simbolos}</div>
 <div class="data">15 de outubro</div>

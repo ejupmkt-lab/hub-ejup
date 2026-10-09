@@ -1,10 +1,8 @@
-Existe uma verdade que acompanha toda trajetória profissional: ninguém chega sozinho. Por trás de cada jurista, de cada profissional, há alguém que explicou o primeiro conceito, corrigiu o primeiro erro e mostrou como se estuda com calma.
+Ninguém chega sozinho a lugar nenhum. Antes de cada jurista, de cada profissional, houve alguém que explicou o primeiro conceito, corrigiu o primeiro erro e ensinou a estudar com calma, e esse alguém também aprendeu com outros professores. É assim, de geração em geração, que o conhecimento atravessa o tempo.
 
-Esse professor também teve os seus, numa cadeia em que cada geração forma a seguinte. Quem aprende com um professor, um dia ensina outra pessoa, e é por essa cadeia que o conhecimento atravessa o tempo.
+A formação que defendemos na EJUP funciona do mesmo jeito: aprender é um percurso que se acumula, e ele só existe porque alguém dedicou tempo a ensinar.
 
-É a mesma lógica que sustenta a formação que defendemos aqui. Aprender é um percurso que se acumula, e ele só existe porque alguém, em algum momento, dedicou tempo a ensinar.
-
-A EJUP deseja um feliz Dia dos Professores a todos que dedicam suas vidas a formar pessoas.
+Por isso, a EJUP deseja um feliz Dia dos Professores a todos que dedicam suas vidas a formar pessoas.
 
 Para conhecer a EJUP, o link do site está na bio.
 

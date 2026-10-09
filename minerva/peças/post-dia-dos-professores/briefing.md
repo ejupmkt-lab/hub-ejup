@@ -21,7 +21,7 @@
 
 ## 4. Texto da arte
 - **Chip:** EJUP · DIA DO PROFESSOR
-- **Título:** Todo percurso (Black, branco) / tem um professor. (Light, dourado)
+- **Título:** Todo percurso começa (Light) / com alguém que ensina. (Black)
 - **Apoio:** A EJUP deseja um feliz Dia dos Professores a todos que dedicam suas vidas a formar pessoas.
 - **Linha de dados:** 15 de outubro · Homenagem a quem ensina
 - **Elemento central:** quatro anéis dourados encadeados, cada um maior que o anterior, o último saindo da tela, com halo dourado atrás.
