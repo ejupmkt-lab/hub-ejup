@@ -181,8 +181,8 @@ __COVERS__
 /* o halo dourado fica centrado na cabeça do retrato, em qualquer formato:
    mede onde a foto caiu e põe o centro do halo no ponto (FX, FY) da imagem */
 (function () {
-  const FX = 0.66, FY = 0.30;   // centro da cabeça, em fração da foto tratada
-  const DH = 0.80;               // diâmetro do halo, em fração da altura do retrato
+  const FX = 0.482, FY = 0.36;   // centro da cabeça, em fração da foto tratada
+  const DH = 1.00;               // diâmetro do halo, em fração da altura do retrato
   document.querySelectorAll('.cover').forEach(s => {
     const img = s.querySelector('.foto img'), h = s.querySelector('.halo');
     if (!img || !h || !img.offsetParent) return;

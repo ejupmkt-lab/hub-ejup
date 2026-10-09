@@ -38,3 +38,6 @@ script do template).
 anjo"). Agora é luz de estúdio difusa atrás do ombro direito, deslocada para o
 lado como na capa do Leonardo: centro em FX 0,66 / FY 0,30 do retrato,
 diâmetro 0,8 da altura dele, gradiente mais suave e desfoque proporcional.
+Ajuste seguinte: luz centralizada atrás do tronco (FX 0,482 / FY 0,36,
+diâmetro 1,0 da altura do retrato), simétrica nos dois lados, ainda abaixo da
+cabeça para não virar aura.
