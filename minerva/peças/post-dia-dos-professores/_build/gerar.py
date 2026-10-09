@@ -18,7 +18,7 @@ def simbolo(i):
     return s.replace('<g ', defs + '<g ', 1)
 
 # centro x, centro y, tamanho, opacidade. Cada geração maior; a última passa da borda direita
-GER = [(120, 905, 62, .55), (250, 840, 100, .66), (440, 750, 165, .8), (815, 600, 500, 1)]
+GER = [(120, 905, 62, .55), (250, 840, 100, .66), (440, 785, 165, .8), (815, 665, 480, 1)]
 nos = "".join(
     f'<div class="g" style="left:{x - t / 2}px;top:{y - t / 2}px;width:{t}px;height:{t}px;opacity:{o}">{simbolo(i)}</div>'
     for i, (x, y, t, o) in enumerate(GER))
@@ -68,9 +68,9 @@ html,body{{background:#10151b}}
 .post::after{{content:"";position:absolute;inset:0;z-index:20;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")}}
 .marcas{{position:absolute;inset:0;width:100%;height:100%;z-index:2}}
-.escrita{{position:absolute;z-index:6;left:84px;right:84px;top:118px;filter:url(#gizfino)}}
-.titulo{{font-size:74px;line-height:1.1;letter-spacing:-.02em;font-weight:400;white-space:nowrap}}
-.titulo b{{display:block;font-weight:700}}
+.escrita{{position:absolute;z-index:6;left:84px;right:84px;top:104px;filter:url(#gizfino)}}
+.titulo{{font-size:92px;line-height:1.02;letter-spacing:-.02em;font-weight:400;white-space:nowrap}}
+.titulo b{{display:block;font-weight:700;font-size:150px;letter-spacing:-.035em;color:var(--gold);margin-top:6px}}
 .titulo em{{font-style:normal;color:var(--gold)}}
 .g{{position:absolute;z-index:5;filter:url(#giz)}}
 .g .sim{{width:100%;height:100%;display:block}}
@@ -89,11 +89,11 @@ html,body{{background:#10151b}}
 .rodape{{position:absolute;z-index:10;left:0;right:0;bottom:44px;display:flex;justify-content:center}}
 .rodape svg{{height:48px;width:auto;display:block}}
 '''
-fio = '<svg class="fio" viewBox="0 0 1080 1440"><path d="M120 905 C 190 892, 205 855, 250 840 C 330 818, 360 780, 440 750 C 570 705, 660 690, 815 600" fill="none" stroke="#f0b855" stroke-opacity=".5" stroke-width="2" stroke-dasharray="2 11" stroke-linecap="round"/></svg>'
+fio = '<svg class="fio" viewBox="0 0 1080 1440"><path d="M120 905 C 190 892, 205 855, 250 840 C 330 818, 360 800, 440 785 C 570 745, 660 740, 815 665" fill="none" stroke="#f0b855" stroke-opacity=".5" stroke-width="2" stroke-dasharray="2 11" stroke-linecap="round"/></svg>'
 html = f'''<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Dia dos Professores · EJUP</title><style>{CSS}</style></head><body>{FILTROS}
 <div class="post">{ARDOSIA}{fio}{nos}
-<div class="escrita"><h1 class="titulo">Todo percurso começa<b>com alguém que <em>ensina.</em></b></h1></div>
-<div class="apoio"><p>A EJUP deseja um <b>feliz Dia dos Professores</b> a todos que dedicam suas vidas a formar pessoas.</p><div class="data">15 de outubro</div></div>
+<div class="escrita"><h1 class="titulo">Feliz Dia dos<b>Professores.</b></h1></div>
+<div class="apoio"><p><b style="display:block;margin-bottom:10px">Todo percurso começa com alguém que ensina.</b>A EJUP agradece a todos que dedicam suas vidas a formar pessoas.</p><div class="data">15 de outubro</div></div>
 <div class="borda"></div><div class="giz1"></div><div class="giz2"></div><div class="apagador"></div><div class="parede"></div>
 <div class="rodape">{logo}</div></div></body></html>'''
 (OUT / "post-dia-dos-professores.html").write_text(html)

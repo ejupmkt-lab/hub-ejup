@@ -53,5 +53,5 @@ Para conhecer a EJUP, o link do site está na bio.
 2. Com os anéis dourados como elemento central, ou só tipografia com o halo?
 3. Mantemos as hashtags?
 
-## 8. Proposta de arte (v9)
-A imagem inteira é a lousa: ardósia azul-marinho em sangria total, com marcas suaves de apagador, escrita e desenho a giz (grão e borda irregular feitos por filtro, sem textura de foto), borda com dois giz e um apagador na base e o logo branco abaixo. A frase "Todo percurso começa com alguém que ensina." está escrita a giz, com "ensina." em dourado, e o símbolo da EJUP, em dourado, é desenhado no quadro quatro vezes ao longo de uma diagonal, cada geração maior que a anterior. O apoio e a data completam o texto. `_build/gerar.py` e `_build/render.py`. Versões anteriores em `_build/gerar_v7_simbolos.py` e `_build/gerar_v8_lousa_moldura.py`.
+## 8. Proposta de arte (v10)
+A imagem inteira é a lousa: ardósia azul-marinho em sangria total, com marcas suaves de apagador, escrita e desenho a giz (grão e borda irregular feitos por filtro, sem textura de foto), borda com dois giz e um apagador na base e o logo branco abaixo. O título é "Feliz Dia dos Professores." ("Professores." grande, em dourado). A frase "Todo percurso começa com alguém que ensina." e o agradecimento da EJUP vêm abaixo, e o símbolo da EJUP, em dourado, é desenhado no quadro quatro vezes ao longo de uma diagonal, cada geração maior que a anterior. O apoio e a data completam o texto. `_build/gerar.py` e `_build/render.py`. Versões anteriores em `_build/gerar_v7_simbolos.py` e `_build/gerar_v8_lousa_moldura.py`.
