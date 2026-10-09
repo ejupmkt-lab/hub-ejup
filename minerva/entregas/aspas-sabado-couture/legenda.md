@@ -2,7 +2,9 @@
 
 "Estuda. O Direito se transforma constantemente. Se não acompanhas seus passos, serás cada dia um pouco menos advogado."
 
-O primeiro dos Mandamentos do Advogado, do jurista uruguaio Eduardo J. Couture, cabe numa linha e pede uma vida. O Direito muda o tempo todo, e acompanhar essa mudança integra a própria competência de quem advoga.
+É o primeiro dos Mandamentos do Advogado, escrito pelo jurista uruguaio Eduardo J. Couture, e resume bem o que a EJUP defende. Para nós, a formação jurídica se constrói por acúmulo, como um percurso, e quem advoga precisa seguir estudando porque o Direito muda a cada lei nova, a cada precedente e a cada tecnologia que entra na prática.
+
+Estudar, nesse sentido, pede profundidade, tempo e critério, sem a pressa que transforma aprendizado em consumo. É o que a nossa assinatura diz: alma clássica, que ensina a estudar, e repertório contemporâneo, que mantém o estudo em dia com o seu tempo.
 
 Defendemos o tempo do estudo.
 
