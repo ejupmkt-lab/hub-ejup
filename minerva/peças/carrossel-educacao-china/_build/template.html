@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<title>Carrossel · A educação do futuro está em curso</title>
+<style>
+__FONT_FACES__
+:root{
+  --navy:#031c37; --deep:#061424; --ink:#0d131a; --steel:#304557;
+  --graphite:#414042; --gray:#5f6062; --silver:#d1d3d4;
+  --gold:#f0b855; --bronze:#9b6b26;
+  --papel:#f2f1ee;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#5b6169}
+body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;
+     font-family:'Gotham','Montserrat',system-ui,sans-serif}
+
+.slide{position:relative;width:1080px;height:1350px;overflow:hidden;
+       display:flex;flex-direction:column}
+
+/* ================= fundos ================= */
+.escuro{color:#fff;background:linear-gradient(180deg,#061625 0%,#04101b 100%)}
+.claro{color:var(--navy);
+  background:radial-gradient(120% 90% at 78% 88%, #efece5 0%, var(--papel) 46%, #f6f5f3 100%)}
+
+/* foto: sangra na tela inteira; o scrim escurece SÓ a parte de baixo, para a
+   imagem continuar sendo imagem na metade de cima */
+.foto{position:absolute;inset:0;z-index:0}
+.foto img{width:100%;height:100%;object-fit:cover;display:block;
+  /* a foto se dissolve antes do bloco de texto: portas e título ficam em área limpa */
+  -webkit-mask-image:linear-gradient(180deg,#000 32%,transparent 58%);
+  mask-image:linear-gradient(180deg,#000 32%,transparent 58%)}
+.foto::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,
+    rgba(4,16,27,.14) 0%, rgba(4,16,27,.04) 24%, rgba(4,16,27,.5) 42%,
+    rgba(4,16,27,.86) 58%, #04101b 80%)}
+
+/* grafismo da marca, só quando não há foto */
+.marca-fundo{position:absolute;top:-150px;right:-180px;width:560px;opacity:.13;
+  pointer-events:none;z-index:0}
+.marca-fundo svg{width:100%;height:auto;display:block}
+.marca-fundo path{fill:#8fb4d8 !important}
+
+/* numeral gigante vazado, sangrando pela direita */
+.numeral{position:absolute;right:-46px;top:190px;z-index:1;
+  font-weight:900;font-size:520px;line-height:.8;letter-spacing:-.04em;
+  color:transparent;-webkit-text-stroke:2px rgba(155,107,38,.42)}
+.escuro .numeral{-webkit-text-stroke-color:rgba(240,184,85,.22)}
+
+/* ============ a moldura que se completa ============
+   Vive na borda, fora da área de conteúdo: nunca disputa espaço com o texto,
+   que era o problema da linha atravessando a tela. */
+.moldura{position:absolute;inset:0;z-index:2;pointer-events:none}
+.moldura svg{width:100%;height:100%;display:block}
+
+/* as portas: o fio do carrossel, pequenas, acima do título e sempre em área
+   limpa (o scrim nas telas de foto, o papel nas claras) */
+.portas-mini{display:block;width:9.2em;height:auto;margin:0 0 .36em;overflow:visible}
+.portas-mini .rot{font:500 3.4px 'Gotham';letter-spacing:.08em;fill:rgba(209,211,212,.6)}
+.portas-mini .rot.on{fill:var(--gold)}
+.claro .portas-mini .rot{fill:rgba(65,64,66,.55)}
+.claro .portas-mini .rot.on{fill:var(--bronze)}
+
+/* nas telas claras, um arco vazado sangrando pela direita: faz o papel do
+   numeral do carrossel de referência, com o desenho das portas */
+.arco{position:absolute;right:-70px;top:150px;width:400px;height:620px;z-index:1;
+  border:2px solid rgba(155,107,38,.3);border-bottom:none;border-radius:200px 200px 0 0}
+
+/* ================= conteúdo ================= */
+.bloco{position:absolute;left:0;right:0;z-index:3;padding:0 80px;
+        font-size:100px}
+/* em tela de foto o texto mora no terço inferior, ancorado pela base */
+.abaixo{bottom:150px}
+.meio{top:50%;transform:translateY(-50%)}
+
+.rotulo{font-weight:500;font-size:.21em;letter-spacing:.2em;text-transform:uppercase;
+        color:var(--gold);margin:0 0 .34em}
+.claro .rotulo{color:var(--bronze)}
+
+/* título de pesos mistos: é o contraste de peso que dá a voz, não só a cor */
+.titulo{margin:0;font-size:.66em;line-height:1.14;letter-spacing:-.022em}
+.titulo .k{font-weight:900;color:#fff;display:inline}
+.titulo .l{font-weight:300;color:rgba(255,255,255,.82);display:inline}
+.titulo .g{font-weight:900;color:var(--gold);display:inline}
+.claro .titulo .k{color:var(--navy)}
+.claro .titulo .l{color:var(--graphite)}
+.claro .titulo .g{color:var(--bronze)}
+
+.corpo{margin:.34em 0 0;font-weight:300;font-size:.31em;line-height:1.62;
+       text-align:justify;color:rgba(209,211,212,.9)}
+.corpo b{font-weight:500;color:#fff}
+.claro .corpo{color:var(--graphite)}
+.claro .corpo b{color:var(--navy)}
+.corpo + .corpo{margin-top:.2em}
+
+/* lista numerada com filetes */
+.lista{margin:.42em 0 0;border-top:1px solid rgba(3,28,55,.14)}
+.escuro .lista{border-top-color:rgba(255,255,255,.14)}
+.lista .it{display:flex;align-items:baseline;gap:.3em;padding:.24em 0;
+  border-bottom:1px solid rgba(3,28,55,.14)}
+.escuro .lista .it{border-bottom-color:rgba(255,255,255,.14)}
+.lista .n{font-weight:900;font-size:.3em;color:var(--bronze);min-width:1em}
+.escuro .lista .n{color:var(--gold)}
+.lista .t{font-weight:700;font-size:.3em;color:var(--navy);line-height:1.3}
+.escuro .lista .t{color:#fff}
+.lista .t small{display:block;font-weight:300;font-size:.78em;
+  color:var(--gray);margin-top:.12em}
+.escuro .lista .t small{color:rgba(209,211,212,.82)}
+
+/* grade de cartões */
+.cartoes{display:grid;grid-template-columns:1fr 1fr;gap:.18em;margin:.42em 0 0}
+.cartoes .c{background:#fff;border:1px solid rgba(3,28,55,.1);border-radius:8px;
+  padding:.24em .26em;box-shadow:0 8px 22px rgba(3,28,55,.07)}
+.escuro .cartoes .c{background:rgba(255,255,255,.045);
+  border-color:rgba(255,255,255,.16);box-shadow:none}
+.cartoes .c .i{font-weight:500;font-size:.19em;letter-spacing:.18em;
+  color:var(--bronze)}
+.escuro .cartoes .c .i{color:var(--gold)}
+.cartoes .c .r{margin-top:.06em;font-weight:700;font-size:.27em;color:var(--navy);
+  line-height:1.24}
+.escuro .cartoes .c .r{color:#fff}
+.cartoes .c.destaque{border-color:var(--bronze);border-width:1.5px}
+.escuro .cartoes .c.destaque{border-color:var(--gold);
+  background:rgba(240,184,85,.08)}
+
+/* citação: bloco de decisão judicial */
+.citacao{margin:.42em 0 0;padding:.26em .3em;border-left:3px solid var(--gold);
+  background:rgba(255,255,255,.04)}
+.claro .citacao{border-left-color:var(--bronze);background:rgba(3,28,55,.03)}
+.citacao p{margin:0;font-weight:300;font-size:.3em;line-height:1.56;
+  color:#fff;text-align:justify}
+.claro .citacao p{color:var(--navy)}
+.citacao .ref{margin-top:.16em;font-weight:500;font-size:.19em;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.claro .citacao .ref{color:var(--bronze)}
+
+/* fecho de raciocínio */
+.fecho{margin:.42em 0 0;font-weight:500;font-size:.34em;line-height:1.34;
+       color:#fff}
+.fecho b{color:var(--gold)}
+.claro .fecho{color:var(--navy)}
+.claro .fecho b{color:var(--bronze)}
+
+/* dado em anel */
+.anel{display:flex;align-items:center;gap:.34em;margin:.42em 0 0}
+.anel svg{width:2.9em;height:2.9em;flex:none}
+.anel .txt{font-weight:300;font-size:.3em;line-height:1.5;
+  color:rgba(209,211,212,.92)}
+.anel .txt b{font-weight:500;color:#fff}
+.claro .anel .txt{color:var(--graphite)}
+.claro .anel .txt b{color:var(--navy)}
+.fonte{margin:.24em 0 0;font-weight:500;font-size:.17em;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--gray)}
+
+/* chamada, cta, assinatura */
+.pilula{margin:.4em 0 0;display:inline-flex;align-items:center;gap:.2em;
+  padding:.26em .36em;border-radius:999px;border:1px solid rgba(240,184,85,.55);
+  background:rgba(240,184,85,.05)}
+.pilula i{font-style:normal;color:var(--gold);font-size:.3em;line-height:1}
+.pilula span{font-weight:500;font-size:.27em}
+.link{display:block;margin:.3em 0 0;font-weight:500;font-size:.26em;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.autoria{margin:.4em 0 0;display:flex;align-items:center;gap:.2em}
+.autoria .rosto{width:1em;height:1em;border-radius:50%;overflow:hidden;flex:none;
+  border:1.5px solid rgba(240,184,85,.5)}
+.autoria .rosto img{width:100%;height:100%;object-fit:cover;
+  object-position:50% 12%;display:block}
+.autoria .quem{font-weight:500;font-size:.26em;color:#fff;line-height:1.34}
+.autoria .quem span{display:block;font-weight:300;color:rgba(209,211,212,.85)}
+.assina{margin:.4em 0 0;padding-top:.26em;border-top:1px solid rgba(255,255,255,.2)}
+.assina .m{font-weight:500;font-size:.19em;letter-spacing:.24em;color:var(--gold)}
+.assina .s{margin-top:.08em;font-weight:300;font-size:.32em;line-height:1.26;
+  letter-spacing:-.012em;color:#fff}
+
+.logo{position:absolute;left:0;right:0;bottom:64px;z-index:3;
+      display:flex;justify-content:center}
+.logo div{width:244px}
+.logo svg{width:100%;height:auto;display:block}
+.escuro .logo path{fill:#fff !important}
+.claro .logo path{fill:var(--navy) !important}
+</style></head>
+<body>
+__SLIDES__
+<script>
+/* O bloco encolhe até respeitar o espaço da sua âncora.
+   Ancorado embaixo (tela de foto): tem de sobrar foto visível acima, então o
+   topo do bloco não pode subir além de 400px.
+   Ancorado no meio: precisa caber entre as margens de 120px. */
+document.querySelectorAll('.slide').forEach(s => {
+  const b = s.querySelector('.bloco');
+  const abaixo = b.classList.contains('abaixo');
+  const alturaMax = 1350 - 240;
+  const passa = () => {
+    const r = b.getBoundingClientRect();
+    return abaixo ? (r.top - s.getBoundingClientRect().top) < 400
+                  : r.height > alturaMax;
+  };
+  let k = 100;
+  while (k > 56 && passa()) { k -= 2; b.style.fontSize = k + 'px'; }
+  s.dataset.escala = k;
+});
+</script>
+</body></html>
