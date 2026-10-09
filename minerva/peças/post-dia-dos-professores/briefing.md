@@ -12,7 +12,7 @@
 - **Título em duas linhas:** a primeira em Gotham Black branco, a segunda em Gotham Light dourado.
 - **Linha de apoio** em Light, prata, até duas linhas.
 - **Linha de dados** com divisória fina (nas capas: coluna jurídica e tema). Aqui: data e ocasião.
-- **Elemento central:** nas capas é o retrato recortado. Aqui, sem pessoa: a cadeia, um fio fino dourado ligando pontos, dissolvendo no navy.
+- **Elemento central:** nas capas é o retrato recortado. Aqui, sem pessoa: a cadeia, quatro anéis dourados encadeados, cada um maior que o anterior, o último saindo da tela. Ecoam o símbolo da EJUP.
 - **Logo** horizontal branco, centralizado na base.
 - **Acento dourado** sobre fundo escuro. Nada de rosa, bronze ou cor temática.
 
@@ -24,7 +24,7 @@
 - **Título:** Todo percurso (Black, branco) / tem um professor. (Light, dourado)
 - **Apoio:** Todo jurista, todo profissional, chegou onde chegou porque alguém lhe ensinou. E quem ensina forma quem vai ensinar.
 - **Linha de dados:** 15 de outubro · Homenagem a quem ensina
-- **Elemento central:** o fio dourado fino ligando quatro pontos em sequência, o último se abrindo para fora da tela, com halo dourado atrás.
+- **Elemento central:** quatro anéis dourados encadeados, cada um maior que o anterior, o último saindo da tela, com halo dourado atrás.
 - **Logo** branco centralizado na base.
 
 ## 5. Legenda (no modelo das legendas de artigo do feed)
@@ -50,5 +50,5 @@ Para conhecer a EJUP, o link do site está na bio.
 
 ## 7. Em aberto
 1. O chip fica como "EJUP · DIA DO PROFESSOR", ou preferem só "DIA DO PROFESSOR"?
-2. Com o fio dourado como elemento central, ou só tipografia com o halo?
+2. Com os anéis dourados como elemento central, ou só tipografia com o halo?
 3. Mantemos as hashtags?
