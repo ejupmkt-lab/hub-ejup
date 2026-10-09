@@ -53,5 +53,5 @@ Para conhecer a EJUP, o link do site está na bio.
 2. Com os anéis dourados como elemento central, ou só tipografia com o halo?
 3. Mantemos as hashtags?
 
-## 8. Proposta de arte (v6)
-Arte própria, pontual, na identidade visual da EJUP e fora do sistema das capas de artigo e do quadro de aspas: fundo claro com radial prata, moldura fina com cantos em bronze, título centralizado em Light e Black (sem chip e sem eyebrow no topo), régua bronze, apoio em Light com o fecho em Bold, a cadeia de quatro símbolos da EJUP crescendo da esquerda para a direita (cada geração um pouco maior e mais nítida), data em caixa alta bronze e logo navy na base. `_build/gerar.py` e `_build/render.py`.
+## 8. Proposta de arte (v7)
+Arte própria e pontual, na identidade visual da EJUP. Fundo navy profundo com um halo dourado discreto e grão fino. O símbolo da EJUP, em dourado (aplicação institucional da marca), aparece quatro vezes ao longo de uma diagonal, cada geração maior e mais nítida, ligadas por um fio pontilhado; a última, gigante, sai do quadro. Texto à esquerda, na terça parte inferior: "Todo percurso começa com alguém que ensina." (Light e Black, com "ensina." em dourado), o apoio com "feliz Dia dos Professores" em Bold, a data com uma régua dourada, e o logo branco centralizado na base. `_build/gerar.py` e `_build/render.py`.

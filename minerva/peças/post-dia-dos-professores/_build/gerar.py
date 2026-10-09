@@ -1,61 +1,63 @@
 #!/usr/bin/env python3
-"""Post único e pontual do Dia dos Professores · 1080x1440 · arte própria, na identidade visual da EJUP (fundo claro, símbolo, hairlines)."""
+"""Post único e pontual do Dia dos Professores · 1080x1440 · arte própria na identidade visual da EJUP.
+Conceito: a cadeia de gerações. O símbolo da EJUP, em dourado (aplicação institucional autorizada), cresce de geração em geração
+até sair do quadro. Fundo navy profundo, texto à esquerda, silêncio em volta."""
 import pathlib, re
 HERE = pathlib.Path(__file__).resolve().parent
 OUT = HERE.parent
 DS = HERE.parents[2] / "skills" / "ejup-design" / "assets"
 FONTS = (DS / "fonts").as_uri()
 
-def inline(nome, cls):
-    s = (DS / "logo" / nome).read_text()
-    return re.sub(r'<svg ', f'<svg class="{cls}" preserveAspectRatio="xMidYMid meet" ', s, 1)
+def simbolo(i):
+    s = (DS / "logo" / "ejup-symbol-navy.svg").read_text()
+    s = s.replace('fill="#031c37"', f'fill="url(#ouro{i})"')
+    s = re.sub(r'<svg ', '<svg class="sim" preserveAspectRatio="xMidYMid meet" ', s, 1)
+    defs = (f'<defs><linearGradient id="ouro{i}" x1="0" y1="0" x2="1" y2="1">'
+            '<stop offset="0" stop-color="#fbe3a6"/><stop offset=".35" stop-color="#f0b855"/>'
+            '<stop offset=".7" stop-color="#b9822d"/><stop offset="1" stop-color="#f0b855"/></linearGradient></defs>')
+    return s.replace('<g ', defs + '<g ', 1)
 
-LOGO = inline("ejup-horizontal-navy.svg", "lg")
-# cadeia de símbolos: cada geração um pouco maior, a opacidade sobe até a última
-TAM = [58, 84, 118, 164]
-OPA = [.22, .38, .62, 1]
-simbolos = "".join(
-    f'<div class="no" style="width:{t}px;height:{t}px;opacity:{o}">{inline("ejup-symbol-navy.svg", "sm")}</div>'
-    for t, o in zip(TAM, OPA))
+# x, y (centro), tamanho, opacidade: cada geração maior e mais nítida; a última sai do quadro
+GER = [(120, 845, 74, .32), (285, 770, 120, .5), (520, 640, 205, .72), (835, 400, 640, 1)]
+nos = "".join(
+    f'<div class="g" style="left:{x - t / 2}px;top:{y - t / 2}px;width:{t}px;height:{t}px;opacity:{o}">{simbolo(i)}</div>'
+    for i, (x, y, t, o) in enumerate(GER))
+logo = re.sub(r'<svg ', '<svg preserveAspectRatio="xMidYMid meet" ', (DS / "logo" / "ejup-horizontal-white.svg").read_text(), 1)
 
 CSS = f'''
 @font-face{{font-family:Gotham;src:url("{FONTS}/Gotham-Light.otf");font-weight:300}}
-@font-face{{font-family:Gotham;src:url("{FONTS}/Gotham-Book.otf");font-weight:400}}
 @font-face{{font-family:Gotham;src:url("{FONTS}/Gotham-Medium.otf");font-weight:500}}
-@font-face{{font-family:Gotham;src:url("{FONTS}/Gotham-Bold.otf");font-weight:700}}
 @font-face{{font-family:Gotham;src:url("{FONTS}/Gotham-Black.otf");font-weight:900}}
-:root{{--navy:#031c37;--steel:#304557;--silver:#d1d3d4;--bronze:#9b6b26;--graphite:#414042}}
+:root{{--navy:#031c37;--ink:#0d131a;--silver:#d1d3d4;--gold:#f0b855}}
 *{{box-sizing:border-box;margin:0;padding:0}}
 html,body{{background:#10151b}}
-.post{{position:relative;width:1080px;height:1440px;overflow:hidden;font-family:Gotham,Montserrat,sans-serif;color:var(--navy);
- background:radial-gradient(75% 60% at 50% 38%,#ffffff 0%,#eceded 55%,var(--silver) 130%)}}
-.moldura{{position:absolute;inset:44px;border:1px solid rgba(3,28,55,.22)}}
-.moldura i{{position:absolute;width:22px;height:22px;border-color:var(--bronze);border-style:solid;border-width:0}}
-.moldura i:nth-child(1){{left:-1px;top:-1px;border-top-width:2px;border-left-width:2px}}
-.moldura i:nth-child(2){{right:-1px;top:-1px;border-top-width:2px;border-right-width:2px}}
-.moldura i:nth-child(3){{left:-1px;bottom:-1px;border-bottom-width:2px;border-left-width:2px}}
-.moldura i:nth-child(4){{right:-1px;bottom:-1px;border-bottom-width:2px;border-right-width:2px}}
-.miolo{{position:absolute;left:80px;right:80px;top:215px;display:flex;flex-direction:column;align-items:center;text-align:center}}
-.titulo{{white-space:nowrap;font-size:74px;line-height:1.02;letter-spacing:-.03em;font-weight:300}}
+.post{{position:relative;width:1080px;height:1440px;overflow:hidden;color:#fff;font-family:Gotham,Montserrat,sans-serif;
+ background:radial-gradient(60% 45% at 78% 30%,rgba(240,184,85,.16) 0%,rgba(240,184,85,0) 70%),
+ radial-gradient(80% 70% at 0% 100%,#0a2340 0%,rgba(10,35,64,0) 62%),
+ linear-gradient(165deg,#031c37 0%,#05152a 55%,var(--ink) 100%)}}
+.post::after{{content:"";position:absolute;inset:0;z-index:7;pointer-events:none;opacity:.045;mix-blend-mode:overlay;
+ background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")}}
+.g{{position:absolute;z-index:2;filter:drop-shadow(0 0 28px rgba(240,184,85,.28))}}
+.g .sim{{width:100%;height:100%;display:block}}
+.fio{{position:absolute;inset:0;z-index:1;width:100%;height:100%}}
+.texto{{position:absolute;z-index:4;left:90px;right:90px;top:960px}}
+.titulo{{font-size:76px;line-height:1.06;letter-spacing:-.03em;font-weight:300;white-space:nowrap}}
 .titulo b{{display:block;font-weight:900;letter-spacing:-.035em}}
-.regua{{width:96px;height:2px;background:var(--bronze);margin:56px 0 50px}}
-.apoio{{text-wrap:balance;font-weight:300;font-size:38px;line-height:1.42;color:var(--graphite);max-width:860px}}
-.apoio b{{font-weight:700;color:var(--navy);white-space:nowrap}}
-.cadeia{{position:absolute;left:120px;right:120px;top:835px;height:190px;display:flex;align-items:flex-end;justify-content:center;gap:0}}
-.cadeia::before{{content:"";position:absolute;left:0;right:0;bottom:82px;height:1px;background:linear-gradient(90deg,rgba(3,28,55,0),rgba(3,28,55,.35) 22%,rgba(3,28,55,.35) 78%,rgba(3,28,55,0))}}
-.no{{position:relative;margin:0 34px;flex:none;display:flex;align-items:center;justify-content:center;transform:translateY(0)}}
-.no:nth-child(1){{margin-bottom:53px}}.no:nth-child(2){{margin-bottom:40px}}.no:nth-child(3){{margin-bottom:23px}}.no:nth-child(4){{margin-bottom:0}}
-.sm{{width:100%;height:100%;display:block}}
-.data{{position:absolute;left:0;right:0;top:1085px;text-align:center;font-weight:500;font-size:22px;letter-spacing:.2em;text-transform:uppercase;color:var(--bronze)}}
-.rodape{{position:absolute;left:0;right:0;bottom:92px;display:flex;justify-content:center}}
-.lg{{height:54px;width:auto;display:block}}
+.titulo em{{font-style:normal;color:var(--gold)}}
+.apoio{{margin-top:32px;font-weight:300;font-size:31px;line-height:1.45;color:rgba(209,211,212,.88);max-width:800px}}
+.apoio b{{font-weight:700;color:#fff;white-space:nowrap}}
+.data{{margin-top:30px;font-weight:500;font-size:20px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:20px}}
+.data::before{{content:"";width:56px;height:1px;background:var(--gold)}}
+.rodape{{position:absolute;z-index:5;left:0;right:0;bottom:60px;display:flex;justify-content:center}}
+.rodape svg{{height:46px;width:auto;display:block}}
 '''
+# fio fino ligando as gerações
+fio = '<svg class="fio" viewBox="0 0 1080 1440"><path d="M120 845 C 200 830, 215 785, 285 770 C 380 750, 420 690, 520 640 C 640 580, 700 480, 835 400" fill="none" stroke="#f0b855" stroke-opacity=".28" stroke-width="1.4" stroke-dasharray="3 9"/></svg>'
 html = f'''<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Dia dos Professores · EJUP</title><style>{CSS}</style></head><body>
-<div class="post"><div class="moldura"><i></i><i></i><i></i><i></i></div>
-<div class="miolo"><h1 class="titulo">Todo percurso começa<b>com alguém que ensina.</b></h1><div class="regua"></div>
-<p class="apoio">A EJUP deseja um <b>feliz Dia dos Professores</b> a todos que dedicam suas vidas a formar pessoas.</p></div>
-<div class="cadeia">{simbolos}</div>
-<div class="data">15 de outubro</div>
-<div class="rodape">{LOGO}</div></div></body></html>'''
+<div class="post">{fio}{nos}
+<div class="texto"><h1 class="titulo">Todo percurso começa<b>com alguém que <em>ensina.</em></b></h1>
+<p class="apoio">A EJUP deseja um <b>feliz Dia dos Professores</b> a todos que dedicam suas vidas a formar pessoas.</p>
+<div class="data">15 de outubro</div></div>
+<div class="rodape">{logo}</div></div></body></html>'''
 (OUT / "post-dia-dos-professores.html").write_text(html)
 print("ok")
