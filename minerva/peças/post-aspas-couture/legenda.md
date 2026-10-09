@@ -6,6 +6,8 @@ O primeiro dos Mandamentos do Advogado, do jurista uruguaio Eduardo J. Couture, 
 
 Defendemos o tempo do estudo.
 
+No domingo, a curadoria de leituras da EJUP apresenta o livro de onde vem essa frase. Siga a EJUP para não perder.
+
 #ejup #couture #advocacia #direito #formacaojuridica
 
 ---
