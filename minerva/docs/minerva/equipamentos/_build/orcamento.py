@@ -13,7 +13,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 OUT = pathlib.Path(__file__).resolve().parents[1] / "Orcamento_Equipamentos_EJUP.xlsx"
 DATA = "09/10/2026"
 
-C, A, L, S = "Câmeras e lentes", "Áudio", "Iluminação", "Suporte e energia"
+C, A, L, S, E = "Câmeras e lentes", "Áudio", "Iluminação", "Suporte e energia", "Edição"
 # (categoria, item, qtd, preço médio, menor preço visto, onde comprar, link, observação)
 ITENS = [
     (C, "Sony FX30 (corpo)", 2, 10800, 9774, "Bella Photo (oficial, garantia Sony Brasil), KaBuM, Amazon",
@@ -65,9 +65,9 @@ ITENS = [
     (A, "Cabo XLR macho-fêmea 3 m (Santo Angelo)", 4, 60, 46, "Amazon, Magalu, Mercado Livre",
      "https://www.amazon.com.br/MICROFONE-CONECTOR-MACHO-FEMEA-METROS/dp/B076N55W36",
      "Se o microfone escolhido for o Samson Q2U, não precisa: ele já vem com cabo."),
-    (A, "Fone fechado Audio-Technica ATH-M20x", 2, 560, 487, "Mercado Livre, Pichau, Mundomax",
-     "https://www.pichau.com.br/fone-de-ouvido-audio-technica-m20x-profissional-ath-m20x",
-     "Fechado: não vaza som para os microfones."),
+    (A, "Fone JBL Tune 500 com fio", 1, 135, 116, "Mercado Livre, Amazon, KaBuM",
+     "https://www.zoom.com.br/fone-de-ouvido-e-headset/headphone-com-microfone-jbl-tune-500",
+     "Com fio, para ouvir o gravador sem atraso. Versão sem fio (Tune 500BT) não serve para monitorar."),
 
     (L, "Amaran 200d S (no lugar do Aputure LS 120D II)", 1, 3100, 2662, "Mercado Livre, Amazon",
      "https://www.mercadolivre.com.br/luz-de-video-led-diurna-aputure-amaran-200d-s-200w-5600k/p/MLB2001538692",
@@ -106,6 +106,16 @@ ITENS = [
     (S, "Extensão elétrica 5 m, 3 tomadas", 2, 57, 51, "Amazon, Leroy Merlin, Magalu",
      "https://www.amazon.com.br/Tramontina-Extens%C3%A3o-M%C3%BAltipla-Tomadas-250/dp/B076X58SD9",
      "Para várias cargas, preferir cabo de 1,0 mm² ou mais."),
+    (E, "MacBook Pro 14\" M1 Pro, 16 GB, 512 GB, usado em ótimo estado", 1, 7100, 5880,
+     "Mac Switch e GGImports (seminovo com garantia); OLX e Mercado Livre (particular)",
+     "https://www.macswitch.com.br/products/macbook-pro-m1-pro-14",
+     "Seminovo com garantia de loja: R$ 6.900 a 7.500. Particular: R$ 5.000 a 9.500, sem garantia. Conferir saúde da bateria, ciclos, conta Apple desvinculada e carregador original."),
+    (E, "HD externo Seagate Expansion 4 TB (USB 3.0)", 1, 1190, 1115, "KaBuM, Amazon",
+     "https://www.kabum.com.br/produto/1005358/hd-externo-portatil-seagate-expansion-4tb-2-5-usb-3-0-preto-stgx4000400",
+     "Para arquivo e backup. Para editar direto, o SSD é melhor."),
+    (E, "SSD externo SanDisk Portable 2 TB (800 MB/s, USB-C)", 1, 1900, 1859, "KaBuM",
+     "https://www.kabum.com.br/produto/513298/ssd-externo-sandisk-2tb-800mbs-usb-portatil-grafite",
+     "No lugar do SanDisk de 560 MB/s: aquele é SSD interno SATA, precisa de case USB-C e sai mais caro (R$ 2.000 a 2.400). Este é externo, mais rápido e já liga no MacBook."),
 ]
 
 LOJAS = [
@@ -126,6 +136,8 @@ LOJAS = [
     ("Mercado Livre", "Luz amaran, mattebox, acessórios, loja oficial Ulanzi",
      "Muitos anúncios são compra internacional: preço menor, mas sem garantia nacional e com prazo maior. Preferir anúncio com nota fiscal."),
     ("Leroy Merlin e KaBuM", "Mesa, filtro de linha e extensão", "Preços estáveis, produto nacional."),
+    ("Mac Switch e GGImports", "MacBook seminovo",
+     "Lojas de seminovos Apple com garantia (3 meses na Mac Switch) e troca em 7 dias. Particular na OLX sai mais barato, mas sem garantia: só comprar vendo a máquina ligada."),
     ("Importar dos EUA (B&H, Adorama)", "Não compensa",
      "Fora do Remessa Conforme: 60% de imposto mais ICMS. Uma FX30 de US$ 1.750 chegaria a cerca de R$ 18 mil, contra R$ 9,8 mil na Bella Photo."),
     ("Trazer na mala", "Pode compensar em lente",
