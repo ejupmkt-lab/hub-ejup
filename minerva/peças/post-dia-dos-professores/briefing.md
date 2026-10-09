@@ -52,3 +52,6 @@ Para conhecer a EJUP, o link do site está na bio.
 1. O chip fica como "EJUP · DIA DO PROFESSOR", ou preferem só "DIA DO PROFESSOR"?
 2. Com os anéis dourados como elemento central, ou só tipografia com o halo?
 3. Mantemos as hashtags?
+
+## 8. Proposta de arte (v6)
+Arte própria, pontual, na identidade visual da EJUP e fora do sistema das capas de artigo e do quadro de aspas: fundo claro com radial prata, moldura fina com cantos em bronze, título centralizado em Light e Black (sem chip e sem eyebrow no topo), régua bronze, apoio em Light com o fecho em Bold, a cadeia de quatro símbolos da EJUP crescendo da esquerda para a direita (cada geração um pouco maior e mais nítida), data em caixa alta bronze e logo navy na base. `_build/gerar.py` e `_build/render.py`.
