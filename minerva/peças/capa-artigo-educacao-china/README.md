@@ -33,3 +33,8 @@ O halo é centrado na cabeça e dimensionado pelo retrato (`FX`, `FY`, `DH` no
 script do template).
 
     python3 _build/recortar_hd.py original.jpg foto.png 0 250 4912 6900
+
+**Luz (09/10/2026):** centrada na cabeça parecia aura ("parece que ele virou
+anjo"). Agora é luz de estúdio difusa atrás do ombro direito, deslocada para o
+lado como na capa do Leonardo: centro em FX 0,66 / FY 0,30 do retrato,
+diâmetro 0,8 da altura dele, gradiente mais suave e desfoque proporcional.
