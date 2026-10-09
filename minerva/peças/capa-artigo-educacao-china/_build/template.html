@@ -71,7 +71,7 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;align-items:flex-start;
 .fmt-h .bokeh .b3{width:300px;height:300px;left:1380px;top:520px;opacity:.45}
 .fmt-h .halo{left:960px;top:-20px;width:460px;height:460px}
 .fmt-h .foto{right:0;top:0;bottom:0;width:720px}
-.fmt-h .foto img{right:-40px;top:40px;height:860px}
+.fmt-h .foto img{right:70px;top:14px;height:1000px}
 .fmt-h .piso{left:880px;right:0;bottom:0;height:230px}
 .fmt-h .texto{position:absolute;left:96px;top:64px;width:900px}
 .fmt-h .tag{padding:11px 24px;font-size:15px;letter-spacing:.18em;margin-bottom:32px}
@@ -126,7 +126,7 @@ body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;align-items:flex-start;
 .fmt-l .bokeh .b3{width:220px;height:220px;left:1040px;top:400px;opacity:.4}
 .fmt-l .halo{left:780px;top:-10px;width:330px;height:330px}
 .fmt-l .foto{right:0;top:0;bottom:0;width:680px}
-.fmt-l .foto img{right:-30px;top:30px;height:620px}
+.fmt-l .foto img{right:50px;top:20px;height:700px}
 .fmt-l .piso{left:0;right:0;bottom:0;height:150px}
 .fmt-l .texto{position:absolute;left:64px;top:52px;width:640px}
 .fmt-l .tag{padding:8px 18px;font-size:12px;letter-spacing:.18em;margin-bottom:22px}
@@ -181,8 +181,8 @@ __COVERS__
 /* o halo dourado fica centrado na cabeça do retrato, em qualquer formato:
    mede onde a foto caiu e põe o centro do halo no ponto (FX, FY) da imagem */
 (function () {
-  const FX = 0.497, FY = 0.30;   // centro da cabeça, em fração da foto tratada
-  const DH = 0.62;               // diâmetro do halo, em fração da altura do retrato
+  const FX = 0.482, FY = 0.18;   // centro da cabeça, em fração da foto tratada
+  const DH = 0.50;               // diâmetro do halo, em fração da altura do retrato
   document.querySelectorAll('.cover').forEach(s => {
     const img = s.querySelector('.foto img'), h = s.querySelector('.halo');
     if (!img || !h || !img.offsetParent) return;

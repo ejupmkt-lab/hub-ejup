@@ -23,3 +23,13 @@ terno claro olhando para o lado (FOTO-07).
 **A confirmar:** cargo "Sócio da EJUP" (se ele assina como sócio-fundador,
 trocar em `ARTIGO`) e o rótulo de tema "Educação". Sem o texto do artigo, o
 título e o subtítulo vêm do tema enviado pelo Victor.
+
+## Ajuste ao padrão (09/10/2026)
+Comparada com as capas do Leonardo e da Rossana, a do Roberto estava com o
+retrato fechado demais (rosto grande, sem tronco). Recorte refeito de y 250 a
+6900 do original, até a cintura, na mesma proporção do retrato do Leonardo, e
+posição do horizontal igual à da capa dele (right 70, top 14, altura 1000).
+O halo é centrado na cabeça e dimensionado pelo retrato (`FX`, `FY`, `DH` no
+script do template).
+
+    python3 _build/recortar_hd.py original.jpg foto.png 0 250 4912 6900
