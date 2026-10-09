@@ -25,7 +25,7 @@ ganchos e uma capa mais forte. Telas em `telas/`, visão geral em
 14. ONU, sobre Goya.
 15. Fecho com a venda, espelhando a capa.
 
-Cada tela termina com um gancho para a seguinte ("Há 65 anos isso não
+Sem etiqueta (eyebrow) acima dos títulos, a pedido do Victor (09/10/2026): a referência da lei entra no próprio texto. Cada tela termina com um gancho para a seguinte ("Há 65 anos isso não
 acontecia →", "E no Brasil? →", "Quem declara a guerra? →"...).
 
 ## Imagem gerada (Higgsfield)

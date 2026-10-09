@@ -26,7 +26,7 @@ h2{font-weight:900;font-size:86px;line-height:1.05;letter-spacing:-.025em}
 .corpo{font-weight:300;font-size:44px;line-height:1.4;margin-top:36px;position:relative}
 .papel .corpo{color:var(--graphite)}
 blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em;padding-left:44px;border-left:5px solid var(--gold);position:relative}
-.gancho{position:absolute;right:96px;bottom:168px;z-index:3;font-weight:500;font-size:22px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.gancho{position:absolute;right:96px;bottom:166px;z-index:3;font-weight:400;font-size:30px;color:var(--gold)}
 .gancho span{display:inline-block;margin-left:10px;font-size:28px;letter-spacing:0;transform:translateY(2px)}
 .papel .gancho{color:var(--bronze)}
 /* imagens */
@@ -46,6 +46,10 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
 .fundo{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.22}
 .fundo::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,var(--bg) 0%,transparent 30%,transparent 70%,var(--bg) 100%)}
 .papel .fundo{opacity:.12}
+.fonte{font-weight:300;font-size:30px;color:var(--silver);margin-top:34px;position:relative}
+.papel .fonte{color:var(--graphite)}
+.rito h2{margin-bottom:30px}
+.rito .lista div{padding:20px 0}
 /* 3 · 65 anos */
 .numero{font-weight:900;font-size:400px;line-height:.8;letter-spacing:-.05em;color:var(--gold);position:relative}
 .numero small{font-size:96px;letter-spacing:-.02em;color:#fff;margin-left:8px}
@@ -64,7 +68,7 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
 /* 5 · diagrama */
 .diagrama{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:64px;position:relative}
 .caixa{border:2px solid rgba(209,211,212,.5);border-radius:4px;padding:28px 30px;background:rgba(3,28,55,.35)}
-.caixa small{display:block;font-weight:500;font-size:20px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.caixa span{display:block;font-weight:300;font-size:28px;color:var(--silver);margin-top:10px} .caixa.final span{color:var(--gold)}
 .caixa b{font-weight:700;font-size:36px;line-height:1.15}
 .liga{grid-column:1/3;height:70px;position:relative;margin:-28px 0}
 .liga::before{content:"";position:absolute;left:25%;right:25%;top:0;height:35px;border:2px solid var(--gold);border-top:none}
@@ -74,14 +78,14 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
 /* 8 · sete dias */
 .semana{margin-top:96px;position:relative}
 .janela{margin:0 3.5% 18px;border:2px solid var(--bronze);border-bottom:none;height:58px;position:relative}
-.janela span{position:absolute;left:0;right:0;top:-44px;text-align:center;font-weight:500;font-size:20px;letter-spacing:.1em;text-transform:uppercase;color:var(--bronze)}
+.janela span{position:absolute;left:0;right:0;top:-50px;text-align:center;font-weight:400;font-size:30px;color:var(--bronze)}
 .dias{display:flex;justify-content:space-between;position:relative}
 .dias::before{content:"";position:absolute;left:3.5%;right:3.5%;top:17px;border-top:2px solid rgba(3,28,55,.35)}
 .dia{width:7%;display:flex;flex-direction:column;align-items:center;position:relative}
 .dia i{width:36px;height:36px;border-radius:50%;border:2px solid var(--navy);background:#f3f0e9}
 .dia.a i{background:var(--navy)}
 .dia b{font-weight:900;font-size:38px;color:var(--navy);margin-top:14px}
-.pontas{display:flex;justify-content:space-between;margin-top:18px;font-weight:500;font-size:22px;letter-spacing:.06em;text-transform:uppercase;color:var(--navy)}
+.pontas{display:flex;justify-content:space-between;margin-top:18px;font-weight:400;font-size:28px;color:var(--navy)}
 .pontas span{max-width:44%} .pontas span+span{text-align:right}
 .nota{margin-top:56px;font-weight:300;font-size:36px;color:var(--graphite);position:relative}
 /* 9 · rito */
@@ -92,7 +96,7 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
 .quadro{display:grid;grid-template-columns:210px 1fr 1fr;margin-top:56px;position:relative}
 .quadro>div{padding:26px 18px 26px 0;border-top:2px solid var(--fio);font-weight:300;font-size:33px;line-height:1.2}
 .quadro .cab{font-weight:900;font-size:36px;color:var(--gold);border-top:none;padding-top:0}
-.quadro .rot{font-weight:500;font-size:19px;letter-spacing:.14em;text-transform:uppercase;color:var(--silver);padding-top:34px}
+.quadro .rot{font-weight:400;font-size:26px;color:var(--silver);padding-top:30px}
 .quadro>div:nth-child(3n+2){font-weight:400}
 /* 11 · ficha */
 .ficha{margin-top:56px;padding-top:26px;border-top:2px solid var(--fio);font-weight:300;font-size:32px;line-height:1.4;color:var(--silver);position:relative}
@@ -118,7 +122,6 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
 .assin{margin-top:50px;border-top:2px solid rgba(209,211,212,.25);padding-top:26px;display:flex;flex-direction:column;gap:10px;position:relative}
 .assin b{font-weight:900;font-size:34px;letter-spacing:-.01em} .assin span{font-weight:300;font-size:28px;color:var(--silver)}
 </style></head><body><section class="s cheia capa"><div class="img" style="background-image:url('file:///home/user/EJUPMinerva/pe%C3%A7as/carrossel-fuzilamento-lei-brasileira/_build/duotone/capa-venda.jpg')"></div><div class="veu"></div><div class="conteudo">
-  <div class="eyebrow">Pena de morte · o que diz a lei brasileira</div>
   <h1>A Constituição brasileira admite a <em>pena de morte</em>.</h1>
   <p class="lead">Em um único caso. E a lei já define o método.</p></div><div class="gancho">Arraste <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
   <g fill="#ffffff">
@@ -154,7 +157,6 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
   </g>
   </g>
 </svg></div></section><section class="s faixa ink" style="--h:600px"><div class="img" style="background-image:url('file:///home/user/EJUPMinerva/pe%C3%A7as/carrossel-fuzilamento-lei-brasileira/_build/duotone/pelotao.jpg')"></div><div class="veu"></div><div class="credito">Édouard Manet, <i>A execução de Maximiliano</i>, 1868 · The Met</div><div class="conteudo">
-  <div class="eyebrow">Por que falar disso agora</div>
   <h2>Os EUA marcaram um fuzilamento para <em>3&nbsp;de dezembro</em></h2>
   <p class="corpo">O condenado matou 13 pessoas na base de Fort Hood, em 2009. O Pentágono anunciou que vai transmitir.</p></div><div class="gancho">Há 65 anos isso não acontecia <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
   <g fill="#ffffff">
@@ -190,9 +192,8 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
   </g>
   </g>
 </svg></div></section><section class="s texto navy anos"><div class="fundo" style="background-image:url('file:///home/user/EJUPMinerva/pe%C3%A7as/carrossel-fuzilamento-lei-brasileira/_build/duotone/fundo-manet-b.jpg')"></div><div class="conteudo">
-  <div class="eyebrow">Justiça militar dos EUA</div>
   <div class="numero">65 <small>anos</small></div>
-  <p class="corpo">sem uma execução militar. A última foi em 1961.</p>
+  <p class="corpo">sem uma execução militar nos EUA. A última foi em 1961.</p>
   <div class="regua"><div class="linha"></div>
     <div class="marco ini"><i></i><b>1961</b><span>última execução militar</span></div>
     <div class="marco fim"><i></i><b>2026</b><span>fuzilamento marcado</span></div></div></div><div class="gancho">E no Brasil? <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
@@ -229,11 +230,10 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
   </g>
   </g>
 </svg></div></section><section class="s texto papel salvo"><div class="fundo" style="background-image:url('file:///home/user/EJUPMinerva/pe%C3%A7as/carrossel-fuzilamento-lei-brasileira/_build/duotone/fundo-hogarth-a-claro.jpg')"></div><div class="conteudo">
-  <div class="eyebrow">E no Brasil? · Constituição, art. 5º, XLVII</div>
   <p class="trecho">“não haverá penas: a) de morte,</p>
   <div class="palavra">salvo</div>
   <p class="trecho dir">em caso de guerra declarada”</p>
-  <p class="corpo">A exceção inteira cabe em uma palavra.</p></div><div class="gancho">Quem declara a guerra? <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
+  <p class="corpo">A exceção inteira cabe em uma palavra, no art. 5º, XLVII, da Constituição.</p></div><div class="gancho">Quem declara a guerra? <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
   <g fill="#031c37">
 <g xmlns="http://www.w3.org/2000/svg">
     <g>
@@ -267,14 +267,14 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
   </g>
   </g>
 </svg></div></section><section class="s texto steel"><div class="fundo" style="background-image:url('file:///home/user/EJUPMinerva/pe%C3%A7as/carrossel-fuzilamento-lei-brasileira/_build/duotone/fundo-manet-a.jpg')"></div><div class="conteudo">
-  <div class="eyebrow">Constituição, art. 84, XIX</div>
   <h2>Guerra declarada exige <em>dois Poderes</em></h2>
   <div class="diagrama">
-    <div class="caixa"><small>Declara</small><b>Presidente da República</b></div>
-    <div class="caixa"><small>Autoriza ou referenda</small><b>Congresso Nacional</b></div>
+    <div class="caixa"><b>Presidente da República</b><span>declara</span></div>
+    <div class="caixa"><b>Congresso Nacional</b><span>autoriza ou referenda</span></div>
     <div class="liga"></div>
-    <div class="caixa final"><small>Só diante de agressão estrangeira</small><b>Guerra declarada</b></div>
-  </div></div><div class="gancho">E a lei já diz como <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
+    <div class="caixa final"><b>Guerra declarada</b><span>só diante de agressão estrangeira</span></div>
+  </div>
+  <p class="fonte">Constituição, art. 84, XIX.</p></div><div class="gancho">E a lei já diz como <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
   <g fill="#ffffff">
 <g xmlns="http://www.w3.org/2000/svg">
     <g>
@@ -308,8 +308,8 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
   </g>
   </g>
 </svg></div></section><section class="s faixa ink" style="--h:620px"><div class="img" style="background-image:url('file:///home/user/EJUPMinerva/pe%C3%A7as/carrossel-fuzilamento-lei-brasileira/_build/duotone/botas.jpg')"></div><div class="veu"></div><div class="credito">Édouard Manet, <i>A execução de Maximiliano</i>, 1868 · The Met</div><div class="conteudo">
-  <div class="eyebrow">Código Penal Militar, art. 56</div>
-  <blockquote>“A pena de morte é executada <em>por fuzilamento</em>.”</blockquote></div><div class="gancho">Mas não para qualquer crime <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
+  <blockquote>“A pena de morte é executada <em>por fuzilamento</em>.”</blockquote>
+  <p class="fonte">Código Penal Militar, art. 56.</p></div><div class="gancho">Mas não para qualquer crime <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
   <g fill="#ffffff">
 <g xmlns="http://www.w3.org/2000/svg">
     <g>
@@ -378,14 +378,13 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
   </g>
   </g>
 </svg></div></section><section class="s texto papel"><div class="fundo" style="background-image:url('file:///home/user/EJUPMinerva/pe%C3%A7as/carrossel-fuzilamento-lei-brasileira/_build/duotone/fundo-goya-claro.jpg')"></div><div class="conteudo">
-  <div class="eyebrow">Código Penal Militar, art. 57</div>
   <h2>Sete dias <em>entre a sentença e a execução</em></h2>
   <div class="semana">
-    <div class="janela"><span>Janela para indulto ou comutação · CF, art. 84, XII</span></div>
+    <div class="janela"><span>janela para indulto ou comutação</span></div>
     <div class="dias"><div class="dia a"><i></i><b>0</b></div><div class="dia"><i></i><b>1</b></div><div class="dia"><i></i><b>2</b></div><div class="dia"><i></i><b>3</b></div><div class="dia"><i></i><b>4</b></div><div class="dia"><i></i><b>5</b></div><div class="dia"><i></i><b>6</b></div><div class="dia a"><i></i><b>7</b></div></div>
     <div class="pontas"><span>Comunicação ao Presidente</span><span>Execução possível</span></div>
   </div>
-  <p class="nota">Em zona de operações de guerra, pode ser imediata.</p></div><div class="gancho">O rito também está na lei <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
+  <p class="nota">Código Penal Militar, art. 57. Em zona de operações de guerra, a execução pode ser imediata.</p></div><div class="gancho">O rito também está na lei <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
   <g fill="#031c37">
 <g xmlns="http://www.w3.org/2000/svg">
     <g>
@@ -419,13 +418,14 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
   </g>
   </g>
 </svg></div></section><section class="s faixa ink rito" style="--h:560px"><div class="img" style="background-image:url('file:///home/user/EJUPMinerva/pe%C3%A7as/carrossel-fuzilamento-lei-brasileira/_build/duotone/faixa-venda.jpg')"></div><div class="veu"></div><div class="conteudo">
-  <div class="eyebrow">Código de Processo Penal Militar, arts. 707 e 708</div>
+  <h2>O rito está <em>na lei</em></h2>
   <div class="lista">
     <div><b>01</b>Uniforme comum, sem insígnias</div>
     <div><b>02</b>Olhos vendados, se o condenado aceitar</div>
     <div><b>03</b>Sinal no lugar da voz de fogo</div>
     <div><b>04</b>Ata assinada por duas testemunhas</div>
-  </div></div><div class="gancho">Lado a lado com os EUA <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
+  </div>
+  <p class="fonte">Código de Processo Penal Militar, arts. 707 e 708.</p></div><div class="gancho">Lado a lado com os EUA <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
   <g fill="#ffffff">
 <g xmlns="http://www.w3.org/2000/svg">
     <g>
@@ -459,7 +459,6 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
   </g>
   </g>
 </svg></div></section><section class="s texto navy"><div class="fundo" style="background-image:url('file:///home/user/EJUPMinerva/pe%C3%A7as/carrossel-fuzilamento-lei-brasileira/_build/duotone/fundo-hogarth-b.jpg')"></div><div class="conteudo">
-  <div class="eyebrow">Lado a lado</div>
   <h2>Brasil <em>e</em> EUA</h2>
   <div class="quadro"><div class="rot"></div><div class="cab">Brasil</div><div class="cab">EUA · Justiça militar</div><div class="rot">Quando cabe</div><div>Só em guerra declarada</div><div>Também em tempo de paz</div><div class="rot">Presidente</div><div>Pode indultar em 7 dias</div><div>Precisa aprovar</div><div class="rot">Método</div><div>Fuzilamento</div><div>Fuzilamento, neste caso</div><div class="rot">Registro</div><div>Ata e duas testemunhas</div><div>Transmissão anunciada</div></div></div><div class="gancho">Uma emenda poderia mudar isso? <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
   <g fill="#ffffff">
@@ -495,10 +494,9 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
   </g>
   </g>
 </svg></div></section><section class="s texto ink"><div class="fundo" style="background-image:url('file:///home/user/EJUPMinerva/pe%C3%A7as/carrossel-fuzilamento-lei-brasileira/_build/duotone/fundo-manet-a.jpg')"></div><div class="conteudo">
-  <div class="eyebrow">Constituição, art. 60, §4º, IV</div>
   <h2>Uma emenda poderia <em>ampliar?</em></h2>
-  <p class="corpo">Para a doutrina majoritária, não. A proibição é cláusula pétrea.</p>
-  <div class="ficha"><small>Decreto 2.754/1998</small>O Brasil ratificou o protocolo americano contra a pena de morte, com reserva só para a guerra.</div></div><div class="gancho">A pena e a plateia <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
+  <p class="corpo">Para a doutrina majoritária, não. A proibição é cláusula pétrea (Constituição, art. 60, §4º, IV).</p>
+  <div class="ficha">O Brasil também ratificou o protocolo americano contra a pena de morte, com reserva só para a guerra (Decreto 2.754/1998).</div></div><div class="gancho">A pena e a plateia <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
   <g fill="#ffffff">
 <g xmlns="http://www.w3.org/2000/svg">
     <g>
@@ -532,7 +530,6 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
   </g>
   </g>
 </svg></div></section><section class="s pano ink"><div class="img" style="background-image:url('file:///home/user/EJUPMinerva/pe%C3%A7as/carrossel-fuzilamento-lei-brasileira/_build/duotone/panorama.jpg');background-position:0px 0"></div><div class="veu"></div><div class="credito">William Hogarth, <i>Execução em Tyburn</i>, 1747 · The Met</div><div class="trilho" style="left:0px"></div><div class="ponto cima" style="left:150px"><i></i><b>1747</b><span>Londres monta arquibancadas para um enforcamento</span></div><div class="ponto baixo" style="left:600px"><i></i><b>1757</b><span>Paris: o suplício de Damiens, que abre <i>Vigiar e Punir</i></span></div><div class="ponto cima" style="left:1230px"><i></i><b>1961</b><span>Última execução militar dos EUA</span></div><div class="ponto baixo" style="left:1680px"><i></i><b>2026</b><span>O Pentágono anuncia a transmissão</span></div><div class="conteudo">
-  <div class="eyebrow">A publicidade da pena</div>
   <h2>Da praça <em>à tela</em></h2></div><div class="gancho">A linha continua <span>→</span></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
   <g fill="#ffffff">
 <g xmlns="http://www.w3.org/2000/svg">
@@ -601,9 +598,8 @@ blockquote{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em
   </g>
   </g>
 </svg></div></section><section class="s cheia "><div class="img" style="background-image:url('file:///home/user/EJUPMinerva/pe%C3%A7as/carrossel-fuzilamento-lei-brasileira/_build/duotone/goya.jpg')"></div><div class="veu"></div><div class="credito">Francisco de Goya, <i>Não se pode olhar</i>, c. 1810 · The Met</div><div class="conteudo">
-  <div class="eyebrow">ONU · 9 de outubro de 2026</div>
-  <h2>Transmitir equivale a <em>executar em público</em></h2>
-  <p class="corpo">Para o Alto Comissariado de Direitos Humanos, violaria a proibição da tortura.</p></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
+  <h2>Para a ONU, transmitir equivale a <em>executar em público</em></h2>
+  <p class="corpo">O Alto Comissariado de Direitos Humanos afirmou, em 9 de outubro, que isso violaria a proibição da tortura.</p></div><div class="logo"><svg preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" viewBox="203 678 619 142" role="img" aria-label="ejup — Educação Jurídica">
   <g fill="#ffffff">
 <g xmlns="http://www.w3.org/2000/svg">
     <g>

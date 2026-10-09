@@ -55,22 +55,19 @@ def texto(cls, corpo, fundo="", gc="", logo=LOGO_B):
 
 # 1 · capa
 t01 = cheia("capa", "capa-venda", '''
-  <div class="eyebrow">Pena de morte · o que diz a lei brasileira</div>
   <h1>A Constituição brasileira admite a <em>pena de morte</em>.</h1>
   <p class="lead">Em um único caso. E a lei já define o método.</p>''', gc="Arraste")
 
 # 2 · a notícia
 t02 = faixa("ink", "pelotao", '''
-  <div class="eyebrow">Por que falar disso agora</div>
   <h2>Os EUA marcaram um fuzilamento para <em>3&nbsp;de dezembro</em></h2>
   <p class="corpo">O condenado matou 13 pessoas na base de Fort Hood, em 2009. O Pentágono anunciou que vai transmitir.</p>''',
             MANET, 600, "Há 65 anos isso não acontecia")
 
 # 3 · 65 anos
 t03 = texto("navy anos", '''
-  <div class="eyebrow">Justiça militar dos EUA</div>
   <div class="numero">65 <small>anos</small></div>
-  <p class="corpo">sem uma execução militar. A última foi em 1961.</p>
+  <p class="corpo">sem uma execução militar nos EUA. A última foi em 1961.</p>
   <div class="regua"><div class="linha"></div>
     <div class="marco ini"><i></i><b>1961</b><span>última execução militar</span></div>
     <div class="marco fim"><i></i><b>2026</b><span>fuzilamento marcado</span></div></div>''',
@@ -78,28 +75,27 @@ t03 = texto("navy anos", '''
 
 # 4 · salvo
 t04 = texto("papel salvo", '''
-  <div class="eyebrow">E no Brasil? · Constituição, art. 5º, XLVII</div>
   <p class="trecho">“não haverá penas: a) de morte,</p>
   <div class="palavra">salvo</div>
   <p class="trecho dir">em caso de guerra declarada”</p>
-  <p class="corpo">A exceção inteira cabe em uma palavra.</p>''',
+  <p class="corpo">A exceção inteira cabe em uma palavra, no art. 5º, XLVII, da Constituição.</p>''',
             "fundo-hogarth-a-claro", "Quem declara a guerra?", LOGO_N)
 
 # 5 · quem declara
 t05 = texto("steel", '''
-  <div class="eyebrow">Constituição, art. 84, XIX</div>
   <h2>Guerra declarada exige <em>dois Poderes</em></h2>
   <div class="diagrama">
-    <div class="caixa"><small>Declara</small><b>Presidente da República</b></div>
-    <div class="caixa"><small>Autoriza ou referenda</small><b>Congresso Nacional</b></div>
+    <div class="caixa"><b>Presidente da República</b><span>declara</span></div>
+    <div class="caixa"><b>Congresso Nacional</b><span>autoriza ou referenda</span></div>
     <div class="liga"></div>
-    <div class="caixa final"><small>Só diante de agressão estrangeira</small><b>Guerra declarada</b></div>
-  </div>''', "fundo-manet-a", "E a lei já diz como")
+    <div class="caixa final"><b>Guerra declarada</b><span>só diante de agressão estrangeira</span></div>
+  </div>
+  <p class="fonte">Constituição, art. 84, XIX.</p>''', "fundo-manet-a", "E a lei já diz como")
 
 # 6 · art. 56
 t06 = faixa("ink", "botas", '''
-  <div class="eyebrow">Código Penal Militar, art. 56</div>
-  <blockquote>“A pena de morte é executada <em>por fuzilamento</em>.”</blockquote>''', MANET, 620,
+  <blockquote>“A pena de morte é executada <em>por fuzilamento</em>.”</blockquote>
+  <p class="fonte">Código Penal Militar, art. 56.</p>''', MANET, 620,
             "Mas não para qualquer crime")
 
 # 7 · só crimes de guerra
@@ -111,24 +107,24 @@ t07 = faixa("navy", "baionetas", '''
 # 8 · sete dias
 dias = "".join(f'<div class="dia{" a" if i in (0, 7) else ""}"><i></i><b>{i}</b></div>' for i in range(8))
 t08 = texto("papel", f'''
-  <div class="eyebrow">Código Penal Militar, art. 57</div>
   <h2>Sete dias <em>entre a sentença e a execução</em></h2>
   <div class="semana">
-    <div class="janela"><span>Janela para indulto ou comutação · CF, art. 84, XII</span></div>
+    <div class="janela"><span>janela para indulto ou comutação</span></div>
     <div class="dias">{dias}</div>
     <div class="pontas"><span>Comunicação ao Presidente</span><span>Execução possível</span></div>
   </div>
-  <p class="nota">Em zona de operações de guerra, pode ser imediata.</p>''', "fundo-goya-claro", "O rito também está na lei", LOGO_N)
+  <p class="nota">Código Penal Militar, art. 57. Em zona de operações de guerra, a execução pode ser imediata.</p>''', "fundo-goya-claro", "O rito também está na lei", LOGO_N)
 
 # 9 · o rito
 t09 = faixa("ink rito", "faixa-venda", '''
-  <div class="eyebrow">Código de Processo Penal Militar, arts. 707 e 708</div>
+  <h2>O rito está <em>na lei</em></h2>
   <div class="lista">
     <div><b>01</b>Uniforme comum, sem insígnias</div>
     <div><b>02</b>Olhos vendados, se o condenado aceitar</div>
     <div><b>03</b>Sinal no lugar da voz de fogo</div>
     <div><b>04</b>Ata assinada por duas testemunhas</div>
-  </div>''', "", 560, "Lado a lado com os EUA")
+  </div>
+  <p class="fonte">Código de Processo Penal Militar, arts. 707 e 708.</p>''', "", 560, "Lado a lado com os EUA")
 
 # 10 · Brasil x EUA
 linhas = [("Quando cabe", "Só em guerra declarada", "Também em tempo de paz"),
@@ -137,17 +133,15 @@ linhas = [("Quando cabe", "Só em guerra declarada", "Também em tempo de paz"),
           ("Registro", "Ata e duas testemunhas", "Transmissão anunciada")]
 quadro = "".join(f'<div class="rot">{a}</div><div>{b}</div><div>{c}</div>' for a, b, c in linhas)
 t10 = texto("navy", f'''
-  <div class="eyebrow">Lado a lado</div>
   <h2>Brasil <em>e</em> EUA</h2>
   <div class="quadro"><div class="rot"></div><div class="cab">Brasil</div><div class="cab">EUA · Justiça militar</div>{quadro}</div>''',
             "fundo-hogarth-b", "Uma emenda poderia mudar isso?")
 
 # 11 · cláusula pétrea
 t11 = texto("ink", '''
-  <div class="eyebrow">Constituição, art. 60, §4º, IV</div>
   <h2>Uma emenda poderia <em>ampliar?</em></h2>
-  <p class="corpo">Para a doutrina majoritária, não. A proibição é cláusula pétrea.</p>
-  <div class="ficha"><small>Decreto 2.754/1998</small>O Brasil ratificou o protocolo americano contra a pena de morte, com reserva só para a guerra.</div>''',
+  <p class="corpo">Para a doutrina majoritária, não. A proibição é cláusula pétrea (Constituição, art. 60, §4º, IV).</p>
+  <div class="ficha">O Brasil também ratificou o protocolo americano contra a pena de morte, com reserva só para a guerra (Decreto 2.754/1998).</div>''',
             "fundo-manet-a", "A pena e a plateia")
 
 
@@ -168,16 +162,14 @@ MARCOS = [(150, "1747", "Londres monta arquibancadas para um enforcamento", "cim
           (1230, "1961", "Última execução militar dos EUA", "cima"),
           (1680, "2026", "O Pentágono anuncia a transmissão", "baixo")]
 t12 = panorama("esq", '''
-  <div class="eyebrow">A publicidade da pena</div>
   <h2>Da praça <em>à tela</em></h2>''', MARCOS)
 t13 = panorama("dir", '''
   <p class="corpo">O Direito moderno tirou a pena do palco. Foucault descreve essa passagem em <i>Vigiar e Punir</i>, de 1975.</p>''', MARCOS)
 
 # 14 · ONU
 t14 = cheia("", "goya", '''
-  <div class="eyebrow">ONU · 9 de outubro de 2026</div>
-  <h2>Transmitir equivale a <em>executar em público</em></h2>
-  <p class="corpo">Para o Alto Comissariado de Direitos Humanos, violaria a proibição da tortura.</p>''', GOYA)
+  <h2>Para a ONU, transmitir equivale a <em>executar em público</em></h2>
+  <p class="corpo">O Alto Comissariado de Direitos Humanos afirmou, em 9 de outubro, que isso violaria a proibição da tortura.</p>''', GOYA)
 
 # 15 · fecho
 t15 = cheia("fecho", "capa-venda", '''
@@ -216,7 +208,7 @@ h2{{font-weight:900;font-size:86px;line-height:1.05;letter-spacing:-.025em}}
 .corpo{{font-weight:300;font-size:44px;line-height:1.4;margin-top:36px;position:relative}}
 .papel .corpo{{color:var(--graphite)}}
 blockquote{{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015em;padding-left:44px;border-left:5px solid var(--gold);position:relative}}
-.gancho{{position:absolute;right:96px;bottom:168px;z-index:3;font-weight:500;font-size:22px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}}
+.gancho{{position:absolute;right:96px;bottom:166px;z-index:3;font-weight:400;font-size:30px;color:var(--gold)}}
 .gancho span{{display:inline-block;margin-left:10px;font-size:28px;letter-spacing:0;transform:translateY(2px)}}
 .papel .gancho{{color:var(--bronze)}}
 /* imagens */
@@ -236,6 +228,10 @@ blockquote{{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015e
 .fundo{{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.22}}
 .fundo::after{{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,var(--bg) 0%,transparent 30%,transparent 70%,var(--bg) 100%)}}
 .papel .fundo{{opacity:.12}}
+.fonte{{font-weight:300;font-size:30px;color:var(--silver);margin-top:34px;position:relative}}
+.papel .fonte{{color:var(--graphite)}}
+.rito h2{{margin-bottom:30px}}
+.rito .lista div{{padding:20px 0}}
 /* 3 · 65 anos */
 .numero{{font-weight:900;font-size:400px;line-height:.8;letter-spacing:-.05em;color:var(--gold);position:relative}}
 .numero small{{font-size:96px;letter-spacing:-.02em;color:#fff;margin-left:8px}}
@@ -254,7 +250,7 @@ blockquote{{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015e
 /* 5 · diagrama */
 .diagrama{{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:64px;position:relative}}
 .caixa{{border:2px solid rgba(209,211,212,.5);border-radius:4px;padding:28px 30px;background:rgba(3,28,55,.35)}}
-.caixa small{{display:block;font-weight:500;font-size:20px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}}
+.caixa span{{display:block;font-weight:300;font-size:28px;color:var(--silver);margin-top:10px}} .caixa.final span{{color:var(--gold)}}
 .caixa b{{font-weight:700;font-size:36px;line-height:1.15}}
 .liga{{grid-column:1/3;height:70px;position:relative;margin:-28px 0}}
 .liga::before{{content:"";position:absolute;left:25%;right:25%;top:0;height:35px;border:2px solid var(--gold);border-top:none}}
@@ -264,14 +260,14 @@ blockquote{{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015e
 /* 8 · sete dias */
 .semana{{margin-top:96px;position:relative}}
 .janela{{margin:0 3.5% 18px;border:2px solid var(--bronze);border-bottom:none;height:58px;position:relative}}
-.janela span{{position:absolute;left:0;right:0;top:-44px;text-align:center;font-weight:500;font-size:20px;letter-spacing:.1em;text-transform:uppercase;color:var(--bronze)}}
+.janela span{{position:absolute;left:0;right:0;top:-50px;text-align:center;font-weight:400;font-size:30px;color:var(--bronze)}}
 .dias{{display:flex;justify-content:space-between;position:relative}}
 .dias::before{{content:"";position:absolute;left:3.5%;right:3.5%;top:17px;border-top:2px solid rgba(3,28,55,.35)}}
 .dia{{width:7%;display:flex;flex-direction:column;align-items:center;position:relative}}
 .dia i{{width:36px;height:36px;border-radius:50%;border:2px solid var(--navy);background:#f3f0e9}}
 .dia.a i{{background:var(--navy)}}
 .dia b{{font-weight:900;font-size:38px;color:var(--navy);margin-top:14px}}
-.pontas{{display:flex;justify-content:space-between;margin-top:18px;font-weight:500;font-size:22px;letter-spacing:.06em;text-transform:uppercase;color:var(--navy)}}
+.pontas{{display:flex;justify-content:space-between;margin-top:18px;font-weight:400;font-size:28px;color:var(--navy)}}
 .pontas span{{max-width:44%}} .pontas span+span{{text-align:right}}
 .nota{{margin-top:56px;font-weight:300;font-size:36px;color:var(--graphite);position:relative}}
 /* 9 · rito */
@@ -282,7 +278,7 @@ blockquote{{font-weight:400;font-size:68px;line-height:1.2;letter-spacing:-.015e
 .quadro{{display:grid;grid-template-columns:210px 1fr 1fr;margin-top:56px;position:relative}}
 .quadro>div{{padding:26px 18px 26px 0;border-top:2px solid var(--fio);font-weight:300;font-size:33px;line-height:1.2}}
 .quadro .cab{{font-weight:900;font-size:36px;color:var(--gold);border-top:none;padding-top:0}}
-.quadro .rot{{font-weight:500;font-size:19px;letter-spacing:.14em;text-transform:uppercase;color:var(--silver);padding-top:34px}}
+.quadro .rot{{font-weight:400;font-size:26px;color:var(--silver);padding-top:30px}}
 .quadro>div:nth-child(3n+2){{font-weight:400}}
 /* 11 · ficha */
 .ficha{{margin-top:56px;padding-top:26px;border-top:2px solid var(--fio);font-weight:300;font-size:32px;line-height:1.4;color:var(--silver);position:relative}}
