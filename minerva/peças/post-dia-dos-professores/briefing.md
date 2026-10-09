@@ -53,5 +53,5 @@ Para conhecer a EJUP, o link do site está na bio.
 2. Com os anéis dourados como elemento central, ou só tipografia com o halo?
 3. Mantemos as hashtags?
 
-## 8. Proposta de arte (v7)
-Arte própria e pontual, na identidade visual da EJUP. Fundo navy profundo com um halo dourado discreto e grão fino. O símbolo da EJUP, em dourado (aplicação institucional da marca), aparece quatro vezes ao longo de uma diagonal, cada geração maior e mais nítida, ligadas por um fio pontilhado; a última, gigante, sai do quadro. Texto à esquerda, na terça parte inferior: "Todo percurso começa com alguém que ensina." (Light e Black, com "ensina." em dourado), o apoio com "feliz Dia dos Professores" em Bold, a data com uma régua dourada, e o logo branco centralizado na base. `_build/gerar.py` e `_build/render.py`.
+## 8. Proposta de arte (v8)
+Leitura imediata de "professor": a lousa. Quadro de aula em ink com moldura em aço, borda com giz e apagador, fundo navy. Na lousa, escrito a giz, "Todo percurso começa com alguém que ensina." ("ensina." em dourado) e, desenhada no quadro, a cadeia de quatro símbolos da EJUP em dourado, cada geração maior que a anterior, a última saindo da lousa. Abaixo, o apoio ("A EJUP deseja um feliz Dia dos Professores a todos que dedicam suas vidas a formar pessoas."), a data e o logo branco. Em desenho geométrico, sem ilustração infantil. A versão anterior, só com símbolos dourados sobre navy, fica em `_build/gerar_v7_simbolos.py`. `_build/gerar.py` e `_build/render.py`.
