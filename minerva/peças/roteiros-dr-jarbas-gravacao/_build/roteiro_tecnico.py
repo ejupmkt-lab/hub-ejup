@@ -29,57 +29,8 @@ PM = "PM"
 PP = "PP"
 
 # (imagem, fala, lettering) · lettering "" = sem lettering
-SEG = {
- "A1": [
-  (PP + ". Olhar firme na lente, rosto sério.", "Na Justiça Militar estadual, a sentença costuma nascer numa **sala fechada**, depois que as partes saem.", ""),
-  ("PM.", "Eu sou o Jarbas Bezerra, e este é O Que o Processo Não Mostra.", "Título do quadro, 2 s: O QUE O PROCESSO NÃO MOSTRA. Identificação: Jarbas Bezerra · [título a confirmar]"),
-  ("PM.", "Desde dois mil e quatro, crime militar contra civil é julgado pelo juiz de direito, **sozinho**, e o doloso contra a vida vai ao júri.", "Constituição, art. 125, §§ 4º e 5º"),
-  ("PM.", "Os demais vão ao **Conselho de Justiça**: o juiz preside e divide a mesa com quatro oficiais da corporação.", "Conselho de Justiça · 1 juiz + 4 oficiais"),
-  ("PP.", "Terminados os debates, o Conselho delibera em **sessão secreta**.", "Sessão secreta · CPPM, art. 434"),
-  ("PM.", "Os oficiais perguntam sobre o direito, o juiz esclarece, e a decisão sai da **maioria**.", ""),
-  (PP + ". Pausa curta antes da frase.", "Em quase vinte e oito anos, meu voto contou como **um entre cinco**.", "Grafismo: cinco cadeiras em linha, uma acesa"),
-  ("PM.", "À mesa estavam oficiais que conheciam a tropa por dentro e nunca tinham estudado processo penal.", ""),
-  ("PM.", "Para quem advoga ali, a sustentação oral fala também a **quatro julgadores** que não são juristas.", ""),
-  (PP + ". Segurar 1 s de silêncio depois da frase.", "Argumento que só o juiz togado entende convence **um voto em cinco**.", ""),
-  (PM + ". Segurar o olhar 2 s depois da última palavra.", "Esta é uma reflexão geral, sem relação com processo real. Na próxima terça, volto com outro bastidor da decisão.", "Reflexão geral, sem relação com processo real · Toda terça, 12h"),
- ],
- "A2": [
-  (PP + ". Dizer \"Oito dias\" e fazer uma pausa.", "**Oito dias.** É o prazo que separa uma ausência sem licença do crime de deserção.", "Número 8 grande, sozinho, por 1 s"),
-  ("PM.", "Eu sou o Jarbas Bezerra, e este é O Que o Processo Não Mostra.", "Título do quadro, 2 s: O QUE O PROCESSO NÃO MOSTRA"),
-  ("PM.", "O artigo cento e oitenta e sete do Código Penal Militar pune com detenção de seis meses a dois anos o militar que se ausenta da unidade, sem licença, por **mais de oito dias**.", "Código Penal Militar, art. 187 · detenção de 6 meses a 2 anos"),
-  ("PP.", "Muitos jovens conheceram esse prazo diante de mim, **na audiência**.", ""),
-  ("PM.", "Alguns voltaram no **nono dia**, certos de que responderiam a uma falta disciplinar.", ""),
-  ("PP.", "Isso me levou para fora do gabinete.", ""),
-  ("PM.", "Ajudei a criar o **Probec**, o Programa Brasileiro de Educação Cidadã, para levar a lei à sala de aula antes que ela chegue aos autos.", "Probec · Programa Brasileiro de Educação Cidadã (logotipo, se autorizado). 10 de setembro · Dia Estadual da Educação Cívica (RN, 2013)"),
-  ("PP.", "A sentença alcança o fato depois que ele aconteceu. A aula alcança o jovem **antes**.", ""),
-  ("PM.", "Quem comanda militares recém-incorporados pode começar por esse artigo.", "CPM, art. 187"),
-  (PM + ". Segurar o olhar 2 s depois da última palavra.", "Esta é uma reflexão pessoal, sem relação com processo real. Na próxima terça, volto com outro bastidor da decisão.", "Reflexão pessoal, sem relação com processo real · Toda terça, 12h"),
- ],
- "B1": [
-  (PP + ". Olhar firme na lente.", "Toda ordem recebida coloca o militar entre **dois artigos** do Código Penal Militar.", "Grafismo: art. 163 à esquerda, art. 38 à direita"),
-  ("PM.", "Eu sou o Jarbas Bezerra, e este é o Antes da Consequência.", "Título do quadro, 2 s: ANTES DA CONSEQUÊNCIA. Identificação: Jarbas Bezerra · [título a confirmar]"),
-  (PM + ". Mão esquerda marca o primeiro artigo.", "O cento e sessenta e três pune quem **recusa** obediência a ordem do superior sobre assunto de serviço.", "CPM, art. 163 · Recusa de obediência · detenção de 1 a 2 anos"),
-  (PM + ". Mão direita marca o segundo artigo.", "O trinta e oito **protege** quem cumpre ordem direta do superior, em matéria de serviço.", "CPM, art. 38"),
-  ("PP.", "A proteção acaba quando a ordem manda praticar ato **manifestamente criminoso**, ou quando há **excesso** na execução.", "manifestamente criminoso · excesso"),
-  ("PM.", "Aí o subordinado responde junto com quem mandou.", ""),
-  (PP + ". Pausa curta antes da frase.", "Repare na palavra **manifestamente**.", "MANIFESTAMENTE"),
-  ("PM.", "A lei dispensa o soldado de dar parecer jurídico sobre cada ordem e cobra dele a recusa do **crime evidente**.", ""),
-  ("PM.", "Nas audiências que presidi, a discussão mais difícil girava em torno do **excesso**, que pertence a quem executa, mesmo quando a ordem era legal.", ""),
-  ("PP.", "O dever de cumprir vem da hierarquia. A forma de cumprir é **de quem executa**, e é por ela que se responde.", ""),
-  (PM + ". Segurar o olhar 2 s depois da última palavra.", "Conteúdo educativo, sem orientação individual. Na próxima quinta, volto com outro cuidado antes da consequência.", "Conteúdo educativo, sem orientação individual · Toda quinta, 18h30"),
- ],
- "B2": [
-  (PP + ". Olhar firme na lente.", "Há uma frase na Constituição que muito comandante lê **pela metade**: não caberá habeas corpus em relação a punições disciplinares militares.", "A frase escrita; a segunda metade aparece depois"),
-  ("PM.", "Eu sou o Jarbas Bezerra, e este é o Antes da Consequência.", "Título do quadro, 2 s: ANTES DA CONSEQUÊNCIA"),
-  ("PM.", "Está no artigo cento e quarenta e dois.", "Constituição, art. 142, § 2º"),
-  ("PP.", "O Supremo leu a **frase inteira**: o mérito da punição fica com o comando, e a legalidade continua sob controle do juiz.", "STF, RE 338.840"),
-  (PM + ". Contar os quatro pontos com a mão.", "O juiz examina hierarquia, poder disciplinar, ligação do fato com a função e pena cabível.", "hierarquia · poder disciplinar · ligação com a função · pena cabível"),
-  ("PM.", "Desde dois mil e quatro, as ações contra punições disciplinares chegam ao **juiz de direito** do juízo militar.", "Constituição, art. 125, §§ 4º e 5º"),
-  ("PP.", "Na minha mesa, as punições anuladas tinham quase sempre um **vício de rito**: acusação mal descrita, prazo de defesa ignorado, decisão sem fundamento.", "Contraditório e ampla defesa · Constituição, art. 5º, LV"),
-  (PM + ", indo a PP na pergunta.", "Antes de assinar uma punição, vale uma pergunta: o acusado soube **exatamente** do que era acusado e teve prazo para responder?", ""),
-  (PM + ". Segurar o olhar 2 s depois da última palavra.", "Conteúdo educativo, sem orientação individual. Na próxima quinta, volto com outro cuidado antes da consequência.", "Conteúdo educativo, sem orientação individual · Toda quinta, 18h30"),
- ],
-}
+# (imagem, fala, lettering), a partir de videos_v3.py
+SEG = {k: [(img, fala, let) for _, img, fala, let in v["seg"]] for k, v in g.V3.VIDEOS.items()}
 
 LOCACOES = {
  "A": dict(
@@ -270,15 +221,14 @@ def pagina_locacao(q):
 
 def pagina_ep(k):
     ep = next(e for e in g.EPS if e["id"] == k)
-    L = LOCACOES[ep["q"]]
     ts, dur = tempo(SEG[k])
     linhas = ""
     for (img, fala, gc), t in zip(SEG[k], ts):
         gc_html = html.escape(gc) if gc else '<span class="nada">sem lettering</span>'
         linhas += f'<tr><td class="img"><span class="t">{mm(t)}</span>{html.escape(img)}</td><td class="fala">{enfase(fala)}</td><td class="gc">{gc_html}</td></tr>'
     return f'''<section>
-<div class="cab"><div><p class="eyebrow">{html.escape(g.QN[ep["q"]])} · episódio {ep["n"]}</p><h2>{html.escape(ep["titulo"])}</h2></div>
-<div class="meta">{html.escape(L["nome"])}<br>cerca de {round(dur)} s · teleprompter/{k}.txt</div></div>
+<div class="cab"><div><p class="eyebrow">Vídeo {g.V3.VIDEOS[k]["num"]} · {html.escape(g.V3.VIDEOS[k]["local"])}</p><h2>{html.escape(ep["titulo"])}</h2></div>
+<div class="meta">cerca de {round(dur)} s<br>teleprompter/{k}.txt</div></div>
 <table><colgroup><col style="width:25%"><col style="width:47%"><col style="width:28%"></colgroup>
 <thead><tr><th>Imagem</th><th>Fala</th><th>Lettering</th></tr></thead><tbody>{linhas}</tbody></table>
 <p class="legenda">PM: plano médio. PP: primeiro plano, com aproximação na edição. Negrito na fala: palavra de ênfase. Tempos estimados em leitura calma.</p>

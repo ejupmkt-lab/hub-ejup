@@ -21,7 +21,9 @@ h1{{font-weight:900;font-size:17px;letter-spacing:-.005em;margin-bottom:34px;col
 def pagina(q, n):
     ep = next(e for e in g.EPS if e["q"] == q and e["n"] == n)
     corpo = "".join("<div class='b'>" + "".join(f"<p>{html.escape(l)}</p>" for l in ls) + "</div>" for _, ls in ep["blocos"])
-    return f'<!doctype html><html lang="pt-BR"><meta charset="utf-8"><style>{CSS}</style><h1>EPISÓDIO {n} - {g.QN[q].upper()} - ROTEIRO</h1>{corpo}</html>'
+    v = g.V3.VIDEOS.get(ep["id"])
+    titulo = f"VÍDEO {v['num']} - {v['titulo'].upper()} - ROTEIRO" if v else f"EPISÓDIO {n} - {g.QN[q].upper()} - ROTEIRO"
+    return f'<!doctype html><html lang="pt-BR"><meta charset="utf-8"><style>{CSS}</style><h1>{html.escape(titulo)}</h1>{corpo}</html>'
 
 
 from PIL import Image

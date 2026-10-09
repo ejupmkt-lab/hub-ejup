@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Roteiros de gravação do Dr. Jarbas: textos de teleprompter (txt e PDF) e folha de gravação (md e PDF)."""
-import html, pathlib, re
+import html, importlib.util, pathlib, re
 from playwright.sync_api import sync_playwright
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -80,6 +80,19 @@ EPS = [
   conferir=["Texto do art. 166 do CPM e a pena (detenção de dois meses a um ano) conferidos no Planalto em 06/10/2026.", "A relação do art. 166 com a liberdade de expressão está sob debate. [conferir a jurisprudência atual do STF e do STM antes de gravar; incluir a segunda fonte]. O texto falado só informa a existência do debate.", "Este episódio é novo (não consta na proposta). Dr. Jarbas confirma se entra na gravação."]),
 ]
 
+# Versão 3 (09/10/2026): A1, A2, B1 e B2 viram vídeos individuais, sem quadro.
+# A fala, o lettering e a legenda vêm de videos_v3.py.
+_spec = importlib.util.spec_from_file_location("videos_v3", HERE / "videos_v3.py")
+V3 = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(V3)
+for _ep in EPS:
+    _v = V3.VIDEOS.get(_ep["id"])
+    if not _v:
+        continue
+    _ep.update(titulo=_v["titulo"], base=f"Vídeo individual {_v['num']} (versão de 09/10/2026, sem quadro) · {_v['local']}",
+               blocos=V3.blocos(_ep["id"]), legenda=_v["legenda"], conferir=_v["conferir"],
+               camb="Sem câmera B: o vídeo inteiro é o Dr. Jarbas falando para a câmera.",
+               tela=[f"Em \"{' '.join(V3.limpa(f).split()[:5])}…\": {l}" for _, _, f, l in _v["seg"] if l])
+
 
 def stats(ep):
     t = 0; cue = []
@@ -142,6 +155,9 @@ def md_geral():
          "- Reescrevi os seis roteiros em frases afirmativas. A proposta usa \"não é X, é Y\" em vários trechos (\"julgar não é exercício de poder; é sacerdócio\", \"hierarquia não é salvo-conduto\", \"a autoridade não é enfraquecida pelo rito; é blindada por ele\"), figura que a EJUP evita.",
          "- Tirei afirmações sem apoio verificável: \"a receita certa para a improcedência das defesas\" (A3), \"o comandante respondendo por abuso de autoridade\" (B2) e \"esvaziar as varas criminais de amanhã\" (A2).",
          "- B3 é novo, porque o art. 166 do CPM é tema recorrente de dúvida entre militares e rende um episódio útil.", "",
+         "## Versão 3 (09/10/2026): quatro vídeos individuais",
+         "- Pedido do Victor: sem nome de quadro, sem apresentação de quadro e sem gancho para o próximo episódio. Cada vídeo fica de pé sozinho, com gancho, autoridade, informação prática para a área jurídica e CTA. Linguagem sem juridiquês; o aviso educativo vai só no lettering.",
+         "- Textos, lettering e legendas em `_build/videos_v3.py`. O PDF de gravação é `Roteiros_Dr_Jarbas_19-10.pdf`.", "",
          "## Versão 2 (08/10/2026): A1, A2, B1 e B2 reescritos",
          "- Pedido do Victor: tirar a cara de IA e o senso comum. As máximas genéricas (\"Quem decide carrega essa soma\", \"Firmeza e método andam juntos\") saíram.",
          "- Cada episódio agora entrega uma informação que só quem conhece a Justiça Militar por dentro tem: o Conselho de Justiça e a sessão secreta (A1), o prazo de oito dias da deserção (A2), o militar entre os arts. 163 e 38 do CPM (B1) e a leitura do STF sobre o habeas corpus na punição disciplinar (B2).",
