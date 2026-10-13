@@ -1,26 +1,32 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  --color-papel: #f6f7f9;
+  --color-superficie: #ffffff;
+  --color-linha: #dfe3ea;
+  --color-tinta: #1b2533;
+  --color-tinta-2: #5b6676;
+  --color-marinho: #1f5c8a;
+  --color-marinho-escuro: #17476b;
+  --color-marinho-claro: #e3eef7;
+  --color-ambar: #d39e17;
+  --color-ambar-claro: #fbf3dc;
+  --color-verde: #2f7d4f;
+  --color-verde-claro: #e2f2e8;
+  --color-vermelho: #b3412e;
+  --color-vermelho-claro: #f8e4e0;
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-papel);
+  color: var(--color-tinta);
+}
+
+/* Campos de formulário com o mesmo acabamento em todo o sistema */
+.campo {
+  @apply w-full rounded-md border border-linha bg-superficie px-3 py-2 text-sm outline-none focus:border-marinho focus:ring-2 focus:ring-marinho/15;
+}
+textarea.campo {
+  @apply font-mono text-[13px] leading-relaxed;
 }
