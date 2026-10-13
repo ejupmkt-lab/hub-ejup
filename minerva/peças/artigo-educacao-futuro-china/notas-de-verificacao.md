@@ -35,3 +35,6 @@ Estado em 08/10/2026. Cada afirmação factual do artigo, com a fonte onde foi c
 
 ## Versão em artigo de opinião (09/10/2026)
 `artigo-opiniao.md` e o PDF `Artigo_Opiniao_A_educacao_do_futuro_esta_em_curso.pdf`. Mesmos fatos e fontes da versão informativa, em voz argumentativa, com tese declarada na linha fina e no fecho. As frases de posição ("O método merece atenção", "Defendemos...") são opinião da EJUP, não dado, e dependem de aprovação do Roberto Pivotto. O estudo da China Economic Review é usado só para dar proporção ao problema, sem inferir causalidade para a reforma atual. A frase "Em uma década, o ritmo mudou de escala" compara 57 cursos (2014) com mais de mil por ano (ciclos recentes); anos exatos dos ciclos recentes divergem entre fontes e por isso não são citados.
+
+## Revisão de coesão (13/10/2026)
+A pedido da revisão do Roberto, `artigo-opiniao.md` foi reescrito para ganhar fluidez: frases curtas em sequência foram unidas com conectores (porém, contudo, por isso, em contrapartida, ao passo que), o par de frases paralelas da linha fina virou uma só frase, e saiu o trecho que atribuía a tese a "manchetes" não identificadas. Fatos, números, fontes e links permanecem os mesmos, sem acréscimo de dado novo.
