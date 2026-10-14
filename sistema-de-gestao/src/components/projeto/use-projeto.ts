@@ -1,8 +1,8 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { registrarEvento, useEstado, useUsuario } from "@/lib/prototipo/store";
-import type { Projeto } from "@/lib/prototipo/tipos";
+import { registrarEvento, useEstado, useUsuario } from "@/lib/dados/store";
+import type { Projeto } from "@/lib/dados/tipos";
 
 // Projeto da rota + função para alterá-lo registrando no histórico
 export function useProjeto() {

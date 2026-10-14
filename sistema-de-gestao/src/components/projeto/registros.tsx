@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import type { Projeto } from "@/lib/prototipo/tipos";
+import type { Projeto } from "@/lib/dados/tipos";
 import { tiposRegistro } from "@/lib/registros";
 import { etapaAtual } from "@/lib/projeto";
-import { novoId } from "@/lib/prototipo/store";
+import { novoId } from "@/lib/dados/store";
 import { Botao, Cartao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 

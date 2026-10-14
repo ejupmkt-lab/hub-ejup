@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEstado } from "@/lib/prototipo/store";
+import { useEstado } from "@/lib/dados/store";
 import { etapaAtual, situacaoPrazo } from "@/lib/projeto";
 import { formatarData } from "@/lib/datas";
 import { doisDigitos, statusProjeto } from "@/lib/rotulos";

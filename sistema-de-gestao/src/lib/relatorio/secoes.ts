@@ -1,4 +1,4 @@
-import type { Etapa, Projeto } from "../prototipo/tipos";
+import type { Etapa, Projeto } from "../dados/tipos";
 import { tipoRegistro } from "../registros";
 
 // Seções do Relatório Técnico de Nª Entrega, na ordem em que aparecem.

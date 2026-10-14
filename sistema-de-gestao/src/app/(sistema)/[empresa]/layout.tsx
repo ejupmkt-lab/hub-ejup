@@ -1,8 +1,8 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useAcesso, useEstado } from "@/lib/prototipo/store";
-import type { EmpresaSlug } from "@/lib/prototipo/tipos";
+import { useAcesso, useEstado } from "@/lib/dados/store";
+import type { EmpresaSlug } from "@/lib/dados/tipos";
 import { Cabecalho, Cartao, Chip } from "@/components/ui";
 import { statusEmpresa } from "@/lib/rotulos";
 

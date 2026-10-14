@@ -1,4 +1,4 @@
-import type { Cliente } from "./prototipo/tipos";
+import type { Cliente } from "./dados/tipos";
 
 // Campos do Modelo de Diagnóstico — HUB SEBRAE (dados da empresa demandante)
 export const camposCliente: { chave: keyof Cliente; rotulo: string; obrigatorio?: boolean; largo?: boolean }[] = [

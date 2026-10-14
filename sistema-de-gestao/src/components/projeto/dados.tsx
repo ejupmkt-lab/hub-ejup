@@ -1,6 +1,6 @@
 "use client";
 
-import type { Projeto } from "@/lib/prototipo/tipos";
+import type { Projeto } from "@/lib/dados/tipos";
 import { Campo, Cartao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 

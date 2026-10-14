@@ -10,7 +10,7 @@ import { gerarDocx } from "@/lib/relatorio/docx";
 import { formatarData } from "@/lib/datas";
 import { doisDigitos, ordemStatusEtapa, statusEtapa, type StatusEtapa } from "@/lib/rotulos";
 import { situacaoPrazo } from "@/lib/projeto";
-import type { Etapa } from "@/lib/prototipo/tipos";
+import type { Etapa } from "@/lib/dados/tipos";
 import { Botao, Cabecalho, Campo, Cartao, Chip, ChipEtapa } from "@/components/ui";
 
 const abas = ["Checklist da ficha", "Redação do relatório", "Entregáveis", "Fechamento e envio"] as const;

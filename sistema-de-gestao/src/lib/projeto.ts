@@ -1,5 +1,5 @@
 import { diferencaDias, hojeIso } from "./datas";
-import type { Etapa, Projeto } from "./prototipo/tipos";
+import type { Etapa, Projeto } from "./dados/tipos";
 
 const concluidas = new Set(["enviada", "aprovada"]);
 

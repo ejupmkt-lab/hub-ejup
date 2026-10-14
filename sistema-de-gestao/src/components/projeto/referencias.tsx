@@ -1,8 +1,8 @@
 "use client";
 
-import type { Projeto } from "@/lib/prototipo/tipos";
+import type { Projeto } from "@/lib/dados/tipos";
 import { hojeIso } from "@/lib/datas";
-import { novoId } from "@/lib/prototipo/store";
+import { novoId } from "@/lib/dados/store";
 import { Botao, Cartao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 

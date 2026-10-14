@@ -1,51 +1,75 @@
-# HUB Pivotto — protótipo
+# Sistema de Gestão — ecossistema Pivotto
 
-Sistema de gestão das empresas do ecossistema Pivotto. Especificação completa no PRD
-([`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.md)).
+Sistema de gestão das empresas do ecossistema Pivotto (Pivotto & Pivotto, ORB e EJUP).
+Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.md).
 
-> **Protótipo.** Não há banco nem login reais: os dados são fictícios e ficam salvos no
-> `localStorage` do navegador. "Restaurar dados de exemplo", no menu, volta ao estado inicial.
+- **Produção:** https://sistema-de-gestao-alpha.vercel.app (Vercel, time EJUP, projeto `sistema-de-gestao`)
+- **Banco e login:** Supabase, projeto "Sistema de gestão" (`lhbiuflzlnznilhqhfhu`, São Paulo)
 
 ## O que já funciona
 
+- **Login** com e-mail e senha. Só cria acesso quem tem e-mail cadastrado em `convites`.
 - **Três módulos**, um por empresa: Pivotto & Pivotto (ativo), ORB (em estruturação), EJUP (standby).
-- **Acesso por usuário** (troque em "Entrar como"): Roberto é administrador do grupo e vê tudo;
-  Leonardo vê só a Pivotto & Pivotto.
-- **Painel do grupo** com os próximos prazos de todas as empresas.
+- **Isolamento por empresa no banco (RLS):** cada pessoa só recebe os dados das empresas a que tem acesso.
+  O administrador do grupo vê todas, inclusive as inativas.
+- **Painel do grupo** com os próximos prazos (só administrador).
 - **Clientes** com os campos do Modelo de Diagnóstico do HUB SEBRAE.
-- **Projetos** criados a partir do modelo *Adequação à LGPD · HUB SEBRAE* (ficha 13070-5):
-  5 etapas, 333 h, checklist de atividades e 23 entregáveis.
-- **Plano de trabalho**: datas sugeridas pela duração de referência, fechadas por Roberto; alteração
-  posterior exige justificativa e fica no histórico.
-- **Etapas no formato do HUB SEBRAE**, com status (Não iniciada → … → A enviar → Enviada → Aprovada).
-- **Registros do programa** (pessoas, marcos, fornecedores, normas, reuniões, treinamentos,
-  processos, riscos, plano de ação, RoPA, incidentes), reaproveitados entre etapas.
-- **Redação do relatório** por seção obrigatória e por entregável.
-- **Checagem de completude** que impede marcar "A enviar" com pendências.
-- **Relatório Técnico em Word (.docx)** no papel timbrado FUNCERN + Sebraetec do modelo
-  (`public/modelos/relatorio-base.docx`), com ficha de identificação, faixas, quadros, tabelas,
-  referências e assinaturas.
+- **Projetos** a partir do modelo *Adequação à LGPD · HUB SEBRAE* (ficha 13070-5): 5 etapas, 333 h,
+  checklist de atividades e 23 entregáveis.
+- **Plano de trabalho**: datas sugeridas e fechadas por Roberto; alteração posterior exige justificativa.
+- **Etapas no formato do HUB SEBRAE**, registros do programa, redação por seção, checagem de completude.
+- **Relatório Técnico em Word (.docx)** no papel timbrado do modelo (`public/modelos/relatorio-base.docx`).
+- **Salvamento automático** com controle de versão: se duas pessoas editam o mesmo projeto ao mesmo
+  tempo, quem salvar por último é avisado e recebe a versão mais recente.
 
-## Rodar
+## Como o banco guarda os dados
+
+| Tabela | Conteúdo |
+|---|---|
+| `empresas` | As três empresas e o status de cada módulo |
+| `perfis`, `membros` | Pessoas e o papel de cada uma em cada empresa |
+| `convites` | E-mails liberados e os acessos que recebem ao criar a conta |
+| `clientes` | Cadastro do cliente (documento `dados`) |
+| `projetos` | O projeto inteiro em `dados` (etapas, checklist, redação, registros, referências, histórico) + `versao` |
+
+Migrações em `supabase/migrations/`. As funções de acesso usadas pelas regras ficam no esquema `privado`,
+fora da API.
+
+### Liberar o acesso de alguém
+
+No SQL Editor do Supabase:
+
+```sql
+insert into public.convites (email, nome, nome_completo, admin_grupo, acessos) values
+  ('pessoa@exemplo.com', 'Nome', 'Nome Completo', false, '{"pivotto": "gestor"}');
+```
+
+Depois a pessoa abre o sistema, clica em **Primeiro acesso? Criar conta** e usa esse e-mail.
+Papéis: `gestor`, `consultor`, `equipe`. Empresas: `pivotto`, `orb`, `ejup`.
+
+## Rodar localmente
 
 ```bash
 npm install
-npm run dev   # http://localhost:3000
+npx supabase start          # banco local (Docker); aplica as migrações
+# .env.local com NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY do `npx supabase status`
+npm run dev                 # http://localhost:3000
 ```
 
 ## Estrutura
 
 | Caminho | Conteúdo |
 |---|---|
-| `src/lib/modelos/` | Modelos de fluxo (o da LGPD SEBRAE está em `lgpd-sebrae.ts`) |
-| `src/lib/relatorio/secoes.ts` | Seções do relatório e regras de completude |
-| `src/lib/relatorio/docx.ts` | Geração do .docx a partir do modelo Word |
-| `src/lib/registros.ts` | Tipos de registro do programa e suas colunas |
-| `src/lib/prototipo/` | Estado no navegador e dados de exemplo |
-| `docs/esquema-banco-producao.sql` | Esquema do banco para a versão de produção (Postgres/Supabase com isolamento por empresa via RLS) |
+| `src/app/(sistema)/` | Telas do sistema (exigem login) |
+| `src/app/login`, `src/app/auth/` | Login, criação de conta, recuperação de senha |
+| `src/lib/dados/store.tsx` | Carrega do Supabase e salva as alterações |
+| `src/lib/modelos/` | Modelos de fluxo (LGPD SEBRAE em `lgpd-sebrae.ts`) |
+| `src/lib/relatorio/` | Seções do relatório, completude e geração do .docx |
+| `src/lib/registros.ts` | Tipos de registro do programa |
 
-## Próximos passos para produção
+## Próximos passos
 
-1. Trocar o estado local pelo banco (`docs/esquema-banco-producao.sql`) e login com MFA.
-2. Upload de evidências (imagens entram como figuras no relatório) e do PDF assinado.
-3. Avisos de prazo por e-mail.
+1. Tela para o administrador liberar acessos (hoje é pelo SQL Editor).
+2. MFA no login.
+3. Upload de evidências (imagens como figuras no relatório) e do PDF assinado.
+4. Avisos de prazo por e-mail.

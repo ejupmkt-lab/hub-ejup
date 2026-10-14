@@ -2,8 +2,8 @@
 
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { novoId, useEstado } from "@/lib/prototipo/store";
-import type { Cliente, EmpresaSlug } from "@/lib/prototipo/tipos";
+import { novoId, useEstado } from "@/lib/dados/store";
+import type { Cliente, EmpresaSlug } from "@/lib/dados/tipos";
 import { camposCliente } from "@/lib/campos-cliente";
 import { Botao, Cabecalho, Campo, Cartao, Vazio } from "@/components/ui";
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useAcesso, useEstado } from "@/lib/prototipo/store";
+import { useAcesso, useEstado } from "@/lib/dados/store";
 import { etapaAtual, situacaoPrazo } from "@/lib/projeto";
 import { formatarData } from "@/lib/datas";
 import { doisDigitos, statusEmpresa, statusProjeto } from "@/lib/rotulos";

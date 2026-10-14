@@ -1,5 +1,5 @@
 import PizZip from "pizzip";
-import type { Cliente, Etapa, Projeto, Usuario } from "../prototipo/tipos";
+import type { Cliente, Etapa, Projeto, Usuario } from "../dados/tipos";
 import { tipoRegistro } from "../registros";
 import { dataPorExtenso, formatarData } from "../datas";
 import { doisDigitos, ordinalFeminino } from "../rotulos";

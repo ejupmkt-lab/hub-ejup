@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import type { Projeto } from "@/lib/prototipo/tipos";
+import type { Projeto } from "@/lib/dados/tipos";
 import { formatarData } from "@/lib/datas";
 import { doisDigitos, statusEtapa } from "@/lib/rotulos";
 import { progressoAtividades, situacaoPrazo } from "@/lib/projeto";

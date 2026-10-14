@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Projeto } from "@/lib/prototipo/tipos";
+import type { Projeto } from "@/lib/dados/tipos";
 import { formatarData, hojeIso, sugerirDatas } from "@/lib/datas";
 import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Campo, Cartao, Chip } from "@/components/ui";

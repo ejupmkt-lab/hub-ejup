@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { novoId, registrarEvento, useEstado, useUsuario } from "@/lib/prototipo/store";
-import type { EmpresaSlug, Projeto } from "@/lib/prototipo/tipos";
+import { novoId, registrarEvento, useEstado, useUsuario } from "@/lib/dados/store";
+import type { EmpresaSlug, Projeto } from "@/lib/dados/tipos";
 import { modelosDaEmpresa } from "@/lib/modelos";
-import { etapasDoModelo } from "@/lib/prototipo/semente";
+import { etapasDoModelo } from "@/lib/modelos/instanciar";
 import { Botao, Cabecalho, Campo, Cartao } from "@/components/ui";
 
 export default function NovoProjeto() {

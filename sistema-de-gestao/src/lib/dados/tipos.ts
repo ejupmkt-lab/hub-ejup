@@ -13,6 +13,7 @@ export type Empresa = {
 
 export type Usuario = {
   id: string;
+  email: string;
   nome: string;
   nomeCompleto: string;
   adminGrupo: boolean;
@@ -121,7 +122,6 @@ export type Projeto = {
 };
 
 export type Estado = {
-  versao: number;
   usuarioAtualId: string;
   usuarios: Usuario[];
   empresas: Empresa[];
