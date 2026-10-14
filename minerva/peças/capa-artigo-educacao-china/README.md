@@ -41,3 +41,12 @@ diâmetro 0,8 da altura dele, gradiente mais suave e desfoque proporcional.
 Ajuste seguinte: luz centralizada atrás do tronco (FX 0,482 / FY 0,36,
 diâmetro 1,0 da altura do retrato), simétrica nos dois lados, ainda abaixo da
 cabeça para não virar aura.
+
+## Foto trocada (14/10/2026)
+Pedido do Victor: "tenta outra foto de roberto". Agora é a FOTO-03 do ensaio
+(blazer escuro sem gravata, camisa branca, mãos juntas, corpo levemente
+virado, boca fechada), recortada de x 300 a 4500 e y 200 a 5900 do original.
+Luz centralizada atrás do tronco (FX 0,53). A versão com a FOTO-01 (terno e
+gravata, mãos na lapela) fica no histórico do git.
+
+    python3 _build/recortar_hd.py original-foto03.jpg foto.png 300 200 4500 5900
