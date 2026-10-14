@@ -1,5 +1,6 @@
 import type { Etapa, Projeto } from "../dados/tipos";
 import { tipoRegistro } from "../registros";
+import { MARCA_COMPLETAR } from "./padroes";
 
 // Seções do Relatório Técnico de Nª Entrega, na ordem em que aparecem.
 // O padrão vem dos relatórios já entregues (PRD, seção 7.2).
@@ -78,7 +79,7 @@ export const secoesDepois: DefSecao[] = [
     chave: "evidencias",
     titulo: () => "Evidências de levantamento e validação",
     obrigatoria: sempre,
-    ajuda: "Descreva as evidências (prints, áudios, atas). Uma linha \"Figura: legenda\" por figura.",
+    ajuda: "Um parágrafo de abertura. As imagens (prints, fotos de reunião) são enviadas logo abaixo e viram Figura 1, Figura 2…",
   },
 ];
 
@@ -99,6 +100,12 @@ export function verificarCompletude(projeto: Projeto, etapa: Etapa): Pendencia[]
       p.push({ onde: "Entregáveis", texto: `Entregável ${i + 1} sem conteúdo: ${ent.titulo}` });
     }
   });
+  for (const s of todasSecoes) {
+    if (MARCA_COMPLETAR.test(etapa.secoes[s.chave] ?? "")) p.push({ onde: "Relatório", texto: `Trecho a completar em: ${s.titulo(etapa)}` });
+  }
+  etapa.entregaveis.forEach((ent) => {
+    if (MARCA_COMPLETAR.test(ent.conteudo)) p.push({ onde: "Entregáveis", texto: `Trecho a completar em: ${ent.titulo}` });
+  });
   const textos = [...Object.values(etapa.secoes), ...etapa.entregaveis.map((e) => e.conteudo)].join("\n");
   for (const m of textos.matchAll(/\[\[tabela:([a-z_]+)\]\]/g)) {
     const t = tipoRegistro(m[1]);
@@ -106,6 +113,10 @@ export function verificarCompletude(projeto: Projeto, etapa: Etapa): Pendencia[]
     else if (!projeto.registros.some((r) => r.tipo === m[1]))
       p.push({ onde: "Registros", texto: `A tabela "${t.nome}" é citada mas não tem linhas` });
   }
+  if (!(etapa.evidencias ?? []).length) p.push({ onde: "Evidências", texto: "Nenhuma imagem de evidência (prints, fotos de reunião)" });
+  (etapa.evidencias ?? []).forEach((ev, i) => {
+    if (!ev.legenda.trim()) p.push({ onde: "Evidências", texto: `Figura ${i + 1} sem legenda` });
+  });
   if (projeto.referencias.length === 0) p.push({ onde: "Referências", texto: "Nenhuma referência normativa cadastrada" });
   projeto.referencias.forEach((r, i) => {
     if (r.url && !r.consultadoEm) p.push({ onde: "Referências", texto: `Referência [${i + 1}] sem data de consulta` });

@@ -5,7 +5,9 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useProjeto } from "@/components/projeto/use-projeto";
 import { AjudaFormatacao } from "@/components/projeto/ajuda-formatacao";
-import { secoesAntes, secoesDepois, verificarCompletude, type DefSecao } from "@/lib/relatorio/secoes";
+import { Evidencias, baixarImagens } from "@/components/projeto/evidencias";
+import { secoesAntes, secoesDepois, todasSecoes, verificarCompletude, type DefSecao } from "@/lib/relatorio/secoes";
+import { preencherVazios, textoPadraoSecao } from "@/lib/relatorio/padroes";
 import { gerarDocx } from "@/lib/relatorio/docx";
 import { periodoCurto } from "@/lib/datas";
 import { doisDigitos, statusEtapa, type StatusEtapa } from "@/lib/rotulos";
@@ -42,8 +44,23 @@ export default function PaginaEtapa() {
   const proxima = projeto.etapas.find((e) => e.ordem === etapa.ordem + 1);
   const base = `/${projeto.empresa}/projetos/${projeto.id}`;
 
+  // Toda alteração passa por aqui; o status avança sozinho nos pontos óbvios:
+  // primeira atividade marcada → "Em levantamento"; duas assinaturas com o
+  // relatório completo → "A enviar".
   const mudarEtapa = (fn: (e: Etapa) => void, evento?: { acao: string; detalhe?: string }) =>
-    alterar((p) => fn(p.etapas.find((e) => e.ordem === etapa.ordem)!), evento);
+    alterar((p) => {
+      const e = p.etapas.find((x) => x.ordem === etapa.ordem)!;
+      fn(e);
+      if (!p.planoFechadoEm) return;
+      if (e.status === "nao_iniciada" && e.atividades.some((a) => a.status !== "pendente")) e.status = "em_levantamento";
+      const assinada = e.assinaturaConsultor && e.assinaturaCliente;
+      const antes = ["nao_iniciada", "em_levantamento", "em_redacao", "em_revisao", "aguardando_assinaturas"];
+      if (assinada && antes.includes(e.status) && verificarCompletude(p, e).length === 0) e.status = "a_enviar";
+    }, evento);
+
+  const usarPadroes = () =>
+    mudarEtapa((x) => void preencherVazios(projeto, x, cliente, todasSecoes.map((d) => d.chave)), { acao: `Etapa ${doisDigitos(etapa.ordem)}: textos-padrão aplicados` });
+  const vazias = todasSecoes.filter((d) => d.obrigatoria(etapa) && !(etapa.secoes[d.chave] ?? "").trim()).length + etapa.entregaveis.filter((x) => x.tipo === "entregavel" && !x.conteudo.trim()).length;
 
   const bloqueio = (s: StatusEtapa): string | null => {
     if (semPlano && s !== "nao_iniciada") return "Feche o plano de trabalho primeiro";
@@ -53,19 +70,25 @@ export default function PaginaEtapa() {
     return null;
   };
 
+  // Escolha manual do status: vale o que a pessoa clicou, sem automação
   const definirStatus = (s: StatusEtapa) =>
-    mudarEtapa((x) => void (x.status = s), { acao: `Etapa ${doisDigitos(etapa.ordem)}: ${statusEtapa[s].rotulo.toLowerCase()}` });
+    alterar((p) => void (p.etapas.find((x) => x.ordem === etapa.ordem)!.status = s), {
+      acao: `Etapa ${doisDigitos(etapa.ordem)}: ${statusEtapa[s].rotulo.toLowerCase()}`,
+    });
 
   const baixar = async () => {
     setGerando(true);
     try {
-      const blob = await gerarDocx({ projeto, etapa, cliente, consultor });
+      const imagens = await baixarImagens(etapa.evidencias ?? []);
+      const blob = await gerarDocx({ projeto, etapa, cliente, consultor }, imagens);
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
       const nome = (cliente.nomeFantasia || cliente.razaoSocial).replace(/[^\p{L}\p{N}]+/gu, "_");
       a.download = `Relatorio_Tecnico_${etapa.ordem}a_Entrega_Etapa_${doisDigitos(etapa.ordem)}_${nome}.docx`;
       a.click();
       URL.revokeObjectURL(a.href);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Não foi possível gerar o relatório.");
     } finally {
       setGerando(false);
     }
@@ -197,9 +220,10 @@ export default function PaginaEtapa() {
 
           {aba === "Redação do relatório" && (
             <div className="space-y-8">
+              {vazias > 0 && <PreencherPadroes vazias={vazias} aoUsar={usarPadroes} />}
               <AjudaFormatacao />
               {secoesAntes.map((s) => (
-                <EditorSecao key={s.chave} def={s} etapa={etapa} onChange={(v) => mudarEtapa((x) => void (x.secoes[s.chave] = v))} />
+                <EditorSecao key={s.chave} def={s} etapa={etapa} padrao={() => textoPadraoSecao(s.chave, projeto, etapa, cliente)} onChange={(v) => mudarEtapa((x) => void (x.secoes[s.chave] = v))} />
               ))}
               <div className="border-l-2 border-garrafa py-1 pl-5 text-[15px] text-tinta-2">
                 Aqui entram os entregáveis da ficha, cada um com a sua faixa no relatório.{" "}
@@ -208,13 +232,15 @@ export default function PaginaEtapa() {
                 </button>
               </div>
               {secoesDepois.map((s) => (
-                <EditorSecao key={s.chave} def={s} etapa={etapa} onChange={(v) => mudarEtapa((x) => void (x.secoes[s.chave] = v))} />
+                <EditorSecao key={s.chave} def={s} etapa={etapa} padrao={() => textoPadraoSecao(s.chave, projeto, etapa, cliente)} onChange={(v) => mudarEtapa((x) => void (x.secoes[s.chave] = v))} />
               ))}
+              <Evidencias projeto={projeto} etapa={etapa} alterarEtapa={mudarEtapa} />
             </div>
           )}
 
           {aba === "Entregáveis" && (
             <div className="space-y-8">
+              {vazias > 0 && <PreencherPadroes vazias={vazias} aoUsar={usarPadroes} />}
               <AjudaFormatacao />
               {etapa.entregaveis.map((ent, i) => {
                 const n = etapa.entregaveis.slice(0, i + 1).filter((x) => x.tipo === "entregavel").length;
@@ -335,7 +361,10 @@ export default function PaginaEtapa() {
               <Botao onClick={baixar} disabled={gerando} className="mt-4 w-full">
                 {gerando ? "Gerando…" : "Baixar relatório em Word"}
               </Botao>
-              <p className="mt-2 text-[13px] leading-snug text-tinta-2">No papel timbrado FUNCERN e Sebraetec. Pode ser baixado como rascunho a qualquer momento.</p>
+              <p className="mt-2 text-[13px] leading-snug text-tinta-2">
+                No papel timbrado FUNCERN e Sebraetec; pode ser baixado como rascunho a qualquer momento. Para enviar: abra no Word, salve como PDF e
+                assine no gov.br.
+              </p>
             </div>
           </div>
           <nav className="mt-4 flex justify-between text-sm" aria-label="Outras etapas">
@@ -358,20 +387,45 @@ export default function PaginaEtapa() {
   );
 }
 
-function EditorSecao({ def, etapa, onChange }: { def: DefSecao; etapa: Etapa; onChange: (v: string) => void }) {
+function PreencherPadroes({ vazias, aoUsar }: { vazias: number; aoUsar: () => void }) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-bloco)] border border-garrafa/25 bg-garrafa-claro/60 px-5 py-4">
+      <p className="max-w-xl text-[15px] text-tinta">
+        {vazias === 1 ? "1 parte do relatório está em branco." : `${vazias} partes do relatório estão em branco.`} O sistema pode escrevê-las com os textos-padrão dos
+        relatórios, já com os dados deste cliente e desta etapa.
+      </p>
+      <Botao onClick={aoUsar}>Preencher com textos-padrão</Botao>
+    </div>
+  );
+}
+
+function EditorSecao({ def, etapa, padrao, onChange }: { def: DefSecao; etapa: Etapa; padrao: () => string; onChange: (v: string) => void }) {
+  const valor = etapa.secoes[def.chave] ?? "";
+  const gerado = padrao();
+  const doChecklist = def.chave === "atividades_realizadas";
   return (
     <section>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className={`font-serif text-xl leading-snug ${def.quadro ? "text-garrafa" : ""}`}>
           {def.quadro ? capitalizar(def.titulo(etapa)) : def.titulo(etapa)}
         </h3>
-        {!def.obrigatoria(etapa) && <span className="text-[13px] text-tinta-2">Opcional</span>}
+        <span className="flex items-baseline gap-4 text-[13px]">
+          {gerado && (!valor.trim() || doChecklist) && (
+            <button
+              className="text-garrafa underline-offset-4 hover:underline"
+              onClick={() => (!valor.trim() || confirm("Substituir o texto atual pelo gerado a partir do checklist?")) && onChange(gerado)}
+            >
+              {doChecklist ? "Gerar a partir do checklist" : "Usar texto-padrão"}
+            </button>
+          )}
+          {!def.obrigatoria(etapa) && <span className="text-tinta-2">Opcional</span>}
+        </span>
       </div>
       <p className="mb-3 mt-1 text-sm text-tinta-2">
         {def.quadro ? "Quadro de destaque no relatório. " : ""}
         {def.ajuda}
       </p>
-      <textarea rows={6} className="campo" value={etapa.secoes[def.chave] ?? ""} onChange={(e) => onChange(e.target.value)} />
+      <textarea rows={Math.min(16, Math.max(5, valor.split("\n").length + 2))} className="campo" value={valor} onChange={(e) => onChange(e.target.value)} />
     </section>
   );
 }

@@ -38,6 +38,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
         p.etapas.forEach((e, i) => {
           e.dataInicio = e.dataInicioPlano = linhas[i].inicio;
           e.dataFim = e.dataFimPlano = linhas[i].fim;
+          e.dataRelatorio ??= linhas[i].fim; // local e data do relatório: o fim da etapa, ajustável
         });
         p.planoFechadoEm = new Date().toISOString().slice(0, 19);
         p.status = "em_andamento";
@@ -57,7 +58,12 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
       .filter(Boolean)
       .join("; ");
     alterar(
-      (p) => p.etapas.forEach((e, i) => ((e.dataInicio = linhas[i].inicio), (e.dataFim = linhas[i].fim))),
+      (p) =>
+        p.etapas.forEach((e, i) => {
+          if (e.dataRelatorio === e.dataFim) e.dataRelatorio = linhas[i].fim; // acompanha o novo fim, se não foi mudada à mão
+          e.dataInicio = linhas[i].inicio;
+          e.dataFim = linhas[i].fim;
+        }),
       { acao: "Datas do plano alteradas", detalhe: `${mudancas}. Justificativa: ${justificativa}` },
     );
     setJustificativa("");

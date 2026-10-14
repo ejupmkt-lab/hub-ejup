@@ -7,9 +7,9 @@ export const gruposCliente: { titulo: string; campos: CampoCliente[] }[] = [
   {
     titulo: "Empresa",
     campos: [
-      { chave: "razaoSocial", rotulo: "Razão social", obrigatorio: true, largo: true },
-      { chave: "nomeFantasia", rotulo: "Nome fantasia" },
       { chave: "cnpj", rotulo: "CNPJ", obrigatorio: true },
+      { chave: "nomeFantasia", rotulo: "Nome fantasia" },
+      { chave: "razaoSocial", rotulo: "Razão social", obrigatorio: true, largo: true },
       { chave: "ramo", rotulo: "Ramo" },
       { chave: "porte", rotulo: "Porte" },
       { chave: "tempoAtividade", rotulo: "Tempo de atividade" },

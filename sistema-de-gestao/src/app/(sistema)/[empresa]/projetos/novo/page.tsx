@@ -1,25 +1,28 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import Link from "next/link";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { novoId, registrarEvento, useEstado, useUsuario } from "@/lib/dados/store";
 import type { EmpresaSlug, Projeto } from "@/lib/dados/tipos";
 import { modelosDaEmpresa } from "@/lib/modelos";
 import { etapasDoModelo } from "@/lib/modelos/instanciar";
+import { normasPadrao, referenciasPadrao } from "@/lib/relatorio/padroes";
 import { Botao, BotaoLink, Cabecalho, Campo, Vazio } from "@/components/ui";
 
-export default function NovoProjeto() {
+function Conteudo() {
   const { empresa: slug } = useParams<{ empresa: EmpresaSlug }>();
   const { estado, atualizar } = useEstado();
   const usuario = useUsuario();
   const router = useRouter();
+  const params = useSearchParams();
   const modelos = modelosDaEmpresa(slug);
   const clientes = estado.clientes.filter((c) => c.empresa === slug);
   const consultores = estado.usuarios.filter((u) => u.acessos[slug]);
 
   const [f, setF] = useState({
     modeloId: modelos[0]?.id ?? "",
-    clienteId: clientes[0]?.id ?? "",
+    clienteId: "", // em branco = cliente indicado no endereço (?cliente=) ou o mais recente
     consultorId: usuario.id,
     numeroProjetoHub: "",
     codigoSolicitacaoHub: "",
@@ -29,6 +32,14 @@ export default function NovoProjeto() {
   });
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setF({ ...f, [k]: e.target.value });
   const modelo = modelos.find((m) => m.id === f.modeloId);
+  // Calculado a cada render: o cliente recém-cadastrado pode chegar à lista um instante depois
+  const clienteId = f.clienteId || (clientes.find((c) => c.id === params.get("cliente")) ?? clientes[clientes.length - 1])?.id || "";
+  const cliente = clientes.find((c) => c.id === clienteId);
+  // Sugestões a partir da atividade do cliente (CNAE); valem se o campo ficar em branco
+  const segmentoSugerido = cliente?.ramo ?? "";
+  const areaSugerida = cliente?.ramo
+    ? `Governança em privacidade e proteção de dados pessoais aplicada a ${cliente.ramo.charAt(0).toLowerCase() + cliente.ramo.slice(1)}`
+    : "Governança em privacidade e proteção de dados pessoais";
 
   const criar = () => {
     if (!modelo) return;
@@ -37,7 +48,7 @@ export default function NovoProjeto() {
       const p: Projeto = {
         id,
         empresa: slug,
-        clienteId: f.clienteId,
+        clienteId,
         modeloId: modelo.id,
         modeloVersao: modelo.versao,
         consultorId: f.consultorId,
@@ -48,13 +59,13 @@ export default function NovoProjeto() {
         gestorSebrae: f.gestorSebrae,
         fichaTecnica: modelo.fichaTecnica,
         codigoFichaTecnica: modelo.codigoFichaTecnica,
-        segmento: f.segmento,
-        areaAtuacao: f.areaAtuacao,
+        segmento: f.segmento.trim() || segmentoSugerido,
+        areaAtuacao: f.areaAtuacao.trim() || areaSugerida,
         localAssinatura: "Natal/RN",
         planoFechadoEm: null,
         etapas: etapasDoModelo(modelo),
-        registros: [],
-        referencias: [],
+        registros: normasPadrao().map((r) => ({ ...r, id: novoId("reg") })),
+        referencias: referenciasPadrao().map((r) => ({ ...r, id: novoId("ref") })),
         historico: [],
       };
       registrarEvento(p, usuario.nome, "Projeto criado");
@@ -69,7 +80,7 @@ export default function NovoProjeto() {
     <>
       <Cabecalho migalhas={[{ rotulo: empresa.nome, href: `/${slug}` }, { rotulo: "Novo projeto" }]} titulo="Novo projeto" />
       {clientes.length === 0 ? (
-        <Vazio titulo="Cadastre o cliente primeiro" acao={<BotaoLink href={`/${slug}/clientes`}>Ir para clientes</BotaoLink>}>
+        <Vazio titulo="Cadastre o cliente primeiro" acao={<BotaoLink href={`/${slug}/clientes?novo=1&voltar=novo-projeto`}>Cadastrar cliente</BotaoLink>}>
           O projeto é criado para um cliente já cadastrado, porque os dados dele preenchem a ficha de todos os relatórios.
         </Vazio>
       ) : (
@@ -93,13 +104,16 @@ export default function NovoProjeto() {
                 </select>
               </Campo>
               <Campo rotulo="Cliente">
-                <select className="campo" value={f.clienteId} onChange={set("clienteId")}>
+                <select className="campo" value={clienteId} onChange={set("clienteId")}>
                   {clientes.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.razaoSocial}
                     </option>
                   ))}
                 </select>
+                <Link href={`/${slug}/clientes?novo=1&voltar=novo-projeto`} className="mt-1.5 inline-block text-[13px] text-garrafa underline-offset-4 hover:underline">
+                  Cadastrar outro cliente
+                </Link>
               </Campo>
               <Campo rotulo="Consultor responsável">
                 <select className="campo" value={f.consultorId} onChange={set("consultorId")}>
@@ -123,14 +137,14 @@ export default function NovoProjeto() {
                 <input className="campo" value={f.gestorSebrae} onChange={set("gestorSebrae")} />
               </Campo>
               <Campo rotulo="Segmento do cliente">
-                <input className="campo" value={f.segmento} onChange={set("segmento")} />
+                <input className="campo" placeholder={segmentoSugerido} value={f.segmento} onChange={set("segmento")} />
               </Campo>
               <Campo rotulo="Área de atuação da consultoria" className="sm:col-span-2">
-                <input className="campo" value={f.areaAtuacao} onChange={set("areaAtuacao")} />
+                <input className="campo" placeholder={areaSugerida} value={f.areaAtuacao} onChange={set("areaAtuacao")} />
               </Campo>
             </fieldset>
             <div className="border-t border-linha pt-6">
-              <Botao type="submit" disabled={!f.clienteId}>
+              <Botao type="submit" disabled={!clienteId}>
                 Criar projeto
               </Botao>
             </div>
@@ -151,12 +165,21 @@ export default function NovoProjeto() {
                 ))}
               </ol>
               <p className="mt-5 text-sm text-tinta-2">
-                Prestadora vinculada: {modelo.prestadoraVinculada}. As datas de cada etapa são definidas logo depois, no plano de trabalho.
+                Também já entram as referências normativas e o inventário de normas usados nos relatórios. Prestadora vinculada:{" "}
+                {modelo.prestadoraVinculada}. As datas de cada etapa são definidas logo depois, no plano de trabalho.
               </p>
             </aside>
           )}
         </div>
       )}
     </>
+  );
+}
+
+export default function NovoProjeto() {
+  return (
+    <Suspense fallback={null}>
+      <Conteudo />
+    </Suspense>
   );
 }

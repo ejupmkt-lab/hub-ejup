@@ -56,6 +56,15 @@ export type Entregavel = {
   conteudo: string;
 };
 
+export type Evidencia = {
+  id: string;
+  caminho: string; // no bucket "evidencias": <empresa>/<projeto>/<etapa>/<arquivo>
+  legenda: string;
+  largura: number; // pixels da imagem original
+  altura: number;
+  tipo: string; // image/png, image/jpeg…
+};
+
 export type Etapa = {
   ordem: number;
   nome: string;
@@ -73,6 +82,7 @@ export type Etapa = {
   dataRelatorio: string | null;
   assinaturaConsultor: string | null;
   assinaturaCliente: string | null;
+  evidencias?: Evidencia[];
 };
 
 export type Registro = {

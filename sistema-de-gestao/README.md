@@ -19,6 +19,15 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Plano de trabalho**: datas sugeridas e fechadas por Roberto; alteração posterior exige justificativa.
 - **Etapas no formato do HUB SEBRAE**, registros do programa, redação por seção, checagem de completude.
 - **Relatório Técnico em Word (.docx)** no papel timbrado do modelo (`public/modelos/relatorio-base.docx`).
+- **Cadastro pelo CNPJ**: razão social, nome fantasia, endereço, CEP, porte, atividade e data de abertura
+  vêm da Receita Federal (BrasilAPI, com cnpj.ws de reserva), pela rota `/api/cnpj/[cnpj]`.
+- **Textos-padrão do relatório** no estilo dos relatórios entregues (`src/lib/relatorio/padroes.ts`);
+  o que só o consultor sabe fica como `[completar: …]` e a checagem de pendências acusa.
+- **Referências normativas e inventário de normas** já carregados em todo projeto novo.
+- **Imagens de evidência** no Supabase Storage (bucket privado `evidencias`, separado por empresa),
+  inseridas no Word como Figura 1, Figura 2…
+- **Status automático**: primeira atividade marcada leva a "Em levantamento"; as duas assinaturas com o
+  relatório completo levam a "A enviar". A data do relatório já vem com o fim da etapa.
 - **Salvamento automático** com controle de versão: se duas pessoas editam o mesmo projeto ao mesmo
   tempo, quem salvar por último é avisado e recebe a versão mais recente.
 
@@ -71,5 +80,5 @@ npm run dev                 # http://localhost:3000
 
 1. Tela para o administrador liberar acessos (hoje é pelo SQL Editor).
 2. MFA no login.
-3. Upload de evidências (imagens como figuras no relatório) e do PDF assinado.
+3. Upload do PDF assinado.
 4. Avisos de prazo por e-mail.

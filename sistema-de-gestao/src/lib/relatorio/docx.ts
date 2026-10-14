@@ -106,7 +106,7 @@ function quadro(titulo: string, corpo: string, tipo: "azul" | "alerta") {
     corpo
       .split("\n")
       .filter((l) => l.trim())
-      .map((l) => par([{ t: l.trim(), tam: 23 }], { alinhar: "both", depois: 0, linha: 260 }))
+      .map((l) => par([{ t: l.trim(), tam: 23 }], { alinhar: "both", depois: 0, linha: 260, recuoPrimeira: 709 }))
       .join("");
   return tabela([linhaTabela([celula(conteudo, LARGURA, { fundo })])], [LARGURA], borda, 12);
 }
@@ -184,14 +184,36 @@ function blocos(texto: string, projeto: Projeto, numeroSecao: string, contador: 
   return saida.join("");
 }
 
+export type ImagemRelatorio = { rId: string; legenda: string; largura: number; altura: number };
+
 export type DadosRelatorio = {
   projeto: Projeto;
   etapa: Etapa;
   cliente: Cliente;
   consultor: Usuario | undefined;
+  imagens?: ImagemRelatorio[];
 };
 
-export function corpoRelatorio({ projeto, etapa, cliente, consultor }: DadosRelatorio) {
+// Figura centralizada, até 15 cm de largura e 11 cm de altura, mantendo a proporção
+const EMU_CM = 360000;
+function figuraXml(img: ImagemRelatorio, n: number) {
+  const escala = Math.min((15 * EMU_CM) / img.largura, (11 * EMU_CM) / img.altura);
+  const cx = Math.round(img.largura * escala);
+  const cy = Math.round(img.altura * escala);
+  const id = 1000 + n;
+  return (
+    `<w:p><w:pPr><w:keepNext/><w:spacing w:before="160" w:after="60"/><w:jc w:val="center"/></w:pPr><w:r><w:drawing>` +
+    `<wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:docPr id="${id}" name="Figura ${n}"/>` +
+    `<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">` +
+    `<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="${id}" name="figura${n}"/><pic:cNvPicPr/></pic:nvPicPr>` +
+    `<pic:blipFill><a:blip r:embed="${img.rId}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>` +
+    `<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic>` +
+    `</a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>` +
+    par([{ t: `Figura ${n} - ${img.legenda}`, i: true, tam: 22 }], { alinhar: "center", depois: 200 })
+  );
+}
+
+export function corpoRelatorio({ projeto, etapa, cliente, consultor, imagens = [] }: DadosRelatorio) {
   const partes: string[] = [];
   const ordinal = ordinalFeminino[etapa.ordem];
   const etapaNome = `ETAPA ${doisDigitos(etapa.ordem)} | ${etapa.nome}`;
@@ -217,17 +239,24 @@ export function corpoRelatorio({ projeto, etapa, cliente, consultor }: DadosRela
     ficha.push([`Período da Etapa ${doisDigitos(etapa.ordem)}`, `${formatarData(etapa.dataInicio)} a ${formatarData(etapa.dataFim)}`]);
     ficha.push(["Carga horária prevista", `${etapa.horasPrevistas} horas`]);
   }
-  const lf = [3402, LARGURA - 3402];
+  // Como nos relatórios: rótulo em faixa azul à esquerda, valor em cinza-claro à direita,
+  // linhas separadas por branco. Campo em branco não entra na ficha.
+  const lf = [4100, LARGURA - 4100];
+  const celulaFicha = (t: string, opc: Parameters<typeof textoCelula>[1]) =>
+    `<w:p><w:pPr><w:spacing w:before="40" w:after="40" w:line="252" w:lineRule="auto"/><w:jc w:val="${opc?.alinhar ?? "left"}"/></w:pPr>${run({ t, b: opc?.b, cor: opc?.cor, tam: 24 })}</w:p>`;
   partes.push(
     tabela(
-      ficha.map(([k, v], i) =>
-        linhaTabela([
-          celula(textoCelula(k, { b: true, cor: "FFFFFF", tam: 24 }), lf[0], { fundo: AZUL_FAIXA }),
-          celula(textoCelula(v || "—", { alinhar: "both", tam: 24 }), lf[1], { fundo: i % 2 ? undefined : ZEBRA }),
-        ]),
-      ),
+      ficha
+        .filter(([, v]) => v.trim())
+        .map(([k, v]) =>
+          linhaTabela([
+            celula(celulaFicha(k, { b: true, cor: "FFFFFF" }), lf[0], { fundo: AZUL_FAIXA }),
+            celula(celulaFicha(v, { alinhar: "both" }), lf[1], { fundo: "F2F2F2" }),
+          ]),
+        ),
       lf,
       "FFFFFF",
+      12,
     ),
   );
   partes.push(faixa(["Detalhes", `${ordinal} entrega - ${etapaNome}`]));
@@ -236,7 +265,7 @@ export function corpoRelatorio({ projeto, etapa, cliente, consultor }: DadosRela
   const figura = { n: 0 };
   const secao = (def: DefSecao) => {
     const texto = (etapa.secoes[def.chave] ?? "").trim();
-    if (!texto) return;
+    if (!texto && !(def.chave === "evidencias" && imagens.length)) return;
     if (def.quadro) {
       partes.push(quadro(def.titulo(etapa), texto, "azul"));
       return;
@@ -244,6 +273,8 @@ export function corpoRelatorio({ projeto, etapa, cliente, consultor }: DadosRela
     num += 1;
     partes.push(titulo(`${num}.`, def.titulo(etapa)));
     partes.push(blocos(texto, projeto, `${num}.`, { sub: 0, figura }));
+    // As imagens de evidência entram logo depois do texto da seção de evidências
+    if (def.chave === "evidencias") imagens.forEach((img) => partes.push(figuraXml(img, ++figura.n)));
   };
 
   secoesAntes.forEach(secao);
@@ -282,28 +313,55 @@ export function corpoRelatorio({ projeto, etapa, cliente, consultor }: DadosRela
     );
   }
 
+  // Local, data e as duas assinaturas ficam juntos na mesma página
   if (etapa.dataRelatorio) {
-    partes.push(par(`${projeto.localAssinatura}, ${dataPorExtenso(etapa.dataRelatorio)}.`, { alinhar: "left", antes: 120 }));
+    partes.push(par(`${projeto.localAssinatura}, ${dataPorExtenso(etapa.dataRelatorio)}.`, { alinhar: "left", antes: 120, manterProximo: true }));
   }
 
-  const assinatura = (nome: string, papel: string) =>
-    par("", { depois: 600 }) +
-    par("_________________________________________________________________", { alinhar: "center", depois: 0 }) +
-    par([{ t: nome, b: true }], { alinhar: "center", depois: 0 }) +
-    par(papel, { alinhar: "center", depois: 240 });
-  partes.push(assinatura(consultor?.nomeCompleto ?? "Consultor", "Consultor Responsável"));
-  partes.push(assinatura(cliente.responsavel || "Responsável", "Responsável pela Empresa Demandante"));
+  const assinatura = (nome: string, papel: string, ultima: boolean) =>
+    par("", { depois: 600, manterProximo: true }) +
+    par("_________________________________________________________________", { alinhar: "center", depois: 0, manterProximo: true }) +
+    par([{ t: nome, b: true }], { alinhar: "center", depois: 0, manterProximo: true }) +
+    par(papel, { alinhar: "center", depois: 240, manterProximo: !ultima });
+  partes.push(assinatura(consultor?.nomeCompleto ?? "Consultor", "Consultor Responsável", false));
+  partes.push(assinatura(cliente.responsavel || "Responsável", "Responsável pela Empresa Demandante", true));
 
   return partes.join("");
 }
 
-export async function gerarDocx(dados: DadosRelatorio): Promise<Blob> {
+export type ArquivoImagem = { dados: ArrayBuffer; tipo: string; legenda: string; largura: number; altura: number };
+
+export async function gerarDocx(dados: Omit<DadosRelatorio, "imagens">, arquivos: ArquivoImagem[] = []): Promise<Blob> {
   const base = await fetch("/modelos/relatorio-base.docx").then((r) => r.arrayBuffer());
   const zip = new PizZip(base);
+
+  // Imagens: arquivo em word/media, relação no document.xml.rels e tipo no [Content_Types].xml
+  const imagens: ImagemRelatorio[] = [];
+  if (arquivos.length) {
+    let rels = zip.file("word/_rels/document.xml.rels")!.asText();
+    let tipos = zip.file("[Content_Types].xml")!.asText();
+    arquivos.forEach((a, i) => {
+      const ext = a.tipo === "image/png" ? "png" : a.tipo === "image/webp" ? "webp" : "jpeg";
+      const nome = `evidencia${i + 1}.${ext}`;
+      const rId = `rIdEvidencia${i + 1}`;
+      zip.file(`word/media/${nome}`, a.dados);
+      rels = rels.replace(
+        "</Relationships>",
+        `<Relationship Id="${rId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${nome}"/></Relationships>`,
+      );
+      if (!new RegExp(`Extension="${ext}"`, "i").test(tipos)) {
+        tipos = tipos.replace("<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">", (m) => `${m}<Default Extension="${ext}" ContentType="${a.tipo === "image/jpeg" ? "image/jpeg" : a.tipo}"/>`);
+      }
+      imagens.push({ rId, legenda: a.legenda, largura: a.largura, altura: a.altura });
+    });
+    zip.file("word/_rels/document.xml.rels", rels);
+    zip.file("[Content_Types].xml", tipos);
+  }
+
   const doc = zip.file("word/document.xml")!.asText();
   const inicio = doc.indexOf("<w:body>") + "<w:body>".length;
   const fimSect = doc.lastIndexOf("<w:sectPr");
-  const novo = doc.slice(0, inicio) + corpoRelatorio(dados) + doc.slice(fimSect);
+  const novo = doc.slice(0, inicio) + corpoRelatorio({ ...dados, imagens }) + doc.slice(fimSect);
   zip.file("word/document.xml", novo);
   return zip.generate({
     type: "blob",

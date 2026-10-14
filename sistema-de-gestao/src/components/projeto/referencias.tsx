@@ -3,11 +3,13 @@
 import type { Projeto } from "@/lib/dados/tipos";
 import { hojeIso } from "@/lib/datas";
 import { novoId } from "@/lib/dados/store";
+import { referenciasPadrao } from "@/lib/relatorio/padroes";
 import { Botao, Cartao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 
 export function Referencias({ projeto }: { projeto: Projeto }) {
   const { alterar } = useProjeto();
+  const faltam = referenciasPadrao().filter((r) => !projeto.referencias.some((x) => x.url === r.url && x.texto === r.texto));
   const editar = (id: string, k: "texto" | "url" | "consultadoEm", v: string) =>
     alterar((p) => void (p.referencias.find((r) => r.id === id)![k] = v));
 
@@ -18,12 +20,24 @@ export function Referencias({ projeto }: { projeto: Projeto }) {
           <h2 className="font-serif text-2xl">Referências normativas e técnicas</h2>
           <p className="text-[13px] text-tinta-2">Numeradas [1]…[n] na ordem abaixo; cite no texto como [1][3]. Fonte externa precisa de data de consulta.</p>
         </div>
-        <Botao
-          variante="secundario"
-          onClick={() => alterar((p) => void p.referencias.push({ id: novoId("ref"), texto: "", url: "", consultadoEm: hojeIso() }))}
-        >
-          Adicionar referência
-        </Botao>
+        <span className="flex flex-wrap gap-2">
+          {faltam.length > 0 && (
+            <Botao
+              variante="secundario"
+              onClick={() =>
+                alterar((p) => void p.referencias.push(...faltam.map((r) => ({ ...r, id: novoId("ref") }))), { acao: "Referências-padrão adicionadas" })
+              }
+            >
+              {projeto.referencias.length ? "Completar com as referências-padrão" : "Adicionar as referências-padrão"}
+            </Botao>
+          )}
+          <Botao
+            variante="secundario"
+            onClick={() => alterar((p) => void p.referencias.push({ id: novoId("ref"), texto: "", url: "", consultadoEm: hojeIso() }))}
+          >
+            Adicionar referência
+          </Botao>
+        </span>
       </div>
       <ol className="space-y-3">
         {projeto.referencias.map((r, i) => (

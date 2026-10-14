@@ -5,6 +5,7 @@ import type { Projeto } from "@/lib/dados/tipos";
 import { tiposRegistro } from "@/lib/registros";
 import { etapaAtual } from "@/lib/projeto";
 import { novoId } from "@/lib/dados/store";
+import { normasPadrao } from "@/lib/relatorio/padroes";
 import { Botao, Cartao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 
@@ -62,7 +63,17 @@ export function Registros({ projeto }: { projeto: Projeto }) {
               No relatório: escreva <code className="rounded bg-pedra px-1">[[tabela:{def.tipo}]]</code> em qualquer seção ou entregável.
             </p>
           </div>
-          <Botao variante="secundario" onClick={adicionar}>Adicionar linha</Botao>
+          <span className="flex flex-wrap gap-2">
+            {tipo === "normas" && linhas.length === 0 && (
+              <Botao
+                variante="secundario"
+                onClick={() => alterar((p) => void p.registros.push(...normasPadrao().map((r) => ({ ...r, id: novoId("reg") }))), { acao: "Inventário normativo-padrão carregado" })}
+              >
+                Carregar o inventário-padrão
+              </Botao>
+            )}
+            <Botao variante="secundario" onClick={adicionar}>Adicionar linha</Botao>
+          </span>
         </div>
         {linhas.length === 0 ? (
           <p className="py-6 text-center text-sm text-tinta-2">Nenhuma linha ainda.</p>

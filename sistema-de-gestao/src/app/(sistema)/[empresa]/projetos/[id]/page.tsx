@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useProjeto } from "@/components/projeto/use-projeto";
 import { EtapasHub } from "@/components/projeto/etapas-hub";
@@ -9,6 +10,7 @@ import { Referencias } from "@/components/projeto/referencias";
 import { DadosProjeto } from "@/components/projeto/dados";
 import { useEstado } from "@/lib/dados/store";
 import { statusProjeto } from "@/lib/rotulos";
+import { etapaConcluida } from "@/lib/projeto";
 import { Abas, Botao, Cabecalho, Status } from "@/components/ui";
 import { Trilho } from "@/components/trilho";
 
@@ -16,7 +18,7 @@ const abas = ["Etapas", "Plano de trabalho", "Registros do programa", "Referênc
 type Aba = (typeof abas)[number];
 
 export default function PaginaProjeto() {
-  const { projeto, cliente, consultor } = useProjeto();
+  const { projeto, cliente, consultor, alterar } = useProjeto();
   const { estado } = useEstado();
   const [aba, setAba] = useState<Aba>(projeto?.status === "aguardando_plano" ? "Plano de trabalho" : "Etapas");
   if (!projeto || !cliente) return <p className="text-tinta-2">Projeto não encontrado.</p>;
@@ -38,7 +40,22 @@ export default function PaginaProjeto() {
         }
       >
         <Status tom={tomStatus}>{statusProjeto[projeto.status]}</Status>
+        <Link href={`/${projeto.empresa}/clientes?editar=${cliente.id}`} className="text-sm text-tinta-2 underline-offset-4 hover:text-garrafa hover:underline">
+          Dados do cliente
+        </Link>
+        {projeto.status === "em_andamento" && projeto.etapas.every(etapaConcluida) && (
+          <Botao onClick={() => alterar((p) => void (p.status = "encerrado"), { acao: "Projeto encerrado" })}>Encerrar projeto</Botao>
+        )}
+        {projeto.status === "encerrado" && (
+          <Botao variante="secundario" onClick={() => alterar((p) => void (p.status = "em_andamento"), { acao: "Projeto reaberto" })}>
+            Reabrir projeto
+          </Botao>
+        )}
       </Cabecalho>
+
+      {projeto.status === "em_andamento" && projeto.etapas.every(etapaConcluida) && (
+        <p className="-mt-4 mb-8 text-[15px] text-musgo">Todas as etapas foram enviadas ao HUB. Encerre o projeto quando o SEBRAE aprovar a última entrega.</p>
+      )}
 
       <div className="mb-10">
         <Trilho projeto={projeto} grande />
