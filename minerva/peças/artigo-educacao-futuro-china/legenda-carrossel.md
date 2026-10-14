@@ -1,14 +1,14 @@
 # Legenda do carrossel · A educação do futuro está em curso: o que o caso da China nos ensina
 
-Quando um país revisa mais de 30% dos seus cursos de graduação em cinco anos, o que isso ensina a quem forma profissionais?
+57 cursos de graduação eliminados em 2014. Mais de mil por ano nos ciclos recentes.
 
-Neste carrossel você vê os números da reforma chinesa, de cerca de 12.200 cursos revogados ou suspensos e 10.200 criados entre 2021 e 2025, e a reorganização que eles descrevem, com cortes em línguas, artes, humanidades e gestão e novos cursos em inteligência incorporada, semicondutores e arteterapia. Vê também as três lições que o caso deixa: o ritmo da revisão, que virou política de Estado; o indicador escolhido, que molda o que a universidade faz; e a reformulação das humanidades, que ainda carece de evidência.
+Essa distância mede a velocidade com que a China passou a rever o que ensina em suas universidades. Neste carrossel, o caso se desdobra em três perguntas que qualquer escola de formação pode fazer a si mesma. Quem define o ritmo da revisão de um currículo? Que indicador diz se um curso funciona, e quem audita esse indicador? O que acontece com as humanidades quando a tecnologia ocupa o centro da formação?
 
-Para o Brasil, o modelo chinês serve pouco como molde, já que o art. 207 da Constituição assegura autonomia às universidades. O método tem muito a ensinar: revisão em ciclos curtos, metas explícitas, dados públicos e cuidado com a régua escolhida. E a formação do jurista precisa unir tecnologia e base conceitual, porque é a base que permite avaliar o que a ferramenta produz.
+Nas telas, você acompanha as respostas que o caso oferece, entre metas de Estado, cartões vermelho e amarelo para cursos com baixa qualidade de emprego e uma aposta que ainda espera evidência. Nas últimas, o que o Brasil pode aproveitar desse método e o que a formação do jurista precisa preservar.
 
-O artigo completo traz o argumento inteiro, com todas as fontes. O link está na bio. Siga a EJUP para acompanhar a conversa sobre a formação jurídica.
+O argumento completo, com todas as fontes, está no artigo. O link está na bio.
 
 #ejup #educacaojuridica #educacaodofuturo #ensinosuperior #china #direito
 
 ---
-[conferir antes de publicar] os números de 12.200 e 10.200 cursos são de segunda mão (South China Morning Post, repetido pela Forbes) e precisam ser abertos na fonte; autoria do artigo a definir, para citar na legenda se quiserem. Sem menção ao EJUPcast, conforme a instrução para os artigos. Publicação depende da aprovação de Roberto Pivotto.
+[conferir antes de publicar] os números de 2014 e dos ciclos recentes vêm do Caixin, cujo texto é parcialmente pago, e os anos dos ciclos recentes divergem entre fontes (por isso a legenda não cita ano); autoria do artigo a definir, para citar na legenda se quiserem. Sem menção ao EJUPcast, conforme a instrução para os artigos. Publicação depende da aprovação de Roberto Pivotto.
