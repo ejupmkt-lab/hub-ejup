@@ -3,10 +3,9 @@
 import { useParams } from "next/navigation";
 import { useAcesso, useEstado } from "@/lib/dados/store";
 import type { EmpresaSlug } from "@/lib/dados/tipos";
-import { Cabecalho, Cartao, Chip } from "@/components/ui";
-import { statusEmpresa } from "@/lib/rotulos";
+import { Cabecalho } from "@/components/ui";
 
-// Guarda de acesso por empresa + tela dos módulos ainda inativos.
+// Guarda de acesso por empresa e tela dos módulos ainda não estruturados.
 export default function LayoutEmpresa({ children }: { children: React.ReactNode }) {
   const { empresa: slug } = useParams<{ empresa: EmpresaSlug }>();
   const { estado } = useEstado();
@@ -15,30 +14,30 @@ export default function LayoutEmpresa({ children }: { children: React.ReactNode 
 
   if (!empresa || !podeVer(slug)) {
     return (
-      <Cartao className="p-8 text-center">
-        <h1 className="text-lg font-semibold">Sem acesso</h1>
-        <p className="mt-2 text-sm text-tinta-2">Seu usuário não tem acesso a este módulo.</p>
-      </Cartao>
+      <div className="mx-auto mt-16 max-w-md text-center">
+        <h1 className="font-serif text-2xl">Sem acesso a esta empresa</h1>
+        <p className="mt-2 text-[15px] text-tinta-2">Seu usuário não está liberado para este módulo. Fale com o administrador do grupo se precisar dele.</p>
+      </div>
     );
   }
 
   if (empresa.status !== "ativo") {
+    const standby = empresa.status === "standby";
     return (
       <>
-        <Cabecalho sobre="Módulo" titulo={empresa.nome} />
-        <Cartao className="p-8">
-          <Chip cor={empresa.status === "standby" ? "cinza" : "ambar"}>{statusEmpresa[empresa.status]}</Chip>
-          <p className="mt-4 max-w-2xl text-tinta">{empresa.descricao}</p>
-          <dl className="mt-6 grid max-w-md grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
+        <Cabecalho titulo={empresa.nome} subtitulo={standby ? "Módulo em standby" : "Módulo em estruturação"} />
+        <div className="max-w-2xl border-l-2 border-linha-forte pl-6">
+          <p className="font-serif text-xl leading-relaxed text-tinta">{empresa.descricao}</p>
+          <dl className="mt-8 grid grid-cols-[8rem_1fr] gap-y-3 text-[15px]">
             <dt className="text-tinta-2">Sócios</dt>
             <dd>{empresa.socios}</dd>
-            <dt className="text-tinta-2">Situação</dt>
-            <dd>{empresa.status === "standby" ? "Aguardando a estruturação dos cursos" : "Fluxos a levantar depois do MVP"}</dd>
+            <dt className="text-tinta-2">Próximo passo</dt>
+            <dd>{standby ? "Estruturar o processo dos cursos" : "Levantar serviços, etapas e entregas"}</dd>
           </dl>
-          <p className="mt-6 text-sm text-tinta-2">
-            A empresa já existe no sistema com os dados separados das demais. Quando o funcionamento for definido, os serviços e fluxos entram aqui.
+          <p className="mt-8 text-sm text-tinta-2">
+            A empresa já existe no sistema, com dados separados das demais. Quando o funcionamento estiver definido, os fluxos entram aqui.
           </p>
-        </Cartao>
+        </div>
       </>
     );
   }

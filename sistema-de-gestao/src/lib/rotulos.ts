@@ -1,14 +1,18 @@
+// Tom: neutro (não começou), andamento, atencao (pronta para envio),
+// ok (concluída do nosso lado) e critico (devolvida).
+export type Tom = "neutro" | "andamento" | "atencao" | "ok" | "critico";
+
 export const statusEtapa = {
-  nao_iniciada: { rotulo: "Não iniciada", cor: "cinza" },
-  em_levantamento: { rotulo: "Em levantamento", cor: "azul" },
-  em_redacao: { rotulo: "Em redação", cor: "azul" },
-  em_revisao: { rotulo: "Em revisão", cor: "azul" },
-  aguardando_assinaturas: { rotulo: "Aguardando assinaturas", cor: "azul" },
-  a_enviar: { rotulo: "A enviar", cor: "ambar" },
-  enviada: { rotulo: "Enviada no HUB", cor: "verde" },
-  aprovada: { rotulo: "Aprovada", cor: "verde" },
-  devolvida: { rotulo: "Devolvida para ajuste", cor: "vermelho" },
-} as const;
+  nao_iniciada: { rotulo: "Não iniciada", curto: "Não iniciada", tom: "neutro" },
+  em_levantamento: { rotulo: "Em levantamento", curto: "Levantamento", tom: "andamento" },
+  em_redacao: { rotulo: "Em redação", curto: "Redação", tom: "andamento" },
+  em_revisao: { rotulo: "Em revisão", curto: "Revisão", tom: "andamento" },
+  aguardando_assinaturas: { rotulo: "Aguardando assinaturas", curto: "Assinaturas", tom: "andamento" },
+  a_enviar: { rotulo: "A enviar", curto: "A enviar", tom: "atencao" },
+  enviada: { rotulo: "Enviada no HUB", curto: "Enviada", tom: "ok" },
+  aprovada: { rotulo: "Aprovada", curto: "Aprovada", tom: "ok" },
+  devolvida: { rotulo: "Devolvida para ajuste", curto: "Devolvida", tom: "critico" },
+} as const satisfies Record<string, { rotulo: string; curto: string; tom: Tom }>;
 
 export type StatusEtapa = keyof typeof statusEtapa;
 export const ordemStatusEtapa = Object.keys(statusEtapa) as StatusEtapa[];

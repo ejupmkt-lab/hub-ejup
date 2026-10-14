@@ -41,3 +41,20 @@ export function sugerirDatas(inicioIso: string, duracoes: number[]) {
     return par;
   });
 }
+
+const mesesCurtos = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
+// "5 out"
+export function dataCurta(iso?: string | null) {
+  if (!iso) return "—";
+  const [, m, d] = iso.split("-").map(Number);
+  return `${d} ${mesesCurtos[m - 1]}`;
+}
+
+// "5–8 out" ou "29 out – 2 nov"
+export function periodoCurto(inicio?: string | null, fim?: string | null) {
+  if (!inicio || !fim) return "Sem datas";
+  const [, mi, di] = inicio.split("-").map(Number);
+  const [, mf, df] = fim.split("-").map(Number);
+  return mi === mf ? `${di}–${df} ${mesesCurtos[mf - 1]}` : `${di} ${mesesCurtos[mi - 1]} – ${df} ${mesesCurtos[mf - 1]}`;
+}

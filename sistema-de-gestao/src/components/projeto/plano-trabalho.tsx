@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Projeto } from "@/lib/dados/tipos";
 import { formatarData, hojeIso, sugerirDatas } from "@/lib/datas";
 import { doisDigitos } from "@/lib/rotulos";
-import { Botao, Campo, Cartao, Chip } from "@/components/ui";
+import { Botao, Campo, Status } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 
 type Linha = { inicio: string; fim: string };
@@ -65,37 +65,37 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
   };
 
   return (
-    <Cartao className="p-5">
+    <section className="max-w-4xl">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-semibold">Plano de trabalho</h2>
-          <p className="mt-1 max-w-2xl text-sm text-tinta-2">
+          <h2 className="font-serif text-2xl">Plano de trabalho</h2>
+          <p className="mt-2 max-w-2xl text-[15px] text-tinta-2">
             Registro interno: Roberto define as datas de cada etapa depois da contratação. Não é enviado ao SEBRAE nem ao cliente. As datas fechadas aqui são a base dos prazos e avisos.
           </p>
         </div>
-        {fechado ? <Chip cor="verde">Fechado em {formatarData(projeto.planoFechadoEm!.slice(0, 10))}</Chip> : <Chip cor="ambar">Aguardando plano de trabalho</Chip>}
+        {fechado ? <Status tom="ok">Fechado em {formatarData(projeto.planoFechadoEm!.slice(0, 10))}</Status> : <Status tom="atencao">Ainda não fechado</Status>}
       </div>
 
       {editando && !fechado && (
-        <div className="mb-4 flex flex-wrap items-end gap-3 rounded-md bg-papel p-4">
+        <div className="mb-6 flex flex-wrap items-end gap-4 rounded-[var(--radius-bloco)] bg-folha p-5">
           <Campo rotulo="Início da Etapa 01">
             <input type="date" className="campo" value={inicio} onChange={(e) => setInicio(e.target.value)} />
           </Campo>
           <Botao variante="secundario" onClick={sugerir}>Sugerir datas</Botao>
-          <span className="text-xs text-tinta-2">Usa a duração de referência de cada etapa, em dias corridos. Ajuste o que precisar.</span>
+          <span className="text-[13px] text-tinta-2">Usa a duração de referência de cada etapa, em dias corridos. Ajuste o que precisar.</span>
         </div>
       )}
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[680px] text-sm">
-          <thead className="border-b border-linha text-left text-xs text-tinta-2">
+        <table className="w-full min-w-[680px] text-[15px]">
+          <thead className="border-b border-linha text-left text-[13px] text-tinta-2">
             <tr>
-              <th className="py-2 pr-3 font-medium">Etapa</th>
-              <th className="py-2 pr-3 font-medium">Horas</th>
-              <th className="py-2 pr-3 font-medium">Referência</th>
-              <th className="py-2 pr-3 font-medium">Início</th>
-              <th className="py-2 pr-3 font-medium">Fim</th>
-              {fechado && <th className="py-2 font-medium">No plano original</th>}
+              <th className="py-2.5 pr-4 font-normal">Etapa</th>
+              <th className="py-2.5 pr-4 font-normal">Horas</th>
+              <th className="py-2.5 pr-4 font-normal">Referência</th>
+              <th className="py-2.5 pr-4 font-normal">Início</th>
+              <th className="py-2.5 pr-4 font-normal">Fim</th>
+              {fechado && <th className="py-2.5 font-normal">No plano original</th>}
             </tr>
           </thead>
           <tbody>
@@ -103,17 +103,17 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
               const mudou = fechado && (e.dataInicio !== e.dataInicioPlano || e.dataFim !== e.dataFimPlano);
               return (
                 <tr key={e.ordem} className="border-b border-linha last:border-0">
-                  <td className="py-2 pr-3 font-medium">{doisDigitos(e.ordem)} | {e.nome}</td>
-                  <td className="py-2 pr-3">{e.horasPrevistas} h</td>
-                  <td className="py-2 pr-3 text-tinta-2">{e.duracaoReferenciaDias} dias</td>
-                  <td className="py-2 pr-3">
+                  <td className="py-3 pr-4"><span className="num font-serif">{doisDigitos(e.ordem)}</span> {e.nome.charAt(0) + e.nome.slice(1).toLowerCase()}</td>
+                  <td className="num py-3 pr-4">{e.horasPrevistas} h</td>
+                  <td className="num py-3 pr-4 text-tinta-2">{e.duracaoReferenciaDias} dias</td>
+                  <td className="num py-3 pr-4">
                     {editando ? <input type="date" className="campo" value={linhas[i].inicio} onChange={(ev) => setLinha(i, "inicio", ev.target.value)} /> : formatarData(e.dataInicio)}
                   </td>
-                  <td className="py-2 pr-3">
+                  <td className="num py-3 pr-4">
                     {editando ? <input type="date" className="campo" value={linhas[i].fim} onChange={(ev) => setLinha(i, "fim", ev.target.value)} /> : formatarData(e.dataFim)}
                   </td>
                   {fechado && (
-                    <td className={`py-2 text-xs ${mudou ? "text-vermelho" : "text-tinta-2"}`}>
+                    <td className={`py-2 text-[13px] ${mudou ? "text-vinho" : "text-tinta-2"}`}>
                       {mudou ? `${formatarData(e.dataInicioPlano)} a ${formatarData(e.dataFimPlano)}` : "sem alteração"}
                     </td>
                   )}
@@ -125,7 +125,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
       </div>
 
       {editando && erros.length > 0 && (
-        <ul className="mt-3 list-disc pl-5 text-xs text-vermelho">{erros.map((e) => <li key={e}>{e}</li>)}</ul>
+        <ul className="mt-3 list-disc pl-5 text-[13px] text-vinho">{erros.map((e) => <li key={e}>{e}</li>)}</ul>
       )}
 
       <div className="mt-4 flex flex-wrap items-end gap-3">
@@ -141,6 +141,6 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
           </>
         )}
       </div>
-    </Cartao>
+    </section>
   );
 }

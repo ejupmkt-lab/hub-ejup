@@ -44,22 +44,22 @@ export function Registros({ projeto }: { projeto: Projeto }) {
             <button
               key={t.tipo}
               onClick={() => setTipo(t.tipo)}
-              className={`flex items-center justify-between gap-3 whitespace-nowrap rounded-md px-3 py-2 text-left text-sm ${
-                t.tipo === tipo ? "bg-marinho-claro font-medium text-marinho-escuro" : "text-tinta-2 hover:bg-superficie"
+              className={`flex items-center justify-between gap-3 whitespace-nowrap rounded-[var(--radius-campo)] px-3 py-2 text-left text-sm ${
+                t.tipo === tipo ? "bg-folha text-tinta" : "text-tinta-2 hover:text-tinta"
               }`}
             >
               {t.nome}
-              <span className="text-xs">{n || ""}</span>
+              <span className="text-[13px]">{n || ""}</span>
             </button>
           );
         })}
       </nav>
-      <Cartao className="min-w-0 p-5">
+      <Cartao className="min-w-0 p-6">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h2 className="font-semibold">{def.nome}</h2>
-            <p className="text-xs text-tinta-2">
-              No relatório: escreva <code className="rounded bg-papel px-1">[[tabela:{def.tipo}]]</code> em qualquer seção ou entregável.
+            <h2 className="font-serif text-2xl">{def.nome}</h2>
+            <p className="text-[13px] text-tinta-2">
+              No relatório: escreva <code className="rounded bg-pedra px-1">[[tabela:{def.tipo}]]</code> em qualquer seção ou entregável.
             </p>
           </div>
           <Botao variante="secundario" onClick={adicionar}>Adicionar linha</Botao>
@@ -69,7 +69,7 @@ export function Registros({ projeto }: { projeto: Projeto }) {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm" style={{ minWidth: 140 * def.colunas.length + 120 }}>
-              <thead className="border-b border-linha text-left text-xs text-tinta-2">
+              <thead className="border-b border-linha text-left text-[13px] text-tinta-2">
                 <tr>
                   <th className="w-14 py-2 pr-2 font-medium">ID</th>
                   {def.colunas.map((c) => <th key={c.chave} className="py-2 pr-2 font-medium">{c.titulo}</th>)}
@@ -86,9 +86,9 @@ export function Registros({ projeto }: { projeto: Projeto }) {
                         <textarea rows={2} className="campo !font-sans !text-sm" value={r.dados[c.chave] ?? ""} onChange={(e) => editar(r.id, c.chave, e.target.value)} />
                       </td>
                     ))}
-                    <td className="py-2 text-xs text-tinta-2">{String(r.etapaOrigem).padStart(2, "0")}</td>
+                    <td className="py-2 text-[13px] text-tinta-2">{String(r.etapaOrigem).padStart(2, "0")}</td>
                     <td className="py-2">
-                      <button title="Remover" onClick={() => remover(r.id)} className="text-tinta-2 hover:text-vermelho">✕</button>
+                      <button title="Remover" onClick={() => remover(r.id)} className="text-tinta-2 hover:text-vinho">✕</button>
                     </td>
                   </tr>
                 ))}

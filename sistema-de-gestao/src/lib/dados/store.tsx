@@ -203,17 +203,17 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
     [carga, atualizar, salvamento, sair],
   );
 
-  if (carga.tipo === "carregando") return <div className="p-10 text-sm text-tinta-2">Carregando…</div>;
+  if (carga.tipo === "carregando") return <div className="flex min-h-screen items-center justify-center font-serif text-xl text-tinta-2">Pivotto</div>;
   if (carga.tipo !== "pronto")
     return (
-      <div className="mx-auto mt-24 max-w-md rounded-lg border border-linha bg-superficie p-8 text-center">
-        <h1 className="text-lg font-semibold">{carga.tipo === "sem_acesso" ? "Conta sem acesso" : "Não foi possível carregar"}</h1>
+      <div className="mx-auto mt-24 max-w-md px-6 text-center">
+        <h1 className="font-serif text-2xl">{carga.tipo === "sem_acesso" ? "Conta sem acesso" : "Não foi possível carregar"}</h1>
         <p className="mt-2 text-sm text-tinta-2">
           {carga.tipo === "sem_acesso"
             ? `O e-mail ${carga.email} ainda não foi liberado. Peça ao administrador do grupo para cadastrar o seu acesso.`
             : carga.mensagem}
         </p>
-        <button onClick={sair} className="mt-6 text-sm text-marinho underline">
+        <button onClick={sair} className="mt-6 text-sm text-garrafa underline">
           Sair
         </button>
       </div>

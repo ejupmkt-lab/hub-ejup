@@ -91,12 +91,12 @@ export function verificarCompletude(projeto: Projeto, etapa: Etapa): Pendencia[]
   const p: Pendencia[] = [];
   for (const s of todasSecoes) {
     if (s.obrigatoria(etapa) && !(etapa.secoes[s.chave] ?? "").trim()) {
-      p.push({ onde: "Relatório", texto: `Seção "${s.titulo(etapa)}" vazia` });
+      p.push({ onde: "Relatório", texto: `Seção em branco: ${s.titulo(etapa)}` });
     }
   }
   etapa.entregaveis.forEach((ent, i) => {
     if (ent.tipo === "entregavel" && !ent.conteudo.trim()) {
-      p.push({ onde: "Entregáveis", texto: `Entregável ${i + 1} — ${ent.titulo} sem conteúdo` });
+      p.push({ onde: "Entregáveis", texto: `Entregável ${i + 1} sem conteúdo: ${ent.titulo}` });
     }
   });
   const textos = [...Object.values(etapa.secoes), ...etapa.entregaveis.map((e) => e.conteudo)].join("\n");
@@ -112,7 +112,7 @@ export function verificarCompletude(projeto: Projeto, etapa: Etapa): Pendencia[]
   });
   if (!etapa.dataRelatorio) p.push({ onde: "Fechamento", texto: "Data do relatório (local e data) não informada" });
   const pendentes = etapa.atividades.filter((a) => a.status === "pendente").length;
-  if (pendentes) p.push({ onde: "Checklist", texto: `${pendentes} atividade(s) da ficha ainda pendente(s)` });
+  if (pendentes) p.push({ onde: "Checklist", texto: pendentes === 1 ? "1 atividade da ficha ainda pendente" : `${pendentes} atividades da ficha ainda pendentes` });
   etapa.atividades
     .filter((a) => a.status === "nao_aplicavel" && !a.justificativa.trim())
     .forEach((a) => p.push({ onde: "Checklist", texto: `Atividade ${a.codigo} marcada como não aplicável sem justificativa` }));

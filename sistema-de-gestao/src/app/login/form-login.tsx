@@ -70,31 +70,31 @@ export function FormLogin({ erroLink }: { erroLink: boolean }) {
           </Campo>
         )}
         {msg && (
-          <p className={`rounded-md p-3 text-sm ${msg.tipo === "ok" ? "bg-verde-claro text-verde" : "bg-vermelho-claro text-vermelho"}`}>{msg.texto}</p>
+          <p className={`rounded-[var(--radius-campo)] p-3 text-sm ${msg.tipo === "ok" ? "bg-musgo-claro text-musgo" : "bg-vinho-claro text-vinho"}`}>{msg.texto}</p>
         )}
         <Botao type="submit" disabled={enviando} className="w-full">
           {enviando ? "Aguarde…" : modo === "entrar" ? "Entrar" : modo === "criar" ? "Criar conta" : "Enviar link"}
         </Botao>
       </form>
-      <div className="mt-5 flex flex-col gap-1 text-center text-sm">
+      <div className="mt-6 flex flex-col items-start gap-2 text-[15px]">
         {modo !== "entrar" && (
-          <button className="text-marinho hover:underline" onClick={() => (setModo("entrar"), setMsg(null))}>
+          <button className="text-garrafa underline-offset-4 hover:underline" onClick={() => (setModo("entrar"), setMsg(null))}>
             Já tenho conta
           </button>
         )}
         {modo === "entrar" && (
           <>
-            <button className="text-marinho hover:underline" onClick={() => (setModo("criar"), setMsg(null))}>
+            <button className="text-garrafa underline-offset-4 hover:underline" onClick={() => (setModo("criar"), setMsg(null))}>
               Primeiro acesso? Criar conta
             </button>
-            <button className="text-tinta-2 hover:underline" onClick={() => (setModo("esqueci"), setMsg(null))}>
+            <button className="text-tinta-2 underline-offset-4 hover:underline" onClick={() => (setModo("esqueci"), setMsg(null))}>
               Esqueci a senha
             </button>
           </>
         )}
       </div>
       {modo === "criar" && (
-        <p className="mt-4 text-center text-xs text-tinta-2">O acesso só é liberado para e-mails cadastrados pelo administrador.</p>
+        <p className="mt-6 text-[13px] text-tinta-2">O acesso só é liberado para e-mails cadastrados pelo administrador.</p>
       )}
     </TelaAcesso>
   );
