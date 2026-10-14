@@ -14,7 +14,7 @@ A China revisou, em cinco anos, mais de 30% da oferta de cursos de graduação d
 
 **Em resumo**
 
-- Entre 2021 e 2025, universidades chinesas revogaram ou suspenderam cerca de 12.200 cursos de graduação e criaram cerca de 10.200, segundo dados do Ministério da Educação reportados pela imprensa. O saldo é de aproximadamente 2.000 cursos a menos.
+- Entre 2021 e 2025, universidades chinesas revogaram ou suspenderam cerca de 12.200 cursos de graduação e criaram cerca de 10.200, segundo dados do Ministério da Educação da China reportados pela imprensa. O saldo é de aproximadamente 2.000 cursos a menos.
 - Os cortes se concentraram em artes, humanidades, línguas estrangeiras e gestão, com marketing entre os mais afetados. As criações incluem inteligência incorporada, economia de baixa altitude, semicondutores e terras raras.
 - O governo aprova os cursos de forma centralizada e, desde 2024, prevê um sistema de cartões amarelo e vermelho para cursos com baixa qualidade de emprego.
 - As humanidades passam por reformulação, com a incorporação de inteligência artificial aos currículos, ao lado de cortes em línguas e tradução.
@@ -26,7 +26,7 @@ Segundo dados do Ministério da Educação da China, reportados pelo South China
 
 As cifras variam entre as fontes porque contam realidades distintas: cursos revogados, cursos com ingresso suspenso e cursos oferecidos por cada universidade. Em setembro de 2024, a [agência Xinhua](https://english.www.gov.cn/news/202409/26/content_WS66f51356c6d0868f4e8eb4ae.html) registrou, em coletiva do Ministério da Educação, que, em doze anos, foram abertos 21.000 cursos de graduação e retirados 12.000 considerados inadequados ao desenvolvimento econômico e social. Só em 2024, foram 1.673 criados em áreas de importância estratégica nacional e 1.670 descontinuados.
 
-A aceleração tem origem em meta explícita. Um guia do Ministério da Educação e de outros quatro órgãos, de 2023, fixou o objetivo de otimizar ou ajustar cerca de 20% dos cursos universitários até 2025, conforme o [China Daily](https://govt.chinadaily.com.cn/s/202508/29/WS68d64dde498e23165e068b68/universities-adjust-majors-for-strategy.html). Em 2014, segundo o [Caixin](https://www.caixinglobal.com/2025-08-25/opinion-getting-chinas-higher-education-reforms-right-102355194.html), foram eliminados 57 cursos. Os ciclos recentes ultrapassam mil cancelamentos por ano.
+A aceleração tem origem em meta explícita. Um guia do Ministério da Educação chinês e de outros quatro órgãos, de 2023, fixou o objetivo de otimizar ou ajustar cerca de 20% dos cursos universitários até 2025, conforme o [China Daily](https://govt.chinadaily.com.cn/s/202508/29/WS68d64dde498e23165e068b68/universities-adjust-majors-for-strategy.html). Em 2014, segundo o [Caixin](https://www.caixinglobal.com/2025-08-25/opinion-getting-chinas-higher-education-reforms-right-102355194.html), foram eliminados 57 cursos. Os ciclos recentes ultrapassam mil cancelamentos por ano.
 
 ## Quais cursos a China cortou e quais criou?
 
@@ -46,7 +46,7 @@ No Brasil, o desenho institucional é outro. O art. 207 da [Constituição Feder
 
 ## O emprego dos formados virou régua dos cursos?
 
-A régua existe e ganhou nome. Em novembro de 2024, o Ministério da Educação publicou o aviso sobre o emprego dos formados da turma de 2025 e previu um sistema de cartões vermelho e amarelo para cursos com baixa qualidade de emprego, além de ajuste ou atualização dos cursos que deixarem de atender às necessidades sociais, conforme a [Xinhua](https://www.news.cn/politics/20241114/7ad789ffae5242b7b0a8941435f20e2a/c.html). O aviso, segundo a reportagem, não define critérios nacionais nem consequências concretas. Há mecanismos provinciais relatados pela imprensa, sem vínculo oficial com o documento, em que um curso recebe cartão vermelho após três anos consecutivos com taxa de destino dos formados inferior a 50%.
+A régua existe e ganhou nome. Em novembro de 2024, o Ministério da Educação chinês publicou o aviso sobre o emprego dos formados da turma de 2025 e previu um sistema de cartões vermelho e amarelo para cursos com baixa qualidade de emprego, além de ajuste ou atualização dos cursos que deixarem de atender às necessidades sociais, conforme a [Xinhua](https://www.news.cn/politics/20241114/7ad789ffae5242b7b0a8941435f20e2a/c.html). O aviso, segundo a reportagem, não define critérios nacionais nem consequências concretas. Há mecanismos provinciais relatados pela imprensa, sem vínculo oficial com o documento, em que um curso recebe cartão vermelho após três anos consecutivos com taxa de destino dos formados inferior a 50%.
 
 O indicador traz benefícios e riscos. Entre os riscos, analistas apontam o incentivo para que instituições inflem as taxas de emprego dos formados, como registra a [The Wire China](https://www.thewirechina.com/2025/08/31/red-cards-for-rejected-majors/). A pesquisa acadêmica oferece outro dado de contexto. Um estudo publicado na [China Economic Review](https://ideas.repec.org/a/eee/chieco/v74y2022ics1043951x22000803.html), de Shengjun Jiang e Yilan Guo, com dados de formados da turma de 2019 em uma província central, encontrou que quase um quarto dos formados recentes trabalha em ocupações sem relação com o curso. Os autores observam que quem muda de área por escolha tem resultados melhores, enquanto quem muda por falta de habilidade ou de vagas na área tem piores resultados de satisfação, promoção e estabilidade. O estudo antecede a reforma atual, e serve como retrato do problema que ela busca enfrentar.
 
@@ -88,11 +88,11 @@ Os dados indicam reorganização. Foram criados cerca de 10.200 cursos e revogad
 
 ### Quantos cursos a China cancelou?
 
-Reportagens que citam o Ministério da Educação falam em cerca de 12.200 cursos de graduação revogados ou suspensos entre 2021 e 2025. O número inclui cursos com ingresso suspenso, e os totais variam conforme a fonte e o método de contagem.
+Reportagens que citam o Ministério da Educação da China falam em cerca de 12.200 cursos de graduação revogados ou suspensos entre 2021 e 2025. O número inclui cursos com ingresso suspenso, e os totais variam conforme a fonte e o método de contagem.
 
 ### O que é o sistema de cartões amarelo e vermelho nas universidades chinesas?
 
-É um mecanismo previsto em aviso do Ministério da Educação, de novembro de 2024, para sinalizar cursos com baixa qualidade de emprego dos formados. O aviso não define critérios nacionais, e a imprensa relata mecanismos provinciais com limites próprios.
+É um mecanismo previsto em aviso do Ministério da Educação da China, de novembro de 2024, para sinalizar cursos com baixa qualidade de emprego dos formados. O aviso não define critérios nacionais, e a imprensa relata mecanismos provinciais com limites próprios.
 
 ### Quem decide quais cursos as universidades chinesas podem oferecer?
 

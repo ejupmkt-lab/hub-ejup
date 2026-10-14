@@ -15,7 +15,7 @@ Estrutura escrita, 10 telas, 1080x1440, sem arte. Uma ideia por tela. Alternânc
 **Título:** Cinco anos, **dois números**
 **Texto:** Entre 2021 e 2025, as universidades chinesas revogaram ou suspenderam cerca de 12.200 cursos de graduação e criaram cerca de 10.200. A mudança alcançou mais de 30% da oferta.
 **Dispositivo:** dois números lado a lado, 12.200 e 10.200, com a legenda "revogados ou suspensos" e "criados".
-**Fonte (rodapé da tela):** dados do Ministério da Educação, via South China Morning Post e Forbes. [conferir na fonte]
+**Fonte (rodapé da tela):** dados do Ministério da Educação da China, via South China Morning Post e Forbes. [conferir na fonte]
 
 ## Tela 3 · O ritmo (navy)
 **Título:** Em uma década, **o ritmo mudou de escala**
@@ -40,7 +40,7 @@ Estrutura escrita, 10 telas, 1080x1440, sem arte. Uma ideia por tela. Alternânc
 ## Tela 6 · Segunda lição (papel)
 **Eyebrow:** Lição 2
 **Título:** O indicador escolhido **molda o que a universidade faz**
-**Texto:** Em novembro de 2024, o Ministério previu cartões vermelho e amarelo para cursos com baixa qualidade de emprego. A reportagem registra que o aviso deixa sem definição os critérios nacionais e as consequências concretas. Analistas apontam um incentivo para que as instituições inflem suas taxas de emprego.
+**Texto:** Em novembro de 2024, o Ministério da Educação da China previu cartões vermelho e amarelo para cursos com baixa qualidade de emprego. A reportagem registra que o aviso deixa sem definição os critérios nacionais e as consequências concretas. Analistas apontam um incentivo para que as instituições inflem suas taxas de emprego.
 **Dispositivo:** dois cartões, um amarelo e um vermelho, em cores da paleta (bronze e tinta), com o retângulo liso como único elemento.
 **Fonte:** Xinhua, 14/11/2024; The Wire China, 31/08/2025.
 
