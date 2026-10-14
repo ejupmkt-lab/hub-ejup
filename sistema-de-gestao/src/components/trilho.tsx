@@ -48,17 +48,17 @@ export function Trilho({ projeto, grande = false }: { projeto: Projeto; grande?:
               href={`/${projeto.empresa}/projetos/${projeto.id}/etapas/${e.ordem}`}
               title={titulo}
               aria-label={titulo}
-              className="group min-w-0"
+              className={`group min-w-0 ${grande ? "sm:min-w-[6.5rem]" : ""}`}
               style={{ flexGrow: dias, flexBasis: 0 }}
             >
               {barra}
               {grande && (
                 <span className="mt-2.5 block min-w-0 pr-2">
-                  <span className={`block truncate text-[13px] ${eAtual ? "text-tinta" : "text-tinta-2"} group-hover:text-garrafa`}>
+                  <span className={`block text-[13px] leading-snug ${eAtual ? "text-tinta" : "text-tinta-2"} group-hover:text-garrafa`}>
                     <span className="num font-serif text-[15px] text-tinta">{doisDigitos(e.ordem)}</span>
                     <span className="hidden sm:inline"> {e.nome.charAt(0) + e.nome.slice(1).toLowerCase()}</span>
                   </span>
-                  <span className="num hidden truncate text-xs text-tinta-2 sm:block">{periodoCurto(e.dataInicio, e.dataFim)}</span>
+                  <span className="num mt-0.5 hidden text-xs leading-snug text-tinta-2 sm:block">{periodoCurto(e.dataInicio, e.dataFim)}</span>
                 </span>
               )}
             </Link>

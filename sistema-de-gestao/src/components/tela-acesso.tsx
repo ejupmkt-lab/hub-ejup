@@ -18,10 +18,11 @@ export function TelaAcesso({ titulo, children }: { titulo: string; children: Rea
         <div className="mt-16 hidden lg:block" aria-hidden>
           <div className="flex gap-1">
             {etapas.map((e, i) => (
-              <div key={e.nome} style={{ flexGrow: e.dias, flexBasis: 0 }} className="min-w-0">
+              <div key={e.nome} style={{ flexGrow: e.dias, flexBasis: 0 }} className="min-w-[5.75rem]">
                 <span className={`block h-2 rounded-[3px] ${i < 2 ? "bg-folha" : i === 2 ? "bg-folha/40" : "bg-folha/15"}`} />
-                <span className="mt-3 block truncate pr-2 text-[13px] text-folha/70">
-                  <span className="font-serif text-[15px] text-folha">{String(i + 1).padStart(2, "0")}</span> {e.nome}
+                <span className="mt-3 block pr-2 text-[13px] leading-snug text-folha/70">
+                  <span className="block font-serif text-[15px] text-folha">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="block text-balance">{e.nome}</span>
                 </span>
               </div>
             ))}
