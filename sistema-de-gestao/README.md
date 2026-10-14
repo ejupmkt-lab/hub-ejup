@@ -1,7 +1,7 @@
 # HUB Pivotto — protótipo
 
 Sistema de gestão das empresas do ecossistema Pivotto. Especificação completa no PRD
-(`docs/prd-hub-gestao.md` no repositório `robertopivotto`).
+([`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.md)).
 
 > **Protótipo.** Não há banco nem login reais: os dados são fictícios e ficam salvos no
 > `localStorage` do navegador. "Restaurar dados de exemplo", no menu, volta ao estado inicial.
