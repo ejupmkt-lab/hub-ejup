@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import type { Projeto } from "@/lib/dados/tipos";
-import { formatarData, hojeIso, sugerirDatas } from "@/lib/datas";
+import { diferencaDias, distribuirPorHoras, formatarData, hojeIso, sugerirDatas } from "@/lib/datas";
+import { faltandoNoPlano, textoPlano } from "@/lib/plano-texto";
 import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Campo, Status } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
@@ -22,15 +23,32 @@ function validar(linhas: Linha[]) {
 }
 
 export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
-  const { alterar } = useProjeto();
+  const { alterar, cliente } = useProjeto();
   const fechado = !!projeto.planoFechadoEm;
   const [editando, setEditando] = useState(!fechado);
   const [inicio, setInicio] = useState(projeto.etapas[0].dataInicio ?? hojeIso());
+  const [fim, setFim] = useState(projeto.etapas[projeto.etapas.length - 1].dataFim ?? "");
+  const [copiado, setCopiado] = useState(false);
+  const horasTotal = projeto.etapas.reduce((a, e) => a + e.horasPrevistas, 0);
   const [linhas, setLinhas] = useState<Linha[]>(projeto.etapas.map((e) => ({ inicio: e.dataInicio ?? "", fim: e.dataFim ?? "" })));
   const [justificativa, setJustificativa] = useState("");
   const erros = validar(linhas);
 
-  const sugerir = () => setLinhas(sugerirDatas(inicio, projeto.etapas.map((e) => e.duracaoReferenciaDias)));
+  // Com início e fim: divide os dias na proporção das horas. Só com o início: usa a duração de referência.
+  const curtoDemais = !!fim && diferencaDias(inicio, fim) + 1 < projeto.etapas.length;
+  const sugerir = () => {
+    const porHoras = fim ? distribuirPorHoras(inicio, fim, projeto.etapas.map((e) => e.horasPrevistas)) : null;
+    setLinhas(porHoras ?? sugerirDatas(inicio, projeto.etapas.map((e) => e.duracaoReferenciaDias)));
+  };
+  const copiar = async () => {
+    try {
+      await navigator.clipboard.writeText(textoPlano(projeto, cliente));
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2500);
+    } catch {
+      alert("Não foi possível copiar automaticamente. Selecione o texto na tela e copie.");
+    }
+  };
   const setLinha = (i: number, k: keyof Linha, v: string) => setLinhas(linhas.map((l, j) => (j === i ? { ...l, [k]: v } : l)));
 
   const fechar = () => {
@@ -79,19 +97,33 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
         <div>
           <h2 className="font-serif text-2xl">Plano de trabalho</h2>
           <p className="mt-2 max-w-2xl text-[15px] text-tinta-2">
-            Registro interno: o gestor define as datas de cada etapa depois da contratação. Não é enviado ao SEBRAE nem ao cliente. As datas fechadas aqui são a base dos prazos e avisos.
+            O gestor define o início e o fim depois da contratação; as etapas dividem o período na proporção da carga horária ({horasTotal} h no total). As datas
+            fechadas aqui são a base dos prazos e avisos, e a mensagem abaixo sai pronta para enviar.
           </p>
         </div>
         {fechado ? <Status tom="ok">Fechado em {formatarData(projeto.planoFechadoEm!.slice(0, 10))}</Status> : <Status tom="atencao">Ainda não fechado</Status>}
       </div>
 
       {editando && !fechado && (
-        <div className="mb-6 flex flex-wrap items-end gap-4 rounded-[var(--radius-bloco)] bg-pedra/60 p-5">
-          <Campo rotulo="Início da Etapa 01">
-            <input type="date" className="campo" value={inicio} onChange={(e) => setInicio(e.target.value)} />
-          </Campo>
-          <Botao variante="secundario" onClick={sugerir}>Sugerir datas</Botao>
-          <span className="text-[13px] text-tinta-2">Usa a duração de referência de cada etapa, em dias corridos. Ajuste o que precisar.</span>
+        <div className="mb-6 rounded-[var(--radius-bloco)] bg-pedra/60 p-5">
+          <div className="flex flex-wrap items-end gap-4">
+            <Campo rotulo="Início do projeto">
+              <input type="date" className="campo" value={inicio} onChange={(e) => setInicio(e.target.value)} />
+            </Campo>
+            <Campo rotulo="Fim do projeto">
+              <input type="date" className="campo" value={fim} min={inicio} onChange={(e) => setFim(e.target.value)} />
+            </Campo>
+            <Botao variante="secundario" onClick={sugerir} disabled={!inicio || curtoDemais}>
+              Calcular as datas das etapas
+            </Botao>
+          </div>
+          <p className="mt-3 text-[13px] text-tinta-2">
+            {curtoDemais
+              ? "O período precisa ter pelo menos um dia por etapa."
+              : fim
+                ? "Os dias são divididos entre as etapas na proporção da carga horária de cada uma. Depois, ajuste o que precisar na tabela."
+                : "Sem a data de fim, o sistema usa a duração de referência de cada etapa. Ajuste o que precisar na tabela."}
+          </p>
         </div>
       )}
 
@@ -101,7 +133,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
             <tr>
               <th className="py-2.5 pr-4 font-normal">Etapa</th>
               <th className="py-2.5 pr-4 font-normal">Horas</th>
-              <th className="py-2.5 pr-4 font-normal">Referência</th>
+              <th className="py-2.5 pr-4 font-normal">Dias</th>
               <th className="py-2.5 pr-4 font-normal">Início</th>
               <th className="py-2.5 pr-4 font-normal">Fim</th>
               {fechado && <th className="py-2.5 font-normal">No plano original</th>}
@@ -114,7 +146,13 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
                 <tr key={e.ordem} className="border-b border-linha last:border-0">
                   <td className="py-3 pr-4"><span className="num font-serif">{doisDigitos(e.ordem)}</span> {e.nome.charAt(0) + e.nome.slice(1).toLowerCase()}</td>
                   <td className="num py-3 pr-4">{e.horasPrevistas} h</td>
-                  <td className="num py-3 pr-4 text-tinta-2">{e.duracaoReferenciaDias} dias</td>
+                  <td className="num py-3 pr-4 text-tinta-2">
+                    {(() => {
+                      const ini = editando ? linhas[i].inicio : e.dataInicio;
+                      const fi = editando ? linhas[i].fim : e.dataFim;
+                      return ini && fi && fi >= ini ? `${diferencaDias(ini, fi) + 1}` : "—";
+                    })()}
+                  </td>
                   <td className="num py-3 pr-4">
                     {editando ? <input type="date" className="campo" value={linhas[i].inicio} onChange={(ev) => setLinha(i, "inicio", ev.target.value)} /> : formatarData(e.dataInicio)}
                   </td>
@@ -130,6 +168,16 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
               );
             })}
           </tbody>
+          <tfoot className="border-t border-linha-forte">
+            <tr>
+              <td className="py-3 pr-4 font-medium">Carga horária total</td>
+              <td className="num py-3 pr-4 font-medium">{horasTotal} h</td>
+              <td />
+              <td className="num py-3 pr-4 text-tinta-2">{formatarData(editando ? linhas[0]?.inicio : projeto.etapas[0].dataInicio)}</td>
+              <td className="num py-3 pr-4 text-tinta-2">{formatarData(editando ? linhas[linhas.length - 1]?.fim : projeto.etapas[projeto.etapas.length - 1].dataFim)}</td>
+              {fechado && <td />}
+            </tr>
+          </tfoot>
         </table>
       </div>
 
@@ -150,6 +198,23 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
           </>
         )}
       </div>
+
+      {fechado && !editando && (
+        <div className="mt-10 border-t border-linha pt-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="font-serif text-xl">Mensagem do plano de trabalho</h3>
+            <Botao onClick={copiar}>{copiado ? "Copiada" : "Copiar mensagem"}</Botao>
+          </div>
+          {faltandoNoPlano(projeto).length > 0 && (
+            <p className="mt-2 text-sm text-latao">
+              Falta preencher na ficha de identificação: {faltandoNoPlano(projeto).join(" e ")}. Até lá, a mensagem sai com “a definir”.
+            </p>
+          )}
+          <pre className="mt-4 whitespace-pre-wrap rounded-[var(--radius-campo)] bg-pedra/60 p-4 font-sans text-sm leading-relaxed text-tinta">
+            {textoPlano(projeto, cliente)}
+          </pre>
+        </div>
+      )}
     </section>
   );
 }

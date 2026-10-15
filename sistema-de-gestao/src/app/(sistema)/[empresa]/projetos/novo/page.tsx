@@ -26,6 +26,7 @@ function Conteudo() {
     consultorId: (consultores.find((u) => u.id === usuario.id) ?? consultores[0])?.id ?? "",
     numeroProjetoHub: "",
     codigoSolicitacaoHub: "",
+    numeroVisitas: "",
     gestorSebrae: "",
     segmento: "",
     areaAtuacao: "",
@@ -60,6 +61,7 @@ function Conteudo() {
         prestadoraVinculada: modelo.prestadoraVinculada,
         numeroProjetoHub: f.numeroProjetoHub,
         codigoSolicitacaoHub: f.codigoSolicitacaoHub,
+        numeroVisitas: f.numeroVisitas,
         gestorSebrae: f.gestorSebrae,
         fichaTecnica: modelo.fichaTecnica,
         codigoFichaTecnica: modelo.codigoFichaTecnica,
@@ -139,8 +141,11 @@ function Conteudo() {
               <Campo rotulo="Nº do projeto no HUB">
                 <input className="campo num" value={f.numeroProjetoHub} onChange={set("numeroProjetoHub")} />
               </Campo>
-              <Campo rotulo="Código da solicitação">
+              <Campo rotulo="Código do pedido no HUB">
                 <input className="campo num" value={f.codigoSolicitacaoHub} onChange={set("codigoSolicitacaoHub")} />
+              </Campo>
+              <Campo rotulo="Número de visitas">
+                <input className="campo num" inputMode="numeric" value={f.numeroVisitas} onChange={set("numeroVisitas")} />
               </Campo>
               <Campo rotulo="Gestor ou gestora SEBRAE">
                 <input className="campo" value={f.gestorSebrae} onChange={set("gestorSebrae")} />

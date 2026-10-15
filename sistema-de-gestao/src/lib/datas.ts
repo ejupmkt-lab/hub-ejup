@@ -42,6 +42,35 @@ export function sugerirDatas(inicioIso: string, duracoes: number[]) {
   });
 }
 
+// Plano a partir do início e do fim do projeto: os dias corridos são divididos
+// entre as etapas na proporção das horas de cada uma (pelo menos 1 dia cada),
+// em sequência, sem sobreposição.
+export function distribuirPorHoras(inicioIso: string, fimIso: string, horas: number[]) {
+  const total = diferencaDias(inicioIso, fimIso) + 1;
+  const n = horas.length;
+  if (total < n) return null;
+  const somaHoras = horas.reduce((a, h) => a + h, 0) || n;
+  const exatos = horas.map((h) => (h / somaHoras) * total);
+  const dias = exatos.map((x) => Math.max(1, Math.floor(x)));
+  // Sobras de dias vão para as etapas com a maior fração (método do maior resto)
+  let falta = total - dias.reduce((a, d) => a + d, 0);
+  const ordem = exatos.map((x, i) => ({ i, resto: x - Math.floor(x) })).sort((a, b) => b.resto - a.resto);
+  for (let k = 0; falta > 0; k = (k + 1) % n, falta--) dias[ordem[k].i]++;
+  for (let k = n - 1; falta < 0; k = (k - 1 + n) % n) {
+    if (dias[ordem[k].i] > 1) {
+      dias[ordem[k].i]--;
+      falta++;
+    }
+  }
+  let inicio = inicioIso;
+  return dias.map((d) => {
+    const fim = somarDias(inicio, d - 1);
+    const par = { inicio, fim };
+    inicio = somarDias(fim, 1);
+    return par;
+  });
+}
+
 const mesesCurtos = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
 
 // "5 out"

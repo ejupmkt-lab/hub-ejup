@@ -11,7 +11,8 @@ import { useProjeto } from "./use-projeto";
 const campos: { k: keyof Projeto; r: string; largo?: boolean }[] = [
   { k: "prestadoraVinculada", r: "Prestadora vinculada" },
   { k: "numeroProjetoHub", r: "Nº do projeto no HUB" },
-  { k: "codigoSolicitacaoHub", r: "Código da solicitação no HUB" },
+  { k: "codigoSolicitacaoHub", r: "Código do pedido no HUB" },
+  { k: "numeroVisitas", r: "Número de visitas" },
   { k: "gestorSebrae", r: "Gestor ou gestora SEBRAE" },
   { k: "fichaTecnica", r: "Ficha técnica", largo: true },
   { k: "codigoFichaTecnica", r: "Código da ficha técnica" },

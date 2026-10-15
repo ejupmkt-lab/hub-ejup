@@ -126,7 +126,8 @@ export type Projeto = {
   status: "aguardando_plano" | "em_andamento" | "encerrado";
   prestadoraVinculada: string;
   numeroProjetoHub: string;
-  codigoSolicitacaoHub: string;
+  codigoSolicitacaoHub: string; // "código do pedido" no HUB
+  numeroVisitas?: string;
   gestorSebrae: string;
   fichaTecnica: string;
   codigoFichaTecnica: string;
