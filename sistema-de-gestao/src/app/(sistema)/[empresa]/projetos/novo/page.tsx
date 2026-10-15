@@ -23,7 +23,7 @@ function Conteudo() {
   const [f, setF] = useState({
     modeloId: modelos[0]?.id ?? "",
     clienteId: "", // em branco = cliente indicado no endereço (?cliente=) ou o mais recente
-    consultorId: usuario.id,
+    consultorId: (consultores.find((u) => u.id === usuario.id) ?? consultores[0])?.id ?? "",
     numeroProjetoHub: "",
     codigoSolicitacaoHub: "",
     gestorSebrae: "",
@@ -41,8 +41,12 @@ function Conteudo() {
     ? `Governança em privacidade e proteção de dados pessoais aplicada a ${cliente.ramo.charAt(0).toLowerCase() + cliente.ramo.slice(1)}`
     : "Governança em privacidade e proteção de dados pessoais";
 
+  const [criando, setCriando] = useState(false);
+  const jaTemProjeto = estado.projetos.filter((p) => p.clienteId === clienteId);
+
   const criar = () => {
-    if (!modelo) return;
+    if (!modelo || criando) return;
+    setCriando(true);
     const id = novoId("prj");
     atualizar((r) => {
       const p: Projeto = {
@@ -111,6 +115,11 @@ function Conteudo() {
                     </option>
                   ))}
                 </select>
+                {jaTemProjeto.length > 0 && (
+                  <span className="mt-1.5 block text-[13px] text-latao">
+                    Este cliente já tem {jaTemProjeto.length === 1 ? "um projeto" : `${jaTemProjeto.length} projetos`}. Confira se não é o mesmo.
+                  </span>
+                )}
                 <Link href={`/${slug}/clientes?novo=1&voltar=novo-projeto`} className="mt-1.5 inline-block text-[13px] text-garrafa underline-offset-4 hover:underline">
                   Cadastrar outro cliente
                 </Link>
@@ -144,9 +153,10 @@ function Conteudo() {
               </Campo>
             </fieldset>
             <div className="border-t border-linha pt-6">
-              <Botao type="submit" disabled={!clienteId}>
-                Criar projeto
+              <Botao type="submit" disabled={!clienteId || !modelo || criando}>
+                {criando ? "Criando…" : "Criar projeto"}
               </Botao>
+              {!modelo && <span className="ml-3 text-sm text-tinta-2">Esta empresa ainda não tem serviço cadastrado.</span>}
             </div>
           </form>
 

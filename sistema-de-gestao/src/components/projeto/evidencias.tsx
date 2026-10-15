@@ -1,5 +1,6 @@
 "use client";
 
+import { traduzirErro } from "@/lib/erros";
 import { useEffect, useRef, useState } from "react";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import type { Etapa, Evidencia, Projeto } from "@/lib/dados/tipos";
@@ -87,7 +88,7 @@ export function Evidencias({
           { acao: `Etapa ${String(etapa.ordem).padStart(2, "0")}: evidência adicionada` },
         );
       } catch (e) {
-        setErro(e instanceof Error ? `Falha ao enviar “${arquivo.name}”: ${e.message}` : `Falha ao enviar “${arquivo.name}”.`);
+        setErro(`Falha ao enviar “${arquivo.name}”. ${traduzirErro(e, "Tente de novo.")}`);
       } finally {
         setEnviando((n) => n - 1);
       }

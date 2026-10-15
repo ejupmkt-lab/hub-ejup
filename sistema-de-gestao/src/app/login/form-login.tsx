@@ -5,6 +5,7 @@ import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { Botao, Campo } from "@/components/ui";
 import { TelaAcesso } from "@/components/tela-acesso";
 import { MSG_SENHA_VAZADA, senhaVazada } from "@/lib/senha";
+import { traduzirErro } from "@/lib/erros";
 
 type Modo = "entrar" | "criar" | "esqueci";
 
@@ -32,7 +33,7 @@ export function FormLogin({ erroLink }: { erroLink: boolean }) {
     try {
       if (modo === "entrar") {
         const { error } = await sb.auth.signInWithPassword({ email, password: senha });
-        if (error) throw new Error(error.message === "Invalid login credentials" ? "E-mail ou senha incorretos." : error.message);
+        if (error) throw error;
         window.location.href = "/";
       } else if (modo === "criar") {
         if (await senhaVazada(senha)) throw new Error(MSG_SENHA_VAZADA);
@@ -46,7 +47,7 @@ export function FormLogin({ erroLink }: { erroLink: boolean }) {
         setMsg({ tipo: "ok", texto: "Se o e-mail estiver cadastrado, você vai receber um link para criar uma nova senha." });
       }
     } catch (err) {
-      setMsg({ tipo: "erro", texto: err instanceof Error ? err.message : "Não foi possível concluir." });
+      setMsg({ tipo: "erro", texto: traduzirErro(err) });
     } finally {
       setEnviando(false);
     }

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { useUsuario } from "@/lib/dados/store";
 import { MSG_SENHA_VAZADA, senhaVazada } from "@/lib/senha";
+import { traduzirErro } from "@/lib/erros";
 import { Botao, Cabecalho, Campo, Cartao, Status } from "@/components/ui";
 
 type Cadastro = { id: string; qr: string; segredo: string };
@@ -45,7 +46,7 @@ function DuasEtapas() {
     for (const f of lista?.all ?? []) if (f.status !== "verified") await sb.auth.mfa.unenroll({ factorId: f.id });
     const { data, error } = await sb.auth.mfa.enroll({ factorType: "totp", friendlyName: "Aplicativo autenticador" });
     setOcupado(false);
-    if (error || !data) return setMsg({ tipo: "erro", texto: error?.message ?? "Não foi possível começar agora." });
+    if (error || !data) return setMsg({ tipo: "erro", texto: traduzirErro(error, "Não foi possível começar agora.") });
     setCadastro({ id: data.id, qr: data.totp.qr_code, segredo: data.totp.secret });
   };
 
@@ -69,7 +70,7 @@ function DuasEtapas() {
     const { error } = await sb.auth.mfa.unenroll({ factorId: ativo });
     if (!error) await sb.auth.refreshSession();
     setOcupado(false);
-    if (error) return setMsg({ tipo: "erro", texto: error.message });
+    if (error) return setMsg({ tipo: "erro", texto: traduzirErro(error) });
     setMsg({ tipo: "ok", texto: "Verificação em duas etapas desativada." });
     await carregar();
   };
@@ -150,7 +151,7 @@ function AlterarSenha() {
     }
     const { error } = await supabaseNavegador().auth.updateUser({ password: senha });
     setOcupado(false);
-    if (error) return setMsg({ tipo: "erro", texto: error.message });
+    if (error) return setMsg({ tipo: "erro", texto: traduzirErro(error) });
     setSenha("");
     setMsg({ tipo: "ok", texto: "Senha alterada." });
   };

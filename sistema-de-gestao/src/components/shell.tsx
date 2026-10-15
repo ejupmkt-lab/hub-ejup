@@ -2,15 +2,23 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAcesso, useEstado, type Salvamento } from "@/lib/dados/store";
 import { statusEmpresa } from "@/lib/rotulos";
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const { salvamento, sair, estado } = useEstado();
-  const { usuario, empresasVisiveis } = useAcesso();
+  const { usuario, empresasVisiveis, inicio } = useAcesso();
   const caminho = usePathname();
   const [aberto, setAberto] = useState(false);
+
+  // Menu aberto no celular: a página por baixo não rola
+  useEffect(() => {
+    document.body.style.overflow = aberto ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [aberto]);
 
   const ativos = estado.projetos.filter((p) => p.status !== "encerrado");
 
@@ -31,7 +39,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const menu = (
     <>
       <div className="px-6 pb-8 pt-7">
-        <Link href={usuario.adminGrupo ? "/" : "/pivotto"} className="block">
+        <Link href={inicio} onClick={() => setAberto(false)} className="block">
           <span className="block font-serif text-[1.45rem] leading-none text-folha">Pivotto</span>
           <span className="mt-1.5 block text-[13px] text-folha/55">Sistema de gestão</span>
         </Link>

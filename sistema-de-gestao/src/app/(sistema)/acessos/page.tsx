@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { useEstado, useUsuario } from "@/lib/dados/store";
 import { papelMembro, statusEmpresa } from "@/lib/rotulos";
+import { traduzirErro } from "@/lib/erros";
 import type { EmpresaSlug, Papel } from "@/lib/dados/tipos";
 import { Botao, Cabecalho, Campo, Cartao, Status } from "@/components/ui";
 
@@ -87,7 +88,7 @@ export default function Acessos() {
     try {
       setPessoas(await carregarPessoas());
     } catch (e) {
-      setErro(e instanceof Error ? e.message : "Não foi possível carregar os acessos.");
+      setErro(traduzirErro(e, "Não foi possível carregar os acessos."));
     }
   }, []);
 
@@ -120,7 +121,7 @@ export default function Acessos() {
       p_acessos: form.acessos,
     });
     setSalvando(false);
-    if (error) return setErro(error.message);
+    if (error) return setErro(traduzirErro(error));
     const lista = await carregarPessoas();
     setPessoas(lista);
     const salva = lista.find((p) => p.email === form.email.trim().toLowerCase());
@@ -136,14 +137,19 @@ export default function Acessos() {
     setSalvando(true);
     const { error } = await supabaseNavegador().rpc("retirar_acesso", { p_email: p.email });
     setSalvando(false);
-    if (error) return setErro(error.message);
+    if (error) return setErro(traduzirErro(error));
     setEditando(null);
     await atualizarLista();
     await recarregar();
   };
 
   const copiar = async (p: { nome: string; email: string }) => {
-    await navigator.clipboard.writeText(mensagemConvite(p));
+    try {
+      await navigator.clipboard.writeText(mensagemConvite(p));
+    } catch {
+      setConvite(p); // mostra a mensagem na tela para copiar à mão
+      return alert("Não foi possível copiar automaticamente. A mensagem está na tela: selecione e copie.");
+    }
     setCopiado(p.email);
     setTimeout(() => setCopiado(null), 2500);
   };
@@ -207,7 +213,7 @@ export default function Acessos() {
               <legend className="mb-3 font-serif text-lg">Empresas</legend>
               <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha">
                 {estado.empresas.map((emp) => (
-                  <li key={emp.slug} className="flex flex-wrap items-center justify-between gap-4 py-3">
+                  <li key={emp.slug} className="flex flex-wrap items-center justify-between gap-4 px-1 py-3">
                     <span>
                       <span className="block text-[15px]">{emp.nome}</span>
                       {emp.status !== "ativo" && <span className="block text-[13px] italic text-tinta-2">{statusEmpresa[emp.status].toLowerCase()}</span>}
@@ -260,6 +266,9 @@ export default function Acessos() {
                 Cancelar
               </Botao>
               {semEmpresa && <span className="text-sm text-tinta-2">Escolha ao menos uma empresa.</span>}
+              {!semEmpresa && !form.admin && Object.keys(form.acessos).every((s) => estado.empresas.find((e) => e.slug === s)?.status !== "ativo") && (
+                <span className="text-sm text-latao">As empresas escolhidas ainda não estão ativas: a pessoa entra, mas não vê nada por enquanto.</span>
+              )}
               {editando !== "novo" && !proprio && pessoas?.find((p) => p.email === editando)?.situacao !== "sem_acesso" && (
                 <Botao type="button" variante="perigo" onClick={retirar} disabled={salvando} className="ml-auto">
                   Retirar acesso

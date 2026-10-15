@@ -99,7 +99,7 @@ export function Registros({ projeto }: { projeto: Projeto }) {
                     ))}
                     <td className="py-2 text-[13px] text-tinta-2">{String(r.etapaOrigem).padStart(2, "0")}</td>
                     <td className="py-2">
-                      <button title="Remover" onClick={() => remover(r.id)} className="text-tinta-2 hover:text-vinho">✕</button>
+                      <button title="Remover" onClick={() => confirm("Remover esta linha do registro?") && remover(r.id)} aria-label="Remover linha" className="text-tinta-2 hover:text-vinho">✕</button>
                     </td>
                   </tr>
                 ))}

@@ -3,20 +3,21 @@
 import { useParams } from "next/navigation";
 import { useAcesso, useEstado } from "@/lib/dados/store";
 import type { EmpresaSlug } from "@/lib/dados/tipos";
-import { Cabecalho } from "@/components/ui";
+import { BotaoLink, Cabecalho, Vazio } from "@/components/ui";
 
 // Guarda de acesso por empresa e tela dos módulos ainda não estruturados.
 export default function LayoutEmpresa({ children }: { children: React.ReactNode }) {
   const { empresa: slug } = useParams<{ empresa: EmpresaSlug }>();
   const { estado } = useEstado();
-  const { podeVer } = useAcesso();
+  const { podeVer, inicio } = useAcesso();
   const empresa = estado.empresas.find((e) => e.slug === slug);
 
   if (!empresa || !podeVer(slug)) {
     return (
-      <div className="mx-auto mt-16 max-w-md text-center">
-        <h1 className="font-serif text-2xl">Sem acesso a esta empresa</h1>
-        <p className="mt-2 text-[15px] text-tinta-2">Seu usuário não está liberado para este módulo. Fale com o administrador do grupo se precisar dele.</p>
+      <div className="pt-16">
+        <Vazio titulo="Página não disponível" acao={<BotaoLink href={inicio}>Ir para o início</BotaoLink>}>
+          Este endereço não existe, ou o seu usuário não tem acesso a esta empresa. Se precisar dela, fale com o administrador do grupo.
+        </Vazio>
       </div>
     );
   }

@@ -2,7 +2,7 @@ import type { ModeloFluxo } from "./tipos";
 
 // Ficha técnica Sebraetec 13070-5 — Adequação à LGPD, conforme o HUB SEBRAE.
 // Durações de referência vêm de um projeto real (dias corridos); as datas de
-// cada projeto são definidas por Roberto no plano de trabalho.
+// cada projeto são definidas pelo gestor no plano de trabalho.
 export const modeloLgpdSebrae: ModeloFluxo = {
   id: "lgpd-sebrae-13070-5",
   versao: 1,

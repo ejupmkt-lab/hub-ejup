@@ -20,8 +20,8 @@ export const ordemGrupos: Grupo[] = ["nao_iniciada", "andamento", "a_enviar", "c
 export function grupoDaEtapa(e: Etapa, hoje = hojeIso()): Grupo {
   if (e.status === "devolvida") return "acao";
   if (etapaConcluida(e)) return "concluida";
+  if (e.dataFim && e.dataFim < hoje) return "acao"; // atrasada, mesmo se já pronta
   if (e.status === "a_enviar") return "a_enviar";
-  if (e.dataFim && e.dataFim < hoje) return "acao";
   if (e.status === "nao_iniciada" && (!e.dataInicio || e.dataInicio > hoje)) return "nao_iniciada";
   return "andamento";
 }
@@ -111,6 +111,8 @@ export function pendenciasDoGrupo(projetos: Projeto[]): Pendencia[] {
     for (const e of p.etapas) {
       const g = grupoDaEtapa(e, hoje);
       if (e.status === "devolvida") lista.push({ projeto: p, etapa: e, texto: "Devolvida pelo SEBRAE", grupo: "acao" });
+      else if (g === "acao" && e.status === "a_enviar")
+        lista.push({ projeto: p, etapa: e, texto: "Pronta para enviar, com o prazo vencido", grupo: "acao", data: e.dataFim! });
       else if (g === "acao") {
         const d = diferencaDias(e.dataFim!, hoje);
         lista.push({ projeto: p, etapa: e, texto: d === 1 ? "1 dia de atraso" : `${d} dias de atraso`, grupo: "acao", data: e.dataFim! });

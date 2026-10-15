@@ -18,12 +18,12 @@ import type { Tom } from "@/lib/rotulos";
 
 export default function Painel() {
   const { estado } = useEstado();
-  const { usuario, empresasVisiveis } = useAcesso();
+  const { usuario, empresasVisiveis, inicio, novoProjeto } = useAcesso();
   const router = useRouter();
 
   useEffect(() => {
-    if (!usuario.adminGrupo) router.replace("/pivotto");
-  }, [usuario, router]);
+    if (!usuario.adminGrupo) router.replace(inicio);
+  }, [usuario, router, inicio]);
   if (!usuario.adminGrupo) return null;
 
   // Em andamento e sem plano; os que pedem ação urgente primeiro
@@ -48,11 +48,11 @@ export default function Painel() {
           </span>
         }
       >
-        <BotaoLink href="/pivotto/projetos/novo">Novo projeto</BotaoLink>
+        {novoProjeto && <BotaoLink href={novoProjeto}>Novo projeto</BotaoLink>}
       </Cabecalho>
 
       {ativos.length === 0 ? (
-        <Vazio titulo="Nenhum projeto em andamento" acao={<BotaoLink href="/pivotto/projetos/novo">Novo projeto</BotaoLink>}>
+        <Vazio titulo="Nenhum projeto em andamento" acao={novoProjeto && <BotaoLink href={novoProjeto}>Novo projeto</BotaoLink>}>
           Projetos novos aparecem aqui com o cronograma, o calendário de prazos, os gráficos e o próximo passo de cada um.
         </Vazio>
       ) : (

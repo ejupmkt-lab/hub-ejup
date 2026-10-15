@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { Botao, Campo } from "@/components/ui";
 import { TelaAcesso } from "@/components/tela-acesso";
 import { MSG_SENHA_VAZADA, senhaVazada } from "@/lib/senha";
+import { traduzirErro } from "@/lib/erros";
 
 export default function RedefinirSenha() {
   const [senha, setSenha] = useState("");
@@ -21,7 +23,7 @@ export default function RedefinirSenha() {
     }
     const { error } = await supabaseNavegador().auth.updateUser({ password: senha });
     setEnviando(false);
-    if (error) setErro(error.message);
+    if (error) setErro(traduzirErro(error));
     else window.location.href = "/";
   };
 
@@ -31,7 +33,14 @@ export default function RedefinirSenha() {
         <Campo rotulo="Nova senha" dica="Mínimo de 8 caracteres.">
           <input type="password" required minLength={8} autoComplete="new-password" className="campo" value={senha} onChange={(e) => setSenha(e.target.value)} />
         </Campo>
-        {erro && <p className="rounded-[var(--radius-campo)] bg-vinho-claro p-3 text-sm text-vinho">{erro}</p>}
+        {erro && (
+          <p className="rounded-[var(--radius-campo)] bg-vinho-claro p-3 text-sm text-vinho">
+            {erro}{" "}
+            <Link href="/login" className="underline underline-offset-2">
+              Ir para o login
+            </Link>
+          </p>
+        )}
         <Botao type="submit" disabled={enviando} className="w-full">{enviando ? "Salvando…" : "Salvar senha"}</Botao>
       </form>
     </TelaAcesso>

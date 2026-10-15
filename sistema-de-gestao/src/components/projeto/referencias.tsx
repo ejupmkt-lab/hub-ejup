@@ -51,7 +51,7 @@ export function Referencias({ projeto }: { projeto: Projeto }) {
               Consulta em
               <input type="date" className="campo mt-1" value={r.consultadoEm} onChange={(e) => editar(r.id, "consultadoEm", e.target.value)} />
             </label>
-            <button title="Remover" onClick={() => alterar((p) => void (p.referencias = p.referencias.filter((x) => x.id !== r.id)))} className="text-tinta-2 hover:text-vinho">✕</button>
+            <button title="Remover" aria-label="Remover referência" onClick={() => confirm("Remover esta referência?") && alterar((p) => void (p.referencias = p.referencias.filter((x) => x.id !== r.id)))} className="text-tinta-2 hover:text-vinho">✕</button>
           </li>
         ))}
       </ol>

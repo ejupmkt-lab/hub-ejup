@@ -6,7 +6,8 @@ export async function GET(request: NextRequest) {
   const url = request.nextUrl;
   const codigo = url.searchParams.get("code");
   const proximo = url.searchParams.get("next") ?? "/";
-  const destino = proximo.startsWith("/") ? proximo : "/";
+  // Só caminhos internos ("//site" e "/\\site" levariam para fora)
+  const destino = proximo.startsWith("/") && !proximo.startsWith("//") && !proximo.startsWith("/\\") ? proximo : "/";
 
   if (codigo) {
     const supabase = await supabaseServidor();

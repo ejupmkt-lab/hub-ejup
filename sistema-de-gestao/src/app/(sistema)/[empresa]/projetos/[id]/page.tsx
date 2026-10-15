@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useProjeto } from "@/components/projeto/use-projeto";
 import { EtapasHub } from "@/components/projeto/etapas-hub";
 import { PlanoTrabalho } from "@/components/projeto/plano-trabalho";
@@ -9,9 +10,8 @@ import { Referencias } from "@/components/projeto/referencias";
 import { DadosProjeto } from "@/components/projeto/dados";
 import { useEstado } from "@/lib/dados/store";
 import { statusProjeto } from "@/lib/rotulos";
-import { etapaConcluida } from "@/lib/projeto";
-import { passoDoProjeto } from "@/lib/proximo-passo";
-import { Abas, Botao, BotaoLink, Cabecalho, Cartao, ProximoPasso, Status } from "@/components/ui";
+import { ancoraAbaProjeto, passoDoProjeto } from "@/lib/proximo-passo";
+import { Abas, Botao, BotaoLink, Cabecalho, Cartao, ProximoPasso, Status, Vazio } from "@/components/ui";
 import { Trilho } from "@/components/trilho";
 
 const abas = ["Etapas", "Plano de trabalho", "Registros do programa", "Referências", "Ficha de identificação", "Histórico"] as const;
@@ -20,18 +20,45 @@ type Aba = (typeof abas)[number];
 export default function PaginaProjeto() {
   const { projeto, cliente, consultor, alterar } = useProjeto();
   const { estado } = useEstado();
-  // #plano no endereço (vindo do "próximo passo") abre direto o plano de trabalho
-  const [aba, setAba] = useState<Aba>(() =>
-    projeto?.status === "aguardando_plano" || (typeof window !== "undefined" && window.location.hash === "#plano") ? "Plano de trabalho" : "Etapas",
-  );
-  if (!projeto || !cliente) return <p className="text-tinta-2">Projeto não encontrado.</p>;
+  const { empresa: slug } = useParams<{ empresa: string }>();
+  const semPlano = projeto?.status === "aguardando_plano";
+  const [aba, setAba] = useState<Aba>(semPlano ? "Plano de trabalho" : "Etapas");
+
+  // #plano, #referencias, #registros… no endereço abrem a aba certa. Lido
+  // depois da navegação, porque o Next atualiza o hash depois de montar.
+  useEffect(() => {
+    const ler = () => {
+      const a = ancoraAbaProjeto[window.location.hash.slice(1) as keyof typeof ancoraAbaProjeto];
+      if (a) setAba(a);
+    };
+    const t = setTimeout(ler, 0);
+    window.addEventListener("hashchange", ler);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("hashchange", ler);
+    };
+  }, []);
+
+  if (!projeto || !cliente)
+    return (
+      <div className="pt-10">
+        <Vazio titulo="Projeto não encontrado" acao={<BotaoLink href={`/${slug}`}>Ver os projetos</BotaoLink>}>
+          O link pode estar errado, ou o projeto foi excluído.
+        </Vazio>
+      </div>
+    );
 
   const empresa = estado.empresas.find((e) => e.slug === projeto.empresa)!;
   const horas = projeto.etapas.reduce((a, e) => a + e.horasPrevistas, 0);
   const tomStatus = projeto.status === "aguardando_plano" ? "atencao" : projeto.status === "encerrado" ? "ok" : "andamento";
 
   const passo = passoDoProjeto(projeto);
-  const encerravel = projeto.status === "em_andamento" && projeto.etapas.every(etapaConcluida);
+  // Encerrar só depois que o SEBRAE aprovar todas as entregas
+  const encerravel = projeto.status === "em_andamento" && projeto.etapas.every((e) => e.status === "aprovada");
+  const encerrar = () => {
+    if (confirm("Encerrar o projeto? Ele sai da lista de projetos em andamento; dá para reabrir depois."))
+      alterar((p) => void (p.status = "encerrado"), { acao: "Projeto encerrado" });
+  };
 
   return (
     <>
@@ -47,10 +74,10 @@ export default function PaginaProjeto() {
         abas={<Abas abas={abas} atual={aba} aoTrocar={setAba} naFaixa />}
       >
         <Status tom={tomStatus}>{statusProjeto[projeto.status]}</Status>
-        <BotaoLink href={`/${projeto.empresa}/clientes?editar=${cliente.id}`} variante="secundario">
+        <BotaoLink href={`/${projeto.empresa}/clientes?editar=${cliente.id}&voltar=${projeto.id}`} variante="secundario">
           Dados do cliente
         </BotaoLink>
-        {encerravel && <Botao onClick={() => alterar((p) => void (p.status = "encerrado"), { acao: "Projeto encerrado" })}>Encerrar projeto</Botao>}
+        {encerravel && <Botao onClick={encerrar}>Encerrar projeto</Botao>}
         {projeto.status === "encerrado" && (
           <Botao variante="secundario" onClick={() => alterar((p) => void (p.status = "em_andamento"), { acao: "Projeto reaberto" })}>
             Reabrir projeto
@@ -62,7 +89,7 @@ export default function PaginaProjeto() {
         <ProximoPasso
           passo={passo}
           className="mb-6"
-          aoAgir={passo.href.endsWith("#plano") ? () => setAba("Plano de trabalho") : encerravel ? () => alterar((p) => void (p.status = "encerrado"), { acao: "Projeto encerrado" }) : undefined}
+          aoAgir={passo.href.endsWith("#plano") ? () => setAba("Plano de trabalho") : passo.encerrar ? encerrar : undefined}
         />
       )}
 

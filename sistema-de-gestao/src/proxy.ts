@@ -28,6 +28,13 @@ export async function proxy(request: NextRequest) {
 
   const caminho = request.nextUrl.pathname;
   const publica = caminho.startsWith("/login") || caminho.startsWith("/auth");
+  // Já logado e abriu o login: vai para o início
+  if (user && caminho === "/login") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
   if (!user && !publica) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";

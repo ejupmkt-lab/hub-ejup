@@ -42,7 +42,7 @@ export function alertasDoProjeto(p: Projeto): Alerta[] {
   const lista: Alerta[] = [];
   for (const e of p.etapas) {
     if (e.status === "devolvida") lista.push({ projeto: p, etapa: e, texto: "Devolvida pelo SEBRAE para ajuste", tom: "critico", ordem: 0 });
-    else if (e.status === "a_enviar") lista.push({ projeto: p, etapa: e, texto: "Pronta: enviar no HUB SEBRAE", tom: "atencao", ordem: 2 });
+    else if (e.status === "a_enviar") lista.push({ projeto: p, etapa: e, texto: "Pronta para enviar no HUB", tom: "atencao", ordem: 2 });
   }
   const atual = etapaAtual(p);
   if (atual) {

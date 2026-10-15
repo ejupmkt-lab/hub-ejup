@@ -26,7 +26,7 @@ const ESPERA_MS = 800;
 
 type Carga =
   | { tipo: "carregando" }
-  | { tipo: "sem_acesso"; email: string }
+  | { tipo: "sem_acesso"; email: string; temPerfil: boolean }
   | { tipo: "codigo" }
   | { tipo: "erro"; mensagem: string }
   | { tipo: "pronto"; estado: Estado };
@@ -54,7 +54,8 @@ async function carregarDoBanco(): Promise<Carga> {
 
   // Sem perfil, ou com o acesso retirado (perfil sem empresa nenhuma)
   const eu = perfis.data!.find((p) => p.id === user.id);
-  if (!eu || (!eu.admin_grupo && !membros.data!.some((m) => m.user_id === user.id))) return { tipo: "sem_acesso", email: user.email ?? "" };
+  if (!eu || (!eu.admin_grupo && !membros.data!.some((m) => m.user_id === user.id)))
+    return { tipo: "sem_acesso", email: user.email ?? "", temPerfil: !!eu };
 
   const usuarios: Usuario[] = perfis.data!.map((p) => ({
     id: p.id,
@@ -93,7 +94,8 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const salvandoAgora = useRef(false);
   const estadoRef = useRef<Estado | null>(null);
-  const gravarRef = useRef<() => void>(() => {});
+  const gravarRef = useRef<() => Promise<void> | void>(() => {});
+  const saindo = useRef(false);
 
   const recarregar = useCallback(async () => {
     const c = await carregarDoBanco();
@@ -237,6 +239,7 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
   // Avisa antes de fechar a aba com alteração ainda não gravada
   useEffect(() => {
     const aviso = (e: BeforeUnloadEvent) => {
+      if (saindo.current) return;
       if (salvamento === "pendente" || salvamento === "salvando" || salvamento === "erro") e.preventDefault();
     };
     window.addEventListener("beforeunload", aviso);
@@ -244,6 +247,14 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
   }, [salvamento]);
 
   const sair = useCallback(async () => {
+    // Grava o que ainda estava esperando antes de sair
+    if (timer.current) {
+      clearTimeout(timer.current);
+      timer.current = null;
+      await gravarRef.current();
+    }
+    while (salvandoAgora.current) await new Promise((r) => setTimeout(r, 100));
+    saindo.current = true;
     await supabaseNavegador().auth.signOut();
     window.location.href = "/login";
   }, []);
@@ -261,7 +272,9 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
         <h1 className="font-serif text-2xl">{carga.tipo === "sem_acesso" ? "Conta sem acesso" : "Não foi possível carregar"}</h1>
         <p className="mt-2 text-sm text-tinta-2">
           {carga.tipo === "sem_acesso"
-            ? `O e-mail ${carga.email} ainda não foi liberado. Peça ao administrador do grupo para cadastrar o seu acesso.`
+            ? carga.temPerfil
+              ? `A conta ${carga.email} existe, mas não tem nenhuma empresa ativa liberada no momento: o acesso foi retirado ou a empresa ainda está em estruturação. Fale com o administrador do grupo.`
+              : `O e-mail ${carga.email} ainda não foi liberado. Peça ao administrador do grupo para cadastrar o seu acesso.`
             : carga.mensagem}
         </p>
         <button onClick={sair} className="mt-6 text-sm text-garrafa underline">
@@ -292,7 +305,11 @@ export function useAcesso() {
   );
   const podeVer = (slug: EmpresaSlug) => empresasVisiveis.some((e) => e.slug === slug);
   const gerencia = (slug: EmpresaSlug) => usuario.adminGrupo || usuario.acessos[slug] === "gestor";
-  return { usuario, empresasVisiveis, podeVer, gerencia };
+  // Página inicial de cada pessoa: o painel (admin) ou a primeira empresa ativa
+  const ativa = empresasVisiveis.find((e) => e.status === "ativo");
+  const inicio = usuario.adminGrupo ? "/" : ativa ? `/${ativa.slug}` : "/sem-empresa";
+  const novoProjeto = ativa ? `/${ativa.slug}/projetos/novo` : null;
+  return { usuario, empresasVisiveis, podeVer, gerencia, inicio, novoProjeto };
 }
 
 export function registrarEvento(p: Projeto, usuario: string, acao: string, detalhe?: string) {

@@ -1,5 +1,6 @@
 "use client";
 
+import { traduzirErro } from "@/lib/erros";
 import { useRef, useState } from "react";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { useUsuario } from "@/lib/dados/store";
@@ -56,7 +57,7 @@ export function RelatorioAssinado({
         { acao: `${rotuloEtapa}: PDF assinado anexado`, detalhe: arquivo.name },
       );
     } catch (e) {
-      setErro(e instanceof Error ? `Falha ao enviar: ${e.message}` : "Falha ao enviar o PDF.");
+      setErro(`Falha ao enviar o PDF. ${traduzirErro(e, "Tente de novo.")}`);
     } finally {
       setEnviando(false);
       if (entrada.current) entrada.current.value = "";

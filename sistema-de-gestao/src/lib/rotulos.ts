@@ -8,7 +8,7 @@ export const statusEtapa = {
   em_redacao: { rotulo: "Em redação", curto: "Redação", tom: "andamento" },
   em_revisao: { rotulo: "Em revisão", curto: "Revisão", tom: "andamento" },
   aguardando_assinaturas: { rotulo: "Aguardando assinaturas", curto: "Assinaturas", tom: "andamento" },
-  a_enviar: { rotulo: "A enviar", curto: "A enviar", tom: "atencao" },
+  a_enviar: { rotulo: "Pronta para enviar", curto: "Pronta", tom: "atencao" },
   enviada: { rotulo: "Enviada no HUB", curto: "Enviada", tom: "ok" },
   aprovada: { rotulo: "Aprovada", curto: "Aprovada", tom: "ok" },
   devolvida: { rotulo: "Devolvida para ajuste", curto: "Devolvida", tom: "critico" },

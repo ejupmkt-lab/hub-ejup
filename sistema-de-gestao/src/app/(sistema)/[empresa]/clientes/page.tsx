@@ -1,5 +1,6 @@
 "use client";
 
+import { traduzirErro } from "@/lib/erros";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { novoId, useAcesso, useEstado } from "@/lib/dados/store";
@@ -44,6 +45,8 @@ function Conteudo() {
   const [consulta, setConsulta] = useState<{ estado: "buscando" | "ok" | "erro"; texto: string } | null>(null);
   const ultimoCnpj = useRef("");
   const voltarParaProjeto = busca_.get("voltar") === "novo-projeto";
+  // Veio de um projeto ("Dados do cliente"): salvar ou cancelar volta para ele
+  const projetoDeOrigem = busca_.get("voltar")?.startsWith("prj-") ? busca_.get("voltar") : null;
 
   const abrir = (c?: Cliente) => {
     setEditando(c ? c.id : "novo");
@@ -107,6 +110,8 @@ function Conteudo() {
     });
     setEditando(null);
     if (voltarParaProjeto) router.push(`/${slug}/projetos/novo?cliente=${id}`);
+    else if (projetoDeOrigem) router.push(`/${slug}/projetos/${projetoDeOrigem}`);
+    else router.replace(`/${slug}/clientes`);
   };
 
   const excluirCliente = async () => {
@@ -116,7 +121,7 @@ function Conteudo() {
       await excluir("cliente", c.id);
       setEditando(null);
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Não foi possível excluir.");
+      alert(traduzirErro(e, "Não foi possível excluir."));
     }
   };
 
@@ -203,12 +208,18 @@ function Conteudo() {
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-linha pt-6">
               <Botao type="submit" disabled={faltando.length > 0 || !!duplicado}>
-                {editando === "novo" ? (voltarParaProjeto ? "Cadastrar e voltar ao projeto" : "Cadastrar cliente") : "Salvar alterações"}
+                {editando === "novo" ? (voltarParaProjeto ? "Cadastrar e voltar ao projeto" : "Cadastrar cliente") : projetoDeOrigem ? "Salvar e voltar ao projeto" : "Salvar alterações"}
               </Botao>
               <Botao
                 type="button"
                 variante="secundario"
-                onClick={() => (voltarParaProjeto ? router.push(`/${slug}/projetos/novo`) : setEditando(null))}
+                onClick={() =>
+                  voltarParaProjeto
+                    ? router.push(`/${slug}/projetos/novo`)
+                    : projetoDeOrigem
+                      ? router.push(`/${slug}/projetos/${projetoDeOrigem}`)
+                      : (setEditando(null), router.replace(`/${slug}/clientes`))
+                }
               >
                 Cancelar
               </Botao>

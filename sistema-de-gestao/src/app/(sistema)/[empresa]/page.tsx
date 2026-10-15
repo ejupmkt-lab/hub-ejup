@@ -7,7 +7,7 @@ import { BotaoLink, Cabecalho, Cartao, Vazio } from "@/components/ui";
 import { LinhaProjeto } from "@/components/linha-projeto";
 
 const filtros = {
-  andamento: "Em andamento",
+  andamento: "Ativos",
   sem_plano: "Sem plano",
   encerrados: "Encerrados",
   todos: "Todos",
@@ -25,7 +25,7 @@ export default function ModuloEmpresa() {
   const cliente = (id: string) => estado.clientes.find((c) => c.id === id);
   const passaFiltro = (status: string) =>
     filtro === "todos" ||
-    (filtro === "andamento" && status === "em_andamento") ||
+    (filtro === "andamento" && status !== "encerrado") ||
     (filtro === "sem_plano" && status === "aguardando_plano") ||
     (filtro === "encerrados" && status === "encerrado");
   const termo = busca.trim().toLowerCase();
@@ -36,7 +36,7 @@ export default function ModuloEmpresa() {
   });
   const contagem = (f: Filtro) =>
     daEmpresa.filter((p) =>
-      f === "todos" ? true : f === "andamento" ? p.status === "em_andamento" : f === "sem_plano" ? p.status === "aguardando_plano" : p.status === "encerrado",
+      f === "todos" ? true : f === "andamento" ? p.status !== "encerrado" : f === "sem_plano" ? p.status === "aguardando_plano" : p.status === "encerrado",
     ).length;
 
   return (

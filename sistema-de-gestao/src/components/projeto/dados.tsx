@@ -1,5 +1,6 @@
 "use client";
 
+import { traduzirErro } from "@/lib/erros";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Projeto } from "@/lib/dados/tipos";
@@ -39,7 +40,7 @@ export function DadosProjeto({ projeto }: { projeto: Projeto }) {
       await excluir("projeto", projeto.id);
       router.replace(`/${projeto.empresa}`);
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Não foi possível excluir.");
+      alert(traduzirErro(e, "Não foi possível excluir."));
       setExcluindo(false);
     }
   };

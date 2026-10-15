@@ -6,6 +6,7 @@ import { formatarData, hojeIso, sugerirDatas } from "@/lib/datas";
 import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Campo, Status } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
+import { automatizarEtapa } from "@/lib/regras-etapa";
 
 type Linha = { inicio: string; fim: string };
 
@@ -42,6 +43,8 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
         });
         p.planoFechadoEm = new Date().toISOString().slice(0, 19);
         p.status = "em_andamento";
+        // Checklist já marcado antes do plano: aplica os avanços automáticos
+        p.etapas.forEach((e) => automatizarEtapa(p, e));
       },
       { acao: "Plano de trabalho fechado" },
     );
@@ -76,7 +79,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
         <div>
           <h2 className="font-serif text-2xl">Plano de trabalho</h2>
           <p className="mt-2 max-w-2xl text-[15px] text-tinta-2">
-            Registro interno: Roberto define as datas de cada etapa depois da contratação. Não é enviado ao SEBRAE nem ao cliente. As datas fechadas aqui são a base dos prazos e avisos.
+            Registro interno: o gestor define as datas de cada etapa depois da contratação. Não é enviado ao SEBRAE nem ao cliente. As datas fechadas aqui são a base dos prazos e avisos.
           </p>
         </div>
         {fechado ? <Status tom="ok">Fechado em {formatarData(projeto.planoFechadoEm!.slice(0, 10))}</Status> : <Status tom="atencao">Ainda não fechado</Status>}

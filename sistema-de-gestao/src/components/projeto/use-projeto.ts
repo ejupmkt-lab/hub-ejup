@@ -6,10 +6,11 @@ import type { Projeto } from "@/lib/dados/tipos";
 
 // Projeto da rota + função para alterá-lo registrando no histórico
 export function useProjeto() {
-  const { id } = useParams<{ id: string }>();
+  const { id, empresa } = useParams<{ id: string; empresa: string }>();
   const { estado, atualizar } = useEstado();
   const usuario = useUsuario();
-  const projeto = estado.projetos.find((p) => p.id === id);
+  // O projeto precisa ser da empresa do endereço
+  const projeto = estado.projetos.find((p) => p.id === id && p.empresa === empresa);
   const cliente = projeto && estado.clientes.find((c) => c.id === projeto.clienteId);
   const consultor = projeto && estado.usuarios.find((u) => u.id === projeto.consultorId);
 

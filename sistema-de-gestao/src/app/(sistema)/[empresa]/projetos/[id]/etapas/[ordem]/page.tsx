@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useProjeto } from "@/components/projeto/use-projeto";
 import { AjudaFormatacao } from "@/components/projeto/ajuda-formatacao";
 import { Evidencias, baixarImagens } from "@/components/projeto/evidencias";
@@ -15,15 +15,16 @@ import { doisDigitos, statusEtapa, type StatusEtapa } from "@/lib/rotulos";
 import { progressoAtividades, situacaoPrazo } from "@/lib/projeto";
 import { useEstado } from "@/lib/dados/store";
 import type { Etapa } from "@/lib/dados/tipos";
-import { Abas, Barra, Botao, Cabecalho, Campo, ProximoPasso, Selo, Status } from "@/components/ui";
-import { abaDaPendencia, ancoraAba, passoDaEtapa } from "@/lib/proximo-passo";
+import { Abas, Barra, Botao, BotaoLink, Cabecalho, Campo, ProximoPasso, Selo, Status, Vazio } from "@/components/ui";
+import { abaDaPendencia, ancoraAba, ancoraProjetoDaPendencia, passoDaEtapa } from "@/lib/proximo-passo";
+import { automatizarEtapa, bloqueioStatus, fluxoEtapa } from "@/lib/regras-etapa";
+import { supabaseNavegador } from "@/lib/supabase/navegador";
 
 const abas = ["Checklist", "Redação do relatório", "Entregáveis", "Fechamento"] as const;
 type Aba = (typeof abas)[number];
 
 // Caminho normal de uma etapa; "devolvida" fica fora da sequência
-const fluxo: StatusEtapa[] = ["nao_iniciada", "em_levantamento", "em_redacao", "em_revisao", "aguardando_assinaturas", "a_enviar", "enviada", "aprovada"];
-const exigeCompletude: StatusEtapa[] = ["a_enviar", "enviada", "aprovada"];
+const fluxo = fluxoEtapa;
 
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
@@ -31,57 +32,90 @@ export default function PaginaEtapa() {
   const { ordem } = useParams<{ ordem: string }>();
   const { projeto, cliente, consultor, alterar } = useProjeto();
   const { estado } = useEstado();
-  const [aba, setAba] = useState<Aba>(() => {
-    const ancora = typeof window !== "undefined" ? window.location.hash.slice(1) : "";
-    return (Object.keys(ancoraAba) as Aba[]).find((a) => ancoraAba[a] === ancora) ?? "Checklist";
-  });
+  const [aba, setAba] = useState<Aba>("Checklist");
   const [gerando, setGerando] = useState(false);
-  if (!projeto || !cliente) return <p className="text-tinta-2">Projeto não encontrado.</p>;
+  const passosRef = useRef<HTMLOListElement>(null);
+
+  // A aba vem do endereço (#checklist, #redacao…), lido depois da navegação,
+  // porque o Next atualiza o hash só depois de montar a página
+  useEffect(() => {
+    const ler = () => {
+      const ancora = window.location.hash.slice(1);
+      const a = (Object.keys(ancoraAba) as Aba[]).find((x) => ancoraAba[x] === ancora);
+      setAba(a ?? "Checklist");
+    };
+    const t = setTimeout(ler, 0);
+    window.addEventListener("hashchange", ler);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("hashchange", ler);
+    };
+  }, [ordem]);
+
+  // No celular, a sequência de status rola até o status atual
+  useEffect(() => {
+    passosRef.current?.querySelector('[aria-current="step"]')?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [ordem, projeto?.etapas]);
+
+  if (!projeto || !cliente) return <NaoEncontrado />;
   const etapa = projeto.etapas.find((e) => e.ordem === Number(ordem));
-  if (!etapa) return <p className="text-tinta-2">Etapa não encontrada.</p>;
+  if (!etapa) return <NaoEncontrado projeto={`/${projeto.empresa}/projetos/${projeto.id}`} />;
 
   const empresa = estado.empresas.find((e) => e.slug === projeto.empresa)!;
   const pendencias = verificarCompletude(projeto, etapa);
-  const semPlano = !projeto.planoFechadoEm;
-  const sit = projeto.status === "em_andamento" ? situacaoPrazo(etapa) : null;
+  const sit = projeto.planoFechadoEm && projeto.status !== "encerrado" ? situacaoPrazo(etapa) : null;
+  const encerrado = projeto.status === "encerrado";
   const prog = progressoAtividades(etapa);
   const anterior = projeto.etapas.find((e) => e.ordem === etapa.ordem - 1);
   const proxima = projeto.etapas.find((e) => e.ordem === etapa.ordem + 1);
   const base = `/${projeto.empresa}/projetos/${projeto.id}`;
 
-  // Toda alteração passa por aqui; o status avança sozinho nos pontos óbvios:
-  // primeira atividade marcada → "Em levantamento"; checklist completo →
-  // "Em redação"; duas assinaturas com o
-  // relatório completo → "A enviar".
+  // Toda alteração passa por aqui; o status avança sozinho nos pontos óbvios
+  // (regras em lib/regras-etapa)
   const mudarEtapa = (fn: (e: Etapa) => void, evento?: { acao: string; detalhe?: string }) =>
     alterar((p) => {
       const e = p.etapas.find((x) => x.ordem === etapa.ordem)!;
       fn(e);
-      if (!p.planoFechadoEm) return;
-      if (e.status === "nao_iniciada" && e.atividades.some((a) => a.status !== "pendente")) e.status = "em_levantamento";
-      if (e.status === "em_levantamento" && e.atividades.every((a) => a.status !== "pendente")) e.status = "em_redacao";
-      const assinada = e.assinaturaConsultor && e.assinaturaCliente;
-      const antes = ["nao_iniciada", "em_levantamento", "em_redacao", "em_revisao", "aguardando_assinaturas"];
-      if (assinada && antes.includes(e.status) && verificarCompletude(p, e).length === 0) e.status = "a_enviar";
+      automatizarEtapa(p, e);
     }, evento);
 
   const usarPadroes = () =>
     mudarEtapa((x) => void preencherVazios(projeto, x, cliente, todasSecoes.map((d) => d.chave)), { acao: `Etapa ${doisDigitos(etapa.ordem)}: textos-padrão aplicados` });
   const vazias = todasSecoes.filter((d) => d.obrigatoria(etapa) && !(etapa.secoes[d.chave] ?? "").trim()).length + etapa.entregaveis.filter((x) => x.tipo === "entregavel" && !x.conteudo.trim()).length;
 
-  const bloqueio = (s: StatusEtapa): string | null => {
-    if (semPlano && s !== "nao_iniciada") return "Feche o plano de trabalho primeiro";
-    if (exigeCompletude.includes(s) && pendencias.length)
-      return pendencias.length === 1 ? "Há 1 pendência no relatório" : `Há ${pendencias.length} pendências no relatório`;
-    if ((s === "enviada" || s === "aprovada") && !(etapa.assinaturaConsultor && etapa.assinaturaCliente)) return "Registre as duas assinaturas";
-    return null;
+  const bloqueio = (s: StatusEtapa) => bloqueioStatus(projeto, etapa, s);
+
+  // Escolha manual do status: vale o que a pessoa clicou, sem automação.
+  // Voltar de uma devolução descarta as assinaturas e o PDF antigos.
+  const definirStatus = (s: StatusEtapa) => {
+    if (s === "devolvida" && !confirm("Registrar que o SEBRAE devolveu esta entrega para ajuste?")) return;
+    const retomando = etapa.status === "devolvida" && s === "em_redacao";
+    if (
+      retomando &&
+      (etapa.assinaturaConsultor || etapa.assinaturaCliente || etapa.relatorioAssinado) &&
+      !confirm("O relatório vai mudar, então as datas de assinatura e o PDF assinado anterior serão descartados. Continuar?")
+    )
+      return;
+    const pdfAntigo = retomando ? etapa.relatorioAssinado?.caminho : undefined;
+    alterar(
+      (p) => {
+        const e = p.etapas.find((x) => x.ordem === etapa.ordem)!;
+        e.status = s;
+        if (retomando) {
+          e.assinaturaConsultor = null;
+          e.assinaturaCliente = null;
+          e.relatorioAssinado = null;
+        }
+      },
+      { acao: `Etapa ${doisDigitos(etapa.ordem)}: ${statusEtapa[s].rotulo.toLowerCase()}` },
+    );
+    if (pdfAntigo) void supabaseNavegador().storage.from("evidencias").remove([pdfAntigo]);
   };
 
-  // Escolha manual do status: vale o que a pessoa clicou, sem automação
-  const definirStatus = (s: StatusEtapa) =>
-    alterar((p) => void (p.etapas.find((x) => x.ordem === etapa.ordem)!.status = s), {
-      acao: `Etapa ${doisDigitos(etapa.ordem)}: ${statusEtapa[s].rotulo.toLowerCase()}`,
-    });
+  const irPara = (a: Aba) => {
+    setAba(a);
+    document.getElementById("conteudo-etapa")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const baixar = async () => {
     setGerando(true);
@@ -129,7 +163,7 @@ export default function PaginaEtapa() {
               </div>
             ) : (
               <>
-                <ol className="flex overflow-x-auto pb-1">
+                <ol ref={passosRef} className="flex overflow-x-auto pb-1">
                   {fluxo.map((s, i) => {
                     const motivo = s === etapa.status ? null : bloqueio(s);
                     const feito = i < posicao;
@@ -188,18 +222,33 @@ export default function PaginaEtapa() {
         }
       />
 
+      {encerrado && (
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-bloco)] border border-linha bg-folha px-6 py-4">
+          <p className="text-[15px] text-tinta-2">Este projeto está encerrado. O conteúdo fica disponível para consulta e para baixar os relatórios.</p>
+          <BotaoLink href={base} variante="secundario" tamanho="pequeno">
+            Abrir o projeto
+          </BotaoLink>
+        </div>
+      )}
+
       {passo && (
         <ProximoPasso
           passo={passo}
           className="mb-8"
           aoAgir={
             passo.acao
-              ? () => definirStatus(passo.acao!)
-              : passo.aba
-                ? () => {
-                    setAba(passo.aba!);
-                    document.getElementById("conteudo-etapa")?.scrollIntoView({ behavior: "smooth", block: "start" });
+              ? () => {
+                  const motivo = bloqueio(passo.acao!);
+                  if (motivo) {
+                    alert(`${motivo}.`);
+                    irPara("Fechamento");
+                  } else {
+                    definirStatus(passo.acao!);
+                    if (passo.aba) irPara(passo.aba);
                   }
+                }
+              : passo.aba
+                ? () => irPara(passo.aba!)
                 : undefined
           }
         />
@@ -225,7 +274,7 @@ export default function PaginaEtapa() {
             <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha px-5">
               {etapa.atividades.map((a, i) => (
                 <li key={a.codigo} className={`flex flex-wrap items-start gap-x-6 gap-y-3 py-3.5 ${a.nivel > 1 ? "pl-8" : ""}`}>
-                  <div className="min-w-[16rem] flex-1 text-[15px] leading-relaxed">
+                  <div className="min-w-0 flex-1 basis-56 text-[15px] leading-relaxed">
                     <span className={`num mr-2 ${a.nivel === 1 ? "font-serif text-tinta" : "text-tinta-2"}`}>{a.codigo}</span>
                     <span className={a.status === "feito" ? "text-tinta-2" : a.nivel === 1 ? "text-tinta" : "text-tinta"}>{a.texto}</span>
                     {a.status === "nao_aplicavel" && (
@@ -313,7 +362,7 @@ export default function PaginaEtapa() {
             <div className="space-y-10 rounded-[var(--radius-bloco)] border border-linha bg-folha p-6">
               <section>
                 <h3 className="mb-4 font-serif text-xl">Local e data</h3>
-                <Campo rotulo={`${projeto.localAssinatura}, em`} className="max-w-xs">
+                <Campo rotulo={`${projeto.localAssinatura || "Local (defina na ficha de identificação)"}, em`} className="max-w-xs">
                   <input
                     type="date"
                     className="campo num"
@@ -354,15 +403,24 @@ export default function PaginaEtapa() {
               <section>
                 <h3 className="mb-4 font-serif text-xl">Pendências</h3>
                 {pendencias.length === 0 ? (
-                  <p className="text-[15px] text-musgo">Nada pendente. A etapa pode ir para “A enviar”.</p>
+                  <p className={`text-[15px] ${etapa.assinaturaConsultor && etapa.assinaturaCliente ? "text-musgo" : "text-tinta"}`}>
+                    {etapa.assinaturaConsultor && etapa.assinaturaCliente
+                      ? "Relatório completo e assinado. A etapa pode ser marcada como pronta para enviar."
+                      : "Relatório completo. Falta assinar no gov.br e registrar as datas (ou anexar o PDF assinado)."}
+                  </p>
                 ) : (
                   <ul className="space-y-2.5 text-[15px]">
                     {pendencias.map((p, i) => {
                       const destino = abaDaPendencia[p.onde];
+                      const doProjeto = ancoraProjetoDaPendencia[p.onde];
                       return (
                         <li key={i} className="grid grid-cols-[6.5rem_1fr] gap-4">
                           <span className="text-[13px] text-tinta-2">{p.onde}</span>
-                          {destino && destino !== aba ? (
+                          {doProjeto ? (
+                            <Link href={`${base}#${doProjeto}`} className="underline decoration-linha-forte underline-offset-4 hover:text-garrafa hover:decoration-garrafa">
+                              {p.texto}
+                            </Link>
+                          ) : destino && destino !== aba ? (
                             <button onClick={() => setAba(destino)} className="text-left underline decoration-linha-forte underline-offset-4 hover:text-garrafa hover:decoration-garrafa">
                               {p.texto}
                             </button>
@@ -392,7 +450,7 @@ export default function PaginaEtapa() {
               ) : sit ? (
                 <p className="num mt-1 text-sm text-tinta-2">{sit.texto}</p>
               ) : (
-                <p className="mt-1 text-sm text-tinta-2">Sem plano de trabalho</p>
+                <p className="mt-1 text-sm text-tinta-2">{encerrado ? "Projeto encerrado" : "Sem plano de trabalho"}</p>
               )}
             </div>
             <div>
@@ -529,5 +587,19 @@ function EditorSecao({ def, etapa, padrao, onChange }: { def: DefSecao; etapa: E
         </div>
       )}
     </section>
+  );
+}
+
+function NaoEncontrado({ projeto }: { projeto?: string }) {
+  const { empresa } = useParams<{ empresa: string }>();
+  return (
+    <div className="pt-10">
+      <Vazio
+        titulo={projeto ? "Etapa não encontrada" : "Projeto não encontrado"}
+        acao={<BotaoLink href={projeto ?? `/${empresa}`}>{projeto ? "Abrir o projeto" : "Ver os projetos"}</BotaoLink>}
+      >
+        {projeto ? "O projeto tem cinco etapas, de 01 a 05." : "O link pode estar errado, ou o projeto foi excluído."}
+      </Vazio>
+    </div>
   );
 }
