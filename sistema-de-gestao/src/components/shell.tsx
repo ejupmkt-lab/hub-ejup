@@ -59,9 +59,14 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <div className="border-t border-linha px-6 py-5">
         <p className="text-[15px] text-tinta">{usuario.nomeCompleto}</p>
         <p className="mt-0.5 truncate text-[13px] text-tinta-2">{usuario.email}</p>
-        <button onClick={sair} className="mt-3 text-[13px] text-tinta-2 underline-offset-4 hover:text-tinta hover:underline">
-          Sair
-        </button>
+        <div className="mt-3 flex gap-5 text-[13px] text-tinta-2">
+          <Link href="/conta" onClick={() => setAberto(false)} className="underline-offset-4 hover:text-tinta hover:underline">
+            Minha conta
+          </Link>
+          <button onClick={sair} className="underline-offset-4 hover:text-tinta hover:underline">
+            Sair
+          </button>
+        </div>
       </div>
     </>
   );

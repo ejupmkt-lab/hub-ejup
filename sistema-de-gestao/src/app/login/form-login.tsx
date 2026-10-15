@@ -4,6 +4,7 @@ import { useState } from "react";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { Botao, Campo } from "@/components/ui";
 import { TelaAcesso } from "@/components/tela-acesso";
+import { MSG_SENHA_VAZADA, senhaVazada } from "@/lib/senha";
 
 type Modo = "entrar" | "criar" | "esqueci";
 
@@ -34,6 +35,7 @@ export function FormLogin({ erroLink }: { erroLink: boolean }) {
         if (error) throw new Error(error.message === "Invalid login credentials" ? "E-mail ou senha incorretos." : error.message);
         window.location.href = "/";
       } else if (modo === "criar") {
+        if (await senhaVazada(senha)) throw new Error(MSG_SENHA_VAZADA);
         const { data, error } = await sb.auth.signUp({ email, password: senha, options: { emailRedirectTo: retorno("/") } });
         if (error) throw error;
         if (data.session) window.location.href = "/";

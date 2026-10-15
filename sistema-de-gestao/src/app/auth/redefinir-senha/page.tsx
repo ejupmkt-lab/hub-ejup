@@ -4,6 +4,7 @@ import { useState } from "react";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { Botao, Campo } from "@/components/ui";
 import { TelaAcesso } from "@/components/tela-acesso";
+import { MSG_SENHA_VAZADA, senhaVazada } from "@/lib/senha";
 
 export default function RedefinirSenha() {
   const [senha, setSenha] = useState("");
@@ -13,6 +14,11 @@ export default function RedefinirSenha() {
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
     setEnviando(true);
+    setErro(null);
+    if (await senhaVazada(senha)) {
+      setEnviando(false);
+      return setErro(MSG_SENHA_VAZADA);
+    }
     const { error } = await supabaseNavegador().auth.updateUser({ password: senha });
     setEnviando(false);
     if (error) setErro(error.message);

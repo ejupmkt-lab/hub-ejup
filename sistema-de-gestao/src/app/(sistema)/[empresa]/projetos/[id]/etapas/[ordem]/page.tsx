@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useProjeto } from "@/components/projeto/use-projeto";
 import { AjudaFormatacao } from "@/components/projeto/ajuda-formatacao";
 import { Evidencias, baixarImagens } from "@/components/projeto/evidencias";
+import { RelatorioAssinado, abrirAssinado } from "@/components/projeto/assinado";
 import { secoesAntes, secoesDepois, todasSecoes, verificarCompletude, type DefSecao } from "@/lib/relatorio/secoes";
 import { preencherVazios, textoPadraoSecao } from "@/lib/relatorio/padroes";
 import { gerarDocx } from "@/lib/relatorio/docx";
@@ -303,6 +304,7 @@ export default function PaginaEtapa() {
                   ))}
                 </ul>
               </section>
+              <RelatorioAssinado projeto={projeto} etapa={etapa} alterarEtapa={mudarEtapa} />
               <section>
                 <h3 className="mb-4 font-serif text-xl">Pendências</h3>
                 {pendencias.length === 0 ? (
@@ -365,6 +367,23 @@ export default function PaginaEtapa() {
                 No papel timbrado FUNCERN e Sebraetec; pode ser baixado como rascunho a qualquer momento. Para enviar: abra no Word, salve como PDF e
                 assine no gov.br.
               </p>
+              {etapa.relatorioAssinado ? (
+                <button
+                  onClick={() => abrirAssinado(etapa.relatorioAssinado!.caminho, etapa.relatorioAssinado!.nome)}
+                  className="mt-3 block text-left text-sm text-garrafa underline-offset-4 hover:underline"
+                >
+                  Abrir o PDF assinado
+                </button>
+              ) : (
+                <button onClick={() => setAba("Fechamento")} className="mt-3 block text-left text-sm text-tinta-2 underline-offset-4 hover:text-garrafa hover:underline">
+                  Já assinou? Anexe o PDF
+                </button>
+              )}
+              {etapa.status === "a_enviar" && (
+                <Botao variante="secundario" onClick={() => definirStatus("enviada")} className="mt-4 w-full">
+                  Marcar como enviada no HUB
+                </Botao>
+              )}
             </div>
           </div>
           <nav className="mt-4 flex justify-between text-sm" aria-label="Outras etapas">

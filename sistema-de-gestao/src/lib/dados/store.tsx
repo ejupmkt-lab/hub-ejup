@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { supabaseNavegador } from "../supabase/navegador";
+import { TelaCodigo } from "@/components/tela-codigo";
 import type { Cliente, Empresa, EmpresaSlug, Estado, Papel, Projeto, Usuario } from "./tipos";
 
 // Estado do sistema carregado do Supabase. As telas alteram uma cópia local
@@ -16,6 +17,7 @@ type Ctx = {
   atualizar: (fn: (rascunho: Estado) => void) => void;
   salvamento: Salvamento;
   sair: () => Promise<void>;
+  excluir: (tipo: "projeto" | "cliente", id: string) => Promise<void>;
 };
 
 const Contexto = createContext<Ctx | null>(null);
@@ -24,6 +26,7 @@ const ESPERA_MS = 800;
 type Carga =
   | { tipo: "carregando" }
   | { tipo: "sem_acesso"; email: string }
+  | { tipo: "codigo" }
   | { tipo: "erro"; mensagem: string }
   | { tipo: "pronto"; estado: Estado };
 
@@ -33,6 +36,10 @@ async function carregarDoBanco(): Promise<Carga> {
     data: { user },
   } = await sb.auth.getUser();
   if (!user) return { tipo: "erro", mensagem: "Sessão expirada. Entre novamente." };
+
+  // Quem ativou a verificação em duas etapas precisa informar o código nesta sessão
+  const { data: nivel } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (nivel?.nextLevel === "aal2" && nivel.currentLevel !== "aal2") return { tipo: "codigo" };
 
   const [perfis, membros, empresas, clientes, projetos] = await Promise.all([
     sb.from("perfis").select("id, email, nome, nome_completo, admin_grupo"),
@@ -184,6 +191,46 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
     [gravar],
   );
 
+  // Exclusão definitiva (o banco só permite a gestores). O projeto leva junto
+  // as imagens e o PDF assinado guardados no armazenamento.
+  const excluir = useCallback(
+    async (tipo: "projeto" | "cliente", id: string) => {
+      if (timer.current) clearTimeout(timer.current);
+      while (salvandoAgora.current) await new Promise((r) => setTimeout(r, 100));
+      const sb = supabaseNavegador();
+      const tabela = tipo === "projeto" ? "projetos" : "clientes";
+      const chave = `${tipo === "projeto" ? "prj" : "cli"}:${id}`;
+      // Ainda não chegou ao banco: basta tirar da tela
+      if (gravado.current.has(chave)) {
+        const { data, error } = await sb.from(tabela).delete().eq("id", id).select("id");
+        if (error) throw error;
+        if (!data?.length) throw new Error("Só gestores da empresa podem excluir.");
+      }
+      if (tipo === "projeto") {
+        const p = estadoRef.current?.projetos.find((x) => x.id === id);
+        const arquivos = (p?.etapas ?? []).flatMap((e) => [
+          ...(e.evidencias ?? []).map((ev) => ev.caminho),
+          ...(e.relatorioAssinado ? [e.relatorioAssinado.caminho] : []),
+        ]);
+        if (arquivos.length) await sb.storage.from("evidencias").remove(arquivos);
+      }
+      gravado.current.delete(chave);
+      versoes.delete(id);
+      setCarga((atual) => {
+        if (atual.tipo !== "pronto") return atual;
+        const estado = {
+          ...atual.estado,
+          projetos: tipo === "projeto" ? atual.estado.projetos.filter((x) => x.id !== id) : atual.estado.projetos,
+          clientes: tipo === "cliente" ? atual.estado.clientes.filter((x) => x.id !== id) : atual.estado.clientes,
+        };
+        estadoRef.current = estado;
+        return { tipo: "pronto", estado };
+      });
+      timer.current = setTimeout(() => gravarRef.current(), ESPERA_MS);
+    },
+    [],
+  );
+
   // Avisa antes de fechar a aba com alteração ainda não gravada
   useEffect(() => {
     const aviso = (e: BeforeUnloadEvent) => {
@@ -199,11 +246,12 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
   }, []);
 
   const valor = useMemo(
-    () => (carga.tipo === "pronto" ? { estado: carga.estado, atualizar, salvamento, sair } : null),
-    [carga, atualizar, salvamento, sair],
+    () => (carga.tipo === "pronto" ? { estado: carga.estado, atualizar, salvamento, sair, excluir } : null),
+    [carga, atualizar, salvamento, sair, excluir],
   );
 
   if (carga.tipo === "carregando") return <div className="flex min-h-screen items-center justify-center font-serif text-xl text-tinta-2">Pivotto</div>;
+  if (carga.tipo === "codigo") return <TelaCodigo aoConfirmar={recarregar} sair={sair} />;
   if (carga.tipo !== "pronto")
     return (
       <div className="mx-auto mt-24 max-w-md px-6 text-center">
@@ -240,7 +288,8 @@ export function useAcesso() {
     (e) => usuario.adminGrupo || (usuario.acessos[e.slug] && e.status === "ativo"),
   );
   const podeVer = (slug: EmpresaSlug) => empresasVisiveis.some((e) => e.slug === slug);
-  return { usuario, empresasVisiveis, podeVer };
+  const gerencia = (slug: EmpresaSlug) => usuario.adminGrupo || usuario.acessos[slug] === "gestor";
+  return { usuario, empresasVisiveis, podeVer, gerencia };
 }
 
 export function registrarEvento(p: Projeto, usuario: string, acao: string, detalhe?: string) {

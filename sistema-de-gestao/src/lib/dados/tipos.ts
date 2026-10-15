@@ -83,6 +83,15 @@ export type Etapa = {
   assinaturaConsultor: string | null;
   assinaturaCliente: string | null;
   evidencias?: Evidencia[];
+  relatorioAssinado?: RelatorioAssinado | null;
+};
+
+// PDF final, já assinado no gov.br, guardado junto da etapa
+export type RelatorioAssinado = {
+  caminho: string; // no bucket "evidencias": <empresa>/<projeto>/<etapa>/assinado-<id>.pdf
+  nome: string; // nome original do arquivo
+  enviadoEm: string; // ISO data-hora
+  por: string;
 };
 
 export type Registro = {

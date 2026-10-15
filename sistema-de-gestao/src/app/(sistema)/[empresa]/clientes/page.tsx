@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { novoId, useEstado } from "@/lib/dados/store";
+import { novoId, useAcesso, useEstado } from "@/lib/dados/store";
 import type { Cliente, EmpresaSlug } from "@/lib/dados/tipos";
 import { camposCliente, gruposCliente } from "@/lib/campos-cliente";
 import { formatarCnpj, tempoDeAtividade, type DadosCnpj } from "@/lib/cnpj";
@@ -35,7 +35,8 @@ function Conteudo() {
   const { empresa: slug } = useParams<{ empresa: EmpresaSlug }>();
   const busca_ = useSearchParams();
   const router = useRouter();
-  const { estado, atualizar } = useEstado();
+  const { estado, atualizar, excluir } = useEstado();
+  const { gerencia } = useAcesso();
   const empresa = estado.empresas.find((e) => e.slug === slug)!;
   const clientes = estado.clientes.filter((c) => c.empresa === slug);
   const [editando, setEditando] = useState<string | null>(null); // id, "novo" ou null
@@ -107,6 +108,17 @@ function Conteudo() {
     });
     setEditando(null);
     if (voltarParaProjeto) router.push(`/${slug}/projetos/novo?cliente=${id}`);
+  };
+
+  const excluirCliente = async () => {
+    const c = clientes.find((x) => x.id === editando);
+    if (!c || !confirm(`Excluir ${c.nomeFantasia || c.razaoSocial} do cadastro? Não há como desfazer.`)) return;
+    try {
+      await excluir("cliente", c.id);
+      setEditando(null);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Não foi possível excluir.");
+    }
   };
 
   const termo = busca.trim().toLowerCase();
@@ -202,6 +214,17 @@ function Conteudo() {
                 Cancelar
               </Botao>
               {faltando.length > 0 && <span className="text-sm text-tinta-2">Preencha os campos com *.</span>}
+              {editando !== "novo" && gerencia(slug) && (
+                <span className="ml-auto">
+                  {estado.projetos.some((p) => p.clienteId === editando) ? (
+                    <span className="text-[13px] text-tinta-2">Para excluir este cliente, exclua antes o projeto dele.</span>
+                  ) : (
+                    <Botao type="button" variante="perigo" onClick={excluirCliente}>
+                      Excluir cliente
+                    </Botao>
+                  )}
+                </span>
+              )}
             </div>
           </form>
         </Cartao>

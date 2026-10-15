@@ -30,6 +30,13 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   relatório completo levam a "A enviar". A data do relatório já vem com o fim da etapa.
 - **Salvamento automático** com controle de versão: se duas pessoas editam o mesmo projeto ao mesmo
   tempo, quem salvar por último é avisado e recebe a versão mais recente.
+- **PDF assinado** de cada entrega guardado com a etapa (mesmo bucket, `assinado-<id>.pdf`); ao anexar,
+  as datas de assinatura em branco recebem a data do dia. Botão "Marcar como enviada no HUB".
+- **Exclusão** de projeto (leva junto imagens e PDF) e de cliente sem projeto, só para gestores (RLS).
+- **Verificação em duas etapas** opcional (aplicativo autenticador), em Minha conta. Com ela ativa, o
+  banco só entrega dados à sessão confirmada com o código (`privado.sessao_verificada`, aal2).
+- **Senhas vazadas recusadas** no cadastro e na troca de senha (consulta anônima ao Have I Been Pwned;
+  só os 5 primeiros caracteres do hash saem do navegador).
 
 ## Como o banco guarda os dados
 
@@ -79,6 +86,4 @@ npm run dev                 # http://localhost:3000
 ## Próximos passos
 
 1. Tela para o administrador liberar acessos (hoje é pelo SQL Editor).
-2. MFA no login.
-3. Upload do PDF assinado.
-4. Avisos de prazo por e-mail.
+2. Avisos de prazo por e-mail (precisa de um serviço de envio, como Resend, e da chave dele).
