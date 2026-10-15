@@ -53,14 +53,12 @@ fora da API.
 
 ### Liberar o acesso de alguém
 
-No SQL Editor do Supabase:
+Pelo próprio sistema, em **Acessos** (menu lateral, só administrador do grupo): e-mail, nome, nome
+completo, papel em cada empresa e, se for o caso, administrador do grupo. Se a pessoa ainda não tem
+conta, a tela gera a mensagem de convite para copiar e enviar; se já tem, o acesso vale na hora. Na mesma
+tela dá para alterar papéis e retirar acessos (`public.salvar_acesso` e `public.retirar_acesso`, que
+conferem se quem chama é administrador).
 
-```sql
-insert into public.convites (email, nome, nome_completo, admin_grupo, acessos) values
-  ('pessoa@exemplo.com', 'Nome', 'Nome Completo', false, '{"pivotto": "gestor"}');
-```
-
-Depois a pessoa abre o sistema, clica em **Primeiro acesso? Criar conta** e usa esse e-mail.
 Papéis: `gestor`, `consultor`, `equipe`. Empresas: `pivotto`, `orb`, `ejup`.
 
 ## Rodar localmente
@@ -85,5 +83,4 @@ npm run dev                 # http://localhost:3000
 
 ## Próximos passos
 
-1. Tela para o administrador liberar acessos (hoje é pelo SQL Editor).
-2. Avisos de prazo por e-mail (precisa de um serviço de envio, como Resend, e da chave dele).
+1. Avisos de prazo por e-mail (precisa de um serviço de envio, como Resend, e da chave dele).

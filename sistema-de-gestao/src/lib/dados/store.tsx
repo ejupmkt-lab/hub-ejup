@@ -18,6 +18,7 @@ type Ctx = {
   salvamento: Salvamento;
   sair: () => Promise<void>;
   excluir: (tipo: "projeto" | "cliente", id: string) => Promise<void>;
+  recarregar: () => Promise<void>;
 };
 
 const Contexto = createContext<Ctx | null>(null);
@@ -51,7 +52,9 @@ async function carregarDoBanco(): Promise<Carga> {
   const erro = [perfis, membros, empresas, clientes, projetos].find((r) => r.error)?.error;
   if (erro) return { tipo: "erro", mensagem: erro.message };
 
-  if (!perfis.data!.some((p) => p.id === user.id)) return { tipo: "sem_acesso", email: user.email ?? "" };
+  // Sem perfil, ou com o acesso retirado (perfil sem empresa nenhuma)
+  const eu = perfis.data!.find((p) => p.id === user.id);
+  if (!eu || (!eu.admin_grupo && !membros.data!.some((m) => m.user_id === user.id))) return { tipo: "sem_acesso", email: user.email ?? "" };
 
   const usuarios: Usuario[] = perfis.data!.map((p) => ({
     id: p.id,
@@ -246,8 +249,8 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
   }, []);
 
   const valor = useMemo(
-    () => (carga.tipo === "pronto" ? { estado: carga.estado, atualizar, salvamento, sair, excluir } : null),
-    [carga, atualizar, salvamento, sair, excluir],
+    () => (carga.tipo === "pronto" ? { estado: carga.estado, atualizar, salvamento, sair, excluir, recarregar } : null),
+    [carga, atualizar, salvamento, sair, excluir, recarregar],
   );
 
   if (carga.tipo === "carregando") return <div className="flex min-h-screen items-center justify-center font-serif text-xl text-tinta-2">Pivotto</div>;

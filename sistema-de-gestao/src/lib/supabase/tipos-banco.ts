@@ -149,11 +149,11 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "acessa_empresa":
-{ Args: { "e": string }; Returns: boolean
+            "retirar_acesso":
+{ Args: { "p_email": string }; Returns: undefined
                            },
-"eh_admin_grupo":
-{ Args: Record<PropertyKey, never>; Returns: boolean
+"salvar_acesso":
+{ Args: { "p_acessos": Json,"p_admin": boolean,"p_email": string,"p_nome": string,"p_nome_completo": string }; Returns: undefined
                            },
 "salvar_projeto":
 { Args: { "p_dados": Json,"p_id": string,"p_versao": number }; Returns: number

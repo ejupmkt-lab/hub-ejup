@@ -40,6 +40,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
       <nav className="flex-1 space-y-0.5 px-3" aria-label="Principal">
         {usuario.adminGrupo && item("/", caminho === "/", "Painel")}
+        {usuario.adminGrupo && item("/acessos", caminho === "/acessos", "Acessos")}
         <p className="px-3 pb-1.5 pt-6 text-[13px] text-tinta-2/80">Empresas</p>
         {empresasVisiveis.map((e) => {
           const n = ativos.filter((p) => p.empresa === e.slug).length;
