@@ -1,13 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { novoId, useAcesso, useEstado } from "@/lib/dados/store";
 import type { Cliente, EmpresaSlug } from "@/lib/dados/tipos";
 import { camposCliente, gruposCliente } from "@/lib/campos-cliente";
 import { formatarCnpj, tempoDeAtividade, type DadosCnpj } from "@/lib/cnpj";
-import { Botao, Cabecalho, Campo, Cartao, Vazio } from "@/components/ui";
+import { Botao, BotaoLink, Cabecalho, Campo, Cartao, Vazio } from "@/components/ui";
 
 const vazio = Object.fromEntries(camposCliente.map((c) => [c.chave, ""])) as Record<string, string>;
 
@@ -230,7 +229,7 @@ function Conteudo() {
         </Cartao>
       )}
 
-      {clientes.length === 0 ? (
+      {editando ? null : clientes.length === 0 ? (
         !editando && (
           <Vazio titulo="Nenhum cliente cadastrado" acao={<Botao onClick={() => abrir()}>Cadastrar o primeiro cliente</Botao>}>
             Cadastre a empresa demandante antes de criar o projeto. Basta o CNPJ para começar.
@@ -248,24 +247,28 @@ function Conteudo() {
               aria-label="Buscar clientes"
             />
           </div>
-          <ul className="divide-y divide-linha border-y border-linha">
+          <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha">
             {lista.map((c) => {
               const projetos = estado.projetos.filter((p) => p.clienteId === c.id);
               return (
-                <li key={c.id} className="flex flex-wrap items-center justify-between gap-x-8 gap-y-2 py-4">
+                <li key={c.id} className="flex flex-wrap items-center justify-between gap-x-8 gap-y-2 px-6 py-4">
                   <div className="min-w-0">
                     <p className="font-serif text-[18px] text-tinta">{c.razaoSocial}</p>
                     <p className="num mt-0.5 text-sm text-tinta-2">{[c.nomeFantasia, c.cnpj, c.responsavel].filter(Boolean).join(", ")}</p>
                   </div>
                   <div className="flex items-center gap-5 text-sm">
                     {projetos.length === 1 ? (
-                      <Link href={`/${slug}/projetos/${projetos[0].id}`} className="text-tinta-2 hover:text-garrafa">
-                        Ver projeto
-                      </Link>
+                      <BotaoLink href={`/${slug}/projetos/${projetos[0].id}`} variante="secundario" tamanho="pequeno">
+                        Abrir projeto
+                      </BotaoLink>
+                    ) : projetos.length === 0 ? (
+                      <BotaoLink href={`/${slug}/projetos/novo?cliente=${c.id}`} variante="secundario" tamanho="pequeno">
+                        Criar projeto
+                      </BotaoLink>
                     ) : (
-                      <span className="num text-tinta-2">{projetos.length === 0 ? "Sem projeto" : `${projetos.length} projetos`}</span>
+                      <span className="num text-tinta-2">{`${projetos.length} projetos`}</span>
                     )}
-                    <Botao variante="fantasma" onClick={() => abrir(c)}>
+                    <Botao variante="fantasma" tamanho="pequeno" onClick={() => abrir(c)}>
                       Editar
                     </Botao>
                   </div>

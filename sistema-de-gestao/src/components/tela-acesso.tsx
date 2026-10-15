@@ -10,7 +10,7 @@ const etapas = [
 export function TelaAcesso({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
     <div className="grid min-h-screen bg-pedra lg:grid-cols-[1.1fr_1fr]">
-      <div className="flex flex-col justify-between bg-garrafa px-8 py-10 text-folha sm:px-14 lg:py-14">
+      <div className="flex flex-col justify-between bg-capa px-8 py-10 text-folha sm:px-14 lg:py-14">
         <div>
           <p className="font-serif text-[2rem] leading-none">Pivotto</p>
           <p className="mt-2 text-[15px] text-folha/70">Sistema de gestão das empresas do ecossistema</p>

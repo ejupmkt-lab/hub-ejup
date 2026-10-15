@@ -71,7 +71,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
   };
 
   return (
-    <section className="max-w-4xl">
+    <section className="rounded-[var(--radius-bloco)] border border-linha bg-folha p-6 sm:p-8">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-serif text-2xl">Plano de trabalho</h2>
@@ -83,7 +83,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
       </div>
 
       {editando && !fechado && (
-        <div className="mb-6 flex flex-wrap items-end gap-4 rounded-[var(--radius-bloco)] bg-folha p-5">
+        <div className="mb-6 flex flex-wrap items-end gap-4 rounded-[var(--radius-bloco)] bg-pedra/60 p-5">
           <Campo rotulo="Início da Etapa 01">
             <input type="date" className="campo" value={inicio} onChange={(e) => setInicio(e.target.value)} />
           </Campo>

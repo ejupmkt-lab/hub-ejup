@@ -205,7 +205,7 @@ export default function Acessos() {
 
             <fieldset>
               <legend className="mb-3 font-serif text-lg">Empresas</legend>
-              <ul className="divide-y divide-linha border-y border-linha">
+              <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha">
                 {estado.empresas.map((emp) => (
                   <li key={emp.slug} className="flex flex-wrap items-center justify-between gap-4 py-3">
                     <span>
@@ -275,9 +275,9 @@ export default function Acessos() {
       {pessoas === null ? (
         <p className="text-[15px] text-tinta-2">Carregando…</p>
       ) : (
-        <ul className="divide-y divide-linha border-y border-linha">
+        <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha">
           {pessoas.map((p) => (
-            <li key={p.email} className="flex flex-wrap items-center justify-between gap-x-8 gap-y-2 py-4">
+            <li key={p.email} className="flex flex-wrap items-center justify-between gap-x-8 gap-y-2 px-6 py-4">
               <div className="min-w-0">
                 <p className="font-serif text-[18px] text-tinta">
                   {p.nomeCompleto}
@@ -300,7 +300,7 @@ export default function Acessos() {
                     {copiado === p.email ? "Copiada" : "Copiar convite"}
                   </button>
                 )}
-                <Botao variante="fantasma" onClick={() => abrir(p)}>
+                <Botao variante="fantasma" tamanho="pequeno" onClick={() => abrir(p)}>
                   {p.situacao === "sem_acesso" ? "Liberar de novo" : "Editar"}
                 </Botao>
               </div>

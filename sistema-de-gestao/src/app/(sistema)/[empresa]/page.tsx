@@ -1,13 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useEstado } from "@/lib/dados/store";
-import { etapaAtual, etapaConcluida, situacaoPrazo } from "@/lib/projeto";
-import { doisDigitos } from "@/lib/rotulos";
-import { BotaoLink, Cabecalho, Selo, Status, StatusEtapa, Vazio } from "@/components/ui";
-import { Trilho } from "@/components/trilho";
+import { BotaoLink, Cabecalho, Cartao, Vazio } from "@/components/ui";
+import { LinhaProjeto } from "@/components/linha-projeto";
 
 const filtros = {
   andamento: "Em andamento",
@@ -44,7 +41,7 @@ export default function ModuloEmpresa() {
 
   return (
     <>
-      <Cabecalho titulo={empresa.nome} subtitulo="Adequação à LGPD pelo HUB SEBRAE">
+      <Cabecalho titulo={empresa.nome} subtitulo="Adequação à LGPD pelo HUB SEBRAE, ficha técnica 13070-5">
         <BotaoLink href={`/${slug}/clientes`} variante="secundario">
           Clientes
         </BotaoLink>
@@ -61,15 +58,15 @@ export default function ModuloEmpresa() {
       ) : (
         <>
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <div role="radiogroup" aria-label="Filtrar projetos" className="flex flex-wrap gap-1">
+            <div role="radiogroup" aria-label="Filtrar projetos" className="flex max-w-full gap-0.5 overflow-x-auto rounded-[var(--radius-bloco)] border border-linha bg-folha p-1">
               {(Object.keys(filtros) as Filtro[]).map((f) => (
                 <button
                   key={f}
                   role="radio"
                   aria-checked={filtro === f}
                   onClick={() => setFiltro(f)}
-                  className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
-                    filtro === f ? "bg-garrafa text-folha" : "text-tinta-2 hover:bg-folha hover:text-tinta"
+                  className={`whitespace-nowrap rounded-[var(--radius-campo)] px-3.5 py-1.5 text-sm transition-colors ${
+                    filtro === f ? "bg-garrafa font-medium text-folha" : "text-tinta-2 hover:bg-pedra hover:text-tinta"
                   }`}
                 >
                   {filtros[f]} <span className="num opacity-70">{contagem(f)}</span>
@@ -87,48 +84,17 @@ export default function ModuloEmpresa() {
           </div>
 
           {projetos.length === 0 ? (
-            <p className="py-10 text-center text-[15px] text-tinta-2">Nenhum projeto neste filtro.</p>
+            <p className="rounded-[var(--radius-bloco)] border border-dashed border-linha-forte py-10 text-center text-[15px] text-tinta-2">
+              Nenhum projeto neste filtro.
+            </p>
           ) : (
-            <ul className="divide-y divide-linha border-y border-linha">
-              {projetos.map((p) => {
-                const c = cliente(p.clienteId);
-                const consultor = estado.usuarios.find((u) => u.id === p.consultorId);
-                const et = etapaAtual(p);
-                const sit = et && p.status === "em_andamento" ? situacaoPrazo(et) : null;
-                const feitas = p.etapas.filter(etapaConcluida).length;
-                return (
-                  <li key={p.id}>
-                    <div className="py-6">
-                      <div className="mb-4 flex flex-wrap items-start justify-between gap-x-8 gap-y-2">
-                        <div className="min-w-0">
-                          <Link href={`/${slug}/projetos/${p.id}`} className="font-serif text-[21px] leading-snug text-tinta hover:text-garrafa">
-                            {c?.razaoSocial}
-                          </Link>
-                          <p className="num mt-1 text-sm text-tinta-2">
-                            Projeto HUB {p.numeroProjetoHub || "sem número"}, consultor {consultor?.nome ?? "a definir"}, {feitas} de {p.etapas.length} etapas
-                            concluídas
-                          </p>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-3">
-                          {p.status === "aguardando_plano" ? (
-                            <Selo tom="atencao">Definir plano de trabalho</Selo>
-                          ) : et ? (
-                            <>
-                              <span className="text-sm text-tinta-2">Etapa {doisDigitos(et.ordem)}</span>
-                              <StatusEtapa status={et.status} />
-                              {sit && sit.tom !== "neutro" && <Selo tom={sit.tom}>{sit.texto}</Selo>}
-                            </>
-                          ) : (
-                            <Status tom="ok">Etapas concluídas</Status>
-                          )}
-                        </div>
-                      </div>
-                      <Trilho projeto={p} />
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+            <Cartao>
+              <ul className="divide-y divide-linha">
+                {projetos.map((p) => (
+                  <LinhaProjeto key={p.id} projeto={p} />
+                ))}
+              </ul>
+            </Cartao>
           )}
         </>
       )}

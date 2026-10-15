@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { useProjeto } from "@/components/projeto/use-projeto";
 import { EtapasHub } from "@/components/projeto/etapas-hub";
@@ -11,7 +10,8 @@ import { DadosProjeto } from "@/components/projeto/dados";
 import { useEstado } from "@/lib/dados/store";
 import { statusProjeto } from "@/lib/rotulos";
 import { etapaConcluida } from "@/lib/projeto";
-import { Abas, Botao, Cabecalho, Status } from "@/components/ui";
+import { passoDoProjeto } from "@/lib/proximo-passo";
+import { Abas, Botao, BotaoLink, Cabecalho, Cartao, ProximoPasso, Status } from "@/components/ui";
 import { Trilho } from "@/components/trilho";
 
 const abas = ["Etapas", "Plano de trabalho", "Registros do programa", "Referências", "Ficha de identificação", "Histórico"] as const;
@@ -20,12 +20,18 @@ type Aba = (typeof abas)[number];
 export default function PaginaProjeto() {
   const { projeto, cliente, consultor, alterar } = useProjeto();
   const { estado } = useEstado();
-  const [aba, setAba] = useState<Aba>(projeto?.status === "aguardando_plano" ? "Plano de trabalho" : "Etapas");
+  // #plano no endereço (vindo do "próximo passo") abre direto o plano de trabalho
+  const [aba, setAba] = useState<Aba>(() =>
+    projeto?.status === "aguardando_plano" || (typeof window !== "undefined" && window.location.hash === "#plano") ? "Plano de trabalho" : "Etapas",
+  );
   if (!projeto || !cliente) return <p className="text-tinta-2">Projeto não encontrado.</p>;
 
   const empresa = estado.empresas.find((e) => e.slug === projeto.empresa)!;
   const horas = projeto.etapas.reduce((a, e) => a + e.horasPrevistas, 0);
   const tomStatus = projeto.status === "aguardando_plano" ? "atencao" : projeto.status === "encerrado" ? "ok" : "andamento";
+
+  const passo = passoDoProjeto(projeto);
+  const encerravel = projeto.status === "em_andamento" && projeto.etapas.every(etapaConcluida);
 
   return (
     <>
@@ -38,14 +44,13 @@ export default function PaginaProjeto() {
             {consultor?.nome ?? "a definir"}
           </span>
         }
+        abas={<Abas abas={abas} atual={aba} aoTrocar={setAba} naFaixa />}
       >
         <Status tom={tomStatus}>{statusProjeto[projeto.status]}</Status>
-        <Link href={`/${projeto.empresa}/clientes?editar=${cliente.id}`} className="text-sm text-tinta-2 underline-offset-4 hover:text-garrafa hover:underline">
+        <BotaoLink href={`/${projeto.empresa}/clientes?editar=${cliente.id}`} variante="secundario">
           Dados do cliente
-        </Link>
-        {projeto.status === "em_andamento" && projeto.etapas.every(etapaConcluida) && (
-          <Botao onClick={() => alterar((p) => void (p.status = "encerrado"), { acao: "Projeto encerrado" })}>Encerrar projeto</Botao>
-        )}
+        </BotaoLink>
+        {encerravel && <Botao onClick={() => alterar((p) => void (p.status = "encerrado"), { acao: "Projeto encerrado" })}>Encerrar projeto</Botao>}
         {projeto.status === "encerrado" && (
           <Botao variante="secundario" onClick={() => alterar((p) => void (p.status = "em_andamento"), { acao: "Projeto reaberto" })}>
             Reabrir projeto
@@ -53,21 +58,19 @@ export default function PaginaProjeto() {
         )}
       </Cabecalho>
 
-      {projeto.status === "em_andamento" && projeto.etapas.every(etapaConcluida) && (
-        <p className="-mt-4 mb-8 text-[15px] text-musgo">Todas as etapas foram enviadas ao HUB. Encerre o projeto quando o SEBRAE aprovar a última entrega.</p>
+      {passo && !(aba === "Plano de trabalho" && !projeto.planoFechadoEm) && (
+        <ProximoPasso
+          passo={passo}
+          className="mb-6"
+          aoAgir={passo.href.endsWith("#plano") ? () => setAba("Plano de trabalho") : encerravel ? () => alterar((p) => void (p.status = "encerrado"), { acao: "Projeto encerrado" }) : undefined}
+        />
       )}
 
-      <div className="mb-10">
-        <Trilho projeto={projeto} grande />
-        {projeto.status === "aguardando_plano" && aba !== "Plano de trabalho" && (
-          <div className="mt-5 flex flex-wrap items-center gap-4">
-            <Botao onClick={() => setAba("Plano de trabalho")}>Definir o plano de trabalho</Botao>
-            <span className="text-sm text-tinta-2">Enquanto isso, as etapas não têm datas nem avisos de prazo.</span>
-          </div>
-        )}
-      </div>
-
-      <Abas abas={abas} atual={aba} aoTrocar={setAba} />
+      {aba === "Etapas" && (
+        <Cartao className="mb-6 px-6 pb-5 pt-2">
+          <Trilho projeto={projeto} grande />
+        </Cartao>
+      )}
 
       {aba === "Etapas" && <EtapasHub projeto={projeto} />}
       {aba === "Plano de trabalho" && <PlanoTrabalho projeto={projeto} />}
@@ -75,6 +78,7 @@ export default function PaginaProjeto() {
       {aba === "Referências" && <Referencias projeto={projeto} />}
       {aba === "Ficha de identificação" && <DadosProjeto projeto={projeto} />}
       {aba === "Histórico" && (
+        <Cartao className="px-6 py-1">
         <ol className="max-w-3xl">
           {projeto.historico.map((h, i) => (
             <li key={i} className="grid grid-cols-[7.5rem_1fr] gap-x-6 border-b border-linha py-3.5 text-[15px] last:border-0">
@@ -90,6 +94,7 @@ export default function PaginaProjeto() {
             </li>
           ))}
         </ol>
+        </Cartao>
       )}
     </>
   );

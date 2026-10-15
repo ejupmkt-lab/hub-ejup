@@ -1,13 +1,16 @@
 @import "tailwindcss";
 
-/* Papel de arquivo e verde-garrafa. Latão só para prazo; vinho só para atraso e erro. */
+/* Verde-garrafa sobre papel. O menu é a capa escura do processo; o trabalho
+   acontece em folhas brancas. Latão só para prazo; vinho só para atraso e erro. */
 @theme {
-  --color-pedra: #e8eae6;
-  --color-folha: #f8f9f7;
-  --color-linha: #d3d8d2;
-  --color-linha-forte: #b9c0b9;
-  --color-tinta: #1d2420;
-  --color-tinta-2: #66716b;
+  --color-pedra: #eceee9;
+  --color-folha: #ffffff;
+  --color-linha: #dde2dc;
+  --color-linha-forte: #bec6be;
+  --color-tinta: #17201b;
+  --color-tinta-2: #59655f;
+  --color-capa: #183029;
+  --color-capa-2: #224039;
   --color-garrafa: #1f3d35;
   --color-garrafa-escuro: #162d27;
   --color-garrafa-claro: #e1e9e5;
@@ -22,7 +25,7 @@
   --font-serif: var(--font-newsreader), Georgia, serif;
 
   --radius-campo: 5px;
-  --radius-bloco: 10px;
+  --radius-bloco: 8px;
 }
 
 body {
@@ -42,7 +45,7 @@ body {
 }
 
 .campo {
-  @apply w-full rounded-[var(--radius-campo)] border border-linha bg-white/70 px-3 py-2 text-[15px] text-tinta outline-none transition-colors placeholder:text-tinta-2/70 hover:border-linha-forte focus:border-garrafa focus:bg-white;
+  @apply w-full rounded-[var(--radius-campo)] border border-linha-forte/70 bg-white px-3 py-2 text-[15px] text-tinta outline-none transition-colors placeholder:text-tinta-2/70 hover:border-linha-forte focus:border-garrafa focus:bg-white;
 }
 textarea.campo {
   @apply leading-relaxed;

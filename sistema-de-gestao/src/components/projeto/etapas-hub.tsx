@@ -6,7 +6,7 @@ import type { Projeto } from "@/lib/dados/tipos";
 import { periodoCurto } from "@/lib/datas";
 import { doisDigitos } from "@/lib/rotulos";
 import { etapaAtual, progressoAtividades, situacaoPrazo } from "@/lib/projeto";
-import { Barra, Selo, StatusEtapa } from "@/components/ui";
+import { Barra, Botao, BotaoLink, Cartao, Selo, StatusEtapa } from "@/components/ui";
 
 // As etapas na ordem da ficha, como no HUB SEBRAE: título, descrição,
 // período, horas, checklist e status; o "i" abre atividades e entregas.
@@ -15,7 +15,8 @@ export function EtapasHub({ projeto }: { projeto: Projeto }) {
   const atual = etapaAtual(projeto);
 
   return (
-    <ol className="divide-y divide-linha border-y border-linha">
+    <Cartao>
+    <ol className="divide-y divide-linha">
       {projeto.etapas.map((e) => {
         const prog = progressoAtividades(e);
         const sit = projeto.status === "em_andamento" ? situacaoPrazo(e) : null;
@@ -23,7 +24,7 @@ export function EtapasHub({ projeto }: { projeto: Projeto }) {
         const eAtual = atual?.ordem === e.ordem;
         const nome = e.nome.charAt(0) + e.nome.slice(1).toLowerCase();
         return (
-          <li key={e.ordem} className="grid grid-cols-[3rem_1fr] gap-x-4 py-6 sm:grid-cols-[4rem_1fr]">
+          <li key={e.ordem} className={`grid grid-cols-[3rem_1fr] gap-x-4 px-6 py-6 sm:grid-cols-[4rem_1fr] ${eAtual ? "bg-garrafa-claro/35" : ""}`}>
             <span className={`num font-serif text-3xl leading-none ${eAtual ? "text-garrafa" : "text-linha-forte"}`}>{doisDigitos(e.ordem)}</span>
             <div className="min-w-0">
               <div className="flex flex-wrap items-start justify-between gap-x-8 gap-y-3">
@@ -48,13 +49,13 @@ export function EtapasHub({ projeto }: { projeto: Projeto }) {
                     {prog.feitas}/{prog.total}
                   </span>
                 </span>
-                <span className="ml-auto flex gap-4">
-                  <button onClick={() => setAberta(aberta === e.ordem ? null : e.ordem)} aria-expanded={aberta === e.ordem} className="hover:text-garrafa">
-                    {aberta === e.ordem ? "Fechar detalhes" : "Ver atividades e entregas"}
-                  </button>
-                  <Link href={href} className="font-medium text-garrafa hover:underline">
+                <span className="ml-auto flex items-center gap-2">
+                  <Botao variante="fantasma" tamanho="pequeno" onClick={() => setAberta(aberta === e.ordem ? null : e.ordem)} aria-expanded={aberta === e.ordem}>
+                    {aberta === e.ordem ? "Fechar detalhes" : "Atividades e entregas"}
+                  </Botao>
+                  <BotaoLink href={href} variante={eAtual ? "primario" : "secundario"} tamanho="pequeno">
                     Abrir etapa
-                  </Link>
+                  </BotaoLink>
                 </span>
               </div>
 
@@ -85,5 +86,6 @@ export function EtapasHub({ projeto }: { projeto: Projeto }) {
         );
       })}
     </ol>
+    </Cartao>
   );
 }
