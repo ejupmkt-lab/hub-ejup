@@ -116,6 +116,20 @@ export type Evento = {
   detalhe?: string;
 };
 
+// Visita, reunião ou trabalho interno registrado no projeto: conta horas e
+// as anotações alimentam a redação do relatório da etapa
+export type TipoAtividade = "visita" | "reuniao_remota" | "trabalho_interno";
+export type RegistroAtividade = {
+  id: string;
+  data: string; // AAAA-MM-DD
+  etapa: number;
+  tipo: TipoAtividade;
+  horas: number;
+  participantes: string;
+  anotacoes: string;
+  registradoPor: string;
+};
+
 export type Projeto = {
   id: string;
   empresa: EmpresaSlug;
@@ -139,6 +153,7 @@ export type Projeto = {
   registros: Registro[];
   referencias: Referencia[];
   historico: Evento[];
+  atividadesRegistradas?: RegistroAtividade[];
 };
 
 export type Estado = {

@@ -16,6 +16,25 @@ async function dimensoes(arquivo: File) {
   return d;
 }
 
+// Envia uma imagem para o armazenamento e devolve a evidência pronta para a etapa
+export async function subirEvidencia(projeto: Projeto, ordem: number, arquivo: File, legenda?: string): Promise<Evidencia> {
+  if (!ACEITOS.includes(arquivo.type)) throw new Error(`“${arquivo.name}” não é PNG, JPG ou WEBP.`);
+  if (arquivo.size > 10 * 1024 * 1024) throw new Error(`“${arquivo.name}” passa de 10 MB.`);
+  const { largura, altura } = await dimensoes(arquivo);
+  const ext = arquivo.type === "image/png" ? "png" : arquivo.type === "image/webp" ? "webp" : "jpg";
+  const caminho = `${projeto.empresa}/${projeto.id}/${ordem}/${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabaseNavegador().storage.from(BUCKET).upload(caminho, arquivo, { contentType: arquivo.type });
+  if (error) throw new Error(`Falha ao enviar “${arquivo.name}”. ${traduzirErro(error, "Tente de novo.")}`);
+  return {
+    id: crypto.randomUUID(),
+    caminho,
+    legenda: legenda ?? arquivo.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " "),
+    largura,
+    altura,
+    tipo: arquivo.type,
+  };
+}
+
 // Baixa as imagens da etapa para montar o relatório
 export async function baixarImagens(evidencias: Evidencia[]) {
   const sb = supabaseNavegador();
@@ -65,30 +84,13 @@ export function Evidencias({
   const enviar = async (arquivos: FileList | null) => {
     if (!arquivos?.length) return;
     setErro(null);
-    const sb = supabaseNavegador();
     for (const arquivo of Array.from(arquivos)) {
-      if (!ACEITOS.includes(arquivo.type)) {
-        setErro(`“${arquivo.name}” não é PNG, JPG ou WEBP.`);
-        continue;
-      }
-      if (arquivo.size > 10 * 1024 * 1024) {
-        setErro(`“${arquivo.name}” passa de 10 MB.`);
-        continue;
-      }
       setEnviando((n) => n + 1);
       try {
-        const { largura, altura } = await dimensoes(arquivo);
-        const ext = arquivo.type === "image/png" ? "png" : arquivo.type === "image/webp" ? "webp" : "jpg";
-        const caminho = `${projeto.empresa}/${projeto.id}/${etapa.ordem}/${crypto.randomUUID()}.${ext}`;
-        const { error } = await sb.storage.from(BUCKET).upload(caminho, arquivo, { contentType: arquivo.type });
-        if (error) throw error;
-        const legenda = arquivo.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ");
-        alterarEtapa(
-          (e) => void (e.evidencias ??= []).push({ id: crypto.randomUUID(), caminho, legenda, largura, altura, tipo: arquivo.type }),
-          { acao: `Etapa ${String(etapa.ordem).padStart(2, "0")}: evidência adicionada` },
-        );
+        const ev = await subirEvidencia(projeto, etapa.ordem, arquivo);
+        alterarEtapa((e) => void (e.evidencias ??= []).push(ev), { acao: `Etapa ${String(etapa.ordem).padStart(2, "0")}: evidência adicionada` });
       } catch (e) {
-        setErro(`Falha ao enviar “${arquivo.name}”. ${traduzirErro(e, "Tente de novo.")}`);
+        setErro(e instanceof Error ? e.message : `Falha ao enviar “${arquivo.name}”.`);
       } finally {
         setEnviando((n) => n - 1);
       }

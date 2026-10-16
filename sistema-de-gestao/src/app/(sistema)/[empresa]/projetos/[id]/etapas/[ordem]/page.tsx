@@ -7,6 +7,8 @@ import { useProjeto } from "@/components/projeto/use-projeto";
 import { AjudaFormatacao } from "@/components/projeto/ajuda-formatacao";
 import { Evidencias, baixarImagens } from "@/components/projeto/evidencias";
 import { RelatorioAssinado, abrirAssinado } from "@/components/projeto/assinado";
+import { Visitas } from "@/components/projeto/visitas";
+import { horasFmt, registrosDaEtapa } from "@/lib/horas";
 import { secoesAntes, secoesDepois, todasSecoes, verificarCompletude, type DefSecao } from "@/lib/relatorio/secoes";
 import { MARCA_COMPLETAR, preencherVazios, textoPadraoSecao } from "@/lib/relatorio/padroes";
 import { gerarDocx } from "@/lib/relatorio/docx";
@@ -20,7 +22,7 @@ import { abaDaPendencia, ancoraAba, ancoraProjetoDaPendencia, passoDaEtapa } fro
 import { automatizarEtapa, bloqueioStatus, fluxoEtapa } from "@/lib/regras-etapa";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 
-const abas = ["Checklist", "Redação do relatório", "Entregáveis", "Fechamento"] as const;
+const abas = ["Checklist", "Visitas e horas", "Redação do relatório", "Entregáveis", "Fechamento"] as const;
 type Aba = (typeof abas)[number];
 
 // Caminho normal de uma etapa; "devolvida" fica fora da sequência
@@ -31,7 +33,8 @@ const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 export default function PaginaEtapa() {
   const { ordem } = useParams<{ ordem: string }>();
   const { projeto, cliente, consultor, alterar } = useProjeto();
-  const { estado } = useEstado();
+  const { estado, salvarAgora } = useEstado();
+  const [redigindo, setRedigindo] = useState<string | null>(null); // "todas" ou a chave da seção
   const [aba, setAba] = useState<Aba>("Checklist");
   const [gerando, setGerando] = useState(false);
   const passosRef = useRef<HTMLOListElement>(null);
@@ -66,6 +69,7 @@ export default function PaginaEtapa() {
   const sit = projeto.planoFechadoEm && projeto.status !== "encerrado" ? situacaoPrazo(etapa) : null;
   const encerrado = projeto.status === "encerrado";
   const prog = progressoAtividades(etapa);
+  const horasEtapa = registrosDaEtapa(projeto, etapa.ordem).reduce((a, r) => a + r.horas, 0);
   const anterior = projeto.etapas.find((e) => e.ordem === etapa.ordem - 1);
   const proxima = projeto.etapas.find((e) => e.ordem === etapa.ordem + 1);
   const base = `/${projeto.empresa}/projetos/${projeto.id}`;
@@ -111,6 +115,38 @@ export default function PaginaEtapa() {
     );
     if (pdfAntigo) void supabaseNavegador().storage.from("evidencias").remove([pdfAntigo]);
   };
+
+  // Redação com IA: grava o que estiver pendente (o servidor lê do banco),
+  // pede as seções e aplica o texto devolvido
+  const redigir = async (chaves: string[], qual: string) => {
+    setRedigindo(qual);
+    try {
+      await salvarAgora();
+      const r = await fetch("/api/redigir", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projetoId: projeto.id, etapa: etapa.ordem, secoes: chaves }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.erro ?? "Não foi possível redigir agora.");
+      const novas = d.secoes as { chave: string; texto: string }[];
+      mudarEtapa(
+        (x) => {
+          for (const n of novas) x.secoes[n.chave] = n.texto;
+        },
+        { acao: `Etapa ${doisDigitos(etapa.ordem)}: ${novas.length === 1 ? "seção redigida" : `${novas.length} seções redigidas`} com IA` },
+      );
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Não foi possível redigir agora.");
+    } finally {
+      setRedigindo(null);
+    }
+  };
+  const anotacoesDaEtapa = registrosDaEtapa(projeto, etapa.ordem).filter((r) => r.anotacoes.trim()).length;
+  const paraRedigir = todasSecoes
+    .filter((d) => d.obrigatoria(etapa) || (etapa.secoes[d.chave] ?? "").trim())
+    .filter((d) => !(etapa.secoes[d.chave] ?? "").trim() || MARCA_COMPLETAR.test(etapa.secoes[d.chave]))
+    .map((d) => d.chave);
 
   const irPara = (a: Aba) => {
     setAba(a);
@@ -314,10 +350,30 @@ export default function PaginaEtapa() {
 
           {aba === "Redação do relatório" && (
             <div className="space-y-3">
+              <RedigirComIA
+                anotacoes={anotacoesDaEtapa}
+                secoes={paraRedigir.length}
+                redigindo={redigindo === "todas"}
+                ocupado={!!redigindo}
+                aoRedigir={() => redigir(paraRedigir, "todas")}
+                aoRegistrar={() => irPara("Visitas e horas")}
+              />
               {vazias > 0 && <PreencherPadroes vazias={vazias} aoUsar={usarPadroes} />}
               <AjudaFormatacao />
               {secoesAntes.map((s) => (
-                <EditorSecao key={s.chave} def={s} etapa={etapa} padrao={() => textoPadraoSecao(s.chave, projeto, etapa, cliente)} onChange={(v) => mudarEtapa((x) => void (x.secoes[s.chave] = v))} />
+                <EditorSecao
+                  key={s.chave}
+                  def={s}
+                  etapa={etapa}
+                  padrao={() => textoPadraoSecao(s.chave, projeto, etapa, cliente)}
+                  onChange={(v) => mudarEtapa((x) => void (x.secoes[s.chave] = v))}
+                  redigindo={redigindo === s.chave}
+                  ocupado={!!redigindo}
+                  aoRedigir={() => {
+                    if ((etapa.secoes[s.chave] ?? "").trim() && !MARCA_COMPLETAR.test(etapa.secoes[s.chave]) && !confirm("Substituir o texto atual desta seção pelo redigido com IA?")) return;
+                    void redigir([s.chave], s.chave);
+                  }}
+                />
               ))}
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-bloco)] border border-dashed border-linha-forte px-5 py-3 text-[15px] text-tinta-2">
                 <span>Neste ponto do relatório entram os entregáveis da ficha, cada um com a sua faixa.</span>
@@ -326,13 +382,27 @@ export default function PaginaEtapa() {
                 </Botao>
               </div>
               {secoesDepois.map((s) => (
-                <EditorSecao key={s.chave} def={s} etapa={etapa} padrao={() => textoPadraoSecao(s.chave, projeto, etapa, cliente)} onChange={(v) => mudarEtapa((x) => void (x.secoes[s.chave] = v))} />
+                <EditorSecao
+                  key={s.chave}
+                  def={s}
+                  etapa={etapa}
+                  padrao={() => textoPadraoSecao(s.chave, projeto, etapa, cliente)}
+                  onChange={(v) => mudarEtapa((x) => void (x.secoes[s.chave] = v))}
+                  redigindo={redigindo === s.chave}
+                  ocupado={!!redigindo}
+                  aoRedigir={() => {
+                    if ((etapa.secoes[s.chave] ?? "").trim() && !MARCA_COMPLETAR.test(etapa.secoes[s.chave]) && !confirm("Substituir o texto atual desta seção pelo redigido com IA?")) return;
+                    void redigir([s.chave], s.chave);
+                  }}
+                />
               ))}
               <div className="rounded-[var(--radius-bloco)] border border-linha bg-folha p-5">
                 <Evidencias projeto={projeto} etapa={etapa} alterarEtapa={mudarEtapa} />
               </div>
             </div>
           )}
+
+          {aba === "Visitas e horas" && <Visitas projeto={projeto} etapa={etapa.ordem} />}
 
           {aba === "Entregáveis" && (
             <div className="space-y-3">
@@ -454,6 +524,18 @@ export default function PaginaEtapa() {
               )}
             </div>
             <div>
+              <p className="text-[13px] text-tinta-2">Horas registradas</p>
+              <div className="mt-2 flex items-center gap-3">
+                <Barra valor={horasEtapa} total={etapa.horasPrevistas} tom={horasEtapa > etapa.horasPrevistas ? "atencao" : "andamento"} />
+                <span className="num shrink-0 text-sm">
+                  {horasFmt(horasEtapa)} / {etapa.horasPrevistas} h
+                </span>
+              </div>
+              <button onClick={() => irPara("Visitas e horas")} className="mt-1.5 text-left text-[13px] text-garrafa underline-offset-4 hover:underline">
+                Registrar visita ou horas
+              </button>
+            </div>
+            <div>
               <p className="text-[13px] text-tinta-2">Checklist da ficha</p>
               <div className="mt-2 flex items-center gap-3">
                 <Barra valor={prog.feitas} total={prog.total} tom={prog.feitas === prog.total ? "ok" : "andamento"} />
@@ -529,7 +611,23 @@ function PreencherPadroes({ vazias, aoUsar }: { vazias: number; aoUsar: () => vo
 
 // Cada seção do relatório fechada mostra só o título, a situação e o começo
 // do texto; abre para editar. Evita uma parede de caixas vazias.
-function EditorSecao({ def, etapa, padrao, onChange }: { def: DefSecao; etapa: Etapa; padrao: () => string; onChange: (v: string) => void }) {
+function EditorSecao({
+  def,
+  etapa,
+  padrao,
+  onChange,
+  redigindo,
+  ocupado,
+  aoRedigir,
+}: {
+  def: DefSecao;
+  etapa: Etapa;
+  padrao: () => string;
+  onChange: (v: string) => void;
+  redigindo: boolean;
+  ocupado: boolean;
+  aoRedigir: () => void;
+}) {
   const valor = etapa.secoes[def.chave] ?? "";
   const [aberta, setAberta] = useState(false);
   const gerado = padrao();
@@ -568,6 +666,9 @@ function EditorSecao({ def, etapa, padrao, onChange }: { def: DefSecao; etapa: E
               {doChecklist ? "Gerar do checklist" : "Usar texto-padrão"}
             </Botao>
           )}
+          <Botao variante="fantasma" tamanho="pequeno" onClick={aoRedigir} disabled={ocupado}>
+            {redigindo ? "Redigindo…" : "Redigir com IA"}
+          </Botao>
           <Status tom={situacao.tom}>{situacao.texto}</Status>
         </span>
       </div>
@@ -600,6 +701,52 @@ function NaoEncontrado({ projeto }: { projeto?: string }) {
       >
         {projeto ? "O projeto tem cinco etapas, de 01 a 05." : "O link pode estar errado, ou o projeto foi excluído."}
       </Vazio>
+    </div>
+  );
+}
+
+function RedigirComIA({
+  anotacoes,
+  secoes,
+  redigindo,
+  ocupado,
+  aoRedigir,
+  aoRegistrar,
+}: {
+  anotacoes: number;
+  secoes: number;
+  redigindo: boolean;
+  ocupado: boolean;
+  aoRedigir: () => void;
+  aoRegistrar: () => void;
+}) {
+  return (
+    <div className="rounded-[var(--radius-bloco)] border border-linha bg-folha px-5 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="max-w-xl">
+          <p className="text-[15px] text-tinta">
+            {anotacoes === 0
+              ? "Registre as visitas desta etapa com anotações para a IA redigir o relatório a partir do que foi levantado."
+              : secoes === 0
+                ? "Todas as seções estão escritas. Use “Redigir com IA” numa seção para reescrevê-la a partir das anotações."
+                : `A IA redige ${secoes === 1 ? "a seção em branco ou incompleta" : `as ${secoes} seções em branco ou incompletas`} a partir das anotações de ${anotacoes} ${anotacoes === 1 ? "registro" : "registros"}, do checklist e dos dados do cliente. Depois é só revisar.`}
+          </p>
+          <p className="mt-1 text-[13px] text-tinta-2">
+            Os dados são enviados à API da Anthropic (Claude), que não os usa para treinar modelos. O que faltar volta marcado como [completar].
+          </p>
+        </div>
+        {anotacoes === 0 ? (
+          <Botao variante="secundario" onClick={aoRegistrar}>
+            Registrar visita
+          </Botao>
+        ) : (
+          secoes > 0 && (
+            <Botao onClick={aoRedigir} disabled={ocupado}>
+              {redigindo ? "Redigindo… (até 1 minuto)" : "Redigir com IA"}
+            </Botao>
+          )
+        )}
+      </div>
     </div>
   );
 }

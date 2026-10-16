@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useProjeto } from "@/components/projeto/use-projeto";
 import { EtapasHub } from "@/components/projeto/etapas-hub";
 import { PlanoTrabalho } from "@/components/projeto/plano-trabalho";
+import { Visitas } from "@/components/projeto/visitas";
 import { Registros } from "@/components/projeto/registros";
 import { Referencias } from "@/components/projeto/referencias";
 import { DadosProjeto } from "@/components/projeto/dados";
@@ -14,7 +15,7 @@ import { ancoraAbaProjeto, passoDoProjeto } from "@/lib/proximo-passo";
 import { Abas, Botao, BotaoLink, Cabecalho, Cartao, ProximoPasso, Status, Vazio } from "@/components/ui";
 import { Trilho } from "@/components/trilho";
 
-const abas = ["Etapas", "Plano de trabalho", "Registros do programa", "Referências", "Ficha de identificação", "Histórico"] as const;
+const abas = ["Etapas", "Plano de trabalho", "Visitas e horas", "Registros do programa", "Referências", "Ficha de identificação", "Histórico"] as const;
 type Aba = (typeof abas)[number];
 
 export default function PaginaProjeto() {
@@ -101,6 +102,7 @@ export default function PaginaProjeto() {
 
       {aba === "Etapas" && <EtapasHub projeto={projeto} />}
       {aba === "Plano de trabalho" && <PlanoTrabalho projeto={projeto} />}
+      {aba === "Visitas e horas" && <Visitas projeto={projeto} />}
       {aba === "Registros do programa" && <Registros projeto={projeto} />}
       {aba === "Referências" && <Referencias projeto={projeto} />}
       {aba === "Ficha de identificação" && <DadosProjeto projeto={projeto} />}

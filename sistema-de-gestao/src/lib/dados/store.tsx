@@ -19,6 +19,7 @@ type Ctx = {
   sair: () => Promise<void>;
   excluir: (tipo: "projeto" | "cliente", id: string) => Promise<void>;
   recarregar: () => Promise<void>;
+  salvarAgora: () => Promise<void>;
 };
 
 const Contexto = createContext<Ctx | null>(null);
@@ -246,6 +247,16 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("beforeunload", aviso);
   }, [salvamento]);
 
+  // Grava já o que estiver esperando (antes de algo que lê o banco no servidor)
+  const salvarAgora = useCallback(async () => {
+    if (timer.current) {
+      clearTimeout(timer.current);
+      timer.current = null;
+    }
+    while (salvandoAgora.current) await new Promise((r) => setTimeout(r, 100));
+    await gravarRef.current();
+  }, []);
+
   const sair = useCallback(async () => {
     // Grava o que ainda estava esperando antes de sair
     if (timer.current) {
@@ -260,8 +271,8 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
   }, []);
 
   const valor = useMemo(
-    () => (carga.tipo === "pronto" ? { estado: carga.estado, atualizar, salvamento, sair, excluir, recarregar } : null),
-    [carga, atualizar, salvamento, sair, excluir, recarregar],
+    () => (carga.tipo === "pronto" ? { estado: carga.estado, atualizar, salvamento, sair, excluir, recarregar, salvarAgora } : null),
+    [carga, atualizar, salvamento, sair, excluir, recarregar, salvarAgora],
   );
 
   if (carga.tipo === "carregando") return <div className="flex min-h-screen items-center justify-center font-serif text-xl text-tinta-2">Pivotto</div>;

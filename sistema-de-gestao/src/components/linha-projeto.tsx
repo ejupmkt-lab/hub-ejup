@@ -5,6 +5,7 @@ import type { Projeto } from "@/lib/dados/tipos";
 import { useEstado } from "@/lib/dados/store";
 import { etapaAtual, etapaConcluida, situacaoPrazo } from "@/lib/projeto";
 import { passoDoProjeto } from "@/lib/proximo-passo";
+import { horasDoProjeto, horasFmt } from "@/lib/horas";
 import { doisDigitos, statusProjeto } from "@/lib/rotulos";
 import { BotaoLink, Selo, Status, StatusEtapa, corTom } from "@/components/ui";
 import { Trilho } from "@/components/trilho";
@@ -20,6 +21,7 @@ export function LinhaProjeto({ projeto: p, mostrarEmpresa = false }: { projeto: 
   const sit = et && p.status === "em_andamento" ? situacaoPrazo(et) : null;
   const passo = passoDoProjeto(p);
   const feitas = p.etapas.filter(etapaConcluida).length;
+  const horas = horasDoProjeto(p);
   const href = `/${p.empresa}/projetos/${p.id}`;
 
   return (
@@ -30,7 +32,7 @@ export function LinhaProjeto({ projeto: p, mostrarEmpresa = false }: { projeto: 
             {c?.nomeFantasia || c?.razaoSocial || "Cliente"}
           </Link>
           <p className="num mt-0.5 text-sm text-tinta-2">
-            {[mostrarEmpresa && empresa?.nome, c?.nomeFantasia && c.razaoSocial, `consultor ${consultor?.nome ?? "a definir"}`, `${feitas} de ${p.etapas.length} etapas enviadas`]
+            {[mostrarEmpresa && empresa?.nome, c?.nomeFantasia && c.razaoSocial, `consultor ${consultor?.nome ?? "a definir"}`, `${feitas} de ${p.etapas.length} etapas enviadas`, `${horasFmt(horas.realizadas)} de ${horas.previstas} h registradas`]
               .filter(Boolean)
               .join(", ")}
           </p>

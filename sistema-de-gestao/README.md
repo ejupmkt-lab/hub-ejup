@@ -35,6 +35,14 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Exclusão** de projeto (leva junto imagens e PDF) e de cliente sem projeto, só para gestores (RLS).
 - **Verificação em duas etapas** opcional (aplicativo autenticador), em Minha conta. Com ela ativa, o
   banco só entrega dados à sessão confirmada com o código (`privado.sessao_verificada`, aal2).
+- **Visitas e horas**: cada visita presencial, reunião remota ou trabalho interno é registrado com data,
+  horas, participantes e anotações (aba "Visitas e horas" no projeto e em cada etapa). As horas somam contra
+  as 333 h previstas, por etapa; fotos da visita entram como evidências do relatório; o texto-padrão das
+  evidências cita as datas dos encontros.
+- **Redação com IA** (`/api/redigir`): redige as seções do relatório a partir das anotações da etapa, do
+  checklist e dos dados do cliente (Claude, modelo `claude-opus-5-5`, saída em JSON estruturado). Os dados
+  são lidos no banco com a sessão de quem pediu. O que faltar volta como `[completar: …]`. Requer a variável
+  `ANTHROPIC_API_KEY` na Vercel (Settings → Environment Variables); sem ela, a tela avisa e nada quebra.
 - **Senhas vazadas recusadas** no cadastro e na troca de senha (consulta anônima ao Have I Been Pwned;
   só os 5 primeiros caracteres do hash saem do navegador).
 

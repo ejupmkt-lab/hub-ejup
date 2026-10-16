@@ -1,6 +1,7 @@
 import type { Cliente, Etapa, Projeto, Referencia, Registro } from "../dados/tipos";
 import { dataPorExtenso, hojeIso } from "../datas";
 import { doisDigitos, ordinalFeminino } from "../rotulos";
+import { encontrosDaEtapa } from "../horas";
 
 // Textos-padrão no estilo dos relatórios já entregues. Montados com os dados do
 // projeto; o que só o consultor sabe fica como [completar: …], e a checagem de
@@ -83,7 +84,12 @@ export function textoPadraoSecao(chave: string, projeto: Projeto, etapa: Etapa, 
     case "conclusao":
       return `Com esta entrega, considera-se cumprida a ${nomeEtapa(etapa).toLowerCase().replace(/^etapa \d+ \| /, "")} prevista na ficha técnica ${projeto.codigoFichaTecnica}: ${entregaveis.join("; ")}. Os instrumentos deverão permanecer vivos e ser atualizados à medida que novos processos, clientes, fornecedores ou riscos forem identificados.`;
     case "evidencias":
-      return `As evidências abaixo registram a interação consultiva, a coleta de informações e a validação junto a ${responsavel}, responsável pela empresa demandante.`;
+      return [
+        `As evidências abaixo registram a interação consultiva, a coleta de informações e a validação junto a ${responsavel}, responsável pela empresa demandante.`,
+        encontrosDaEtapa(projeto, etapa.ordem),
+      ]
+        .filter(Boolean)
+        .join(" ");
     default:
       return "";
   }
