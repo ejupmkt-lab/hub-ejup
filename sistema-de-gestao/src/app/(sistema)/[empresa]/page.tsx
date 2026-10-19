@@ -45,6 +45,9 @@ export default function ModuloEmpresa() {
         <BotaoLink href={`/${slug}/clientes`} variante="secundario">
           Clientes
         </BotaoLink>
+        <BotaoLink href={`/${slug}/biblioteca`} variante="secundario">
+          Biblioteca
+        </BotaoLink>
         <BotaoLink href={`/${slug}/projetos/novo`}>Novo projeto</BotaoLink>
       </Cabecalho>
 

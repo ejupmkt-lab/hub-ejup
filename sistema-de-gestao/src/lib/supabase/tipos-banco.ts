@@ -23,7 +23,33 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "clientes": {
+            "biblioteca_textos": {
+                  Row: {
+                    "chave": string,"created_at": string,"criado_por": string | null,"empresa": string,"etapa": number,"id": string,"origem": string,"porte": string,"projeto_origem": string | null,"ramo": string,"texto": string,"titulo": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "chave": string,"created_at"?: string,"criado_por"?: string | null,"empresa": string,"etapa": number,"id"?: string,"origem"?: string,"porte"?: string,"projeto_origem"?: string | null,"ramo"?: string,"texto": string,"titulo"?: string
+                  }
+                  Update: {
+                    "chave"?: string,"created_at"?: string,"criado_por"?: string | null,"empresa"?: string,"etapa"?: number,"id"?: string,"origem"?: string,"porte"?: string,"projeto_origem"?: string | null,"ramo"?: string,"texto"?: string,"titulo"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "biblioteca_textos_criado_por_fkey"
+      columns: ["criado_por"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "biblioteca_textos_empresa_fkey"
+      columns: ["empresa"]
+isOneToOne: false
+      referencedRelation: "empresas"
+      referencedColumns: ["slug"]
+    }
+                  ]
+                },"clientes": {
                   Row: {
                     "created_at": string,"dados": NonNullable<Json>,"empresa": string,"id": string,"updated_at": string
                   }

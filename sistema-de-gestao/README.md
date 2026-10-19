@@ -39,6 +39,11 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   horas, participantes e anotações (aba "Visitas e horas" no projeto e em cada etapa). As horas somam contra
   as 333 h previstas, por etapa; fotos da visita entram como evidências do relatório; o texto-padrão das
   evidências cita as datas dos encontros.
+- **Biblioteca de textos aprovados** (tabela `biblioteca_textos`, tela "Biblioteca" de cada empresa): quando
+  uma etapa é marcada como aprovada, as seções e os entregáveis completos entram anonimizados (empresa,
+  responsável, CNPJ, participantes e datas viram marcadores). Nos próximos projetos, cada seção mostra
+  "Da biblioteca (N)" com os mais parecidos (mesmo ramo primeiro), e "Preencher" usa o melhor texto aprovado
+  antes do texto-padrão. Textos de relatórios antigos podem ser colados à mão.
 - **Redação com IA** (`/api/redigir`): redige as seções do relatório a partir das anotações da etapa, do
   checklist e dos dados do cliente (Claude, modelo `claude-opus-5-5`, saída em JSON estruturado). Os dados
   são lidos no banco com a sessão de quem pediu. O que faltar volta como `[completar: …]`. Requer a variável

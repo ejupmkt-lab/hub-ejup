@@ -8,6 +8,9 @@ import { AjudaFormatacao } from "@/components/projeto/ajuda-formatacao";
 import { Evidencias, baixarImagens } from "@/components/projeto/evidencias";
 import { RelatorioAssinado, abrirAssinado } from "@/components/projeto/assinado";
 import { Visitas } from "@/components/projeto/visitas";
+import { SugestoesBiblioteca, useBiblioteca } from "@/components/projeto/sugestoes-biblioteca";
+import { chaveEntregavel, ordenarSugestoes, preencherMarcadores, textosParaBiblioteca } from "@/lib/biblioteca";
+import { traduzirErro } from "@/lib/erros";
 import { horasFmt, registrosDaEtapa } from "@/lib/horas";
 import { secoesAntes, secoesDepois, todasSecoes, verificarCompletude, type DefSecao } from "@/lib/relatorio/secoes";
 import { MARCA_COMPLETAR, preencherVazios, textoPadraoSecao } from "@/lib/relatorio/padroes";
@@ -35,6 +38,8 @@ export default function PaginaEtapa() {
   const { projeto, cliente, consultor, alterar } = useProjeto();
   const { estado, salvarAgora } = useEstado();
   const [redigindo, setRedigindo] = useState<string | null>(null); // "todas" ou a chave da seção
+  const { empresa: slugEmpresa } = useParams<{ empresa: string }>();
+  const biblioteca = useBiblioteca(slugEmpresa, Number(ordem));
   const [aba, setAba] = useState<Aba>("Checklist");
   const [gerando, setGerando] = useState(false);
   const passosRef = useRef<HTMLOListElement>(null);
@@ -83,8 +88,23 @@ export default function PaginaEtapa() {
       automatizarEtapa(p, e);
     }, evento);
 
+  const sugestoes = (chave: string) => ordenarSugestoes(biblioteca.lista.filter((t) => t.chave === chave), cliente, projeto.id);
+  // Em branco: primeiro o texto aprovado mais parecido da biblioteca; no resto, o texto-padrão
   const usarPadroes = () =>
-    mudarEtapa((x) => void preencherVazios(projeto, x, cliente, todasSecoes.map((d) => d.chave)), { acao: `Etapa ${doisDigitos(etapa.ordem)}: textos-padrão aplicados` });
+    mudarEtapa(
+      (x) => {
+        for (const d of todasSecoes) {
+          const melhor = sugestoes(d.chave)[0];
+          if (melhor && !(x.secoes[d.chave] ?? "").trim()) x.secoes[d.chave] = preencherMarcadores(melhor.texto, cliente);
+        }
+        for (const ent of x.entregaveis) {
+          const melhor = sugestoes(chaveEntregavel(ent.titulo))[0];
+          if (melhor && !ent.conteudo.trim()) ent.conteudo = preencherMarcadores(melhor.texto, cliente);
+        }
+        preencherVazios(projeto, x, cliente, todasSecoes.map((d) => d.chave));
+      },
+      { acao: `Etapa ${doisDigitos(etapa.ordem)}: textos-padrão e da biblioteca aplicados` },
+    );
   const vazias = todasSecoes.filter((d) => d.obrigatoria(etapa) && !(etapa.secoes[d.chave] ?? "").trim()).length + etapa.entregaveis.filter((x) => x.tipo === "entregavel" && !x.conteudo.trim()).length;
 
   const bloqueio = (s: StatusEtapa) => bloqueioStatus(projeto, etapa, s);
@@ -114,6 +134,16 @@ export default function PaginaEtapa() {
       { acao: `Etapa ${doisDigitos(etapa.ordem)}: ${statusEtapa[s].rotulo.toLowerCase()}` },
     );
     if (pdfAntigo) void supabaseNavegador().storage.from("evidencias").remove([pdfAntigo]);
+    if (s === "aprovada") void guardarNaBiblioteca();
+  };
+
+  // Etapa aprovada: seções e entregáveis completos vão, anonimizados, para a biblioteca
+  const guardarNaBiblioteca = async () => {
+    const linhas = textosParaBiblioteca(projeto, etapa, cliente);
+    if (!linhas.length) return;
+    const { error } = await supabaseNavegador().from("biblioteca_textos").upsert(linhas, { onConflict: "projeto_origem,etapa,chave" });
+    if (error) alert(`A etapa foi aprovada, mas os textos não entraram na biblioteca. ${traduzirErro(error, "Tente marcar de novo mais tarde.")}`);
+    else void biblioteca.recarregar();
   };
 
   // Redação com IA: grava o que estiver pendente (o servidor lê do banco),
@@ -147,6 +177,12 @@ export default function PaginaEtapa() {
     .filter((d) => d.obrigatoria(etapa) || (etapa.secoes[d.chave] ?? "").trim())
     .filter((d) => !(etapa.secoes[d.chave] ?? "").trim() || MARCA_COMPLETAR.test(etapa.secoes[d.chave]))
     .map((d) => d.chave);
+
+  const usarSugestao = (chave: string, texto: string) => {
+    const atual = (etapa.secoes[chave] ?? "").trim();
+    if (atual && !MARCA_COMPLETAR.test(atual) && !confirm("Substituir o texto atual desta seção pelo da biblioteca?")) return;
+    mudarEtapa((x) => void (x.secoes[chave] = texto), { acao: `Etapa ${doisDigitos(etapa.ordem)}: texto da biblioteca aplicado` });
+  };
 
   const irPara = (a: Aba) => {
     setAba(a);
@@ -367,6 +403,7 @@ export default function PaginaEtapa() {
                   etapa={etapa}
                   padrao={() => textoPadraoSecao(s.chave, projeto, etapa, cliente)}
                   onChange={(v) => mudarEtapa((x) => void (x.secoes[s.chave] = v))}
+                  sugestoes={<SugestoesBiblioteca sugestoes={sugestoes(s.chave)} cliente={cliente} aoUsar={(t) => usarSugestao(s.chave, t)} />}
                   redigindo={redigindo === s.chave}
                   ocupado={!!redigindo}
                   aoRedigir={() => {
@@ -388,6 +425,7 @@ export default function PaginaEtapa() {
                   etapa={etapa}
                   padrao={() => textoPadraoSecao(s.chave, projeto, etapa, cliente)}
                   onChange={(v) => mudarEtapa((x) => void (x.secoes[s.chave] = v))}
+                  sugestoes={<SugestoesBiblioteca sugestoes={sugestoes(s.chave)} cliente={cliente} aoUsar={(t) => usarSugestao(s.chave, t)} />}
                   redigindo={redigindo === s.chave}
                   ocupado={!!redigindo}
                   aoRedigir={() => {
@@ -413,8 +451,20 @@ export default function PaginaEtapa() {
                 const rotulo = ent.tipo === "entregavel" ? `Entregável ${n}` : etapa.ordem === 1 ? "Instrumento complementar" : "Instrumento operacional";
                 return (
                   <section key={ent.titulo} className="rounded-[var(--radius-bloco)] border border-linha bg-folha p-5">
-                    <p className="text-[13px] text-tinta-2">{rotulo}</p>
-                    <h3 className="mb-3 mt-0.5 font-serif text-xl leading-snug">{ent.titulo}</h3>
+                    <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
+                      <div>
+                        <p className="text-[13px] text-tinta-2">{rotulo}</p>
+                        <h3 className="mt-0.5 font-serif text-xl leading-snug">{ent.titulo}</h3>
+                      </div>
+                      <SugestoesBiblioteca
+                        sugestoes={sugestoes(chaveEntregavel(ent.titulo))}
+                        cliente={cliente}
+                        aoUsar={(t) => {
+                          if (ent.conteudo.trim() && !MARCA_COMPLETAR.test(ent.conteudo) && !confirm("Substituir o conteúdo atual pelo da biblioteca?")) return;
+                          mudarEtapa((x) => void (x.entregaveis[i].conteudo = t), { acao: `Etapa ${doisDigitos(etapa.ordem)}: entregável da biblioteca aplicado` });
+                        }}
+                      />
+                    </div>
                     <textarea
                       rows={7}
                       className="campo"
@@ -601,7 +651,7 @@ function PreencherPadroes({ vazias, aoUsar }: { vazias: number; aoUsar: () => vo
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-bloco)] border border-garrafa/20 bg-garrafa-claro px-5 py-4">
       <p className="max-w-xl text-[15px] text-tinta">
-        {vazias === 1 ? "1 parte do relatório está em branco." : `${vazias} partes do relatório estão em branco.`} O sistema escreve todas com os textos-padrão,
+        {vazias === 1 ? "1 parte do relatório está em branco." : `${vazias} partes do relatório estão em branco.`} O sistema escreve todas com textos de relatórios já aprovados (quando houver) e com os textos-padrão,
         já com os dados deste cliente e desta etapa. Depois é só revisar.
       </p>
       <Botao onClick={aoUsar}>Preencher com textos-padrão</Botao>
@@ -619,6 +669,7 @@ function EditorSecao({
   redigindo,
   ocupado,
   aoRedigir,
+  sugestoes,
 }: {
   def: DefSecao;
   etapa: Etapa;
@@ -627,6 +678,7 @@ function EditorSecao({
   redigindo: boolean;
   ocupado: boolean;
   aoRedigir: () => void;
+  sugestoes: React.ReactNode;
 }) {
   const valor = etapa.secoes[def.chave] ?? "";
   const [aberta, setAberta] = useState(false);
@@ -660,6 +712,7 @@ function EditorSecao({
             {!aberta && !vazio && <span className="mt-0.5 line-clamp-1 text-sm text-tinta-2">{valor.replace(/\s+/g, " ")}</span>}
           </span>
         </button>
+        {sugestoes}
         <span className="flex items-center gap-3">
           {gerado && (vazio || doChecklist) && (
             <Botao variante={vazio ? "secundario" : "fantasma"} tamanho="pequeno" onClick={usarGerado}>
