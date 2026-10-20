@@ -87,7 +87,10 @@ export default function PaginaServico() {
                 {(
                   [
                     ["Nome curto", s.nomeCurto],
-                    ["Carga horária", `${horasDoServico(s)} h em ${s.etapas.length} ${s.etapas.length === 1 ? "etapa" : "etapas"}`],
+                    [
+                      "Carga horária",
+                      `${horasDoServico(s) ? `${horasDoServico(s)} h` : "Definida na proposta de cada projeto"}, ${s.etapas.length} ${s.etapas.length === 1 ? "etapa" : "etapas"}`,
+                    ],
                     ["Prestadora vinculada", s.prestadoraVinculada],
                     ["Área de atuação nos relatórios", s.areaAtuacao],
                     [
@@ -133,7 +136,8 @@ function EtapaFicha({ e }: { e: EtapaModelo }) {
           <span className="num text-azul">{doisDigitos(e.ordem)}</span> · {e.nome.charAt(0) + e.nome.slice(1).toLowerCase()}
         </h2>
         <span className="num text-sm text-tinta-2">
-          {e.horasPrevistas} h{e.duracaoReferenciaDias ? ` · cerca de ${e.duracaoReferenciaDias} ${e.duracaoReferenciaDias === 1 ? "dia" : "dias"}` : ""}
+          {e.horasPrevistas ? `${e.horasPrevistas} h` : "horas da proposta"}
+          {e.duracaoReferenciaDias ? ` · cerca de ${e.duracaoReferenciaDias} ${e.duracaoReferenciaDias === 1 ? "dia" : "dias"}` : ""}
         </span>
       </div>
       {e.descricao && <p className="mt-2 text-[15px] text-tinta-2">{e.descricao}</p>}

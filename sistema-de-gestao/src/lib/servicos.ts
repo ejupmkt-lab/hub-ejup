@@ -74,7 +74,7 @@ export function problemasDoServico(s: Servico): string[] {
   s.etapas.forEach((e) => {
     const n = `Etapa ${String(e.ordem).padStart(2, "0")}`;
     if (!e.nome.trim()) erros.push(`${n}: informe o nome`);
-    if (!(e.horasPrevistas > 0)) erros.push(`${n}: informe a carga horária`);
+    if (e.horasPrevistas < 0) erros.push(`${n}: a carga horária não pode ser negativa`);
     if (!e.atividades.length) erros.push(`${n}: inclua as atividades do checklist`);
     const codigos = e.atividades.map(([c]) => c);
     const repetido = codigos.find((c, i) => codigos.indexOf(c) !== i);

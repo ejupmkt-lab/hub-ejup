@@ -1,4 +1,5 @@
-import type { Atividade, Etapa, Projeto, RelatorioAssinado, TipoAtividade } from "./dados/tipos";
+import type { Atividade, Contratacao, Etapa, Projeto, RelatorioAssinado, TipoAtividade } from "./dados/tipos";
+import { faseDoProjeto, mudarContratacao, ordemContratacao } from "./fase";
 import { todasSecoes, verificarCompletude } from "./relatorio/secoes";
 import { assinada, automatizarEtapa, bloqueioStatus } from "./regras-etapa";
 import { doisDigitos, statusEtapa, type StatusEtapa as StatusEtapaTipo } from "./rotulos";
@@ -21,7 +22,8 @@ export type AcaoIA =
   | { tipo: "definir_cronograma"; inicio: string; fim: string }
   | { tipo: "alterar_datas_etapa"; etapa: number; inicio: string; fim: string; justificativa: string }
   | { tipo: "registrar_assinatura"; etapa: number; anexo: string; data_consultor: string; data_cliente: string }
-  | { tipo: "mudar_situacao_etapa"; etapa: number; situacao: "a_enviar" | "enviada" | "aprovada" | "devolvida"; observacao: string };
+  | { tipo: "mudar_situacao_etapa"; etapa: number; situacao: "a_enviar" | "enviada" | "aprovada" | "devolvida"; observacao: string }
+  | { tipo: "atualizar_contratacao"; situacao: "aguardando_aprovacao" | "aguardando_pagamento" | "contratado"; data: string };
 
 // O que a IA fez (ou tentou e o sistema não deixou, com o motivo)
 export type ItemAcao = { descricao: string; aviso?: boolean };
@@ -44,6 +46,7 @@ export type Desfazer =
       dataRelatorio: string | null;
     }
   | { tipo: "plano"; planoFechadoEm: string | null; status: Projeto["status"] }
+  | { tipo: "contratacao"; anterior: Contratacao | null }
   | { tipo: "assinatura"; etapa: number; assinaturaConsultor: string | null; assinaturaCliente: string | null; relatorioAssinado: RelatorioAssinado | null };
 
 const concluida = (s: StatusEtapaTipo) => s === "enviada" || s === "aprovada";
@@ -79,9 +82,27 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
   if (p.status === "encerrado") return { itens, desfazer };
 
   acoes.forEach((a, i) => {
+    // Antes da consultoria: diagnóstico enviado, gestor aprovou, cliente pagou
+    if (a.tipo === "atualizar_contratacao") {
+      const antes = p.contratacao?.situacao ?? "contratado";
+      if (!ordemContratacao.includes(a.situacao) || ordemContratacao.indexOf(a.situacao) <= ordemContratacao.indexOf(antes)) return;
+      const data = dataValida(a.data) ? a.data : hojeIso();
+      desfazer.push({ tipo: "contratacao", anterior: p.contratacao ? { ...p.contratacao } : null });
+      p.contratacao = mudarContratacao(p.contratacao, a.situacao, data);
+      feito(
+        a.situacao === "aguardando_aprovacao"
+          ? `Diagnóstico enviado no HUB em ${formatarData(data)}; aguardando o gestor`
+          : a.situacao === "aguardando_pagamento"
+            ? `Gestor aprovou a contratação em ${formatarData(data)}; aguardando o pagamento`
+            : `Cliente pagou em ${formatarData(data)}: a consultoria começou`,
+      );
+      return;
+    }
     // Cronograma do projeto inteiro: só enquanto o plano não foi definido
     if (a.tipo === "definir_cronograma") {
       if (p.planoFechadoEm || !dataValida(a.inicio) || (a.fim && !dataValida(a.fim))) return;
+      if (!a.fim && p.etapas.every((e) => !e.duracaoReferenciaDias))
+        return avisar("Plano de trabalho não definido: este serviço não tem duração de referência; diga também a data de fim");
       const linhas = a.fim
         ? distribuirPorHoras(
             a.inicio,
@@ -275,6 +296,11 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
 // Volta cada passo, do último para o primeiro
 export function desfazerAcoes(p: Projeto, passos: Desfazer[]) {
   for (const d of [...passos].reverse()) {
+    if (d.tipo === "contratacao") {
+      if (d.anterior) p.contratacao = d.anterior;
+      else delete p.contratacao;
+      continue;
+    }
     if (d.tipo === "plano") {
       p.planoFechadoEm = d.planoFechadoEm;
       p.status = d.status;
@@ -321,6 +347,16 @@ export function desfazerAcoes(p: Projeto, passos: Desfazer[]) {
 export function sugestoesConversa(p: Projeto): string[] {
   if (p.status === "encerrado") return [];
   const nomeEtapa = (e: Etapa) => `Etapa ${doisDigitos(e.ordem)} (${e.nome.charAt(0)}${e.nome.slice(1).toLowerCase()})`;
+  const fase = faseDoProjeto(p);
+  if (fase === "diagnostico")
+    return [
+      "Me ajude a montar o diagnóstico. O cliente pediu: __. O que mapeei: __.",
+      "Por que esta solicitação se justifica para o cliente? Monte os argumentos.",
+      `Enviei o diagnóstico no HUB hoje (${formatarData(hojeIso())}).`,
+    ];
+  if (fase === "aguardando_aprovacao") return ["O gestor aprovou o diagnóstico hoje.", "O que acontece depois que o gestor aprovar?"];
+  if (fase === "aguardando_pagamento")
+    return [`O cliente pagou hoje (${formatarData(hojeIso())}).`, "O cliente pagou. A consultoria começa em __/__/____ e termina em __/__/____."];
   if (!p.planoFechadoEm)
     return [
       `O projeto começa em ${formatarData(hojeIso())} e termina em __/__/____. Monte o plano de trabalho.`,

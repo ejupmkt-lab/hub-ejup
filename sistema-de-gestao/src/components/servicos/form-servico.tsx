@@ -63,7 +63,12 @@ export function FormServico({
   const [avisoIA, setAvisoIA] = useState<{ tom: "ok" | "erro"; texto: string } | null>(null);
   const entrada = useRef<HTMLInputElement>(null);
 
-  const servico: Servico = { ...dados, nome: dados.nome || dados.fichaTecnica, etapas: etapas.map(doForm) };
+  const servico: Servico = {
+    ...dados,
+    nome: dados.nome || dados.fichaTecnica,
+    preDiagnostico: linhasEmLista((dados.preDiagnostico ?? []).join("\n")).map((q) => q.replace(/^\d+[.)]\s*/, "")),
+    etapas: etapas.map(doForm),
+  };
   const problemas = problemasDoServico(servico);
   const set =
     (k: "fichaTecnica" | "nomeCurto" | "area" | "descricao" | "codigoFichaTecnica" | "prestadoraVinculada" | "areaAtuacao") =>
@@ -108,6 +113,7 @@ export function FormServico({
         descricao: texto(f.descricao, x.descricao),
         prestadoraVinculada: texto(f.prestadoraVinculada, x.prestadoraVinculada),
         areaAtuacao: texto(f.areaAtuacao, x.areaAtuacao),
+        preDiagnostico: f.preDiagnostico?.length ? f.preDiagnostico : x.preDiagnostico,
       }));
       if (f.etapas?.length)
         setEtapas(
@@ -217,6 +223,18 @@ export function FormServico({
           >
             <input className="campo" value={dados.areaAtuacao} onChange={set("areaAtuacao")} />
           </Campo>
+          <Campo
+            rotulo="Perguntas do pré-diagnóstico (opcional)"
+            className="sm:col-span-2"
+            dica="Uma por linha, como na ficha. Aparecem no projeto durante o diagnóstico, antes da contratação."
+          >
+            <textarea
+              rows={4}
+              className="campo"
+              value={(dados.preDiagnostico ?? []).join("\n")}
+              onChange={(e) => setDados({ ...dados, preDiagnostico: e.target.value.split("\n") })}
+            />
+          </Campo>
           <label className="flex items-center gap-3 sm:col-span-2">
             <input
               type="checkbox"
@@ -279,7 +297,7 @@ export function FormServico({
                   <Campo rotulo="Nome da etapa">
                     <input className="campo" value={e.nome} onChange={(ev) => setEtapa(i, "nome", ev.target.value)} placeholder="Ex.: Diagnóstico" />
                   </Campo>
-                  <Campo rotulo="Horas">
+                  <Campo rotulo="Horas" dica="Em branco se a ficha não traz.">
                     <input
                       className="campo num"
                       type="number"

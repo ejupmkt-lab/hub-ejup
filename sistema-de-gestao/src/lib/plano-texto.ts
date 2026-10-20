@@ -21,9 +21,9 @@ export function textoPlano(p: Projeto, cliente: Cliente | undefined) {
     `Código da ficha técnica: ${p.codigoFichaTecnica}`,
     `Número de Visitas: ${p.etapas.length}`,
     ...p.etapas.map(
-      (e) => `Etapa ${e.ordem} – ${tituloEtapa(e.nome)}: ${formatarData(e.dataInicio)} a ${formatarData(e.dataFim)} - carga horária - ${e.horasPrevistas}h`,
+      (e) => `Etapa ${e.ordem} – ${tituloEtapa(e.nome)}: ${formatarData(e.dataInicio)} a ${formatarData(e.dataFim)} - carga horária - ${e.horasPrevistas ? `${e.horasPrevistas}h` : "a definir"}`,
     ),
-    `Carga horária total: ${total}h.`,
+    `Carga horária total: ${total ? `${total}h` : "a definir"}.`,
   ];
   return linhas.join("\n");
 }

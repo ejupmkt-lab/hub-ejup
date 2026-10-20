@@ -1,6 +1,7 @@
 import type { Etapa, Projeto } from "./dados/tipos";
 import { diferencaDias, hojeIso, somarDias } from "./datas";
 import { etapaConcluida } from "./projeto";
+import { antesDaContratacao, faseDoProjeto, fases } from "./fase";
 
 // Números, cronograma, calendário e gráficos do painel, calculados a partir
 // das datas do plano de trabalho e do status de cada etapa.
@@ -37,7 +38,7 @@ export function indicadores(projetos: Projeto[]) {
   const hoje = hojeIso();
   const lista = ativos(projetos);
   const etapas = lista.flatMap((p) => p.etapas);
-  const semPlano = lista.filter((p) => !p.planoFechadoEm).length;
+  const semPlano = lista.filter((p) => !p.planoFechadoEm && !antesDaContratacao(p)).length;
   const comPlano = lista.filter((p) => p.planoFechadoEm).flatMap((p) => p.etapas);
   const proximos7 = comPlano.filter((e) => !etapaConcluida(e) && e.dataFim && e.dataFim >= hoje && e.dataFim <= somarDias(hoje, 7)).length;
   const acao = comPlano.filter((e) => pedeAcao(grupoDaEtapa(e, hoje))).length;
@@ -45,7 +46,8 @@ export function indicadores(projetos: Projeto[]) {
   const devolvidas = comPlano.filter((e) => e.status === "devolvida").length;
   const concluidas = etapas.filter(etapaConcluida).length;
   const semana = cargaSemanal(projetos, 0, 1)[0]?.horas ?? 0;
-  return { projetos: lista.length, semPlano, proximos7, acao, atrasadas, devolvidas, concluidas, totalEtapas: etapas.length, horasSemana: Math.round(semana) };
+  const preContrato = lista.filter(antesDaContratacao).length;
+  return { projetos: lista.length, preContrato, emExecucao: lista.length - preContrato, semPlano, proximos7, acao, atrasadas, devolvidas, concluidas, totalEtapas: etapas.length, horasSemana: Math.round(semana) };
 }
 
 // ─── Cronograma (Gantt) ───────────────────────────────────────────────────
@@ -109,6 +111,11 @@ export function pendenciasDoGrupo(projetos: Projeto[]): Pendencia[] {
   const hoje = hojeIso();
   const lista: Pendencia[] = [];
   for (const p of ativos(projetos)) {
+    const fase = faseDoProjeto(p);
+    if (fase !== "execucao") {
+      lista.push({ projeto: p, texto: fases[fase].rotulo, grupo: fase === "diagnostico" ? "andamento" : "nao_iniciada" });
+      continue;
+    }
     if (!p.planoFechadoEm) {
       lista.push({ projeto: p, texto: "Sem plano de trabalho", grupo: "nao_iniciada" });
       continue;

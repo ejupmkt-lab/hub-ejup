@@ -12,6 +12,8 @@ import { DadosProjeto } from "@/components/projeto/dados";
 import { CronogramaProjeto } from "@/components/projeto/cronograma-projeto";
 import { Relatorios } from "@/components/projeto/relatorios";
 import { Conversa } from "@/components/projeto/conversa";
+import { ContratacaoProjeto } from "@/components/projeto/contratacao";
+import { antesDaContratacao, faseDoProjeto, fases } from "@/lib/fase";
 import { formatarData, diferencaDias, hojeIso } from "@/lib/datas";
 import { horasDoProjeto, horasFmt } from "@/lib/horas";
 import {
@@ -100,6 +102,8 @@ export default function PaginaProjeto() {
     setFocar((n) => n + 1);
   };
 
+  const fase = faseDoProjeto(projeto);
+  const preContrato = antesDaContratacao(projeto);
   const situacaoEtapa = et ? (et.status === "devolvida" ? "Devolvida" : etapaAtrasada(et) ? "Atrasada" : statusEtapa[et.status].rotulo) : null;
   const tomAvanco = previsto === null ? undefined : avanco >= previsto ? "ok" : previsto - avanco >= 10 ? "atencao" : undefined;
   const diasEntrega = entrega ? diferencaDias(hoje, entrega) : null;
@@ -140,7 +144,7 @@ export default function PaginaProjeto() {
                 <p className="num mt-0.5 flex flex-wrap items-baseline gap-x-2">
                   <span className="text-2xl font-bold text-tinta">{avanco}%</span>
                   <span className={`text-[13px] ${tomAvanco === "atencao" ? "text-laranja" : "text-tinta-2"}`}>
-                    {previsto === null ? "sem plano de trabalho" : `previsto hoje ${previsto}%`}
+                    {preContrato ? "antes da contratação" : previsto === null ? "sem plano de trabalho" : `previsto hoje ${previsto}%`}
                   </span>
                 </p>
                 <div className="mt-2">
@@ -148,14 +152,26 @@ export default function PaginaProjeto() {
                 </div>
               </div>
               <div className={celula}>
-                <p className="text-[12px] font-semibold text-tinta-2">Etapa atual</p>
-                <p className="mt-0.5 break-words font-semibold leading-snug text-tinta">
-                  {et ? `${doisDigitos(et.ordem)} · ${capitalizar(et.nome)}` : projeto.status === "encerrado" ? "Encerrado" : "Todas enviadas"}
-                </p>
-                {et && (
-                  <p className={`num text-[13px] ${corEtapa}`}>
-                    {Math.round(avancoEtapa(et) * 100)}% · {situacaoEtapa}
-                  </p>
+                {preContrato ? (
+                  <>
+                    <p className="text-[12px] font-semibold text-tinta-2">Fase</p>
+                    <p className="mt-0.5 break-words font-semibold leading-snug text-tinta">{fases[fase].curto}</p>
+                    <p className="text-[13px] text-tinta-2">antes da contratação</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[12px] font-semibold text-tinta-2">
+                      Etapa atual{et ? ` (${et.ordem} de ${projeto.etapas.length})` : ""}
+                    </p>
+                    <p className="mt-0.5 break-words font-semibold leading-snug text-tinta">
+                      {et ? `${doisDigitos(et.ordem)} · ${capitalizar(et.nome)}` : projeto.status === "encerrado" ? "Encerrado" : "Todas enviadas"}
+                    </p>
+                    {et && (
+                      <p className={`num text-[13px] ${corEtapa}`}>
+                        {Math.round(avancoEtapa(et) * 100)}% · {situacaoEtapa}
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
               <div className={celula}>
@@ -232,7 +248,12 @@ export default function PaginaProjeto() {
         }
       />
 
-      {aba === "Desenvolvimento" && <Conversa projeto={projeto} passo={passo?.texto} focar={focar} />}
+      {aba === "Desenvolvimento" && (
+        <>
+          <ContratacaoProjeto projeto={projeto} />
+          <Conversa projeto={projeto} passo={passo?.texto} focar={focar} />
+        </>
+      )}
 
       {aba === "Plano de trabalho" && (
         <div className="space-y-4">

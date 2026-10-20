@@ -2,6 +2,7 @@ import { diferencaDias, hojeIso } from "./datas";
 import type { Etapa, Projeto } from "./dados/tipos";
 import type { Tom } from "./rotulos";
 import { modeloPorId } from "./modelos";
+import { faseDoProjeto, fases } from "./fase";
 
 const concluidas = new Set(["enviada", "aprovada"]);
 
@@ -38,6 +39,8 @@ export type Alerta = { projeto: Projeto; etapa?: Etapa; texto: string; tom: Tom;
 // O que pede ação agora, do mais urgente ao menos urgente
 export function alertasDoProjeto(p: Projeto): Alerta[] {
   if (p.status === "encerrado") return [];
+  const fase = faseDoProjeto(p);
+  if (fase !== "execucao") return [{ projeto: p, texto: fases[fase].rotulo, tom: fase === "diagnostico" ? "atencao" : "neutro", ordem: 3 }];
   if (p.status === "aguardando_plano")
     return [{ projeto: p, texto: "Definir o plano de trabalho para as etapas ganharem datas", tom: "atencao", ordem: 3 }];
   const lista: Alerta[] = [];
@@ -78,19 +81,27 @@ export function avancoEtapa(e: Etapa) {
 }
 
 // Avanço do projeto em %: o andamento de cada etapa pesado pelas horas dela
+// Peso de cada etapa no avanço: as horas; sem horas definidas, pesos iguais
+function pesos(p: Projeto) {
+  const total = p.etapas.reduce((a, e) => a + (e.horasPrevistas || 0), 0);
+  return (e: Etapa) => (total > 0 ? e.horasPrevistas || 0 : 1);
+}
+
 export function avancoProjeto(p: Projeto) {
-  const horas = p.etapas.reduce((a, e) => a + e.horasPrevistas, 0) || 1;
-  return Math.round((p.etapas.reduce((a, e) => a + e.horasPrevistas * avancoEtapa(e), 0) / horas) * 100);
+  const peso = pesos(p);
+  const total = p.etapas.reduce((a, e) => a + peso(e), 0) || 1;
+  return Math.round((p.etapas.reduce((a, e) => a + peso(e) * avancoEtapa(e), 0) / total) * 100);
 }
 
 // Quanto já deveria estar pronto hoje pelo plano de trabalho, em % (nulo sem plano)
 export function previstoProjeto(p: Projeto, hoje = hojeIso()) {
   if (!p.planoFechadoEm || !p.etapas.every((e) => e.dataInicio && e.dataFim)) return null;
-  const horas = p.etapas.reduce((a, e) => a + e.horasPrevistas, 0) || 1;
+  const peso = pesos(p);
+  const horas = p.etapas.reduce((a, e) => a + peso(e), 0) || 1;
   const soma = p.etapas.reduce((a, e) => {
     const dias = diferencaDias(e.dataInicio!, e.dataFim!) + 1;
     const corridos = Math.min(dias, Math.max(0, diferencaDias(e.dataInicio!, hoje) + 1));
-    return a + e.horasPrevistas * (corridos / dias);
+    return a + peso(e) * (corridos / dias);
   }, 0);
   return Math.round((soma / horas) * 100);
 }
@@ -112,6 +123,8 @@ export function diasSemRegistro(p: Projeto, hoje = hojeIso()) {
 export type SituacaoProjeto = { tom: Tom; rotulo: string };
 export function situacaoProjeto(p: Projeto, hoje = hojeIso()): SituacaoProjeto {
   if (p.status === "encerrado") return { tom: "ok", rotulo: "Encerrado" };
+  const fase = faseDoProjeto(p);
+  if (fase !== "execucao") return { tom: "neutro", rotulo: fases[fase].curto };
   if (p.etapas.some((e) => e.status === "devolvida")) return { tom: "critico", rotulo: "Devolvida pelo SEBRAE" };
   if (!p.planoFechadoEm) return { tom: "neutro", rotulo: "Sem plano de trabalho" };
   if (p.etapas.some((e) => etapaAtrasada(e, hoje))) return { tom: "atencao", rotulo: "Atrasado" };

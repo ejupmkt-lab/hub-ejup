@@ -33,7 +33,14 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Clientes** com os campos do Modelo de Diagnóstico do HUB SEBRAE.
 - **Projetos** a partir dos serviços cadastrados; o primeiro é *Adequação à LGPD* (ficha 13070-5): 5
   etapas, 333 h, checklist de atividades e 23 entregáveis, com textos-padrão e referências próprios.
-- **Projeto novo**: escolhe o serviço, o cliente e o consultor; o código do pedido no HUB é um campo só (o
+- **Fases do projeto** (`src/lib/fase.ts`): antes da consultoria, a fase pré-contratual (diagnóstico no
+  modelo do SEBRAE, assinado só pelo consultor e enviado no HUB → aprovação do gestor → pagamento do
+  cliente), registrada no próprio projeto (cartão "Antes da consultoria", ficha do projeto ou conversa com a
+  IA); depois, a execução, com as etapas do serviço (2, 5, 8…). O painel mostra a fase de cada projeto e
+  uma linha por projeto com o diagnóstico (D) e as etapas do serviço dele; o quadro de projetos tem
+  colunas para as fases e para as etapas até a do maior serviço.
+- **Projeto novo**: escolhe o serviço, o cliente, o consultor e onde o projeto está no HUB (começa no
+  diagnóstico); as horas de cada etapa vêm da ficha ou da proposta (editáveis também no plano de trabalho); o código do pedido no HUB é um campo só (o
   mesmo número do projeto no HUB); o número de visitas é o de etapas do serviço (uma por etapa); o gestor
   ou gestora do SEBRAE vem de uma lista da empresa (tabela `gestores_sebrae`), com a opção de digitar
   outro nome e salvá-lo na lista.

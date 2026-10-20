@@ -3,6 +3,7 @@ import { dataCurta } from "./datas";
 import { doisDigitos, type StatusEtapa, type Tom } from "./rotulos";
 import { etapaAtual, progressoAtividades } from "./projeto";
 import { assinada } from "./regras-etapa";
+import { faseDoProjeto } from "./fase";
 import { verificarCompletude } from "./relatorio/secoes";
 
 // O que fazer agora, em uma frase e um botão. Usado no painel, na lista de
@@ -167,6 +168,32 @@ export function passoDaEtapa(p: Projeto, e: Etapa): Passo | null {
 export function passoDoProjeto(p: Projeto): (Passo & { etapa?: Etapa }) | null {
   if (p.status === "encerrado") return null;
   const base = `/${p.empresa}/projetos/${p.id}`;
+  // Antes da contratação: diagnóstico, aprovação do gestor e pagamento
+  const fase = faseDoProjeto(p);
+  if (fase === "diagnostico")
+    return {
+      texto: "Elabore o diagnóstico e envie no HUB",
+      detalhe: "Fase pré-contratual: o diagnóstico segue o modelo do SEBRAE e é assinado só pelo consultor.",
+      rotulo: "Abrir o diagnóstico",
+      tom: "atencao",
+      href: `${base}#desenvolvimento`,
+    };
+  if (fase === "aguardando_aprovacao")
+    return {
+      texto: "Aguardando o gestor aprovar o diagnóstico no HUB",
+      detalhe: "Quando o gestor liberar a contratação, registre aqui.",
+      rotulo: "Registrar a aprovação",
+      tom: "neutro",
+      href: `${base}#desenvolvimento`,
+    };
+  if (fase === "aguardando_pagamento")
+    return {
+      texto: "Aguardando o cliente pagar no HUB",
+      detalhe: "Com o pagamento, a consultoria começa: registre aqui e defina o plano de trabalho.",
+      rotulo: "Registrar o pagamento",
+      tom: "neutro",
+      href: `${base}#desenvolvimento`,
+    };
   if (p.status === "aguardando_plano" || !p.planoFechadoEm) return passoDaEtapa(p, p.etapas[0]);
   // Devolução tem prioridade sobre a etapa em curso
   const devolvida = p.etapas.find((e) => e.status === "devolvida");

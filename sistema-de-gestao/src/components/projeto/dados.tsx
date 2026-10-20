@@ -3,7 +3,9 @@
 import { traduzirErro } from "@/lib/erros";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { Projeto } from "@/lib/dados/tipos";
+import type { Projeto, SituacaoContratacao } from "@/lib/dados/tipos";
+import { mudarContratacao } from "@/lib/fase";
+import { hojeIso } from "@/lib/datas";
 import { useAcesso, useEstado } from "@/lib/dados/store";
 import { Botao, Campo, Cartao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
@@ -73,6 +75,24 @@ export function DadosProjeto({ projeto }: { projeto: Projeto }) {
                   {u.nomeCompleto}
                 </option>
               ))}
+            </select>
+          </Campo>
+          <Campo rotulo="Onde o projeto está no HUB" className="sm:col-span-2" dica="Antes da contratação: diagnóstico, aprovação do gestor e pagamento do cliente.">
+            <select
+              className="campo"
+              value={projeto.contratacao?.situacao ?? "contratado"}
+              onChange={(e) => {
+                const para = e.target.value as SituacaoContratacao;
+                alterar((p) => void (p.contratacao = mudarContratacao(p.contratacao, para, hojeIso())), {
+                  acao: "Situação no HUB alterada",
+                  detalhe: e.target.selectedOptions[0]?.text,
+                });
+              }}
+            >
+              <option value="diagnostico">Diagnóstico em elaboração (pré-contratual)</option>
+              <option value="aguardando_aprovacao">Diagnóstico enviado, aguardando o gestor</option>
+              <option value="aguardando_pagamento">Aprovado, aguardando o pagamento do cliente</option>
+              <option value="contratado">Contratado: o cliente já pagou</option>
             </select>
           </Campo>
           <Campo rotulo="Código do pedido no HUB" dica="É o mesmo número do projeto no HUB.">

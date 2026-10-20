@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { faseDoProjeto, fases } from "@/lib/fase";
 import type { Projeto } from "@/lib/dados/tipos";
 import { useEstado } from "@/lib/dados/store";
 import { formatarData } from "@/lib/datas";
@@ -38,6 +39,7 @@ export function CartaoProjeto({
   const c = estado.clientes.find((x) => x.id === p.clienteId);
   const empresa = estado.empresas.find((e) => e.slug === p.empresa);
   const sit = situacaoProjeto(p);
+  const fase = faseDoProjeto(p);
   const avanco = avancoProjeto(p);
   const previsto = previstoProjeto(p);
   const et = etapaAtual(p);
@@ -86,21 +88,29 @@ export function CartaoProjeto({
 
       <div className="mt-3 space-y-1 text-sm text-tinta-2">
         <p>
-          Etapa:{" "}
-          {et ? (
+          {fase !== "execucao" && fase !== "encerrado" ? (
             <>
-              <span className="font-semibold text-tinta">
-                {doisDigitos(et.ordem)} {capitalizar(et.nome)}
-              </span>
-              {situacaoEtapa && (
-                <span className={`font-medium ${situacaoEtapa.tom === "neutro" ? "text-tinta-2" : corTom[situacaoEtapa.tom].texto}`}>
-                  {" "}
-                  · {situacaoEtapa.texto}
-                </span>
-              )}
+              Fase: <span className="font-semibold text-tinta">{fases[fase].rotulo}</span>
             </>
           ) : (
-            <span className="font-semibold text-tinta">todas enviadas</span>
+            <>
+              Etapa{et ? ` ${et.ordem} de ${p.etapas.length}` : ""}:{" "}
+              {et ? (
+                <>
+                  <span className="font-semibold text-tinta">
+                    {doisDigitos(et.ordem)} {capitalizar(et.nome)}
+                  </span>
+                  {situacaoEtapa && (
+                    <span className={`font-medium ${situacaoEtapa.tom === "neutro" ? "text-tinta-2" : corTom[situacaoEtapa.tom].texto}`}>
+                      {" "}
+                      · {situacaoEtapa.texto}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="font-semibold text-tinta">todas enviadas</span>
+              )}
+            </>
           )}
         </p>
         <p className="num">
@@ -111,7 +121,7 @@ export function CartaoProjeto({
       <div className="mt-3 flex flex-wrap gap-2">
         {devolvidas > 0 && <Chip tom="critico">{devolvidas === 1 ? "1 etapa devolvida" : `${devolvidas} etapas devolvidas`}</Chip>}
         {atrasadas > 0 && <Chip tom="atencao">{atrasadas === 1 ? "1 etapa atrasada" : `${atrasadas} etapas atrasadas`}</Chip>}
-        {!p.planoFechadoEm && p.status !== "encerrado" && <Chip tom="atencao">Sem plano de trabalho</Chip>}
+        {!p.planoFechadoEm && fase === "execucao" && <Chip tom="atencao">Sem plano de trabalho</Chip>}
         {p.status !== "encerrado" && (
           <Chip tom={semRegistro === null || semRegistro > 7 ? "atencao" : "neutro"} icone={<IconeCalendarioPequeno className="h-3.5 w-3.5" />}>
             {semRegistro === null

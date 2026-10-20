@@ -76,7 +76,7 @@ export default function Servicos() {
                       <div className="mt-4 flex flex-wrap gap-2">
                         {s.codigoFichaTecnica && <Chip tom="neutro">Ficha {s.codigoFichaTecnica}</Chip>}
                         <Chip tom="neutro">
-                          {s.etapas.length} {s.etapas.length === 1 ? "etapa" : "etapas"} · {horasDoServico(s)} h
+                          {s.etapas.length} {s.etapas.length === 1 ? "etapa" : "etapas"} · {horasDoServico(s) ? `${horasDoServico(s)} h` : "horas da proposta"}
                         </Chip>
                         <Chip tom={s.credenciado ? "ok" : "atencao"}>{s.credenciado ? "Credenciado" : "Não credenciado"}</Chip>
                       </div>

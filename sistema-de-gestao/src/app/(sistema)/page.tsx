@@ -11,7 +11,8 @@ import { indicadores } from "@/lib/painel";
 import { BotaoLink, Cartao, Cabecalho, Indicador, Vazio } from "@/components/ui";
 import { CartaoProjeto } from "@/components/cartao-projeto";
 import { Pendencias } from "@/components/painel/pendencias";
-import { GraficoCarga, GraficoSituacao } from "@/components/painel/graficos";
+import { GraficoCarga } from "@/components/painel/graficos";
+import { EtapasDosProjetos, FasesDosProjetos } from "@/components/painel/fases";
 import { IconeMaisSinal } from "@/components/icones";
 
 export default function Painel() {
@@ -62,7 +63,13 @@ export default function Painel() {
             <Indicador
               rotulo="Projetos em andamento"
               valor={ind.projetos}
-              detalhe={ind.semPlano ? `${ind.semPlano} sem plano de trabalho` : "Todos com plano de trabalho"}
+              detalhe={
+                ind.preContrato
+                  ? `${ind.emExecucao} em execução, ${ind.preContrato} antes da contratação`
+                  : ind.semPlano
+                    ? `${ind.semPlano} sem plano de trabalho`
+                    : "Todos com plano de trabalho"
+              }
               href={ativa ? `/${ativa.slug}` : undefined}
             />
             <Indicador
@@ -85,13 +92,20 @@ export default function Painel() {
             <Secao titulo="Pendências" descricao="Devoluções, atrasos, envios e prazos da semana.">
               <Pendencias projetos={estado.projetos} />
             </Secao>
-            <Secao titulo="Situação das etapas">
-              <GraficoSituacao projetos={estado.projetos} />
+            <Secao titulo="Fase dos projetos" descricao="Do diagnóstico à execução da consultoria.">
+              <FasesDosProjetos projetos={estado.projetos} />
             </Secao>
             <Secao titulo="Carga de trabalho por semana">
               <GraficoCarga projetos={estado.projetos} />
             </Secao>
           </div>
+
+          <Secao
+            titulo="Etapas de cada projeto"
+            descricao="D é o diagnóstico (antes da contratação); depois, as etapas do serviço de cada projeto, que variam de um serviço para outro."
+          >
+            <EtapasDosProjetos projetos={estado.projetos} />
+          </Secao>
 
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 pt-2">
             <h2 className="text-lg font-bold">Projetos</h2>

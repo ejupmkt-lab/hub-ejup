@@ -8,6 +8,9 @@ import type { EmpresaSlug, Projeto } from "@/lib/dados/tipos";
 import { etapasDoModelo } from "@/lib/modelos/instanciar";
 import { LIMITE_PROJETOS_CLIENTE } from "@/lib/projeto";
 import { horasDoServico, ID_SERVICO_LGPD, servicosDaEmpresa } from "@/lib/servicos";
+import { contratacaoInicial, fases } from "@/lib/fase";
+import { hojeIso } from "@/lib/datas";
+import type { SituacaoContratacao } from "@/lib/dados/tipos";
 import { normasPadrao, referenciasPadrao } from "@/lib/relatorio/padroes";
 import { Botao, BotaoLink, Cabecalho, Campo, Vazio } from "@/components/ui";
 import { EscolherGestorSebrae } from "@/components/projeto/gestor-sebrae";
@@ -30,7 +33,11 @@ function Conteudo() {
     gestorSebrae: "",
     segmento: "",
     areaAtuacao: "",
+    situacao: "diagnostico" as SituacaoContratacao, // onde o projeto está no HUB
   });
+  // Horas de cada etapa: as da ficha do serviço, ou as da proposta (quando a ficha não traz)
+  const [horas, setHoras] = useState<Record<string, string>>({});
+  const horaDaEtapa = (ordem: number, padrao: number) => horas[`${f.modeloId}:${ordem}`] ?? (padrao ? String(padrao) : "");
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setF({ ...f, [k]: e.target.value });
   const modelo = modelos.find((m) => m.id === f.modeloId);
   // Calculado a cada render: o cliente recém-cadastrado pode chegar à lista um instante depois
@@ -74,7 +81,8 @@ function Conteudo() {
         areaAtuacao: f.areaAtuacao.trim() || areaSugerida,
         localAssinatura: "Natal/RN",
         planoFechadoEm: null,
-        etapas: etapasDoModelo(modelo),
+        etapas: etapasDoModelo(modelo).map((e) => ({ ...e, horasPrevistas: Number(horaDaEtapa(e.ordem, e.horasPrevistas).replace(",", ".")) || 0 })),
+        contratacao: contratacaoInicial(f.situacao, hojeIso()),
         registros: lgpd ? normasPadrao().map((r) => ({ ...r, id: novoId("reg") })) : [],
         referencias: lgpd ? referenciasPadrao().map((r) => ({ ...r, id: novoId("ref") })) : [],
         historico: [],
@@ -155,6 +163,14 @@ function Conteudo() {
             </fieldset>
             <fieldset className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
               <legend className="mb-3 text-[15px] font-medium">Dados do HUB SEBRAE</legend>
+              <Campo rotulo="Onde o projeto está no HUB" className="sm:col-span-2" dica={fases[f.situacao === "contratado" ? "execucao" : f.situacao].descricao}>
+                <select className="campo" value={f.situacao} onChange={set("situacao")}>
+                  <option value="diagnostico">Diagnóstico em elaboração (pré-contratual)</option>
+                  <option value="aguardando_aprovacao">Diagnóstico enviado, aguardando o gestor</option>
+                  <option value="aguardando_pagamento">Aprovado, aguardando o pagamento do cliente</option>
+                  <option value="contratado">Contratado: o cliente já pagou</option>
+                </select>
+              </Campo>
               <Campo rotulo="Código do pedido no HUB" dica="É o mesmo número do projeto no HUB.">
                 <input className="campo num" value={f.codigoHub} onChange={set("codigoHub")} />
               </Campo>
@@ -201,18 +217,40 @@ function Conteudo() {
           {modelo && (
             <aside className="lg:pt-9">
               <p className="text-base font-semibold">O projeto nasce com</p>
+              <p className="mt-1 text-[13px] text-tinta-2">
+                {horasDoServico(modelo)
+                  ? "Horas da ficha do serviço; ajuste se a proposta for diferente."
+                  : "A ficha deste serviço não traz as horas: informe as da proposta (ou deixe para depois)."}
+              </p>
               <ol className="mt-4 space-y-3 border-l border-linha pl-5">
                 {modelo.etapas.map((e) => (
                   <li key={e.ordem} className="text-[15px]">
                     <span className="num font-semibold">{String(e.ordem).padStart(2, "0")}</span> {e.nome.charAt(0) + e.nome.slice(1).toLowerCase()}
-                    <span className="num block text-[13px] text-tinta-2">
-                      {e.horasPrevistas} h, {e.atividades.length} {e.atividades.length === 1 ? "atividade" : "atividades"}, {e.entregaveis.length}{" "}
-                      {e.entregaveis.length === 1 ? "entregável" : "entregáveis"}
+                    <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-tinta-2">
+                      <label className="flex items-center gap-1.5">
+                        <input
+                          type="number"
+                          min={0}
+                          inputMode="numeric"
+                          aria-label={`Horas da etapa ${e.ordem}`}
+                          className="campo num !w-20 !py-1 !text-sm"
+                          value={horaDaEtapa(e.ordem, e.horasPrevistas)}
+                          onChange={(ev) => setHoras((h) => ({ ...h, [`${f.modeloId}:${e.ordem}`]: ev.target.value }))}
+                        />
+                        h
+                      </label>
+                      <span className="num">
+                        · {e.atividades.length} {e.atividades.length === 1 ? "atividade" : "atividades"}, {e.entregaveis.length}{" "}
+                        {e.entregaveis.length === 1 ? "entregável" : "entregáveis"}
+                      </span>
                     </span>
                   </li>
                 ))}
               </ol>
-              <p className="num mt-4 text-sm font-semibold text-tinta">{horasDoServico(modelo)} h no total</p>
+              <p className="num mt-4 text-sm font-semibold text-tinta">
+                {modelo.etapas.reduce((a, e) => a + (Number(horaDaEtapa(e.ordem, e.horasPrevistas).replace(",", ".")) || 0), 0) || "Horas a definir"}
+                {modelo.etapas.some((e) => Number(horaDaEtapa(e.ordem, e.horasPrevistas)) > 0) ? " h no total" : ""}
+              </p>
               <p className="mt-3 text-sm text-tinta-2">
                 {lgpd ? "Também já entram as referências normativas e o inventário de normas usados nos relatórios. " : ""}
                 {modelo.prestadoraVinculada ? `Prestadora vinculada: ${modelo.prestadoraVinculada}. ` : ""}As datas de cada etapa são definidas logo depois, no

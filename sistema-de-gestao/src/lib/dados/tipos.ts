@@ -131,6 +131,17 @@ export type RegistroAtividade = {
   registradoPor: string;
 };
 
+// Antes da consultoria: o diagnóstico (pré-contratual, assinado só pelo
+// consultor) vai ao HUB, o gestor do SEBRAE aprova e o cliente paga. Projetos
+// sem este campo são anteriores a ele e já estavam contratados.
+export type SituacaoContratacao = "diagnostico" | "aguardando_aprovacao" | "aguardando_pagamento" | "contratado";
+export type Contratacao = {
+  situacao: SituacaoContratacao;
+  enviadoEm: string | null; // diagnóstico enviado no HUB
+  aprovadoEm: string | null; // gestor aprovou a contratação
+  pagoEm: string | null; // cliente pagou: a consultoria começa
+};
+
 export type Projeto = {
   id: string;
   empresa: EmpresaSlug;
@@ -138,6 +149,7 @@ export type Projeto = {
   modeloId: string; // id do serviço (área de Serviços)
   modeloVersao: number;
   servicoNome?: string; // nome curto do serviço quando o projeto foi criado
+  contratacao?: Contratacao;
   consultorId: string;
   status: "aguardando_plano" | "em_andamento" | "encerrado";
   prestadoraVinculada: string;

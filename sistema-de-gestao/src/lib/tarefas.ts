@@ -1,6 +1,7 @@
 import type { Atividade, Etapa, Projeto } from "./dados/tipos";
 import { hojeIso } from "./datas";
 import { etapaAtrasada, etapaAtual, etapaConcluida } from "./projeto";
+import { antesDaContratacao } from "./fase";
 
 // Tarefas do plano de trabalho: as atividades do checklist ainda pendentes nas
 // etapas já começadas (pelas datas do plano) e na etapa em curso. Atrasada é a
@@ -10,7 +11,7 @@ export type Tarefa = { projeto: Projeto; etapa: Etapa; atividade: Atividade; ind
 export function tarefasPendentes(projetos: Projeto[], hoje = hojeIso()): Tarefa[] {
   const lista: Tarefa[] = [];
   for (const p of projetos) {
-    if (p.status === "encerrado") continue;
+    if (p.status === "encerrado" || antesDaContratacao(p)) continue; // antes de contratado, não há tarefas da consultoria
     const atual = etapaAtual(p);
     for (const e of p.etapas) {
       if (etapaConcluida(e)) continue;

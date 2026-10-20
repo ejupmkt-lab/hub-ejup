@@ -1,7 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { supabaseServidor } from "@/lib/supabase/servidor";
-import type { Cliente, Etapa, Projeto } from "@/lib/dados/tipos";
+import type { Cliente, Etapa, Projeto, Servico } from "@/lib/dados/tipos";
+import { antesDaContratacao, faseDoProjeto, fases } from "@/lib/fase";
 import type { Anexo, ItemAcao } from "@/lib/conversa";
 import { todasSecoes } from "@/lib/relatorio/secoes";
 import { formatarData, hojeIso } from "@/lib/datas";
@@ -27,6 +28,7 @@ O que fazer com cada mensagem:
 6. Plano de trabalho (as datas das etapas): se ele ainda não foi definido e o consultor disser quando o projeto começa (e, se souber, quando termina), use "definir_cronograma" com as datas; o sistema divide o período entre as etapas pela carga horária (sem a data de fim, pela duração de referência). Deixe "fim" vazio se ele não disser. Se o plano já existe e uma etapa mudar de datas, use "alterar_datas_etapa" com a justificativa dele, mandando as novas datas de todas as etapas afetadas, para que continuem em sequência e sem sobreposição.
 7. Fechamento da etapa: quando o consultor mandar o PDF do relatório assinado no gov.br, ou disser as datas das assinaturas, use "registrar_assinatura" (anexo = id do PDF, ou vazio; datas vazias quando não ditas). Quando ele disser que enviou o relatório no HUB, use "mudar_situacao_etapa" com "enviada"; quando disser que o SEBRAE aprovou, "aprovada"; quando disser que o SEBRAE devolveu, "devolvida", com o pedido de ajuste na observação. O sistema confere se o relatório está completo e assinado antes de aceitar.
 8. Nunca altere etapas enviadas ou aprovadas, a não ser para registrar a aprovação ou a devolução do SEBRAE.
+9. Antes da consultoria há a fase pré-contratual: o consultor elabora o diagnóstico no modelo do SEBRAE (justificando por que a solicitação do cliente é válida, com o que ele mapeou), assina sozinho e envia no HUB; o gestor do SEBRAE aprova a contratação; o cliente paga no HUB. Quando o consultor disser que enviou o diagnóstico, que o gestor aprovou ou que o cliente pagou, use "atualizar_contratacao" com a nova situação ("aguardando_aprovacao", "aguardando_pagamento" ou "contratado") e a data. Nessa fase, ajude a escrever o diagnóstico usando o que ele contar e as perguntas do pré-diagnóstico da ficha; não marque checklist nem escreva relatórios de etapa antes da contratação.
 
 A resposta ao consultor ("resposta"): português claro e direto, em poucas linhas, sem Markdown. Diga o que você fez e qual é o próximo passo concreto para a etapa avançar (até a entrega final do projeto), e faça as perguntas necessárias. Se a mensagem for só uma pergunta, responda sem ações. Não repita a lista de ações em detalhe: o sistema já mostra cada alteração.
 
@@ -136,6 +138,16 @@ const ESQUEMA = {
             required: ["tipo", "etapa", "situacao", "observacao"],
             additionalProperties: false,
           },
+          {
+            type: "object",
+            properties: {
+              tipo: { type: "string", const: "atualizar_contratacao" },
+              situacao: { type: "string", enum: ["aguardando_aprovacao", "aguardando_pagamento", "contratado"] },
+              data: { type: "string", format: "date" },
+            },
+            required: ["tipo", "situacao", "data"],
+            additionalProperties: false,
+          },
         ],
       },
     },
@@ -169,6 +181,8 @@ export async function POST(req: Request) {
   const projeto = linhaProjeto.dados as Projeto;
   const { data: linhaCliente } = await sb.from("clientes").select("dados").eq("id", linhaProjeto.cliente_id).maybeSingle();
   const cliente = (linhaCliente?.dados ?? {}) as Partial<Cliente>;
+  const { data: linhaServico } = await sb.from("servicos").select("dados").eq("id", projeto.modeloId).maybeSingle();
+  const preDiagnostico = ((linhaServico?.dados ?? {}) as Partial<Servico>).preDiagnostico ?? [];
 
   const { data: ultimas } = await sb
     .from("mensagens_projeto")
@@ -225,7 +239,7 @@ export async function POST(req: Request) {
             content: [
               {
                 type: "text",
-                text: `<projeto>\n${contextoDoProjeto(projeto, cliente)}\n</projeto>\n\n<conversa_anterior>\n${historico}\n</conversa_anterior>`,
+                text: `<projeto>\n${contextoDoProjeto(projeto, cliente, preDiagnostico)}\n</projeto>\n\n<conversa_anterior>\n${historico}\n</conversa_anterior>`,
               },
               { type: "text", text: `<mensagem_atual>\n${atual.texto || "(sem texto, só anexos)"}\n</mensagem_atual>` },
               ...blocos,
@@ -257,7 +271,7 @@ export async function POST(req: Request) {
 
 // Tudo o que a IA precisa saber do projeto: cliente, etapas, checklist, modelo
 // do relatório (seções e entregáveis, com o texto atual) e o que já foi registrado
-function contextoDoProjeto(p: Projeto, c: Partial<Cliente>) {
+function contextoDoProjeto(p: Projeto, c: Partial<Cliente>, preDiagnostico: string[]) {
   const linha = (rotulo: string, valor?: string | null) => (valor?.trim() ? `${rotulo}: ${valor.trim()}` : null);
   const concluida = (e: Etapa) => e.status === "enviada" || e.status === "aprovada";
   const emCurso = p.etapas.find((e) => !concluida(e));
@@ -276,6 +290,8 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>) {
     "## Projeto",
     `Serviço: ${p.fichaTecnica} (ficha técnica ${p.codigoFichaTecnica})`,
     linha("Código do pedido no HUB", p.codigoSolicitacaoHub || p.numeroProjetoHub),
+    `Fase: ${fases[faseDoProjeto(p)].rotulo}${antesDaContratacao(p) ? " (antes da contratação)" : ""}`,
+    preDiagnostico.length ? `Perguntas do pré-diagnóstico da ficha:\n${preDiagnostico.map((q, i) => `${i + 1}. ${q}`).join("\n")}` : null,
     `Plano de trabalho: ${p.planoFechadoEm ? "definido" : "ainda não definido"}`,
     `Etapa em curso: ${emCurso ? `${emCurso.ordem} (${emCurso.nome})` : "todas enviadas"}`,
   ];

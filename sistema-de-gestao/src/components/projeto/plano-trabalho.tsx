@@ -9,7 +9,7 @@ import { Botao, Campo, Status } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 import { automatizarEtapa } from "@/lib/regras-etapa";
 
-type Linha = { inicio: string; fim: string };
+type Linha = { inicio: string; fim: string; horas: string };
 
 function validar(linhas: Linha[]) {
   const erros: string[] = [];
@@ -29,16 +29,19 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
   const [inicio, setInicio] = useState(projeto.etapas[0].dataInicio ?? hojeIso());
   const [fim, setFim] = useState(projeto.etapas[projeto.etapas.length - 1].dataFim ?? "");
   const [copiado, setCopiado] = useState(false);
-  const horasTotal = projeto.etapas.reduce((a, e) => a + e.horasPrevistas, 0);
-  const [linhas, setLinhas] = useState<Linha[]>(projeto.etapas.map((e) => ({ inicio: e.dataInicio ?? "", fim: e.dataFim ?? "" })));
+  const paraLinhas = () => projeto.etapas.map((e) => ({ inicio: e.dataInicio ?? "", fim: e.dataFim ?? "", horas: e.horasPrevistas ? String(e.horasPrevistas) : "" }));
+  const [linhas, setLinhas] = useState<Linha[]>(paraLinhas);
+  const numero = (h: string) => Number(h.replace(",", ".")) || 0;
+  const horasTotal = editando ? linhas.reduce((a, l) => a + numero(l.horas), 0) : projeto.etapas.reduce((a, e) => a + e.horasPrevistas, 0);
   const [justificativa, setJustificativa] = useState("");
   const erros = validar(linhas);
 
   // Com início e fim: divide os dias na proporção das horas. Só com o início: usa a duração de referência.
   const curtoDemais = !!fim && diferencaDias(inicio, fim) + 1 < projeto.etapas.length;
   const sugerir = () => {
-    const porHoras = fim ? distribuirPorHoras(inicio, fim, projeto.etapas.map((e) => e.horasPrevistas)) : null;
-    setLinhas(porHoras ?? sugerirDatas(inicio, projeto.etapas.map((e) => e.duracaoReferenciaDias)));
+    const porHoras = fim ? distribuirPorHoras(inicio, fim, linhas.map((l) => numero(l.horas))) : null;
+    const datas = porHoras ?? sugerirDatas(inicio, projeto.etapas.map((e) => e.duracaoReferenciaDias));
+    setLinhas(linhas.map((l, i) => ({ ...l, ...datas[i] })));
   };
   const copiar = async () => {
     try {
@@ -55,6 +58,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
     alterar(
       (p) => {
         p.etapas.forEach((e, i) => {
+          e.horasPrevistas = numero(linhas[i].horas);
           e.dataInicio = e.dataInicioPlano = linhas[i].inicio;
           e.dataFim = e.dataFimPlano = linhas[i].fim;
           e.dataRelatorio ??= linhas[i].fim; // local e data do relatório: o fim da etapa, ajustável
@@ -71,16 +75,18 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
 
   const salvarAlteracao = () => {
     const mudancas = projeto.etapas
-      .map((e, i) =>
+      .flatMap((e, i) => [
         e.dataInicio !== linhas[i].inicio || e.dataFim !== linhas[i].fim
           ? `Etapa ${doisDigitos(e.ordem)}: ${formatarData(e.dataInicio)}–${formatarData(e.dataFim)} → ${formatarData(linhas[i].inicio)}–${formatarData(linhas[i].fim)}`
           : null,
-      )
+        e.horasPrevistas !== numero(linhas[i].horas) ? `Etapa ${doisDigitos(e.ordem)}: ${e.horasPrevistas} h → ${numero(linhas[i].horas)} h` : null,
+      ])
       .filter(Boolean)
       .join("; ");
     alterar(
       (p) =>
         p.etapas.forEach((e, i) => {
+          e.horasPrevistas = numero(linhas[i].horas);
           if (e.dataRelatorio === e.dataFim) e.dataRelatorio = linhas[i].fim; // acompanha o novo fim, se não foi mudada à mão
           e.dataInicio = linhas[i].inicio;
           e.dataFim = linhas[i].fim;
@@ -145,7 +151,22 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
               return (
                 <tr key={e.ordem} className="border-b border-linha last:border-0">
                   <td className="py-3 pr-4"><span className="num font-semibold">{doisDigitos(e.ordem)}</span> {e.nome.charAt(0) + e.nome.slice(1).toLowerCase()}</td>
-                  <td className="num py-3 pr-4">{e.horasPrevistas} h</td>
+                  <td className="num py-3 pr-4">
+                    {editando ? (
+                      <input
+                        type="number"
+                        min={0}
+                        aria-label={`Horas da etapa ${e.ordem}`}
+                        className="campo num !w-24"
+                        value={linhas[i].horas}
+                        onChange={(ev) => setLinha(i, "horas", ev.target.value)}
+                      />
+                    ) : e.horasPrevistas ? (
+                      `${e.horasPrevistas} h`
+                    ) : (
+                      "a definir"
+                    )}
+                  </td>
                   <td className="num py-3 pr-4 text-tinta-2">
                     {(() => {
                       const ini = editando ? linhas[i].inicio : e.dataInicio;
@@ -194,7 +215,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
               <input className="campo" value={justificativa} onChange={(e) => setJustificativa(e.target.value)} />
             </Campo>
             <Botao onClick={salvarAlteracao} disabled={erros.length > 0 || !justificativa.trim()}>Salvar alteração</Botao>
-            <Botao variante="secundario" onClick={() => { setLinhas(projeto.etapas.map((e) => ({ inicio: e.dataInicio ?? "", fim: e.dataFim ?? "" }))); setEditando(false); }}>Cancelar</Botao>
+            <Botao variante="secundario" onClick={() => { setLinhas(paraLinhas()); setEditando(false); }}>Cancelar</Botao>
           </>
         )}
       </div>
