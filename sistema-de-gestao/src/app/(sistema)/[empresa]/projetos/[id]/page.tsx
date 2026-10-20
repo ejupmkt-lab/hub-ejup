@@ -14,14 +14,13 @@ import { Relatorios } from "@/components/projeto/relatorios";
 import { Conversa } from "@/components/projeto/conversa";
 import { formatarData, diferencaDias, hojeIso } from "@/lib/datas";
 import { horasDoProjeto, horasFmt } from "@/lib/horas";
-import { avancoEtapa, avancoProjeto, entregaFinal, etapaAtrasada, etapaAtual, previstoProjeto, servicoDoProjeto } from "@/lib/projeto";
-import { doisDigitos, statusEtapa, statusProjeto } from "@/lib/rotulos";
+import { avancoEtapa, avancoProjeto, entregaFinal, etapaAtrasada, etapaAtual, previstoProjeto, servicoDoProjeto, situacaoProjeto } from "@/lib/projeto";
+import { doisDigitos, statusEtapa } from "@/lib/rotulos";
 import { ancoraAbaProjeto, passoDoProjeto } from "@/lib/proximo-passo";
-import { Abas, Botao, BotaoLink, Cabecalho, Cartao, Indicador, ProximoPasso, Vazio } from "@/components/ui";
-import { IconeClientes, IconeRegistrar, IconeRelatorio } from "@/components/icones";
+import { Abas, Barra, Botao, BotaoLink, Cabecalho, Cartao, Chip, ProximoPasso, Vazio } from "@/components/ui";
 
 // Três abas para o dia a dia; o resto fica no "Mais"
-const principais = ["Conversa", "Cronograma", "Entregas"] as const;
+const principais = ["Desenvolvimento", "Cronograma", "Entregas"] as const;
 const secundarias = ["Ficha do projeto", "Tabelas do relatório", "Referências", "Horas e visitas", "Histórico"] as const;
 type Aba = (typeof principais)[number] | (typeof secundarias)[number];
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
@@ -29,13 +28,13 @@ const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 export default function PaginaProjeto() {
   const { projeto, cliente, consultor, alterar } = useProjeto();
   const { empresa: slug } = useParams<{ empresa: string }>();
-  // Sem plano de trabalho, o primeiro passo é definir as datas
-  const [aba, setAba] = useState<Aba>(projeto?.status === "aguardando_plano" ? "Cronograma" : "Conversa");
+  // O projeto abre sempre no Desenvolvimento (a conversa com a IA)
+  const [aba, setAba] = useState<Aba>("Desenvolvimento");
   const [menuMais, setMenuMais] = useState(false);
-  // Cada "Registrar" traz a caixa da conversa à vista (a contagem avisa o componente)
+  // Atalho "Registrar" do menu (#registrar) traz a caixa de mensagem à vista
   const [focar, setFocar] = useState(0);
 
-  // #plano, #registrar, #ficha… no endereço abrem a aba certa. Lido
+  // #plano, #desenvolvimento, #ficha… no endereço abrem a aba certa. Lido
   // depois da navegação, porque o Next atualiza o hash depois de montar.
   useEffect(() => {
     const ler = () => {
@@ -86,16 +85,22 @@ export default function PaginaProjeto() {
     setAba("Cronograma");
     setTimeout(() => document.getElementById("plano")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
   };
-  const registrar = () => {
-    setAba("Conversa");
+  const desenvolver = () => {
+    setAba("Desenvolvimento");
     setFocar((n) => n + 1);
   };
 
   const situacaoEtapa = et ? (et.status === "devolvida" ? "Devolvida" : etapaAtrasada(et) ? "Atrasada" : statusEtapa[et.status].rotulo) : null;
   const tomAvanco = previsto === null ? undefined : avanco >= previsto ? "ok" : previsto - avanco >= 10 ? "atencao" : undefined;
   const diasEntrega = entrega ? diferencaDias(hoje, entrega) : null;
-  const proximoPasso = passo && <ProximoPasso passo={passo} aoAgir={passo.href.endsWith("#plano") ? abrirPlano : passo.encerrar ? encerrar : undefined} />;
+  const proximoPasso = passo && (
+    <ProximoPasso passo={passo} aoAgir={passo.href.endsWith("#desenvolvimento") ? desenvolver : passo.encerrar ? encerrar : undefined} />
+  );
   const abaMais = (secundarias as readonly string[]).includes(aba) ? aba : "Mais";
+
+  const situacao = situacaoProjeto(projeto);
+  const corEtapa = et?.status === "devolvida" ? "text-vermelho" : et && etapaAtrasada(et) ? "text-laranja" : "text-tinta-2";
+  const celula = "min-w-0 bg-folha px-4 py-3.5 sm:px-5";
 
   return (
     <>
@@ -107,128 +112,130 @@ export default function PaginaProjeto() {
         ]}
         titulo={nomeCliente}
         subtitulo={
-          <>
-            <p className="num break-words">
-              <span className="font-semibold text-tinta">{servico}</span> · Projeto HUB {projeto.numeroProjetoHub || "sem número"} · ficha{" "}
-              {projeto.codigoFichaTecnica}
-            </p>
-            <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:flex sm:flex-wrap sm:gap-x-8">
-              <div className="min-w-0">
-                <dt className="text-[12px] text-tinta-2">Consultor</dt>
-                <dd className="break-words font-semibold text-tinta">{consultor?.nome ?? "A definir"}</dd>
-              </div>
-              <div>
-                <dt className="text-[12px] text-tinta-2">Início</dt>
-                <dd className="num font-semibold text-tinta">{formatarData(projeto.etapas[0]?.dataInicio)}</dd>
-              </div>
-              <div>
-                <dt className="text-[12px] text-tinta-2">Fim previsto</dt>
-                <dd className="num font-semibold text-tinta">{formatarData(entrega)}</dd>
-              </div>
-              <div>
-                <dt className="text-[12px] text-tinta-2">Situação</dt>
-                <dd className="font-semibold text-azul">{statusProjeto[projeto.status]}</dd>
-              </div>
-            </dl>
-          </>
+          <p className="num flex flex-wrap items-center gap-x-2 gap-y-1.5 break-words">
+            <span className="font-semibold text-tinta">{servico}</span>
+            <span aria-hidden>·</span>
+            <span>HUB {projeto.numeroProjetoHub || "sem número"}</span>
+            <span aria-hidden>·</span>
+            <span>ficha {projeto.codigoFichaTecnica}</span>
+            <Chip tom={situacao.tom}>{situacao.rotulo}</Chip>
+          </p>
         }
         abas={
-          <div className="relative">
-            <Abas
-              abas={[...principais, abaMais]}
-              atual={aba === abaMais ? abaMais : aba}
-              aoTrocar={(a) => (a === abaMais ? setMenuMais(!menuMais) : irPara(a as Aba))}
-              extra={{ [abaMais]: <span aria-hidden>▾</span> }}
-              naFaixa
-            />
-            {menuMais && (
-              <>
-                <div aria-hidden className="fixed inset-0 z-30" onClick={() => setMenuMais(false)} />
-                <ul className="absolute right-0 top-full z-40 mt-2 w-60 rounded-[var(--radius-bloco)] border border-linha bg-folha p-1.5 shadow-lg">
-                  {secundarias.map((s) => (
-                    <li key={s}>
-                      <button
-                        onClick={() => irPara(s)}
-                        className={`w-full rounded-[var(--radius-campo)] px-3 py-2.5 text-left text-[15px] ${s === aba ? "bg-azul-claro font-semibold text-azul" : "text-tinta hover:bg-pedra"}`}
-                      >
-                        {s}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </>
+          <>
+            {/* Resumo do projeto, o mesmo em todas as abas */}
+            <Cartao className="grid grid-cols-2 gap-px overflow-hidden bg-linha lg:grid-cols-[1.35fr_1.25fr_1fr_1fr_1fr]">
+              <div className={`${celula} col-span-2 lg:col-span-1`}>
+                <p className="text-[12px] font-semibold text-tinta-2">Avanço</p>
+                <p className="num mt-0.5 flex flex-wrap items-baseline gap-x-2">
+                  <span className="text-2xl font-bold text-tinta">{avanco}%</span>
+                  <span className={`text-[13px] ${tomAvanco === "atencao" ? "text-laranja" : "text-tinta-2"}`}>
+                    {previsto === null ? "sem cronograma" : `previsto hoje ${previsto}%`}
+                  </span>
+                </p>
+                <div className="mt-2">
+                  <Barra valor={avanco} total={100} marca={previsto} tom={tomAvanco === "atencao" ? "atencao" : "andamento"} />
+                </div>
+              </div>
+              <div className={celula}>
+                <p className="text-[12px] font-semibold text-tinta-2">Etapa atual</p>
+                <p className="mt-0.5 break-words font-semibold leading-snug text-tinta">
+                  {et ? `${doisDigitos(et.ordem)} · ${capitalizar(et.nome)}` : projeto.status === "encerrado" ? "Encerrado" : "Todas enviadas"}
+                </p>
+                {et && (
+                  <p className={`num text-[13px] ${corEtapa}`}>
+                    {Math.round(avancoEtapa(et) * 100)}% · {situacaoEtapa}
+                  </p>
+                )}
+              </div>
+              <div className={celula}>
+                <p className="text-[12px] font-semibold text-tinta-2">Período</p>
+                {projeto.planoFechadoEm ? (
+                  <>
+                    <p className="num mt-0.5 font-semibold leading-snug text-tinta">
+                      {formatarData(projeto.etapas[0]?.dataInicio)} a {formatarData(entrega)}
+                    </p>
+                    {diasEntrega !== null && projeto.status !== "encerrado" && (
+                      <p className={`num text-[13px] ${diasEntrega < 0 ? "text-laranja" : "text-tinta-2"}`}>
+                        {diasEntrega >= 0 ? `faltam ${diasEntrega} ${diasEntrega === 1 ? "dia" : "dias"}` : `${-diasEntrega} dias após o fim`}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p className="mt-0.5 font-semibold leading-snug text-tinta">A definir</p>
+                )}
+              </div>
+              <div className={celula}>
+                <p className="text-[12px] font-semibold text-tinta-2">Horas</p>
+                <p className="num mt-0.5 font-semibold leading-snug text-tinta">
+                  {horasFmt(horas.realizadas)} de {horas.previstas} h
+                </p>
+                {horas.visitasPrevistas ? (
+                  <p className="num text-[13px] text-tinta-2">
+                    {horas.visitas} de {horas.visitasPrevistas} visitas
+                  </p>
+                ) : null}
+              </div>
+              <div className={celula}>
+                <p className="text-[12px] font-semibold text-tinta-2">Consultor</p>
+                <p className="mt-0.5 break-words font-semibold leading-snug text-tinta">{consultor?.nome ?? "A definir"}</p>
+              </div>
+            </Cartao>
+            {(encerravel || projeto.status === "encerrado") && (
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                {encerravel && <Botao onClick={encerrar}>Encerrar projeto</Botao>}
+                {projeto.status === "encerrado" && (
+                  <Botao variante="secundario" onClick={() => alterar((p) => void (p.status = "em_andamento"), { acao: "Projeto reaberto" })}>
+                    Reabrir projeto
+                  </Botao>
+                )}
+              </div>
             )}
-          </div>
+            <div className="relative mt-5">
+              <Abas
+                abas={[...principais, abaMais]}
+                atual={aba === abaMais ? abaMais : aba}
+                aoTrocar={(a) => (a === abaMais ? setMenuMais(!menuMais) : irPara(a as Aba))}
+                extra={{ [abaMais]: <span aria-hidden>▾</span> }}
+                naFaixa
+              />
+              {menuMais && (
+                <>
+                  <div aria-hidden className="fixed inset-0 z-30" onClick={() => setMenuMais(false)} />
+                  <ul className="absolute right-0 top-full z-40 mt-2 w-60 rounded-[var(--radius-bloco)] border border-linha bg-folha p-1.5 shadow-lg">
+                    {secundarias.map((s) => (
+                      <li key={s}>
+                        <button
+                          onClick={() => irPara(s)}
+                          className={`w-full rounded-[var(--radius-campo)] px-3 py-2.5 text-left text-[15px] ${s === aba ? "bg-azul-claro font-semibold text-azul" : "text-tinta hover:bg-pedra"}`}
+                        >
+                          {s}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
+          </>
         }
-      >
-        <div className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto">
-          {projeto.status !== "encerrado" && (
-            <Botao onClick={registrar} className="px-2 sm:px-4">
-              <IconeRegistrar className="h-5 w-5 shrink-0" />
-              Registrar
-            </Botao>
-          )}
-          <Botao variante="secundario" onClick={() => irPara("Entregas")} className="px-2 sm:px-4">
-            <IconeRelatorio className="h-5 w-5 shrink-0" />
-            Entregas
-          </Botao>
-          <BotaoLink href={`/${projeto.empresa}/clientes/${cliente.id}`} variante="secundario" className="px-2 sm:px-4">
-            <IconeClientes className="h-5 w-5 shrink-0" />
-            Cliente
-          </BotaoLink>
-          {encerravel && (
-            <Botao onClick={encerrar} className="col-span-3">
-              Encerrar projeto
-            </Botao>
-          )}
-          {projeto.status === "encerrado" && (
-            <Botao variante="secundario" className="col-span-2" onClick={() => alterar((p) => void (p.status = "em_andamento"), { acao: "Projeto reaberto" })}>
-              Reabrir projeto
-            </Botao>
-          )}
-        </div>
-      </Cabecalho>
+      />
 
-      {aba === "Conversa" && (
-        <div className="space-y-4">
-          {passo && projeto.status !== "encerrado" && (
-            <p className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-[var(--radius-campo)] bg-azul-claro/70 px-3 py-2 text-sm text-tinta">
-              <span className="font-semibold text-azul">Próximo passo:</span>
-              <span className="min-w-0">{passo.texto}</span>
-            </p>
-          )}
-          <Conversa projeto={projeto} focar={focar} />
-        </div>
-      )}
+      {aba === "Desenvolvimento" && <Conversa projeto={projeto} passo={passo?.texto} focar={focar} />}
 
       {aba === "Cronograma" && (
         <div className="space-y-4">
-          {projeto.planoFechadoEm && (
-            <section aria-label="Resumo do projeto" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <Indicador rotulo="Avanço geral" valor={`${avanco}%`} detalhe={previsto === null ? "Sem plano de trabalho" : `Previsto hoje: ${previsto}%`} tom={tomAvanco} />
-              <Indicador
-                rotulo="Etapa atual"
-                valor={<span className="block break-words text-[1.2rem] leading-tight sm:text-[1.35rem]">{et ? capitalizar(et.nome) : "Concluídas"}</span>}
-                detalhe={et ? `Etapa ${doisDigitos(et.ordem)} · ${Math.round(avancoEtapa(et) * 100)}% · ${situacaoEtapa}` : "Todas as etapas enviadas"}
-                tom={et?.status === "devolvida" ? "critico" : et && etapaAtrasada(et) ? "atencao" : undefined}
-              />
-              <Indicador rotulo="Horas registradas" valor={horasFmt(horas.realizadas)} detalhe={`de ${horas.previstas} h previstas`} />
-              <Indicador
-                rotulo={horas.visitasPrevistas ? "Visitas" : "Entrega final"}
-                valor={horas.visitasPrevistas ? `${horas.visitas} de ${horas.visitasPrevistas}` : entrega ? formatarData(entrega).slice(0, 5) : "—"}
-                detalhe={
-                  horas.visitasPrevistas
-                    ? "visitas presenciais registradas"
-                    : diasEntrega === null
-                      ? "sem plano de trabalho"
-                      : diasEntrega >= 0
-                        ? `faltam ${diasEntrega} ${diasEntrega === 1 ? "dia" : "dias"}`
-                        : `${-diasEntrega} dias depois do fim previsto`
-                }
-              />
-            </section>
+          {!projeto.planoFechadoEm && projeto.status !== "encerrado" && (
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-[var(--radius-bloco)] border border-azul/20 bg-azul-claro px-4 py-4 sm:px-5">
+              <p className="min-w-0 flex-1 basis-64 text-[15px] text-tinta">
+                <span className="font-semibold">O cronograma ainda não foi definido.</span> Diga à IA quando o projeto começa e termina, e ela divide as etapas
+                pela carga horária. Ou preencha as datas abaixo.
+              </p>
+              <Botao onClick={desenvolver} className="w-full sm:w-auto">
+                Definir com a IA
+              </Botao>
+            </div>
           )}
-          {proximoPasso}
           {projeto.planoFechadoEm && <CronogramaProjeto projeto={projeto} aoEditar={abrirPlano} />}
           <div id="plano" className="scroll-mt-4">
             <PlanoTrabalho projeto={projeto} />
@@ -247,9 +254,9 @@ export default function PaginaProjeto() {
       {aba === "Horas e visitas" && (
         <div className="space-y-4">
           <p className="text-sm text-tinta-2">
-            O SEBRAE confere as horas e as visitas contra a ficha técnica. Elas entram aqui sozinhas quando você conta a visita na{" "}
-            <button onClick={registrar} className="font-semibold text-azul hover:underline">
-              conversa
+            O SEBRAE confere as horas e as visitas contra a ficha técnica. Elas entram aqui sozinhas quando você conta a visita no{" "}
+            <button onClick={desenvolver} className="font-semibold text-azul hover:underline">
+              Desenvolvimento
             </button>
             ; nesta tela dá para conferir, corrigir ou lançar à mão.
           </p>
@@ -260,7 +267,10 @@ export default function PaginaProjeto() {
         <Cartao className="px-4 py-1 sm:px-6">
           <ol className="max-w-3xl">
             {projeto.historico.map((h, i) => (
-              <li key={i} className="grid grid-cols-[5.5rem_1fr] gap-x-4 border-b border-linha py-3.5 text-[15px] last:border-0 sm:grid-cols-[7.5rem_1fr] sm:gap-x-6">
+              <li
+                key={i}
+                className="grid grid-cols-[5.5rem_1fr] gap-x-4 border-b border-linha py-3.5 text-[15px] last:border-0 sm:grid-cols-[7.5rem_1fr] sm:gap-x-6"
+              >
                 <span className="num text-sm text-tinta-2">
                   {h.em.slice(0, 10).split("-").reverse().join("/")}
                   <span className="block">{h.em.slice(11, 16)}</span>
@@ -275,7 +285,7 @@ export default function PaginaProjeto() {
           </ol>
         </Cartao>
       )}
-      {aba !== "Conversa" && (
+      {aba !== "Desenvolvimento" && (
         <p className="mt-6 text-center text-[13px] text-tinta-2">
           Outros projetos deste cliente:{" "}
           <Link href={`/${projeto.empresa}/clientes/${cliente.id}`} className="font-semibold text-azul hover:underline">

@@ -5,7 +5,7 @@ import type { Projeto } from "@/lib/dados/tipos";
 import { useEstado } from "@/lib/dados/store";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { traduzirErro } from "@/lib/erros";
-import { aplicarAcoes, desfazerAcoes, type AcaoIA, type Anexo, type Desfazer } from "@/lib/conversa";
+import { aplicarAcoes, desfazerAcoes, sugestoesConversa, type AcaoIA, type Anexo, type Desfazer, type ItemAcao } from "@/lib/conversa";
 import { Botao, Cartao } from "@/components/ui";
 import { IconeAnexo, IconeCheck, IconeEnviar, IconeFechar, IconeIA, IconeMicrofone, IconeRelatorio } from "@/components/icones";
 import { useProjeto } from "./use-projeto";
@@ -16,7 +16,7 @@ type Mensagem = {
   autor_nome: string;
   texto: string;
   anexos: Anexo[];
-  acoes: { descricao: string }[];
+  acoes: ItemAcao[];
   desfazer: Desfazer[];
   desfeita: boolean;
   created_at: string;
@@ -24,16 +24,11 @@ type Mensagem = {
 type Pendente = { id: string; arquivo: File; url: string | null };
 
 const BUCKET = "evidencias";
-const exemplos = [
-  "Hoje fiz a visita de 2 horas com o responsável. Levantamos os sistemas que a empresa usa e quem acessa os dados dos clientes.",
-  "O que falta para fechar a etapa em curso?",
-  "Reunião remota de 1 hora ontem para validar o mapeamento dos processos.",
-];
 
 // Conversa do projeto: o consultor conta o que aconteceu (texto, ditado, fotos,
 // PDFs) e a IA organiza o projeto: marca o checklist, guarda as fotos na etapa
 // certa, registra visitas e escreve o relatório. Cada resposta pode ser desfeita.
-export function Conversa({ projeto, focar = 0 }: { projeto: Projeto; focar?: number }) {
+export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; passo?: string; focar?: number }) {
   const { alterar, usuario } = useProjeto();
   const { salvarAgora } = useEstado();
   const [mensagens, setMensagens] = useState<Mensagem[] | null>(null);
@@ -108,11 +103,12 @@ export function Conversa({ projeto, focar = 0 }: { projeto: Projeto; focar?: num
       if (!r.ok) throw new Error(d.erro ?? "Não foi possível falar com a IA agora.");
       const acoes = ((d.acoes ?? []) as AcaoIA[]).filter((a) => a && typeof a === "object" && "tipo" in a);
       // Calcula sobre uma cópia o que vai mudar (e como desfazer), depois aplica de verdade
-      const { descricoes, desfazer } = aplicarAcoes(structuredClone(projetoAtual.current), acoes, m.anexos, m.id, usuario.nome);
-      if (descricoes.length)
+      const { itens, desfazer } = aplicarAcoes(structuredClone(projetoAtual.current), acoes, m.anexos, m.id, usuario.nome);
+      const feitos = itens.filter((x) => !x.aviso);
+      if (feitos.length)
         alterar((p) => void aplicarAcoes(p, acoes, m.anexos, m.id, usuario.nome), {
-          acao: "Conversa: projeto organizado pela IA",
-          detalhe: descricoes.join("; "),
+          acao: "Desenvolvimento: projeto organizado pela IA",
+          detalhe: feitos.map((x) => x.descricao).join("; "),
         });
       const { data, error } = await supabaseNavegador()
         .from("mensagens_projeto")
@@ -122,7 +118,7 @@ export function Conversa({ projeto, focar = 0 }: { projeto: Projeto; focar?: num
           autor_nome: "Assistente",
           papel: "ia",
           texto: String(d.resposta ?? ""),
-          acoes: descricoes.map((descricao) => ({ descricao })),
+          acoes: itens,
           desfazer,
         })
         .select()
@@ -136,8 +132,9 @@ export function Conversa({ projeto, focar = 0 }: { projeto: Projeto; focar?: num
     }
   };
 
-  const enviar = async () => {
-    if (ocupado || (!texto.trim() && !pendentes.length)) return;
+  const enviar = async (pronto?: string) => {
+    const conteudo = (pronto ?? texto).trim();
+    if (ocupado || (!conteudo && !pendentes.length)) return;
     ditado.parar();
     setOcupado("enviando");
     setAviso(null);
@@ -148,7 +145,7 @@ export function Conversa({ projeto, focar = 0 }: { projeto: Projeto; focar?: num
       await salvarAgora();
       const { data, error } = await supabaseNavegador()
         .from("mensagens_projeto")
-        .insert({ projeto_id: projeto.id, empresa: projeto.empresa, autor_nome: usuario.nome, papel: "usuario", texto: texto.trim(), anexos })
+        .insert({ projeto_id: projeto.id, empresa: projeto.empresa, autor_nome: usuario.nome, papel: "usuario", texto: conteudo, anexos })
         .select()
         .single();
       if (error) throw new Error(traduzirErro(error, "Não foi possível enviar a mensagem."));
@@ -166,7 +163,13 @@ export function Conversa({ projeto, focar = 0 }: { projeto: Projeto; focar?: num
 
   const desfazer = async (m: Mensagem) => {
     if (!confirm("Desfazer as alterações que a IA fez nesta resposta?")) return;
-    alterar((p) => desfazerAcoes(p, m.desfazer), { acao: "Conversa: alterações da IA desfeitas", detalhe: m.acoes.map((a) => a.descricao).join("; ") });
+    alterar((p) => desfazerAcoes(p, m.desfazer), {
+      acao: "Desenvolvimento: alterações da IA desfeitas",
+      detalhe: m.acoes
+        .filter((a) => !a.aviso)
+        .map((a) => a.descricao)
+        .join("; "),
+    });
     setMensagens((l) => (l ?? []).map((x) => (x.id === m.id ? { ...x, desfeita: true } : x)));
     await supabaseNavegador().from("mensagens_projeto").update({ desfeita: true }).eq("id", m.id);
   };
@@ -180,71 +183,105 @@ export function Conversa({ projeto, focar = 0 }: { projeto: Projeto; focar?: num
     setPendentes((p) => [...p, ...novos].slice(0, 6));
   };
 
+  // Sugestão com "__" ou anexo: vai para a caixa, para completar; pergunta pronta: já envia
+  const usarSugestao = (t: string) => {
+    if (ocupado) return;
+    const anexar = t.includes("(anexe o PDF)");
+    const limpo = t.replace(" (anexe o PDF)", "");
+    if (!limpo.includes("__") && !anexar) return void enviar(limpo);
+    setTexto(limpo);
+    setTimeout(() => {
+      const c = caixa.current;
+      if (!c) return;
+      c.focus();
+      const i = limpo.indexOf("__");
+      if (i >= 0) c.setSelectionRange(i, limpo.indexOf(" ", i) > 0 ? limpo.indexOf(" ", i) : limpo.length);
+      if (anexar) entrada.current?.click();
+    }, 0);
+  };
+  const sugestoes = mensagens === null || ocupado || texto.trim() || pendentes.length ? [] : sugestoesConversa(projeto);
+  const vazia = mensagens?.length === 0;
+
   return (
-    <div className="space-y-4">
+    <Cartao className="relative">
+      <div className={`flex items-start gap-3 px-4 sm:px-6 ${vazia ? "pt-5 sm:pt-6" : "border-b border-linha py-3.5"}`}>
+        <span className={`grid shrink-0 place-items-center rounded-full bg-azul-claro text-azul ${vazia ? "h-10 w-10" : "h-8 w-8"}`}>
+          <IconeIA className={vazia ? "h-5 w-5" : "h-4 w-4"} />
+        </span>
+        <div className="min-w-0">
+          <h2 className={`font-bold ${vazia ? "text-lg" : "text-[15px] leading-8"}`}>Desenvolvimento do projeto</h2>
+          {vazia && (
+            <p className="mt-1 max-w-3xl text-[15px] text-tinta-2">
+              Conte ou dite o que aconteceu e mande fotos e documentos. A IA cuida do cronograma, do checklist, das horas e do relatório, até a entrega
+              final. Tudo pode ser desfeito.
+            </p>
+          )}
+        </div>
+      </div>
+
       {mensagens === null ? (
         <p className="py-10 text-center text-sm text-tinta-2">Carregando a conversa…</p>
-      ) : mensagens.length === 0 ? (
-        <Cartao className="p-4 sm:p-6">
-          <div className="flex items-start gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-azul-claro text-azul">
-              <IconeIA className="h-5 w-5" />
-            </span>
-            <div className="min-w-0">
-              <h2 className="text-lg font-bold">Conte o que aconteceu no projeto</h2>
-              <p className="mt-1 text-[15px] text-tinta-2">
-                Escreva ou dite como foi a visita, mande as fotos e os documentos. A IA descobre a etapa, marca o checklist, guarda as fotos como
-                evidência, registra as horas e escreve o relatório no modelo. Tudo aparece aqui e pode ser desfeito.
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 grid gap-2 sm:grid-cols-3">
-            {exemplos.map((e) => (
-              <button
-                key={e}
-                onClick={() => {
-                  setTexto(e);
-                  caixa.current?.focus();
-                }}
-                className="rounded-[var(--radius-campo)] border border-linha bg-pedra/60 px-3 py-2.5 text-left text-sm text-tinta hover:border-azul/40 hover:bg-azul-claro/50"
-              >
-                “{e}”
-              </button>
-            ))}
-          </div>
-        </Cartao>
       ) : (
-        <ol className="space-y-4" aria-label="Conversa">
-          {mensagens.map((m) => (
-            <li key={m.id}>
-              {m.papel === "usuario" ? (
-                <BolhaUsuario m={m} urls={urls} />
-              ) : (
-                <BolhaIA m={m} aoDesfazer={() => void desfazer(m)} />
-              )}
-            </li>
-          ))}
-        </ol>
+        mensagens.length > 0 && (
+          <ol className="space-y-4 px-3 py-5 sm:px-6" aria-label="Conversa">
+            {mensagens.map((m) => (
+              <li key={m.id}>{m.papel === "usuario" ? <BolhaUsuario m={m} urls={urls} /> : <BolhaIA m={m} aoDesfazer={() => void desfazer(m)} />}</li>
+            ))}
+          </ol>
+        )
       )}
 
-      {ocupado === "pensando" && (
-        <div className="mr-auto flex max-w-[90%] items-center gap-3 rounded-2xl rounded-bl-md border border-linha bg-folha px-4 py-3 text-sm text-tinta-2 shadow-[var(--shadow-cartao)]">
-          <IconeIA className="h-5 w-5 shrink-0 animate-pulse text-azul" />A IA está lendo e organizando o projeto…
-        </div>
-      )}
-      {falha && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-bloco)] border border-vermelho/25 bg-vermelho-claro px-4 py-3">
-          <p className="min-w-0 flex-1 basis-60 text-sm text-vermelho">{falha.erro}</p>
-          <Botao variante="secundario" tamanho="pequeno" onClick={() => void pedirIA(falha.mensagem)}>
-            Tentar de novo
-          </Botao>
+      {(ocupado === "pensando" || falha) && (
+        <div className="space-y-3 px-3 pb-4 sm:px-6">
+          {ocupado === "pensando" && (
+            <div className="mr-auto flex w-fit max-w-[90%] items-center gap-3 rounded-2xl rounded-bl-md bg-pedra px-4 py-3 text-sm text-tinta-2">
+              <IconeIA className="h-5 w-5 shrink-0 animate-pulse text-azul" />A IA está lendo e organizando o projeto…
+            </div>
+          )}
+          {falha && (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-campo)] border border-vermelho/25 bg-vermelho-claro px-4 py-3">
+              <p className="min-w-0 flex-1 basis-60 text-sm text-vermelho">{falha.erro}</p>
+              <Botao variante="secundario" tamanho="pequeno" onClick={() => void pedirIA(falha.mensagem)}>
+                Tentar de novo
+              </Botao>
+            </div>
+          )}
         </div>
       )}
       <div ref={fim} />
 
-      {/* Caixa de mensagem, sempre à mão (acima do menu inferior no celular) */}
-      <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-20 lg:bottom-4">
-        <Cartao className="p-2 focus-within:border-azul/50 focus-within:ring-2 focus-within:ring-azul/15 sm:p-3">
+      {/* Sugestões para avançar: empilhadas no celular, em três colunas no computador */}
+      {sugestoes.length > 0 && (
+        <div className="px-3 pt-3 sm:px-6">
+          <p className="mb-2 text-[13px] text-tinta-2">
+            {passo ? (
+              <>
+                <span className="font-semibold text-azul">Próximo passo:</span> {passo}
+              </>
+            ) : (
+              <span className="font-semibold text-azul">Sugestões</span>
+            )}
+          </p>
+          <div className="grid gap-2 sm:grid-cols-3">
+            {sugestoes.map((t) => (
+              <button
+                key={t}
+                onClick={() => usarSugestao(t)}
+                className="rounded-[var(--radius-campo)] border border-linha bg-pedra/60 px-3 py-2.5 text-left text-sm leading-snug text-tinta hover:border-azul/40 hover:bg-azul-claro/50"
+              >
+                {t.replace(" (anexe o PDF)", "")}
+                {t.includes("(anexe o PDF)") && <span className="mt-1 block text-[12px] text-tinta-2">Anexe o PDF assinado</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Caixa de mensagem; com conversa, fica sempre à mão (acima do menu inferior no celular) */}
+      <div
+        className={`z-20 rounded-b-[var(--radius-bloco)] bg-folha px-3 pb-3 pt-3 sm:px-6 sm:pb-5 ${vazia ? "" : "sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] lg:bottom-0"}`}
+      >
+        <div className="rounded-[var(--radius-bloco)] border border-linha-forte bg-folha p-2 focus-within:border-azul/60 focus-within:ring-2 focus-within:ring-azul/15 sm:p-2.5">
           {pendentes.length > 0 && (
             <ul className="mb-2 flex flex-wrap gap-2 px-1 pt-1">
               {pendentes.map((p) => (
@@ -282,7 +319,7 @@ export function Conversa({ projeto, focar = 0 }: { projeto: Projeto; focar?: num
             }}
             rows={Math.min(8, Math.max(2, texto.split("\n").length + Math.floor(texto.length / 70)))}
             placeholder={ditado.ouvindo ? "Pode falar…" : "Conte o que aconteceu, peça um texto ou pergunte o que falta"}
-            className="block w-full resize-none bg-transparent px-2 py-1.5 focus-visible:outline-none text-[15px] leading-relaxed text-tinta outline-none placeholder:text-tinta-2/70"
+            className="block w-full resize-none bg-transparent px-2 py-1.5 text-[15px] leading-relaxed text-tinta outline-none placeholder:text-tinta-2/70 focus-visible:outline-none"
             disabled={ocupado === "enviando"}
           />
           <div className="mt-1 flex items-center gap-1.5">
@@ -318,10 +355,10 @@ export function Conversa({ projeto, focar = 0 }: { projeto: Projeto; focar?: num
               <IconeEnviar className="h-4 w-4" />
             </Botao>
           </div>
-          {(aviso || ditado.erro) && <p className="px-2 pt-2 text-sm text-vermelho">{aviso ?? ditado.erro}</p>}
-        </Cartao>
+        </div>
+        {(aviso || ditado.erro) && <p className="px-2 pt-2 text-sm text-vermelho">{aviso ?? ditado.erro}</p>}
       </div>
-    </div>
+    </Cartao>
   );
 }
 
@@ -354,7 +391,9 @@ function BolhaUsuario({ m, urls }: { m: Mensagem; urls: Record<string, string> }
           )}
         </div>
       )}
-      {m.texto && <p className="whitespace-pre-line break-words rounded-2xl rounded-br-md bg-azul px-4 py-2.5 text-[15px] leading-relaxed text-folha">{m.texto}</p>}
+      {m.texto && (
+        <p className="whitespace-pre-line break-words rounded-2xl rounded-br-md bg-azul px-4 py-2.5 text-[15px] leading-relaxed text-folha">{m.texto}</p>
+      )}
       <span className="num text-[11px] text-tinta-2">
         {m.autor_nome}, {hora(m.created_at)}
       </span>
@@ -363,21 +402,23 @@ function BolhaUsuario({ m, urls }: { m: Mensagem; urls: Record<string, string> }
 }
 
 function BolhaIA({ m, aoDesfazer }: { m: Mensagem; aoDesfazer: () => void }) {
+  const feitos = m.acoes.filter((a) => !a.aviso);
+  const avisos = m.acoes.filter((a) => a.aviso);
   return (
-    <div className="mr-auto max-w-[94%] sm:max-w-[80%]">
-      <div className="rounded-2xl rounded-bl-md border border-linha bg-folha px-4 py-3 shadow-[var(--shadow-cartao)]">
+    <div className="mr-auto max-w-[96%] sm:max-w-[80%]">
+      <div className="rounded-2xl rounded-bl-md bg-pedra px-4 py-3">
         <p className="mb-1 flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-wide text-azul">
           <IconeIA className="h-4 w-4" />
           Assistente
         </p>
         {m.texto && <p className="whitespace-pre-line break-words text-[15px] leading-relaxed text-tinta">{m.texto}</p>}
-        {m.acoes.length > 0 && (
-          <div className={`mt-3 rounded-[var(--radius-campo)] px-3 py-2.5 ${m.desfeita ? "bg-pedra" : "bg-verde-claro"}`}>
+        {feitos.length > 0 && (
+          <div className={`mt-3 rounded-[var(--radius-campo)] border px-3 py-2.5 ${m.desfeita ? "border-linha bg-folha" : "border-verde/20 bg-verde-claro"}`}>
             <p className={`text-[12px] font-bold uppercase tracking-wide ${m.desfeita ? "text-tinta-2" : "text-verde"}`}>
               {m.desfeita ? "Alterações desfeitas" : "O que mudou no projeto"}
             </p>
             <ul className="mt-1.5 space-y-1">
-              {m.acoes.map((a, i) => (
+              {feitos.map((a, i) => (
                 <li key={i} className={`flex items-start gap-2 text-sm ${m.desfeita ? "text-tinta-2 line-through" : "text-tinta"}`}>
                   <IconeCheck className={`mt-0.5 h-4 w-4 shrink-0 ${m.desfeita ? "text-tinta-2" : "text-verde"}`} />
                   <span className="min-w-0 break-words">{a.descricao}</span>
@@ -390,6 +431,15 @@ function BolhaIA({ m, aoDesfazer }: { m: Mensagem; aoDesfazer: () => void }) {
               </button>
             )}
           </div>
+        )}
+        {avisos.length > 0 && (
+          <ul className="mt-3 space-y-1 rounded-[var(--radius-campo)] border border-laranja/25 bg-laranja-claro px-3 py-2.5">
+            {avisos.map((a, i) => (
+              <li key={i} className="break-words text-sm text-laranja">
+                {a.descricao}
+              </li>
+            ))}
+          </ul>
         )}
       </div>
       <span className="num mt-1 block text-[11px] text-tinta-2">{hora(m.created_at)}</span>
@@ -420,7 +470,9 @@ async function subirAnexo(projeto: Projeto, arquivo: File): Promise<Anexo> {
   tela.height = altura;
   tela.getContext("2d")!.drawImage(bmp, 0, 0, largura, altura);
   bmp.close();
-  const blob = await new Promise<Blob>((ok, falha) => tela.toBlob((b) => (b ? ok(b) : falha(new Error("Não foi possível preparar a foto."))), "image/jpeg", 0.85));
+  const blob = await new Promise<Blob>((ok, falha) =>
+    tela.toBlob((b) => (b ? ok(b) : falha(new Error("Não foi possível preparar a foto."))), "image/jpeg", 0.85),
+  );
   const caminho = `${projeto.empresa}/${projeto.id}/conversa/${id}.jpg`;
   const { error } = await sb.upload(caminho, blob, { contentType: "image/jpeg" });
   if (error) throw new Error(`Falha ao enviar “${arquivo.name}”. ${traduzirErro(error, "Tente de novo.")}`);

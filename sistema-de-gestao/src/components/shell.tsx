@@ -101,7 +101,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-campo)] bg-azul px-4 py-2.5 text-sm font-semibold text-folha shadow-sm hover:bg-azul-escuro"
             >
               <IconeRegistrar className="h-5 w-5" />
-              Registrar atividade
+              Desenvolver projeto
             </button>
           </div>
         )}
@@ -171,7 +171,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="flex justify-center">
             <button
               onClick={() => setFolha("registrar")}
-              aria-label="Registrar atividade"
+              aria-label="Desenvolver projeto"
               disabled={!base}
               className="-mt-7 grid h-[3.75rem] w-[3.75rem] place-items-center rounded-full bg-azul text-folha shadow-lg shadow-azul/30 ring-4 ring-folha active:scale-95 disabled:opacity-40"
             >
@@ -319,8 +319,8 @@ function EscolherProjeto({ aoFechar }: { aoFechar: () => void }) {
     return c?.nomeFantasia || c?.razaoSocial || "Cliente";
   };
   return (
-    <FolhaSobreposta titulo="Registrar atividade" aoFechar={aoFechar}>
-      <p className="mb-3 text-sm text-tinta-2">Conte o que aconteceu (visita, reunião, fotos, documentos) na conversa do projeto. Escolha qual:</p>
+    <FolhaSobreposta titulo="Desenvolver projeto" aoFechar={aoFechar}>
+      <p className="mb-3 text-sm text-tinta-2">Conte o que aconteceu (visita, reunião, fotos, documentos) no Desenvolvimento do projeto. Escolha qual:</p>
       {projetos.length === 0 ? (
         <div className="rounded-[var(--radius-campo)] bg-pedra px-4 py-6 text-center text-sm text-tinta-2">
           Nenhum projeto em andamento.

@@ -119,9 +119,9 @@ export function Cabecalho({
   return (
     <header className="mb-6 pt-6 sm:pt-8">
       {migalhas && migalhas.length > 0 && (
-        <nav aria-label="Você está em" className="mb-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] text-tinta-2">
+        <nav aria-label="Você está em" className="mb-2 flex items-center gap-x-1.5 text-[13px] text-tinta-2">
           {migalhas.map((m, i) => (
-            <span key={i} className="flex min-w-0 items-center gap-1.5">
+            <span key={i} className={`flex min-w-0 items-center gap-1.5 ${i === 0 ? "shrink-0" : ""}`}>
               {i > 0 && (
                 <span aria-hidden className="text-linha-forte">
                   ›

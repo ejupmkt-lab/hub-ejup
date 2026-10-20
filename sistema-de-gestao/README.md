@@ -19,23 +19,28 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   (`avancoProjeto` em `src/lib/projeto.ts`); o previsto vem das datas do plano.
 - **Projetos** em lista, quadro (por etapa), cronograma de todos e calendário de prazos.
 - **Tarefas**: as atividades do checklist ainda pendentes nas etapas em curso, marcáveis ali mesmo.
-- **Menu**: lateral no computador; no celular, menu inferior com o botão central **Registrar**
-  (visita, reunião ou horas de qualquer projeto).
+- **Menu**: lateral no computador; no celular, menu inferior com o botão central **Desenvolver projeto**
+  (abre o Desenvolvimento de qualquer projeto em andamento).
 - **Clientes** com os campos do Modelo de Diagnóstico do HUB SEBRAE.
 - **Projetos** a partir do modelo *Adequação à LGPD · HUB SEBRAE* (ficha 13070-5): 5 etapas, 333 h,
   checklist de atividades e 23 entregáveis.
-- **Plano de trabalho**: datas sugeridas e fechadas por Roberto; alteração posterior exige justificativa.
+- **Plano de trabalho / cronograma**: definido pela IA a partir do início e do fim contados no
+  Desenvolvimento, ou à mão na aba Cronograma; alteração posterior exige justificativa.
 - **Clientes e projetos**: cada cliente tem a sua página com todos os projetos (até 3 em andamento ao
   mesmo tempo; um 4º só excepcionalmente), cada um com o seu serviço e as suas etapas, conforme o modelo
   em `src/lib/modelos/` (hoje, Adequação à LGPD).
-- **Dentro do projeto**: Conversa, Cronograma (avanço, Gantt das etapas e o plano de trabalho, que define
-  as datas) e Entregas (o relatório técnico de cada etapa). Ficha, tabelas do relatório, referências,
-  horas e visitas e histórico ficam no menu "Mais".
-- **Conversa com a IA** (`src/components/projeto/conversa.tsx`, rota `/api/conversa`, tabela
+- **Dentro do projeto**: resumo fixo (avanço, etapa atual, período, horas, consultor) e três abas:
+  Desenvolvimento (abre por padrão), Cronograma (Gantt das etapas e o plano de trabalho, editável) e
+  Entregas (o relatório técnico de cada etapa). Ficha, tabelas do relatório, referências, horas e
+  visitas e histórico ficam no menu "Mais".
+- **Desenvolvimento com a IA** (`src/components/projeto/conversa.tsx`, rota `/api/conversa`, tabela
   `mensagens_projeto`): o consultor escreve ou dita (reconhecimento de voz do navegador), manda fotos e
-  PDFs; a IA identifica a etapa, marca o checklist, guarda as fotos como evidência, registra visitas e
-  horas e escreve seções e entregáveis no modelo. Cada resposta mostra o que mudou e pode ser desfeita
-  (`src/lib/conversa.ts`). Precisa da `ANTHROPIC_API_KEY` na Vercel.
+  PDFs; a IA define o cronograma, identifica a etapa, marca o checklist, guarda as fotos como evidência,
+  registra visitas e horas, escreve seções e entregáveis no modelo, guarda o PDF assinado e registra o
+  envio no HUB e a aprovação ou devolução do SEBRAE. O sistema confere cada ação (o que não pode,
+  aparece como aviso com o motivo); cada resposta mostra o que mudou e pode ser desfeita
+  (`src/lib/conversa.ts`). Sugestões de mensagem levam ao próximo passo até a entrega final. Precisa da
+  `ANTHROPIC_API_KEY` na Vercel.
 - **Etapas no formato do HUB SEBRAE**, registros do programa, redação por seção, checagem de completude.
 - **Relatório Técnico em Word (.docx)** no papel timbrado do modelo (`public/modelos/relatorio-base.docx`).
 - **Cadastro pelo CNPJ**: razão social, nome fantasia, endereço, CEP, porte, atividade e data de abertura

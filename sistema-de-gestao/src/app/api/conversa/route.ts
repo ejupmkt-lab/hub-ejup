@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { supabaseServidor } from "@/lib/supabase/servidor";
 import type { Cliente, Etapa, Projeto } from "@/lib/dados/tipos";
-import type { Anexo } from "@/lib/conversa";
+import type { Anexo, ItemAcao } from "@/lib/conversa";
 import { todasSecoes } from "@/lib/relatorio/secoes";
 import { formatarData, hojeIso } from "@/lib/datas";
 import { horasFmt, tiposAtividade } from "@/lib/horas";
@@ -24,9 +24,11 @@ O que fazer com cada mensagem:
 3. Registre visitas, reuniões remotas e trabalho interno quando a mensagem disser que aconteceram. Data e horas precisam estar na mensagem ou ser óbvias ("hoje", "ontem", "2 horas"); se faltar a duração, não registre e pergunte. As anotações do registro resumem o que foi feito e decidido.
 4. Guarde cada foto anexada como evidência da etapa certa, com uma legenda curta no estilo do relatório (ex.: "Reunião de levantamento com a diretoria em 20/10/2026"). Se a foto não servir de evidência (ex.: foto de tela sem relação), não guarde e diga por quê.
 5. Quando a mensagem trouxer conteúdo suficiente, escreva ou atualize as seções do relatório e os entregáveis da etapa, seguindo o modelo (título e orientação de cada seção). Ao atualizar, devolva o texto completo da seção, juntando o que já existia com o novo. Não reescreva seções sem necessidade.
-6. Nunca altere etapas enviadas ou aprovadas.
+6. Cronograma: se o plano de trabalho ainda não foi definido e o consultor disser quando o projeto começa (e, se souber, quando termina), use "definir_cronograma" com as datas; o sistema divide o período entre as etapas pela carga horária (sem a data de fim, pela duração de referência). Deixe "fim" vazio se ele não disser. Se o plano já existe e uma etapa mudar de datas, use "alterar_datas_etapa" com a justificativa dele, mandando as novas datas de todas as etapas afetadas, para que continuem em sequência e sem sobreposição.
+7. Fechamento da etapa: quando o consultor mandar o PDF do relatório assinado no gov.br, ou disser as datas das assinaturas, use "registrar_assinatura" (anexo = id do PDF, ou vazio; datas vazias quando não ditas). Quando ele disser que enviou o relatório no HUB, use "mudar_situacao_etapa" com "enviada"; quando disser que o SEBRAE aprovou, "aprovada"; quando disser que o SEBRAE devolveu, "devolvida", com o pedido de ajuste na observação. O sistema confere se o relatório está completo e assinado antes de aceitar.
+8. Nunca altere etapas enviadas ou aprovadas, a não ser para registrar a aprovação ou a devolução do SEBRAE.
 
-A resposta ao consultor ("resposta"): português claro e direto, em poucas linhas, sem Markdown. Diga o que você fez e o que falta para a etapa avançar, e faça as perguntas necessárias. Se a mensagem for só uma pergunta, responda sem ações. Não repita a lista de ações em detalhe: o sistema já mostra cada alteração.
+A resposta ao consultor ("resposta"): português claro e direto, em poucas linhas, sem Markdown. Diga o que você fez e qual é o próximo passo concreto para a etapa avançar (até a entrega final do projeto), e faça as perguntas necessárias. Se a mensagem for só uma pergunta, responda sem ações. Não repita a lista de ações em detalhe: o sistema já mostra cada alteração.
 
 Para os textos do relatório:
 ${ESTILO_RELATORIO}`;
@@ -59,13 +61,23 @@ const ESQUEMA = {
           },
           {
             type: "object",
-            properties: { tipo: { type: "string", const: "escrever_entregavel" }, etapa: { type: "integer" }, titulo: { type: "string" }, texto: { type: "string" } },
+            properties: {
+              tipo: { type: "string", const: "escrever_entregavel" },
+              etapa: { type: "integer" },
+              titulo: { type: "string" },
+              texto: { type: "string" },
+            },
             required: ["tipo", "etapa", "titulo", "texto"],
             additionalProperties: false,
           },
           {
             type: "object",
-            properties: { tipo: { type: "string", const: "guardar_anexo" }, etapa: { type: "integer" }, anexo: { type: "string" }, legenda: { type: "string" } },
+            properties: {
+              tipo: { type: "string", const: "guardar_anexo" },
+              etapa: { type: "integer" },
+              anexo: { type: "string" },
+              legenda: { type: "string" },
+            },
             required: ["tipo", "etapa", "anexo", "legenda"],
             additionalProperties: false,
           },
@@ -83,6 +95,47 @@ const ESQUEMA = {
             required: ["tipo", "etapa", "data", "modalidade", "horas", "participantes", "anotacoes"],
             additionalProperties: false,
           },
+          {
+            type: "object",
+            properties: { tipo: { type: "string", const: "definir_cronograma" }, inicio: { type: "string" }, fim: { type: "string" } },
+            required: ["tipo", "inicio", "fim"],
+            additionalProperties: false,
+          },
+          {
+            type: "object",
+            properties: {
+              tipo: { type: "string", const: "alterar_datas_etapa" },
+              etapa: { type: "integer" },
+              inicio: { type: "string", format: "date" },
+              fim: { type: "string", format: "date" },
+              justificativa: { type: "string" },
+            },
+            required: ["tipo", "etapa", "inicio", "fim", "justificativa"],
+            additionalProperties: false,
+          },
+          {
+            type: "object",
+            properties: {
+              tipo: { type: "string", const: "registrar_assinatura" },
+              etapa: { type: "integer" },
+              anexo: { type: "string" },
+              data_consultor: { type: "string" },
+              data_cliente: { type: "string" },
+            },
+            required: ["tipo", "etapa", "anexo", "data_consultor", "data_cliente"],
+            additionalProperties: false,
+          },
+          {
+            type: "object",
+            properties: {
+              tipo: { type: "string", const: "mudar_situacao_etapa" },
+              etapa: { type: "integer" },
+              situacao: { type: "string", enum: ["a_enviar", "enviada", "aprovada", "devolvida"] },
+              observacao: { type: "string" },
+            },
+            required: ["tipo", "etapa", "situacao", "observacao"],
+            additionalProperties: false,
+          },
         ],
       },
     },
@@ -91,7 +144,7 @@ const ESQUEMA = {
   additionalProperties: false,
 } as const;
 
-type Linha = { id: string; papel: string; texto: string; anexos: Anexo[]; acoes: { descricao: string }[]; desfeita: boolean; created_at: string };
+type Linha = { id: string; papel: string; texto: string; anexos: Anexo[]; acoes: ItemAcao[]; desfeita: boolean; created_at: string };
 
 export async function POST(req: Request) {
   const sb = await supabaseServidor();
@@ -135,8 +188,7 @@ export async function POST(req: Request) {
     if (!arquivo) continue;
     const base64 = Buffer.from(await arquivo.arrayBuffer()).toString("base64");
     blocos.push({ type: "text", text: `Anexo id="${anexo.id}" (${anexo.nome}):` });
-    if (anexo.tipo === "application/pdf")
-      blocos.push({ type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } });
+    if (anexo.tipo === "application/pdf") blocos.push({ type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } });
     else if (["image/jpeg", "image/png", "image/webp", "image/gif"].includes(anexo.tipo))
       blocos.push({ type: "image", source: { type: "base64", media_type: anexo.tipo as "image/jpeg", data: base64 } });
   }
@@ -147,7 +199,9 @@ export async function POST(req: Request) {
           [
             `[${m.created_at.slice(0, 16).replace("T", " ")}] ${m.papel === "usuario" ? "Consultor" : "Assistente"}: ${m.texto || "(sem texto)"}`,
             m.anexos.length ? `(anexos: ${m.anexos.map((a) => a.nome).join(", ")})` : "",
-            m.acoes.length ? `(${m.desfeita ? "alterações desfeitas pelo consultor" : "alterações feitas"}: ${m.acoes.map((a) => a.descricao).join("; ")})` : "",
+            m.acoes.length
+              ? `(${m.desfeita ? "alterações desfeitas pelo consultor" : "resultado"}: ${m.acoes.map((a) => (a.aviso ? `NÃO FEITO: ${a.descricao}` : a.descricao)).join("; ")})`
+              : "",
           ]
             .filter(Boolean)
             .join("\n"),
@@ -169,7 +223,10 @@ export async function POST(req: Request) {
           {
             role: "user",
             content: [
-              { type: "text", text: `<projeto>\n${contextoDoProjeto(projeto, cliente)}\n</projeto>\n\n<conversa_anterior>\n${historico}\n</conversa_anterior>` },
+              {
+                type: "text",
+                text: `<projeto>\n${contextoDoProjeto(projeto, cliente)}\n</projeto>\n\n<conversa_anterior>\n${historico}\n</conversa_anterior>`,
+              },
               { type: "text", text: `<mensagem_atual>\n${atual.texto || "(sem texto, só anexos)"}\n</mensagem_atual>` },
               ...blocos,
             ],
@@ -191,7 +248,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ erro: "Muitos pedidos à IA ao mesmo tempo. Aguarde um minuto e tente de novo." }, { status: 429 });
     if (e instanceof Anthropic.AuthenticationError)
       return NextResponse.json({ erro: "A chave da API da Anthropic cadastrada na Vercel não é válida." }, { status: 503 });
-    if (e instanceof Anthropic.APIError) return NextResponse.json({ erro: `A IA está indisponível agora (erro ${e.status}). Tente de novo em instantes.` }, { status: 502 });
+    if (e instanceof Anthropic.APIError)
+      return NextResponse.json({ erro: `A IA está indisponível agora (erro ${e.status}). Tente de novo em instantes.` }, { status: 502 });
     console.error(e);
     return NextResponse.json({ erro: "Não foi possível falar com a IA agora. Tente de novo." }, { status: 500 });
   }
@@ -204,7 +262,7 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>) {
   const concluida = (e: Etapa) => e.status === "enviada" || e.status === "aprovada";
   const emCurso = p.etapas.find((e) => !concluida(e));
   const partes: (string | null)[] = [
-    `Hoje: ${formatarData(hojeIso())}`,
+    `Hoje: ${hojeIso()} (datas no formato AAAA-MM-DD)`,
     "",
     "## Cliente",
     linha("Razão social", c.razaoSocial),
@@ -229,7 +287,8 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>) {
       "",
       `## Etapa ${e.ordem}: ${e.nome} (${statusEtapa[e.status].rotulo}${editavel ? "" : ", NÃO ALTERAR"})`,
       e.descricao,
-      `Período: ${formatarData(e.dataInicio)} a ${formatarData(e.dataFim)}. Horas: ${horasFmt(horas)} de ${e.horasPrevistas} h.`,
+      `Período: ${e.dataInicio && e.dataFim ? `${e.dataInicio} a ${e.dataFim}` : "a definir"} (duração de referência: ${e.duracaoReferenciaDias} dias). Horas: ${horasFmt(horas)} de ${e.horasPrevistas} h.`,
+      `Assinaturas do relatório: consultor ${e.assinaturaConsultor ?? "pendente"}, cliente ${e.assinaturaCliente ?? "pendente"}${e.relatorioAssinado ? `; PDF assinado guardado (${e.relatorioAssinado.nome})` : ""}.`,
       "Checklist (código, texto, situação):",
       ...e.atividades.map(
         (a) => `- ${a.codigo} ${a.texto}: ${a.status === "feito" ? "feito" : a.status === "nao_aplicavel" ? `não se aplica (${a.justificativa})` : "pendente"}`,
@@ -247,7 +306,10 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>) {
       `Evidências guardadas: ${(e.evidencias ?? []).length ? (e.evidencias ?? []).map((x) => x.legenda).join("; ") : "nenhuma"}`,
       "Registros de atividade:",
       ...(regs.length
-        ? regs.map((r) => `- ${formatarData(r.data)}, ${tiposAtividade[r.tipo].rotulo.toLowerCase()}, ${horasFmt(r.horas)}${r.participantes ? `, com ${r.participantes}` : ""}: ${r.anotacoes || "(sem anotações)"}`)
+        ? regs.map(
+            (r) =>
+              `- ${formatarData(r.data)}, ${tiposAtividade[r.tipo].rotulo.toLowerCase()}, ${horasFmt(r.horas)}${r.participantes ? `, com ${r.participantes}` : ""}: ${r.anotacoes || "(sem anotações)"}`,
+          )
         : ["- nenhum"]),
     );
   }

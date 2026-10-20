@@ -16,10 +16,11 @@ export const ancoraAba: Record<AbaEtapa, string> = {
   Fechamento: "fechamento",
 };
 
-// Abas do projeto que podem ser abertas pelo endereço (#plano, #conversa…)
+// Abas do projeto que podem ser abertas pelo endereço (#plano, #desenvolvimento…)
 export const ancoraAbaProjeto = {
-  conversa: "Conversa",
-  registrar: "Conversa",
+  desenvolvimento: "Desenvolvimento",
+  conversa: "Desenvolvimento",
+  registrar: "Desenvolvimento",
   cronograma: "Cronograma",
   plano: "Cronograma",
   entregas: "Entregas",
@@ -60,11 +61,11 @@ export function passoDaEtapa(p: Projeto, e: Etapa): Passo | null {
   if (p.status === "encerrado") return null;
   if (!p.planoFechadoEm)
     return {
-      texto: "Defina as datas do plano de trabalho",
-      detalhe: "Sem o plano, as etapas não têm prazo nem avisos.",
-      rotulo: "Abrir o plano de trabalho",
+      texto: "Defina o cronograma do projeto",
+      detalhe: "Diga à IA quando o projeto começa e termina; sem o cronograma, as etapas não têm prazo nem avisos.",
+      rotulo: "Definir o cronograma",
       tom: "atencao",
-      href: `${base}#plano`,
+      href: `${base}#desenvolvimento`,
     };
   if (e.status === "aprovada") return null;
   if (e.status === "devolvida")

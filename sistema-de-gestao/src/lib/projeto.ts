@@ -39,7 +39,7 @@ export type Alerta = { projeto: Projeto; etapa?: Etapa; texto: string; tom: Tom;
 export function alertasDoProjeto(p: Projeto): Alerta[] {
   if (p.status === "encerrado") return [];
   if (p.status === "aguardando_plano")
-    return [{ projeto: p, texto: "Definir o plano de trabalho para as etapas ganharem datas", tom: "atencao", ordem: 3 }];
+    return [{ projeto: p, texto: "Definir o cronograma para as etapas ganharem datas", tom: "atencao", ordem: 3 }];
   const lista: Alerta[] = [];
   for (const e of p.etapas) {
     if (e.status === "devolvida") lista.push({ projeto: p, etapa: e, texto: "Devolvida pelo SEBRAE para ajuste", tom: "critico", ordem: 0 });

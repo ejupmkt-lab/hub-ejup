@@ -23,7 +23,7 @@ export function Pendencias({ projetos }: { projetos: Projeto[] }) {
       {lista.map((x, i) => (
         <li key={i}>
           <Link
-            href={`/${x.projeto.empresa}/projetos/${x.projeto.id}${x.etapa ? `/etapas/${x.etapa.ordem}` : "#plano"}`}
+            href={`/${x.projeto.empresa}/projetos/${x.projeto.id}${x.etapa ? `/etapas/${x.etapa.ordem}` : ""}`}
             className="flex items-start gap-3 rounded-[var(--radius-campo)] px-2 py-2.5 hover:bg-pedra/60"
           >
             <span aria-hidden className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-[3px]" style={{ background: grupos[x.grupo].cor }} />

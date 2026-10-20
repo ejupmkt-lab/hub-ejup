@@ -97,8 +97,8 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
         <div>
           <h2 className="text-xl font-semibold">Plano de trabalho</h2>
           <p className="mt-2 max-w-2xl text-[15px] text-tinta-2">
-            O gestor define o início e o fim depois da contratação; as etapas dividem o período na proporção da carga horária ({horasTotal} h no total). As datas
-            fechadas aqui são a base dos prazos e avisos, e a mensagem abaixo sai pronta para enviar.
+            Defina o início e o fim aqui, ou conte à IA no Desenvolvimento; as etapas dividem o período na proporção da carga horária ({horasTotal} h no
+            total). Essas datas são a base do cronograma, dos prazos e dos avisos, e a mensagem abaixo sai pronta para enviar.
           </p>
         </div>
         {fechado ? <Status tom="ok">Fechado em {formatarData(projeto.planoFechadoEm!.slice(0, 10))}</Status> : <Status tom="atencao">Ainda não fechado</Status>}

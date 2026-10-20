@@ -580,7 +580,7 @@ export default function PaginaEtapa() {
                 </span>
               </div>
               <button onClick={() => router.push(`${base}#registrar`)} className="mt-1.5 text-left text-[13px] text-azul underline-offset-4 hover:underline">
-                Contar uma visita na conversa
+                Contar uma visita no Desenvolvimento
               </button>
             </div>
             <div>
@@ -777,7 +777,7 @@ function RedigirComIA({
         <div className="max-w-xl">
           <p className="text-[15px] text-tinta">
             {anotacoes === 0
-              ? "Conte as visitas desta etapa na conversa do projeto: a IA registra e escreve o relatório a partir do que foi levantado."
+              ? "Conte as visitas desta etapa no Desenvolvimento do projeto: a IA registra e escreve o relatório a partir do que foi levantado."
               : secoes === 0
                 ? "Todas as seções estão escritas. Use “Redigir com IA” numa seção para reescrevê-la a partir das anotações."
                 : `A IA redige ${secoes === 1 ? "a seção em branco ou incompleta" : `as ${secoes} seções em branco ou incompletas`} a partir das anotações de ${anotacoes} ${anotacoes === 1 ? "registro" : "registros"}, do checklist e dos dados do cliente. Depois é só revisar.`}
@@ -788,7 +788,7 @@ function RedigirComIA({
         </div>
         {anotacoes === 0 ? (
           <Botao variante="secundario" onClick={aoRegistrar}>
-            Contar a visita na conversa
+            Contar a visita no Desenvolvimento
           </Botao>
         ) : (
           secoes > 0 && (
