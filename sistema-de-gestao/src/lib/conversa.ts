@@ -92,7 +92,7 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
             a.inicio,
             p.etapas.map((e) => e.duracaoReferenciaDias),
           );
-      if (!linhas) return avisar("Cronograma não definido: o período tem menos dias do que etapas");
+      if (!linhas) return avisar("Plano de trabalho não definido: o período tem menos dias do que etapas");
       p.etapas.forEach((e, j) => {
         desfazer.push(passoDatas(e));
         e.dataInicio = e.dataInicioPlano = linhas[j].inicio;
@@ -105,7 +105,7 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
       p.status = "em_andamento";
       const fim = linhas[linhas.length - 1].fim;
       feito(
-        `Cronograma definido: ${formatarData(a.inicio)} a ${formatarData(fim)}, ${p.etapas.length} etapas divididas ${a.fim ? "pela carga horária" : "pela duração de referência"}`,
+        `Plano de trabalho definido: ${formatarData(a.inicio)} a ${formatarData(fim)}, ${p.etapas.length} etapas divididas ${a.fim ? "pela carga horária" : "pela duração de referência"}`,
       );
       return;
     }
@@ -323,8 +323,8 @@ export function sugestoesConversa(p: Projeto): string[] {
   const nomeEtapa = (e: Etapa) => `Etapa ${doisDigitos(e.ordem)} (${e.nome.charAt(0)}${e.nome.slice(1).toLowerCase()})`;
   if (!p.planoFechadoEm)
     return [
-      `O projeto começa em ${formatarData(hojeIso())} e termina em __/__/____. Monte o cronograma.`,
-      "Ainda não sei a data de fim. Monte o cronograma a partir de hoje, com a duração de referência das etapas.",
+      `O projeto começa em ${formatarData(hojeIso())} e termina em __/__/____. Monte o plano de trabalho.`,
+      "Ainda não sei a data de fim. Monte o plano de trabalho a partir de hoje, com a duração de referência das etapas.",
       "O que preciso preparar para a primeira visita?",
     ];
 

@@ -1,4 +1,5 @@
 import type { StatusEtapa } from "../rotulos";
+import type { Servico } from "../modelos/tipos";
 
 export type EmpresaSlug = "pivotto" | "orb" | "ejup";
 export type Papel = "gestor" | "consultor" | "equipe";
@@ -134,8 +135,9 @@ export type Projeto = {
   id: string;
   empresa: EmpresaSlug;
   clienteId: string;
-  modeloId: string;
+  modeloId: string; // id do serviço (área de Serviços)
   modeloVersao: number;
+  servicoNome?: string; // nome curto do serviço quando o projeto foi criado
   consultorId: string;
   status: "aguardando_plano" | "em_andamento" | "encerrado";
   prestadoraVinculada: string;
@@ -156,10 +158,13 @@ export type Projeto = {
   atividadesRegistradas?: RegistroAtividade[];
 };
 
+export type { Servico };
+
 export type Estado = {
   usuarioAtualId: string;
   usuarios: Usuario[];
   empresas: Empresa[];
   clientes: Cliente[];
   projetos: Projeto[];
+  servicos: Servico[];
 };

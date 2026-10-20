@@ -2,6 +2,7 @@ import type { Cliente, Etapa, Projeto, Referencia, Registro } from "../dados/tip
 import { dataPorExtenso, hojeIso } from "../datas";
 import { doisDigitos, ordinalFeminino } from "../rotulos";
 import { encontrosDaEtapa } from "../horas";
+import { ID_SERVICO_LGPD } from "../servicos";
 
 // Textos-padrão no estilo dos relatórios já entregues. Montados com os dados do
 // projeto; o que só o consultor sabe fica como [completar: …], e a checagem de
@@ -42,9 +43,9 @@ export function textoPadraoSecao(chave: string, projeto: Projeto, etapa: Etapa, 
   const entregaveis = etapa.entregaveis.filter((e) => e.tipo === "entregavel").map((e) => minuscula(e.titulo));
   switch (chave) {
     case "objeto":
-      return `O presente Relatório Técnico registra a ${ord} entrega da consultoria de Adequação à Lei Geral de Proteção de Dados Pessoais (LGPD) da ${nomeCliente(cliente)}, correspondente à ${nomeEtapa(etapa)} da ficha técnica Sebraetec nº ${projeto.codigoFichaTecnica}. A etapa tem por finalidade ${minuscula(semPonto(etapa.descricao))}.`;
+      return `O presente Relatório Técnico registra a ${ord} entrega da consultoria de ${projeto.fichaTecnica} da ${nomeCliente(cliente)}, correspondente à ${nomeEtapa(etapa)} da ficha técnica Sebraetec nº ${projeto.codigoFichaTecnica}. A etapa tem por finalidade ${minuscula(semPonto(etapa.descricao))}.`;
     case "natureza":
-      return natureza[etapa.ordem] ?? "";
+      return projeto.modeloId === ID_SERVICO_LGPD ? (natureza[etapa.ordem] ?? "") : "[completar: o que esta entrega cobre e o que fica para as próximas etapas.]";
     case "escopo": {
       const fontes = [
         "o diagnóstico de qualificação da demanda",
@@ -68,7 +69,7 @@ export function textoPadraoSecao(chave: string, projeto: Projeto, etapa: Etapa, 
     }
     case "caracterizacao":
       return [
-        `A ${cliente.razaoSocial} atua em ${cliente.ramo ? minuscula(cliente.ramo) : "[completar: ramo de atividade]"}${cliente.cidadeUf ? `, em ${cliente.cidadeUf}` : ""}. [completar: estrutura da empresa, pessoas envolvidas e contexto de tratamento de dados pessoais.]`,
+        `A ${cliente.razaoSocial} atua em ${cliente.ramo ? minuscula(cliente.ramo) : "[completar: ramo de atividade]"}${cliente.cidadeUf ? `, em ${cliente.cidadeUf}` : ""}. [completar: estrutura da empresa, pessoas envolvidas e ${projeto.modeloId === ID_SERVICO_LGPD ? "contexto de tratamento de dados pessoais" : "contexto do serviço"}.]`,
         "[[tabela:pessoas]]",
       ].join("\n\n");
     case "diagnostico":

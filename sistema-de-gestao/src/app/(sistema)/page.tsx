@@ -76,30 +76,9 @@ export default function Painel() {
             <Indicador
               rotulo="Etapas atrasadas"
               valor={ind.atrasadas}
-              detalhe={ind.devolvidas ? `e ${ind.devolvidas} ${ind.devolvidas === 1 ? "devolvida" : "devolvidas"} pelo SEBRAE` : "fora do cronograma"}
+              detalhe={ind.devolvidas ? `e ${ind.devolvidas} ${ind.devolvidas === 1 ? "devolvida" : "devolvidas"} pelo SEBRAE` : "fora do plano de trabalho"}
               tom={ind.devolvidas ? "critico" : ind.atrasadas ? "atencao" : undefined}
             />
-          </section>
-
-          <ul aria-label="Legenda das cores" className="flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-tinta-2">
-            <li className="flex items-center gap-2">
-              <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-vermelho-vivo" />
-              Ponto crítico (devolução)
-            </li>
-            <li className="flex items-center gap-2">
-              <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-laranja-vivo" />
-              Atraso (etapa ou tarefa)
-            </li>
-            <li className="flex items-center gap-2">
-              <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-verde-vivo" />
-              Em dia
-            </li>
-          </ul>
-
-          <section aria-label="Projetos" className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {ativos.map((p) => (
-              <CartaoProjeto key={p.id} projeto={p} mostrarEmpresa={variasEmpresas} />
-            ))}
           </section>
 
           <div className="grid gap-4 lg:grid-cols-3">
@@ -113,6 +92,30 @@ export default function Painel() {
               <GraficoCarga projetos={estado.projetos} />
             </Secao>
           </div>
+
+          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 pt-2">
+            <h2 className="text-lg font-bold">Projetos</h2>
+            <ul aria-label="Legenda das cores" className="flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-tinta-2">
+              <li className="flex items-center gap-2">
+                <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-vermelho-vivo" />
+                Ponto crítico (devolução)
+              </li>
+              <li className="flex items-center gap-2">
+                <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-laranja-vivo" />
+                Atraso (etapa ou tarefa)
+              </li>
+              <li className="flex items-center gap-2">
+                <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-verde-vivo" />
+                Em dia
+              </li>
+            </ul>
+          </div>
+
+          <section aria-label="Projetos" className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {ativos.map((p) => (
+              <CartaoProjeto key={p.id} projeto={p} mostrarEmpresa={variasEmpresas} />
+            ))}
+          </section>
         </div>
       )}
     </>

@@ -25,14 +25,14 @@ export type Database = {
           Tables: {
             "biblioteca_textos": {
                   Row: {
-                    "chave": string,"created_at": string,"criado_por": string | null,"empresa": string,"etapa": number,"id": string,"origem": string,"porte": string,"projeto_origem": string | null,"ramo": string,"texto": string,"titulo": string
+                    "chave": string,"created_at": string,"criado_por": string | null,"empresa": string,"etapa": number,"id": string,"origem": string,"porte": string,"projeto_origem": string | null,"ramo": string,"servico_id": string | null,"texto": string,"titulo": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "chave": string,"created_at"?: string,"criado_por"?: string | null,"empresa": string,"etapa": number,"id"?: string,"origem"?: string,"porte"?: string,"projeto_origem"?: string | null,"ramo"?: string,"texto": string,"titulo"?: string
+                    "chave": string,"created_at"?: string,"criado_por"?: string | null,"empresa": string,"etapa": number,"id"?: string,"origem"?: string,"porte"?: string,"projeto_origem"?: string | null,"ramo"?: string,"servico_id"?: string | null,"texto": string,"titulo"?: string
                   }
                   Update: {
-                    "chave"?: string,"created_at"?: string,"criado_por"?: string | null,"empresa"?: string,"etapa"?: number,"id"?: string,"origem"?: string,"porte"?: string,"projeto_origem"?: string | null,"ramo"?: string,"texto"?: string,"titulo"?: string
+                    "chave"?: string,"created_at"?: string,"criado_por"?: string | null,"empresa"?: string,"etapa"?: number,"id"?: string,"origem"?: string,"porte"?: string,"projeto_origem"?: string | null,"ramo"?: string,"servico_id"?: string | null,"texto"?: string,"titulo"?: string
                   }
                   Relationships: [
                     {
@@ -47,6 +47,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "empresas"
       referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "biblioteca_textos_servico_id_fkey"
+      columns: ["servico_id"]
+isOneToOne: false
+      referencedRelation: "servicos"
+      referencedColumns: ["id"]
     }
                   ]
                 },"clientes": {
@@ -195,6 +201,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     },{
       foreignKeyName: "projetos_empresa_fkey"
+      columns: ["empresa"]
+isOneToOne: false
+      referencedRelation: "empresas"
+      referencedColumns: ["slug"]
+    }
+                  ]
+                },"servicos": {
+                  Row: {
+                    "created_at": string,"dados": NonNullable<Json>,"empresa": string,"id": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"dados": NonNullable<Json>,"empresa": string,"id": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"dados"?: NonNullable<Json>,"empresa"?: string,"id"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "servicos_empresa_fkey"
       columns: ["empresa"]
 isOneToOne: false
       referencedRelation: "empresas"

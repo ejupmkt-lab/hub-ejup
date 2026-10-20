@@ -157,38 +157,64 @@ export function Abas<T extends string>({
   aoTrocar,
   extra,
   naFaixa = false,
+  gradeNoCelular = false,
 }: {
   abas: readonly T[];
   atual: T;
   aoTrocar: (a: T) => void;
   extra?: Partial<Record<T, React.ReactNode>>;
   naFaixa?: boolean;
+  gradeNoCelular?: boolean; // no celular, botões em duas colunas em vez de rolar de lado
 }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     ref.current?.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: "nearest", inline: "nearest" });
   }, [atual]);
-  return (
-    <div className={`relative border-b border-linha ${naFaixa ? "" : "mb-6"}`}>
-      <div ref={ref} role="tablist" className="sem-barra -mb-px flex gap-4 overflow-x-auto pr-8 sm:gap-6 lg:pr-0">
-        {abas.map((a) => (
-          <button
-            key={a}
-            role="tab"
-            aria-selected={a === atual}
-            onClick={() => aoTrocar(a)}
-            className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 pb-3 pt-1 text-[14px] transition-colors sm:gap-2 sm:text-[15px] ${
-              a === atual ? "border-azul font-semibold text-azul" : "border-transparent font-medium text-tinta-2 hover:border-linha-forte hover:text-tinta"
-            }`}
-          >
-            {a}
-            {extra?.[a]}
-          </button>
-        ))}
-      </div>
-      {/* Indica que há mais abas para o lado */}
-      <span aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-pedra to-transparent lg:hidden" />
+  const grade = gradeNoCelular && (
+    <div
+      role="tablist"
+      className={`grid grid-cols-2 gap-1 rounded-[var(--radius-bloco)] border border-linha bg-folha p-1 shadow-[var(--shadow-cartao)] sm:hidden ${naFaixa ? "" : "mb-6"}`}
+    >
+      {abas.map((a) => (
+        <button
+          key={a}
+          role="tab"
+          aria-selected={a === atual}
+          onClick={() => aoTrocar(a)}
+          className={`flex min-h-11 items-center justify-center gap-1.5 rounded-[var(--radius-campo)] px-2 py-2 text-center text-[14px] font-semibold leading-tight transition-colors ${
+            a === atual ? "bg-azul text-folha shadow-sm" : "text-tinta-2 hover:bg-pedra hover:text-tinta"
+          }`}
+        >
+          {a}
+          {extra?.[a]}
+        </button>
+      ))}
     </div>
+  );
+  return (
+    <>
+      {grade}
+      <div className={`relative border-b border-linha ${naFaixa ? "" : "mb-6"} ${gradeNoCelular ? "max-sm:hidden" : ""}`}>
+        <div ref={ref} role="tablist" className="sem-barra -mb-px flex gap-4 overflow-x-auto pr-8 sm:gap-6 lg:pr-0">
+          {abas.map((a) => (
+            <button
+              key={a}
+              role="tab"
+              aria-selected={a === atual}
+              onClick={() => aoTrocar(a)}
+              className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 pb-3 pt-1 text-[14px] transition-colors sm:gap-2 sm:text-[15px] ${
+                a === atual ? "border-azul font-semibold text-azul" : "border-transparent font-medium text-tinta-2 hover:border-linha-forte hover:text-tinta"
+              }`}
+            >
+              {a}
+              {extra?.[a]}
+            </button>
+          ))}
+        </div>
+        {/* Indica que há mais abas para o lado */}
+        <span aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-pedra to-transparent lg:hidden" />
+      </div>
+    </>
   );
 }
 

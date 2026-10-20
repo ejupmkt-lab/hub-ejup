@@ -9,7 +9,7 @@ import { etapaAtual, servicoDoProjeto } from "@/lib/projeto";
 import { doisDigitos } from "@/lib/rotulos";
 import {
   IconeAcessos,
-  IconeBiblioteca,
+  IconeServicos,
   IconeClientes,
   IconeConta,
   IconeEmpresa,
@@ -49,7 +49,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const base = ativa ? `/${ativa.slug}` : null;
   const outras = empresasVisiveis.filter((e) => e.status !== "ativo");
   const em = (p: string) => caminho === p || caminho.startsWith(`${p}/`);
-  const emProjetos = !!base && em(base) && !em(`${base}/clientes`) && !em(`${base}/biblioteca`);
+  const emProjetos = !!base && em(base) && !em(`${base}/clientes`) && !em(`${base}/servicos`);
 
   const principais = [
     { href: "/", rotulo: "Painel", icone: IconePainel, ativo: caminho === "/" },
@@ -63,7 +63,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     ...(base
       ? [
           { href: `${base}/clientes`, rotulo: "Clientes", icone: IconeClientes, ativo: em(`${base}/clientes`) },
-          { href: `${base}/biblioteca`, rotulo: "Biblioteca de textos", icone: IconeBiblioteca, ativo: em(`${base}/biblioteca`) },
+          { href: `${base}/servicos`, rotulo: "Serviços", icone: IconeServicos, ativo: em(`${base}/servicos`) },
         ]
       : []),
     ...(usuario.adminGrupo ? [{ href: "/acessos", rotulo: "Acessos", icone: IconeAcessos, ativo: em("/acessos") }] : []),
@@ -90,21 +90,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <Link href="/" className="flex items-center gap-3 px-5 pb-5 pt-6">
           <Marca />
           <span className="min-w-0">
-            <span className="block text-[17px] font-bold leading-tight text-tinta">Pivotto</span>
+            <span className="block text-[17px] font-bold leading-tight text-tinta">Blimp</span>
             <span className="block text-[13px] text-tinta-2">Sistema de gestão</span>
           </span>
         </Link>
-        {base && (
-          <div className="px-4 pb-4">
-            <button
-              onClick={() => setFolha("registrar")}
-              className="flex w-full items-center justify-center gap-2 rounded-[var(--radius-campo)] bg-azul px-4 py-2.5 text-sm font-semibold text-folha shadow-sm hover:bg-azul-escuro"
-            >
-              <IconeRegistrar className="h-5 w-5" />
-              Desenvolver projeto
-            </button>
-          </div>
-        )}
         <nav className="flex-1 space-y-1 overflow-y-auto px-3" aria-label="Principal">
           {principais.map(itemLateral)}
           {secundarios.length > 0 && <div className="!mt-4 border-t border-linha pt-4">{secundarios.map(itemLateral)}</div>}

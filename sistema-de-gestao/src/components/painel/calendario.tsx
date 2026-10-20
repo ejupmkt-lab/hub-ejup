@@ -113,7 +113,7 @@ export function Calendario({ projetos }: { projetos: Projeto[] }) {
           <span aria-hidden className="h-2.5 w-2.5 rounded-full border-2 border-tinta-2" />
           Início da etapa
         </span>
-        <span>A cor segue a situação da etapa, como no cronograma. Toque num dia para ver o que há nele.</span>
+        <span>A cor segue a situação da etapa, como no plano de trabalho. Toque num dia para ver o que há nele.</span>
       </div>
 
       <div className="mt-5 border-t border-linha pt-4">

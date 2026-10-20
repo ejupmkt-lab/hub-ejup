@@ -30,7 +30,7 @@ export function TelaCodigo({ aoConfirmar, sair }: { aoConfirmar: () => Promise<v
   return (
     <TelaAcesso titulo="Código de verificação">
       <form onSubmit={confirmar} className="space-y-4">
-        <p className="text-[15px] text-tinta-2">Abra o aplicativo autenticador no celular e digite o código de 6 dígitos do Sistema de Gestão.</p>
+        <p className="text-[15px] text-tinta-2">Abra o aplicativo autenticador no celular e digite o código de 6 dígitos do Blimp.</p>
         <Campo rotulo="Código">
           <input
             inputMode="numeric"

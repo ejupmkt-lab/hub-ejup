@@ -20,7 +20,7 @@ import { ancoraAbaProjeto, passoDoProjeto } from "@/lib/proximo-passo";
 import { Abas, Barra, Botao, BotaoLink, Cabecalho, Cartao, Chip, ProximoPasso, Vazio } from "@/components/ui";
 
 // Três abas para o dia a dia; o resto fica no "Mais"
-const principais = ["Desenvolvimento", "Cronograma", "Entregas"] as const;
+const principais = ["Desenvolvimento", "Plano de trabalho", "Entregas"] as const;
 const secundarias = ["Ficha do projeto", "Tabelas do relatório", "Referências", "Horas e visitas", "Histórico"] as const;
 type Aba = (typeof principais)[number] | (typeof secundarias)[number];
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
@@ -82,7 +82,7 @@ export default function PaginaProjeto() {
     setMenuMais(false);
   };
   const abrirPlano = () => {
-    setAba("Cronograma");
+    setAba("Plano de trabalho");
     setTimeout(() => document.getElementById("plano")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
   };
   const desenvolver = () => {
@@ -130,7 +130,7 @@ export default function PaginaProjeto() {
                 <p className="num mt-0.5 flex flex-wrap items-baseline gap-x-2">
                   <span className="text-2xl font-bold text-tinta">{avanco}%</span>
                   <span className={`text-[13px] ${tomAvanco === "atencao" ? "text-laranja" : "text-tinta-2"}`}>
-                    {previsto === null ? "sem cronograma" : `previsto hoje ${previsto}%`}
+                    {previsto === null ? "sem plano de trabalho" : `previsto hoje ${previsto}%`}
                   </span>
                 </p>
                 <div className="mt-2">
@@ -198,6 +198,7 @@ export default function PaginaProjeto() {
                 aoTrocar={(a) => (a === abaMais ? setMenuMais(!menuMais) : irPara(a as Aba))}
                 extra={{ [abaMais]: <span aria-hidden>▾</span> }}
                 naFaixa
+                gradeNoCelular
               />
               {menuMais && (
                 <>
@@ -223,12 +224,12 @@ export default function PaginaProjeto() {
 
       {aba === "Desenvolvimento" && <Conversa projeto={projeto} passo={passo?.texto} focar={focar} />}
 
-      {aba === "Cronograma" && (
+      {aba === "Plano de trabalho" && (
         <div className="space-y-4">
           {!projeto.planoFechadoEm && projeto.status !== "encerrado" && (
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-[var(--radius-bloco)] border border-azul/20 bg-azul-claro px-4 py-4 sm:px-5">
               <p className="min-w-0 flex-1 basis-64 text-[15px] text-tinta">
-                <span className="font-semibold">O cronograma ainda não foi definido.</span> Diga à IA quando o projeto começa e termina, e ela divide as etapas
+                <span className="font-semibold">O plano de trabalho ainda não foi definido.</span> Diga à IA quando o projeto começa e termina, e ela divide as etapas
                 pela carga horária. Ou preencha as datas abaixo.
               </p>
               <Botao onClick={desenvolver} className="w-full sm:w-auto">

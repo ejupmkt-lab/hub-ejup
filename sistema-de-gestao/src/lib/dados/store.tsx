@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { supabaseNavegador } from "../supabase/navegador";
 import { TelaCodigo } from "@/components/tela-codigo";
-import type { Cliente, Empresa, EmpresaSlug, Estado, Papel, Projeto, Usuario } from "./tipos";
+import type { Cliente, Empresa, EmpresaSlug, Estado, Papel, Projeto, Servico, Usuario } from "./tipos";
 
 // Estado do sistema carregado do Supabase. As telas alteram uma cópia local
 // (atualizar) e as mudanças são gravadas no banco automaticamente, com uma
@@ -17,7 +17,7 @@ type Ctx = {
   atualizar: (fn: (rascunho: Estado) => void) => void;
   salvamento: Salvamento;
   sair: () => Promise<void>;
-  excluir: (tipo: "projeto" | "cliente", id: string) => Promise<void>;
+  excluir: (tipo: "projeto" | "cliente" | "servico", id: string) => Promise<void>;
   recarregar: () => Promise<void>;
   salvarAgora: () => Promise<void>;
 };
@@ -43,14 +43,15 @@ async function carregarDoBanco(): Promise<Carga> {
   const { data: nivel } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
   if (nivel?.nextLevel === "aal2" && nivel.currentLevel !== "aal2") return { tipo: "codigo" };
 
-  const [perfis, membros, empresas, clientes, projetos] = await Promise.all([
+  const [perfis, membros, empresas, clientes, projetos, servicos] = await Promise.all([
     sb.from("perfis").select("id, email, nome, nome_completo, admin_grupo"),
     sb.from("membros").select("empresa, user_id, papel"),
     sb.from("empresas").select("slug, nome, status, descricao, socios").order("ordem"),
     sb.from("clientes").select("id, dados").order("created_at"),
     sb.from("projetos").select("id, dados, versao").order("created_at", { ascending: false }),
+    sb.from("servicos").select("id, dados").order("created_at"),
   ]);
-  const erro = [perfis, membros, empresas, clientes, projetos].find((r) => r.error)?.error;
+  const erro = [perfis, membros, empresas, clientes, projetos, servicos].find((r) => r.error)?.error;
   if (erro) return { tipo: "erro", mensagem: erro.message };
 
   // Sem perfil, ou com o acesso retirado (perfil sem empresa nenhuma)
@@ -80,6 +81,7 @@ async function carregarDoBanco(): Promise<Carga> {
       empresas: empresas.data as Empresa[],
       clientes: clientes.data!.map((c) => c.dados as Cliente),
       projetos: projetos.data!.map((p) => p.dados as Projeto),
+      servicos: servicos.data!.map((x) => x.dados as Servico),
     },
   };
 }
@@ -104,6 +106,7 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
       gravado.current = new Map([
         ...c.estado.clientes.map((x) => [`cli:${x.id}`, JSON.stringify(x)] as const),
         ...c.estado.projetos.map((x) => [`prj:${x.id}`, JSON.stringify(x)] as const),
+        ...c.estado.servicos.map((x) => [`srv:${x.id}`, JSON.stringify(x)] as const),
       ]);
       estadoRef.current = c.estado;
     }
@@ -130,6 +133,17 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
         const { error } = gravado.current.has(chave)
           ? await sb.from("clientes").update({ dados: c, updated_at: new Date().toISOString() }).eq("id", c.id)
           : await sb.from("clientes").insert({ id: c.id, empresa: c.empresa, dados: c });
+        if (error) throw error;
+        gravado.current.set(chave, json);
+      }
+      // Serviços antes dos projetos: um projeto novo pode usar um serviço recém-cadastrado
+      for (const x of estado.servicos) {
+        const chave = `srv:${x.id}`;
+        const json = JSON.stringify(x);
+        if (gravado.current.get(chave) === json) continue;
+        const { error } = gravado.current.has(chave)
+          ? await sb.from("servicos").update({ dados: x, updated_at: new Date().toISOString() }).eq("id", x.id)
+          : await sb.from("servicos").insert({ id: x.id, empresa: x.empresa, dados: x });
         if (error) throw error;
         gravado.current.set(chave, json);
       }
@@ -169,7 +183,11 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
     const atual = estadoRef.current;
     if (
       atual &&
-      [...atual.clientes.map((x) => [`cli:${x.id}`, x] as const), ...atual.projetos.map((x) => [`prj:${x.id}`, x] as const)].some(
+      [
+        ...atual.clientes.map((x) => [`cli:${x.id}`, x] as const),
+        ...atual.servicos.map((x) => [`srv:${x.id}`, x] as const),
+        ...atual.projetos.map((x) => [`prj:${x.id}`, x] as const),
+      ].some(
         ([k, v]) => gravado.current.get(k) !== JSON.stringify(v),
       )
     ) {
@@ -200,12 +218,12 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
   // Exclusão definitiva (o banco só permite a gestores). O projeto leva junto
   // as imagens e o PDF assinado guardados no armazenamento.
   const excluir = useCallback(
-    async (tipo: "projeto" | "cliente", id: string) => {
+    async (tipo: "projeto" | "cliente" | "servico", id: string) => {
       if (timer.current) clearTimeout(timer.current);
       while (salvandoAgora.current) await new Promise((r) => setTimeout(r, 100));
       const sb = supabaseNavegador();
-      const tabela = tipo === "projeto" ? "projetos" : "clientes";
-      const chave = `${tipo === "projeto" ? "prj" : "cli"}:${id}`;
+      const tabela = tipo === "projeto" ? "projetos" : tipo === "cliente" ? "clientes" : "servicos";
+      const chave = `${tipo === "projeto" ? "prj" : tipo === "cliente" ? "cli" : "srv"}:${id}`;
       // Ainda não chegou ao banco: basta tirar da tela
       if (gravado.current.has(chave)) {
         const { data, error } = await sb.from(tabela).delete().eq("id", id).select("id");
@@ -234,6 +252,7 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
           ...atual.estado,
           projetos: tipo === "projeto" ? atual.estado.projetos.filter((x) => x.id !== id) : atual.estado.projetos,
           clientes: tipo === "cliente" ? atual.estado.clientes.filter((x) => x.id !== id) : atual.estado.clientes,
+          servicos: tipo === "servico" ? atual.estado.servicos.filter((x) => x.id !== id) : atual.estado.servicos,
         };
         estadoRef.current = estado;
         return { tipo: "pronto", estado };
@@ -281,7 +300,7 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
     [carga, atualizar, salvamento, sair, excluir, recarregar, salvarAgora],
   );
 
-  if (carga.tipo === "carregando") return <div className="flex min-h-screen items-center justify-center text-lg font-semibold text-tinta-2">Pivotto</div>;
+  if (carga.tipo === "carregando") return <div className="flex min-h-screen items-center justify-center text-lg font-semibold text-tinta-2">Blimp</div>;
   if (carga.tipo === "codigo") return <TelaCodigo aoConfirmar={recarregar} sair={sair} />;
   if (carga.tipo !== "pronto")
     return (

@@ -1,6 +1,6 @@
-# Sistema de Gestão — ecossistema Pivotto
+# Blimp — sistema de gestão de projetos
 
-Sistema de gestão das empresas do ecossistema Pivotto (Pivotto & Pivotto, ORB e EJUP).
+Blimp é o sistema de gestão de projetos e consultorias usado pelas empresas Pivotto & Pivotto, ORB e EJUP.
 Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.md).
 
 - **Produção:** https://sistema-de-gestao-alpha.vercel.app (Vercel, time EJUP, projeto `sistema-de-gestao`)
@@ -13,29 +13,35 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Isolamento por empresa no banco (RLS):** cada pessoa só recebe os dados das empresas a que tem acesso.
   O administrador do grupo vê todas, inclusive as inativas.
 - **Painel** (página inicial de todos): projetos em andamento, tarefas pendentes do plano de trabalho,
-  horas registradas e etapas atrasadas; abaixo, um cartão por projeto com o avanço contra o previsto,
+  horas registradas e etapas atrasadas; depois, pendências, situação das etapas e carga por semana; por
+  fim, um cartão por projeto com o avanço contra o previsto,
   a etapa, a entrega, os alertas (vermelho = devolução, laranja = atraso, verde = em dia) e o próximo
   passo. O avanço pesa cada etapa pelas horas: 40% pelo checklist e 60% pelo status do relatório
   (`avancoProjeto` em `src/lib/projeto.ts`); o previsto vem das datas do plano.
-- **Projetos** em lista, quadro (por etapa), cronograma de todos e calendário de prazos.
+- **Projetos** em lista, quadro (por etapa), plano de trabalho de todos (linha do tempo) e calendário de prazos.
 - **Tarefas**: as atividades do checklist ainda pendentes nas etapas em curso, marcáveis ali mesmo.
 - **Menu**: lateral no computador; no celular, menu inferior com o botão central **Desenvolver projeto**
   (abre o Desenvolvimento de qualquer projeto em andamento).
+- **Serviços** (tabela `servicos`, menu "Serviços"): as fichas técnicas que a empresa presta, em cartões
+  como no catálogo do Sebraetec (nome, tema, descrição, credenciado ou não). Cada serviço tem a ficha
+  (etapas, horas, duração de referência, checklist, entregáveis e instrumentos), editável por gestores, e a
+  sua própria biblioteca de textos. O cadastro pode ser preenchido pela IA a partir do PDF ou do texto da
+  ficha (`/api/servico-ficha`). O projeto novo escolhe o serviço na lista e copia as etapas dele; mudar a
+  ficha depois não altera projetos em andamento.
 - **Clientes** com os campos do Modelo de Diagnóstico do HUB SEBRAE.
-- **Projetos** a partir do modelo *Adequação à LGPD · HUB SEBRAE* (ficha 13070-5): 5 etapas, 333 h,
-  checklist de atividades e 23 entregáveis.
-- **Plano de trabalho / cronograma**: definido pela IA a partir do início e do fim contados no
-  Desenvolvimento, ou à mão na aba Cronograma; alteração posterior exige justificativa.
+- **Projetos** a partir dos serviços cadastrados; o primeiro é *Adequação à LGPD* (ficha 13070-5): 5
+  etapas, 333 h, checklist de atividades e 23 entregáveis, com textos-padrão e referências próprios.
+- **Plano de trabalho**: definido pela IA a partir do início e do fim contados no Desenvolvimento, ou à
+  mão na aba Plano de trabalho; alteração posterior exige justificativa.
 - **Clientes e projetos**: cada cliente tem a sua página com todos os projetos (até 3 em andamento ao
-  mesmo tempo; um 4º só excepcionalmente), cada um com o seu serviço e as suas etapas, conforme o modelo
-  em `src/lib/modelos/` (hoje, Adequação à LGPD).
+  mesmo tempo; um 4º só excepcionalmente), cada um com o seu serviço e as suas etapas.
 - **Dentro do projeto**: resumo fixo (avanço, etapa atual, período, horas, consultor) e três abas:
-  Desenvolvimento (abre por padrão), Cronograma (Gantt das etapas e o plano de trabalho, editável) e
+  Desenvolvimento (abre por padrão), Plano de trabalho (linha do tempo das etapas e as datas, editáveis) e
   Entregas (o relatório técnico de cada etapa). Ficha, tabelas do relatório, referências, horas e
   visitas e histórico ficam no menu "Mais".
 - **Desenvolvimento com a IA** (`src/components/projeto/conversa.tsx`, rota `/api/conversa`, tabela
   `mensagens_projeto`): o consultor escreve ou dita (reconhecimento de voz do navegador), manda fotos e
-  PDFs; a IA define o cronograma, identifica a etapa, marca o checklist, guarda as fotos como evidência,
+  PDFs; a IA define o plano de trabalho, identifica a etapa, marca o checklist, guarda as fotos como evidência,
   registra visitas e horas, escreve seções e entregáveis no modelo, guarda o PDF assinado e registra o
   envio no HUB e a aprovação ou devolução do SEBRAE. O sistema confere cada ação (o que não pode,
   aparece como aviso com o motivo); cada resposta mostra o que mudou e pode ser desfeita
@@ -63,7 +69,7 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   horas, participantes e anotações (aba "Visitas e horas" no projeto e em cada etapa). As horas somam contra
   as 333 h previstas, por etapa; fotos da visita entram como evidências do relatório; o texto-padrão das
   evidências cita as datas dos encontros.
-- **Biblioteca de textos aprovados** (tabela `biblioteca_textos`, tela "Biblioteca" de cada empresa): quando
+- **Biblioteca de textos aprovados** (tabela `biblioteca_textos`, aba "Biblioteca de textos" de cada serviço): quando
   uma etapa é marcada como aprovada, as seções e os entregáveis completos entram anonimizados (empresa,
   responsável, CNPJ, participantes e datas viram marcadores). Nos próximos projetos, cada seção mostra
   "Da biblioteca (N)" com os mais parecidos (mesmo ramo primeiro), e "Preencher" usa o melhor texto aprovado

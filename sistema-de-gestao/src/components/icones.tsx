@@ -68,6 +68,13 @@ export const IconeBiblioteca = (p: P) => (
   </Svg>
 );
 
+export const IconeServicos = (p: P) => (
+  <Svg {...p}>
+    <rect x="3" y="7" width="18" height="13" rx="2" />
+    <path d="M8.5 7V5.5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2V7M3 12.5h18M10.5 12.5v2h3v-2" />
+  </Svg>
+);
+
 export const IconeAcessos = (p: P) => (
   <Svg {...p}>
     <path d="M12 3.5 5 6v5.5c0 4.4 3 7.8 7 9 4-1.2 7-4.6 7-9V6z" />
@@ -212,7 +219,7 @@ export function Marca({ className = "h-9 w-9", claro = false }: P & { claro?: bo
       aria-hidden
       className={`grid shrink-0 place-items-center rounded-[10px] text-[1.05rem] font-bold ${claro ? "bg-folha text-azul" : "bg-azul text-folha"} ${className}`}
     >
-      P
+      B
     </span>
   );
 }

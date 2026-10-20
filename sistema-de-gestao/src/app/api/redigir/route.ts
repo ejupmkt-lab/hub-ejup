@@ -13,7 +13,8 @@ import { ESTILO_RELATORIO } from "@/lib/ia/estilo";
 
 export const maxDuration = 300;
 
-const SISTEMA = `Você redige seções de Relatórios Técnicos de consultoria de Adequação à LGPD (Lei 13.709/2018), entregues ao SEBRAE pelo programa Sebraetec (ficha técnica 13070-5), em nome do escritório Pivotto & Pivotto.
+// O serviço vem do projeto: cada ficha técnica tem o seu assunto
+const sistema = (p: Projeto) => `Você redige seções de Relatórios Técnicos de consultoria de ${p.fichaTecnica}, entregues ao SEBRAE pelo programa Sebraetec (ficha técnica ${p.codigoFichaTecnica || "sem código"}), em nome do escritório Pivotto & Pivotto.
 
 ${ESTILO_RELATORIO}`;
 
@@ -124,7 +125,7 @@ export async function POST(req: Request) {
           },
         },
       },
-      system: SISTEMA,
+      system: sistema(projeto),
       messages: [
         {
           role: "user",

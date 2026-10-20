@@ -212,7 +212,7 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
           <h2 className={`font-bold ${vazia ? "text-lg" : "text-[15px] leading-8"}`}>Desenvolvimento do projeto</h2>
           {vazia && (
             <p className="mt-1 max-w-3xl text-[15px] text-tinta-2">
-              Conte ou dite o que aconteceu e mande fotos e documentos. A IA cuida do cronograma, do checklist, das horas e do relatório, até a entrega
+              Conte ou dite o que aconteceu e mande fotos e documentos. A IA cuida do plano de trabalho, do checklist, das horas e do relatório, até a entrega
               final. Tudo pode ser desfeito.
             </p>
           )}

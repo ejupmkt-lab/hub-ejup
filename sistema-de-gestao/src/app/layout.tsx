@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Sistema de Gestão",
-  description: "Gestão das empresas do ecossistema Pivotto",
+  title: "Blimp",
+  description: "Sistema de gestão de projetos e consultorias",
 };
 
 export const viewport: Viewport = {

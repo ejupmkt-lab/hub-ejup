@@ -78,7 +78,7 @@ export default function Projetos() {
             opcoes={[
               { valor: "lista", rotulo: "Lista", icone: <IconeLista className="h-5 w-5" /> },
               { valor: "quadro", rotulo: "Quadro", icone: <IconeQuadro className="h-5 w-5" /> },
-              { valor: "cronograma", rotulo: "Cronograma", icone: <IconeCronograma className="h-5 w-5" /> },
+              { valor: "cronograma", rotulo: "Plano de trabalho", icone: <IconeCronograma className="h-5 w-5" /> },
               { valor: "calendario", rotulo: "Calendário", icone: <IconeCalendario className="h-5 w-5" /> },
             ]}
           />

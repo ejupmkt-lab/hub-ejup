@@ -21,8 +21,8 @@ export const ancoraAbaProjeto = {
   desenvolvimento: "Desenvolvimento",
   conversa: "Desenvolvimento",
   registrar: "Desenvolvimento",
-  cronograma: "Cronograma",
-  plano: "Cronograma",
+  cronograma: "Plano de trabalho",
+  plano: "Plano de trabalho",
   entregas: "Entregas",
   relatorios: "Entregas",
   ficha: "Ficha do projeto",
@@ -61,9 +61,9 @@ export function passoDaEtapa(p: Projeto, e: Etapa): Passo | null {
   if (p.status === "encerrado") return null;
   if (!p.planoFechadoEm)
     return {
-      texto: "Defina o cronograma do projeto",
-      detalhe: "Diga à IA quando o projeto começa e termina; sem o cronograma, as etapas não têm prazo nem avisos.",
-      rotulo: "Definir o cronograma",
+      texto: "Defina o plano de trabalho do projeto",
+      detalhe: "Diga à IA quando o projeto começa e termina; sem ele, as etapas não têm prazo nem avisos.",
+      rotulo: "Definir o plano de trabalho",
       tom: "atencao",
       href: `${base}#desenvolvimento`,
     };

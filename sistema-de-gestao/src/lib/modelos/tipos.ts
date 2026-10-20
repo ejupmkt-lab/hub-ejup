@@ -22,3 +22,13 @@ export type ModeloFluxo = {
   prestadoraVinculada: string;
   etapas: EtapaModelo[];
 };
+
+// Serviço cadastrado na área de Serviços: a ficha técnica (etapas, atividades,
+// entregáveis) e os dados do card, como no catálogo do Sebraetec. Cada serviço
+// tem a sua biblioteca de textos; os projetos copiam as etapas ao nascer.
+export type Servico = ModeloFluxo & {
+  area: string; // tema do catálogo (ex.: Gestão da Qualidade)
+  descricao: string; // resumo do serviço, como no card do catálogo
+  credenciado: boolean; // credenciado no Sebraetec para prestar este serviço
+  areaAtuacao: string; // "área de atuação da consultoria", usada nos relatórios
+};

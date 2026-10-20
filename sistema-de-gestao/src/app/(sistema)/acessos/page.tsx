@@ -65,7 +65,7 @@ async function carregarPessoas(): Promise<Pessoa[]> {
 
 function mensagemConvite(p: { nome: string; email: string }) {
   return (
-    `Olá, ${p.nome}! Seu acesso ao Sistema de Gestão do grupo Pivotto foi liberado.\n\n` +
+    `Olá, ${p.nome}! Seu acesso ao Blimp, o sistema de gestão de projetos, foi liberado.\n\n` +
     `1. Entre em ${window.location.origin}/login\n` +
     `2. Clique em "Primeiro acesso? Criar conta"\n` +
     `3. Use este e-mail: ${p.email} e crie a sua senha.`

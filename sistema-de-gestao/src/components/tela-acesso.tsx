@@ -16,8 +16,8 @@ export function TelaAcesso({ titulo, children }: { titulo: string; children: Rea
         <div className="flex items-center gap-3">
           <Marca className="h-10 w-10" claro />
           <div>
-            <p className="text-xl font-bold leading-none">Pivotto</p>
-            <p className="mt-1 text-[13px] text-folha/75">Sistema de gestão das empresas do ecossistema</p>
+            <p className="text-xl font-bold leading-none">Blimp</p>
+            <p className="mt-1 text-[13px] text-folha/75">Sistema de gestão de projetos e consultorias</p>
           </div>
         </div>
         <div className="mt-16 hidden lg:block" aria-hidden>

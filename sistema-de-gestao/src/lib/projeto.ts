@@ -39,7 +39,7 @@ export type Alerta = { projeto: Projeto; etapa?: Etapa; texto: string; tom: Tom;
 export function alertasDoProjeto(p: Projeto): Alerta[] {
   if (p.status === "encerrado") return [];
   if (p.status === "aguardando_plano")
-    return [{ projeto: p, texto: "Definir o cronograma para as etapas ganharem datas", tom: "atencao", ordem: 3 }];
+    return [{ projeto: p, texto: "Definir o plano de trabalho para as etapas ganharem datas", tom: "atencao", ordem: 3 }];
   const lista: Alerta[] = [];
   for (const e of p.etapas) {
     if (e.status === "devolvida") lista.push({ projeto: p, etapa: e, texto: "Devolvida pelo SEBRAE para ajuste", tom: "critico", ordem: 0 });
@@ -119,7 +119,7 @@ export function situacaoProjeto(p: Projeto, hoje = hojeIso()): SituacaoProjeto {
 }
 
 // Nome do serviço contratado, para distinguir os projetos de um mesmo cliente
-export const servicoDoProjeto = (p: Projeto) => modeloPorId(p.modeloId)?.nomeCurto ?? p.fichaTecnica;
+export const servicoDoProjeto = (p: Projeto) => p.servicoNome || modeloPorId(p.modeloId)?.nomeCurto || p.fichaTecnica;
 
 // Até 3 projetos em andamento por cliente; um 4º só excepcionalmente
 export const LIMITE_PROJETOS_CLIENTE = 3;

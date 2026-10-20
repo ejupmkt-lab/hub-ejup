@@ -5,9 +5,9 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { novoId, registrarEvento, useEstado, useUsuario } from "@/lib/dados/store";
 import type { EmpresaSlug, Projeto } from "@/lib/dados/tipos";
-import { modelosDaEmpresa } from "@/lib/modelos";
 import { etapasDoModelo } from "@/lib/modelos/instanciar";
 import { LIMITE_PROJETOS_CLIENTE } from "@/lib/projeto";
+import { horasDoServico, ID_SERVICO_LGPD, servicosDaEmpresa } from "@/lib/servicos";
 import { normasPadrao, referenciasPadrao } from "@/lib/relatorio/padroes";
 import { Botao, BotaoLink, Cabecalho, Campo, Vazio } from "@/components/ui";
 
@@ -17,12 +17,12 @@ function Conteudo() {
   const usuario = useUsuario();
   const router = useRouter();
   const params = useSearchParams();
-  const modelos = modelosDaEmpresa(slug);
+  const modelos = servicosDaEmpresa(estado, slug);
   const clientes = estado.clientes.filter((c) => c.empresa === slug);
   const consultores = estado.usuarios.filter((u) => u.acessos[slug]);
 
   const [f, setF] = useState({
-    modeloId: modelos[0]?.id ?? "",
+    modeloId: (modelos.find((m) => m.id === params.get("servico")) ?? modelos[0])?.id ?? "",
     clienteId: "", // em branco = cliente indicado no endereço (?cliente=) ou o mais recente
     consultorId: (consultores.find((u) => u.id === usuario.id) ?? consultores[0])?.id ?? "",
     numeroProjetoHub: "",
@@ -39,9 +39,10 @@ function Conteudo() {
   const cliente = clientes.find((c) => c.id === clienteId);
   // Sugestões a partir da atividade do cliente (CNAE); valem se o campo ficar em branco
   const segmentoSugerido = cliente?.ramo ?? "";
-  const areaSugerida = cliente?.ramo
-    ? `Governança em privacidade e proteção de dados pessoais aplicada a ${cliente.ramo.charAt(0).toLowerCase() + cliente.ramo.slice(1)}`
-    : "Governança em privacidade e proteção de dados pessoais";
+  const areaBase = modelo?.areaAtuacao || modelo?.fichaTecnica || "";
+  const areaSugerida = cliente?.ramo && areaBase ? `${areaBase} aplicada a ${cliente.ramo.charAt(0).toLowerCase() + cliente.ramo.slice(1)}` : areaBase;
+  // Normas e referências prontas existem só para a LGPD
+  const lgpd = modelo?.id === ID_SERVICO_LGPD;
 
   const [criando, setCriando] = useState(false);
   // Até 3 projetos em andamento por cliente; um 4º só excepcionalmente, e nunca um 5º
@@ -60,6 +61,7 @@ function Conteudo() {
         clienteId,
         modeloId: modelo.id,
         modeloVersao: modelo.versao,
+        servicoNome: modelo.nomeCurto,
         consultorId: f.consultorId,
         status: "aguardando_plano",
         prestadoraVinculada: modelo.prestadoraVinculada,
@@ -74,8 +76,8 @@ function Conteudo() {
         localAssinatura: "Natal/RN",
         planoFechadoEm: null,
         etapas: etapasDoModelo(modelo),
-        registros: normasPadrao().map((r) => ({ ...r, id: novoId("reg") })),
-        referencias: referenciasPadrao().map((r) => ({ ...r, id: novoId("ref") })),
+        registros: lgpd ? normasPadrao().map((r) => ({ ...r, id: novoId("reg") })) : [],
+        referencias: lgpd ? referenciasPadrao().map((r) => ({ ...r, id: novoId("ref") })) : [],
         historico: [],
       };
       registrarEvento(p, usuario.nome, "Projeto criado");
@@ -108,10 +110,15 @@ function Conteudo() {
                 <select className="campo" value={f.modeloId} onChange={set("modeloId")}>
                   {modelos.map((m) => (
                     <option key={m.id} value={m.id}>
-                      {m.nome}, ficha {m.codigoFichaTecnica}
+                      {m.fichaTecnica}
+                      {m.codigoFichaTecnica ? `, ficha ${m.codigoFichaTecnica}` : ""}
+                      {m.credenciado ? "" : " (não credenciado)"}
                     </option>
                   ))}
                 </select>
+                <Link href={`/${slug}/servicos/novo`} className="mt-1.5 inline-block text-[13px] text-azul underline-offset-4 hover:underline">
+                  Cadastrar outro serviço
+                </Link>
               </Campo>
               <Campo rotulo="Cliente">
                 <select className="campo" value={clienteId} onChange={set("clienteId")}>
@@ -130,7 +137,10 @@ function Conteudo() {
                         : `Este cliente já tem ${emAndamento.length === 1 ? "um projeto" : `${emAndamento.length} projetos`} em andamento${mesmoServico ? ", um deles deste mesmo serviço. Confira se não é o mesmo" : ""}.`}
                   </span>
                 )}
-                <Link href={`/${slug}/clientes?novo=1&voltar=novo-projeto`} className="mt-1.5 inline-block text-[13px] text-azul underline-offset-4 hover:underline">
+                <Link
+                  href={`/${slug}/clientes?novo=1&voltar=novo-projeto`}
+                  className="mt-1.5 inline-block text-[13px] text-azul underline-offset-4 hover:underline"
+                >
                   Cadastrar outro cliente
                 </Link>
               </Campo>
@@ -169,7 +179,14 @@ function Conteudo() {
               <Botao type="submit" disabled={!clienteId || !modelo || criando || bloqueado}>
                 {criando ? "Criando…" : "Criar projeto"}
               </Botao>
-              {!modelo && <span className="ml-3 text-sm text-tinta-2">Esta empresa ainda não tem serviço cadastrado.</span>}
+              {!modelo && (
+                <span className="ml-3 text-sm text-tinta-2">
+                  Esta empresa ainda não tem serviço cadastrado.{" "}
+                  <Link href={`/${slug}/servicos/novo`} className="font-semibold text-azul hover:underline">
+                    Cadastrar serviço
+                  </Link>
+                </span>
+              )}
             </div>
           </form>
 
@@ -179,17 +196,19 @@ function Conteudo() {
               <ol className="mt-4 space-y-3 border-l border-linha pl-5">
                 {modelo.etapas.map((e) => (
                   <li key={e.ordem} className="text-[15px]">
-                    <span className="num font-semibold">{String(e.ordem).padStart(2, "0")}</span>{" "}
-                    {e.nome.charAt(0) + e.nome.slice(1).toLowerCase()}
+                    <span className="num font-semibold">{String(e.ordem).padStart(2, "0")}</span> {e.nome.charAt(0) + e.nome.slice(1).toLowerCase()}
                     <span className="num block text-[13px] text-tinta-2">
-                      {e.horasPrevistas} h, {e.entregaveis.length} entregáveis
+                      {e.horasPrevistas} h, {e.atividades.length} {e.atividades.length === 1 ? "atividade" : "atividades"}, {e.entregaveis.length}{" "}
+                      {e.entregaveis.length === 1 ? "entregável" : "entregáveis"}
                     </span>
                   </li>
                 ))}
               </ol>
-              <p className="mt-5 text-sm text-tinta-2">
-                Também já entram as referências normativas e o inventário de normas usados nos relatórios. Prestadora vinculada:{" "}
-                {modelo.prestadoraVinculada}. As datas de cada etapa são definidas logo depois, no plano de trabalho.
+              <p className="num mt-4 text-sm font-semibold text-tinta">{horasDoServico(modelo)} h no total</p>
+              <p className="mt-3 text-sm text-tinta-2">
+                {lgpd ? "Também já entram as referências normativas e o inventário de normas usados nos relatórios. " : ""}
+                {modelo.prestadoraVinculada ? `Prestadora vinculada: ${modelo.prestadoraVinculada}. ` : ""}As datas de cada etapa são definidas logo depois, no
+                plano de trabalho.
               </p>
             </aside>
           )}

@@ -39,7 +39,7 @@ export default function PaginaEtapa() {
   const router = useRouter();
   const [redigindo, setRedigindo] = useState<string | null>(null); // "todas" ou a chave da seção
   const { empresa: slugEmpresa } = useParams<{ empresa: string }>();
-  const biblioteca = useBiblioteca(slugEmpresa, Number(ordem));
+  const biblioteca = useBiblioteca(slugEmpresa, projeto?.modeloId ?? "", Number(ordem));
   const [aba, setAba] = useState<Aba>("Checklist");
   const [gerando, setGerando] = useState(false);
   const passosRef = useRef<HTMLOListElement>(null);

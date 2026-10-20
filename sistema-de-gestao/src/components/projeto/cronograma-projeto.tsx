@@ -22,7 +22,7 @@ export function CronogramaProjeto({ projeto, aoEditar }: { projeto: Projeto; aoE
   if (!comDatas)
     return (
       <Cartao className="p-4 sm:p-5">
-        <h2 className="text-[17px] font-bold">Cronograma</h2>
+        <h2 className="text-[17px] font-bold">Etapas no tempo</h2>
         <p className="mt-1 text-sm text-tinta-2">As etapas ganham datas quando o plano de trabalho for definido.</p>
         <Botao className="mt-4 w-full sm:w-auto" onClick={aoEditar}>
           Definir o plano de trabalho
@@ -43,7 +43,7 @@ export function CronogramaProjeto({ projeto, aoEditar }: { projeto: Projeto; aoE
   return (
     <Cartao className="p-4 sm:p-5">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="text-[17px] font-bold">Cronograma</h2>
+        <h2 className="text-[17px] font-bold">Etapas no tempo</h2>
         <button onClick={aoEditar} className="text-sm font-semibold text-azul hover:underline">
           Editar plano
         </button>

@@ -16,6 +16,7 @@ export type TextoBiblioteca = {
   porte: string;
   origem: "aprovado" | "manual";
   projeto_origem: string | null;
+  servico_id: string | null; // cada serviço tem a sua biblioteca
   created_at: string;
 };
 
@@ -85,7 +86,7 @@ export function preencherMarcadores(texto: string, cliente: Partial<Cliente>) {
 export function textosParaBiblioteca(p: Projeto, e: Etapa, cliente: Partial<Cliente>) {
   const participantes = nomesDosParticipantes(p);
   const linhas: Omit<TextoBiblioteca, "id" | "created_at">[] = [];
-  const base = { empresa: p.empresa, etapa: e.ordem, ramo: cliente.ramo ?? "", porte: cliente.porte ?? "", origem: "aprovado" as const, projeto_origem: p.id };
+  const base = { empresa: p.empresa, etapa: e.ordem, ramo: cliente.ramo ?? "", porte: cliente.porte ?? "", origem: "aprovado" as const, projeto_origem: p.id, servico_id: p.modeloId };
   for (const d of todasSecoes) {
     const t = (e.secoes[d.chave] ?? "").trim();
     if (t && !MARCA_COMPLETAR.test(t)) linhas.push({ ...base, chave: d.chave, titulo: d.titulo(e), texto: anonimizar(t, cliente, participantes) });
