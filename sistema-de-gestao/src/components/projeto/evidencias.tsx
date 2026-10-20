@@ -115,14 +115,14 @@ export function Evidencias({
   return (
     <section>
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3">
-        <h3 className="font-serif text-xl">Imagens de evidência</h3>
+        <h3 className="text-lg font-semibold">Imagens de evidência</h3>
         <span className="text-[13px] text-tinta-2">Entram no relatório como Figura 1, Figura 2…, depois do texto acima.</span>
       </div>
 
       {lista.length > 0 && (
         <ol className="mb-4 space-y-3">
           {lista.map((ev, i) => (
-            <li key={ev.id} className="grid grid-cols-[6rem_1fr] gap-4 rounded-[var(--radius-bloco)] border border-linha bg-folha p-3 sm:grid-cols-[8rem_1fr_auto]">
+            <li key={ev.id} className="grid grid-cols-[6rem_1fr] gap-4 rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)] p-3 sm:grid-cols-[8rem_1fr_auto]">
               <div className="flex h-20 items-center justify-center overflow-hidden rounded-[var(--radius-campo)] bg-pedra">
                 {urls[ev.caminho] ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -154,7 +154,7 @@ export function Evidencias({
                     ↓
                   </button>
                 </span>
-                <button onClick={() => remover(ev)} className="text-tinta-2 hover:text-vinho">
+                <button onClick={() => remover(ev)} className="text-tinta-2 hover:text-vermelho">
                   Remover
                 </button>
               </div>
@@ -177,7 +177,7 @@ export function Evidencias({
         <span className="text-[13px] text-tinta-2">ou arraste prints e fotos para cá. PNG, JPG ou WEBP, até 10 MB.</span>
         <input ref={entrada} type="file" accept={ACEITOS.join(",")} multiple hidden onChange={(e) => enviar(e.target.files)} />
       </div>
-      {erro && <p className="mt-2 text-[13px] text-vinho">{erro}</p>}
+      {erro && <p className="mt-2 text-[13px] text-vermelho">{erro}</p>}
     </section>
   );
 }

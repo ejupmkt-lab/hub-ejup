@@ -34,7 +34,7 @@ export default function RedefinirSenha() {
           <input type="password" required minLength={8} autoComplete="new-password" className="campo" value={senha} onChange={(e) => setSenha(e.target.value)} />
         </Campo>
         {erro && (
-          <p className="rounded-[var(--radius-campo)] bg-vinho-claro p-3 text-sm text-vinho">
+          <p className="rounded-[var(--radius-campo)] bg-vermelho-claro p-3 text-sm text-vermelho">
             {erro}{" "}
             <Link href="/login" className="underline underline-offset-2">
               Ir para o login

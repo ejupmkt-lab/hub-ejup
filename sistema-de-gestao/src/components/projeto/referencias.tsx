@@ -14,10 +14,10 @@ export function Referencias({ projeto }: { projeto: Projeto }) {
     alterar((p) => void (p.referencias.find((r) => r.id === id)![k] = v));
 
   return (
-    <Cartao className="p-6 sm:p-8">
+    <Cartao className="p-4 sm:p-8">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h2 className="font-serif text-2xl">Referências normativas e técnicas</h2>
+          <h2 className="text-xl font-semibold">Referências normativas e técnicas</h2>
           <p className="text-[13px] text-tinta-2">Numeradas [1]…[n] na ordem abaixo; cite no texto como [1][3]. Fonte externa precisa de data de consulta.</p>
         </div>
         <span className="flex flex-wrap gap-2">
@@ -51,7 +51,7 @@ export function Referencias({ projeto }: { projeto: Projeto }) {
               Consulta em
               <input type="date" className="campo mt-1" value={r.consultadoEm} onChange={(e) => editar(r.id, "consultadoEm", e.target.value)} />
             </label>
-            <button title="Remover" aria-label="Remover referência" onClick={() => confirm("Remover esta referência?") && alterar((p) => void (p.referencias = p.referencias.filter((x) => x.id !== r.id)))} className="text-tinta-2 hover:text-vinho">✕</button>
+            <button title="Remover" aria-label="Remover referência" onClick={() => confirm("Remover esta referência?") && alterar((p) => void (p.referencias = p.referencias.filter((x) => x.id !== r.id)))} className="text-tinta-2 hover:text-vermelho">✕</button>
           </li>
         ))}
       </ol>

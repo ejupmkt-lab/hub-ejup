@@ -19,11 +19,14 @@ export const ancoraAba: Record<AbaEtapa, string> = {
 
 // Abas do projeto que podem ser abertas pelo endereço (#plano, #referencias…)
 export const ancoraAbaProjeto = {
+  cronograma: "Cronograma",
+  relatorios: "Relatórios",
   plano: "Plano de trabalho",
   visitas: "Visitas e horas",
-  registros: "Registros do programa",
+  registrar: "Visitas e horas",
+  registros: "Registros",
   referencias: "Referências",
-  ficha: "Ficha de identificação",
+  ficha: "Ficha",
   historico: "Histórico",
 } as const;
 

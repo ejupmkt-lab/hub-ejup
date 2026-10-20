@@ -12,11 +12,22 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Três módulos**, um por empresa: Pivotto & Pivotto (ativo), ORB (em estruturação), EJUP (standby).
 - **Isolamento por empresa no banco (RLS):** cada pessoa só recebe os dados das empresas a que tem acesso.
   O administrador do grupo vê todas, inclusive as inativas.
-- **Painel do grupo** com os próximos prazos (só administrador).
+- **Painel** (página inicial de todos): projetos em andamento, tarefas pendentes do plano de trabalho,
+  horas registradas e etapas atrasadas; abaixo, um cartão por projeto com o avanço contra o previsto,
+  a etapa, a entrega, os alertas (vermelho = devolução, laranja = atraso, verde = em dia) e o próximo
+  passo. O avanço pesa cada etapa pelas horas: 40% pelo checklist e 60% pelo status do relatório
+  (`avancoProjeto` em `src/lib/projeto.ts`); o previsto vem das datas do plano.
+- **Projetos** em lista, quadro (por etapa), cronograma de todos e calendário de prazos.
+- **Tarefas**: as atividades do checklist ainda pendentes nas etapas em curso, marcáveis ali mesmo.
+- **Menu**: lateral no computador; no celular, menu inferior com o botão central **Registrar**
+  (visita, reunião ou horas de qualquer projeto).
 - **Clientes** com os campos do Modelo de Diagnóstico do HUB SEBRAE.
 - **Projetos** a partir do modelo *Adequação à LGPD · HUB SEBRAE* (ficha 13070-5): 5 etapas, 333 h,
   checklist de atividades e 23 entregáveis.
 - **Plano de trabalho**: datas sugeridas e fechadas por Roberto; alteração posterior exige justificativa.
+- **Dentro do projeto**: Cronograma (avanço, etapa atual, horas e Gantt das etapas), Relatórios (o
+  relatório técnico de cada etapa, a etapa em curso em destaque), Plano de trabalho, Visitas e horas,
+  Registros, Referências, Ficha e Histórico.
 - **Etapas no formato do HUB SEBRAE**, registros do programa, redação por seção, checagem de completude.
 - **Relatório Técnico em Word (.docx)** no papel timbrado do modelo (`public/modelos/relatorio-base.docx`).
 - **Cadastro pelo CNPJ**: razão social, nome fantasia, endereço, CEP, porte, atividade e data de abertura

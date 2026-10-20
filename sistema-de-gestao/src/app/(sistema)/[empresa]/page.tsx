@@ -1,106 +1,269 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useEstado } from "@/lib/dados/store";
-import { BotaoLink, Cabecalho, Cartao, Vazio } from "@/components/ui";
-import { LinhaProjeto } from "@/components/linha-projeto";
+import type { Projeto } from "@/lib/dados/tipos";
+import { formatarData } from "@/lib/datas";
+import { alertasDoProjeto, avancoProjeto, entregaFinal, etapaAtrasada, etapaAtual, previstoProjeto, situacaoProjeto } from "@/lib/projeto";
+import { doisDigitos } from "@/lib/rotulos";
+import { Barra, BotaoLink, Cartao, Cabecalho, Status, Segmentos, Vazio, corTom } from "@/components/ui";
+import { Cronograma } from "@/components/painel/cronograma";
+import { CartaoProjeto } from "@/components/cartao-projeto";
+import { Calendario } from "@/components/painel/calendario";
+import { IconeBusca, IconeCalendario, IconeCronograma, IconeLista, IconeMaisSinal, IconeQuadro } from "@/components/icones";
 
-const filtros = {
-  andamento: "Ativos",
-  sem_plano: "Sem plano",
-  encerrados: "Encerrados",
-  todos: "Todos",
-} as const;
-type Filtro = keyof typeof filtros;
+const situacoes = { andamento: "Em andamento", atrasados: "Atrasados", sem_plano: "Sem plano", encerrados: "Encerrados", todos: "Todos" } as const;
+type Situacao = keyof typeof situacoes;
 
-export default function ModuloEmpresa() {
+const ordens = { urgencia: "Por urgência", nome: "Por nome", entrega: "Por entrega", avanco: "Por avanço" } as const;
+type Ordem = keyof typeof ordens;
+
+type Visao = "lista" | "quadro" | "cronograma" | "calendario";
+const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
+
+export default function Projetos() {
   const { empresa: slug } = useParams<{ empresa: string }>();
   const { estado } = useEstado();
   const empresa = estado.empresas.find((e) => e.slug === slug)!;
-  const [filtro, setFiltro] = useState<Filtro>("andamento");
+  const [visao, setVisao] = useState<Visao>("lista");
+  const [situacao, setSituacao] = useState<Situacao>("andamento");
+  const [ordem, setOrdem] = useState<Ordem>("urgencia");
   const [busca, setBusca] = useState("");
 
   const daEmpresa = estado.projetos.filter((p) => p.empresa === slug);
-  const cliente = (id: string) => estado.clientes.find((c) => c.id === id);
-  const passaFiltro = (status: string) =>
-    filtro === "todos" ||
-    (filtro === "andamento" && status !== "encerrado") ||
-    (filtro === "sem_plano" && status === "aguardando_plano") ||
-    (filtro === "encerrados" && status === "encerrado");
+  const cliente = (p: Projeto) => estado.clientes.find((c) => c.id === p.clienteId);
+  const nome = (p: Projeto) => cliente(p)?.nomeFantasia || cliente(p)?.razaoSocial || "Cliente";
+  const passa = (p: Projeto, s: Situacao) =>
+    s === "todos" ||
+    (s === "andamento" && p.status !== "encerrado") ||
+    (s === "atrasados" && p.status !== "encerrado" && p.etapas.some((e) => etapaAtrasada(e) || e.status === "devolvida")) ||
+    (s === "sem_plano" && p.status === "aguardando_plano") ||
+    (s === "encerrados" && p.status === "encerrado");
   const termo = busca.trim().toLowerCase();
-  const projetos = daEmpresa.filter((p) => {
-    const c = cliente(p.clienteId);
-    const texto = `${c?.razaoSocial} ${c?.nomeFantasia} ${p.numeroProjetoHub}`.toLowerCase();
-    return passaFiltro(p.status) && (!termo || texto.includes(termo));
-  });
-  const contagem = (f: Filtro) =>
-    daEmpresa.filter((p) =>
-      f === "todos" ? true : f === "andamento" ? p.status !== "encerrado" : f === "sem_plano" ? p.status === "aguardando_plano" : p.status === "encerrado",
-    ).length;
+  const urgencia = (p: Projeto) => Math.min(9, ...alertasDoProjeto(p).map((a) => a.ordem));
+  const projetos = daEmpresa
+    .filter((p) => passa(p, situacao))
+    .filter((p) => !termo || `${cliente(p)?.razaoSocial} ${cliente(p)?.nomeFantasia} ${p.numeroProjetoHub}`.toLowerCase().includes(termo))
+    .sort((a, b) =>
+      ordem === "nome"
+        ? nome(a).localeCompare(nome(b))
+        : ordem === "entrega"
+          ? (entregaFinal(a) ?? "9").localeCompare(entregaFinal(b) ?? "9")
+          : ordem === "avanco"
+            ? avancoProjeto(a) - avancoProjeto(b)
+            : urgencia(a) - urgencia(b),
+    );
 
   return (
     <>
-      <Cabecalho titulo={empresa.nome} subtitulo="Adequação à LGPD pelo HUB SEBRAE, ficha técnica 13070-5">
-        <BotaoLink href={`/${slug}/clientes`} variante="secundario">
-          Clientes
+      <Cabecalho titulo="Projetos" subtitulo={`${empresa.nome} · ${daEmpresa.filter((p) => p.status !== "encerrado").length} em andamento`}>
+        <BotaoLink href={`/${slug}/projetos/novo`} className="w-full sm:w-auto">
+          <IconeMaisSinal className="h-4 w-4" />
+          Novo projeto
         </BotaoLink>
-        <BotaoLink href={`/${slug}/biblioteca`} variante="secundario">
-          Biblioteca
-        </BotaoLink>
-        <BotaoLink href={`/${slug}/projetos/novo`}>Novo projeto</BotaoLink>
       </Cabecalho>
 
       {daEmpresa.length === 0 ? (
-        <Vazio
-          titulo="Nenhum projeto ainda"
-          acao={<BotaoLink href={`/${slug}/projetos/novo`}>Criar o primeiro projeto</BotaoLink>}
-        >
+        <Vazio titulo="Nenhum projeto ainda" acao={<BotaoLink href={`/${slug}/projetos/novo`}>Criar o primeiro projeto</BotaoLink>}>
           Cada contratação do HUB SEBRAE vira um projeto, com as cinco etapas da ficha 13070-5, o checklist e o relatório de cada entrega.
         </Vazio>
       ) : (
-        <>
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <div role="radiogroup" aria-label="Filtrar projetos" className="flex max-w-full gap-0.5 overflow-x-auto rounded-[var(--radius-bloco)] border border-linha bg-folha p-1">
-              {(Object.keys(filtros) as Filtro[]).map((f) => (
-                <button
-                  key={f}
-                  role="radio"
-                  aria-checked={filtro === f}
-                  onClick={() => setFiltro(f)}
-                  className={`whitespace-nowrap rounded-[var(--radius-campo)] px-3.5 py-1.5 text-sm transition-colors ${
-                    filtro === f ? "bg-garrafa font-medium text-folha" : "text-tinta-2 hover:bg-pedra hover:text-tinta"
-                  }`}
-                >
-                  {filtros[f]} <span className="num opacity-70">{contagem(f)}</span>
-                </button>
-              ))}
-            </div>
-            <input
-              type="search"
-              placeholder="Buscar cliente ou nº do projeto"
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              className="campo !w-72 max-w-full"
-              aria-label="Buscar projetos"
-            />
-          </div>
+        <div className="space-y-4">
+          <Segmentos
+            rotulo="Visão"
+            atual={visao}
+            aoTrocar={setVisao}
+            opcoes={[
+              { valor: "lista", rotulo: "Lista", icone: <IconeLista className="h-5 w-5" /> },
+              { valor: "quadro", rotulo: "Quadro", icone: <IconeQuadro className="h-5 w-5" /> },
+              { valor: "cronograma", rotulo: "Cronograma", icone: <IconeCronograma className="h-5 w-5" /> },
+              { valor: "calendario", rotulo: "Calendário", icone: <IconeCalendario className="h-5 w-5" /> },
+            ]}
+          />
+
+          <Cartao className="grid grid-cols-2 gap-2 p-2 sm:grid-cols-[minmax(0,13rem)_minmax(0,13rem)_1fr]">
+            <label className="min-w-0">
+              <span className="sr-only">Situação</span>
+              <select className="campo" value={situacao} onChange={(e) => setSituacao(e.target.value as Situacao)}>
+                {(Object.keys(situacoes) as Situacao[]).map((s) => (
+                  <option key={s} value={s}>
+                    {situacoes[s]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="min-w-0">
+              <span className="sr-only">Ordenar</span>
+              <select className="campo" value={ordem} onChange={(e) => setOrdem(e.target.value as Ordem)}>
+                {(Object.keys(ordens) as Ordem[]).map((o) => (
+                  <option key={o} value={o}>
+                    {ordens[o]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="relative col-span-2 min-w-0 sm:col-span-1">
+              <span className="sr-only">Buscar projetos</span>
+              <IconeBusca className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-tinta-2" />
+              <input
+                type="search"
+                placeholder="Buscar cliente ou nº do projeto"
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                className="campo !pl-10"
+              />
+            </label>
+          </Cartao>
 
           {projetos.length === 0 ? (
             <p className="rounded-[var(--radius-bloco)] border border-dashed border-linha-forte py-10 text-center text-[15px] text-tinta-2">
-              Nenhum projeto neste filtro.
+              Nenhum projeto nesta busca ou situação.
             </p>
+          ) : visao === "lista" ? (
+            <Lista projetos={projetos} nome={nome} />
+          ) : visao === "quadro" ? (
+            <Quadro projetos={projetos} nome={nome} />
+          ) : visao === "cronograma" ? (
+            <Cartao className="p-4 sm:p-5">
+              <p className="mb-4 text-sm text-tinta-2">
+                Cada linha é um projeto; cada barra, uma etapa no período do plano de trabalho. Toque numa barra para abrir a etapa.
+              </p>
+              <Cronograma projetos={projetos} />
+            </Cartao>
           ) : (
-            <Cartao>
-              <ul className="divide-y divide-linha">
-                {projetos.map((p) => (
-                  <LinhaProjeto key={p.id} projeto={p} />
-                ))}
-              </ul>
+            <Cartao className="p-4 sm:p-5">
+              <Calendario projetos={projetos} />
             </Cartao>
           )}
-        </>
+        </div>
       )}
     </>
+  );
+}
+
+// Lista: tabela nas telas largas; nas menores, os mesmos cartões do painel
+function Lista({ projetos, nome }: { projetos: Projeto[]; nome: (p: Projeto) => string }) {
+  const { estado } = useEstado();
+  const colunas = "grid grid-cols-[minmax(0,1.5fr)_minmax(0,1.2fr)_10rem_6.5rem_12rem] items-center gap-5";
+  return (
+    <>
+      <div className="grid gap-4 md:grid-cols-2 xl:hidden">
+        {projetos.map((p) => (
+          <CartaoProjeto key={p.id} projeto={p} />
+        ))}
+      </div>
+      <Cartao className="hidden overflow-hidden xl:block">
+        <div className={`border-b border-linha bg-pedra/60 px-5 py-2.5 text-[13px] font-semibold text-tinta-2 ${colunas}`}>
+          <span>Cliente / projeto</span>
+          <span>Etapa atual</span>
+          <span>Progresso</span>
+          <span>Entrega</span>
+          <span>Situação</span>
+        </div>
+        <ul className="divide-y divide-linha">
+          {projetos.map((p) => {
+            const c = estado.clientes.find((x) => x.id === p.clienteId);
+            const et = etapaAtual(p);
+            const avanco = avancoProjeto(p);
+            const previsto = previstoProjeto(p);
+            const sit = situacaoProjeto(p);
+            const entrega = entregaFinal(p);
+            const atrasada = et && (etapaAtrasada(et) || et.status === "devolvida");
+            return (
+              <li key={p.id} className="relative">
+                <div className={`px-5 py-4 hover:bg-pedra/50 ${colunas}`}>
+                  <div className="min-w-0">
+                    <Link
+                      href={`/${p.empresa}/projetos/${p.id}`}
+                      className="break-words text-[15px] font-bold text-tinta after:absolute after:inset-0 after:content-[''] hover:text-azul"
+                    >
+                      {nome(p)}
+                    </Link>
+                    <p className="num break-words text-[13px] text-tinta-2">
+                      {c?.nomeFantasia ? `${c.razaoSocial} · ` : ""}HUB {p.numeroProjetoHub || "sem número"}
+                    </p>
+                  </div>
+                  <p className="flex min-w-0 items-start gap-2 text-sm text-tinta">
+                    <span
+                      aria-hidden
+                      className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${atrasada ? corTom[sit.tom].ponto : et ? "bg-azul" : "bg-verde-vivo"}`}
+                    />
+                    <span className="min-w-0">{et ? `${doisDigitos(et.ordem)} ${capitalizar(et.nome)}` : "Todas enviadas"}</span>
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <span className="flex-1">
+                      <Barra valor={avanco} total={100} marca={previsto} />
+                    </span>
+                    <span className="num w-10 shrink-0 text-right text-sm font-semibold">{avanco}%</span>
+                  </div>
+                  <p className="num text-sm text-tinta">{entrega ? formatarData(entrega) : "—"}</p>
+                  <div>
+                    <Status tom={sit.tom}>{sit.rotulo}</Status>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </Cartao>
+    </>
+  );
+}
+
+// Quadro: uma coluna por etapa em curso (como um kanban); rola de lado
+function Quadro({ projetos, nome }: { projetos: Projeto[]; nome: (p: Projeto) => string }) {
+  const modelo = projetos[0]?.etapas ?? [];
+  const coluna = (p: Projeto) => (p.status === "encerrado" ? "encerrado" : !p.planoFechadoEm ? "sem_plano" : String(etapaAtual(p)?.ordem ?? "enviadas"));
+  const colunas = [
+    { id: "sem_plano", titulo: "Sem plano de trabalho" },
+    ...modelo.map((e) => ({ id: String(e.ordem), titulo: `${doisDigitos(e.ordem)} ${capitalizar(e.nome)}` })),
+    { id: "enviadas", titulo: "Todas enviadas" },
+    { id: "encerrado", titulo: "Encerrados" },
+  ].filter((c) => !["sem_plano", "enviadas", "encerrado"].includes(c.id) || projetos.some((p) => coluna(p) === c.id));
+
+  return (
+    <div className="md:overflow-x-auto md:pb-2">
+      <div className="flex flex-col gap-3 md:flex-row">
+        {colunas.map((col) => {
+          const lista = projetos.filter((p) => coluna(p) === col.id);
+          return (
+            <section key={col.id} className="rounded-[var(--radius-bloco)] bg-linha/50 p-2 md:w-[16.5rem] md:shrink-0">
+              <h2 className="flex items-center justify-between gap-2 px-2 pb-2 pt-1 text-sm font-bold text-tinta">
+                <span className="min-w-0 break-words">{col.titulo}</span>
+                <span className="num rounded-full bg-folha px-2 py-0.5 text-[12px] font-semibold text-tinta-2">{lista.length}</span>
+              </h2>
+              <ul className="space-y-2">
+                {lista.map((p) => {
+                  const sit = situacaoProjeto(p);
+                  const avanco = avancoProjeto(p);
+                  return (
+                    <li key={p.id}>
+                      <Link
+                        href={`/${p.empresa}/projetos/${p.id}`}
+                        className={`block rounded-[var(--radius-campo)] border border-l-4 border-linha bg-folha p-3 shadow-[var(--shadow-cartao)] hover:border-azul/40 ${corTom[sit.tom].borda}`}
+                      >
+                        <span className="block break-words text-[15px] font-bold text-tinta">{nome(p)}</span>
+                        <span className="mt-2 flex items-center gap-2">
+                          <span className="flex-1">
+                            <Barra valor={avanco} total={100} marca={previstoProjeto(p)} />
+                          </span>
+                          <span className="num text-[13px] font-semibold">{avanco}%</span>
+                        </span>
+                        <span className="mt-2 block">
+                          <Status tom={sit.tom}>{sit.rotulo}</Status>
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+                {lista.length === 0 && <li className="px-2 py-3 text-[13px] text-tinta-2">Nenhum projeto</li>}
+              </ul>
+            </section>
+          );
+        })}
+      </div>
+    </div>
   );
 }

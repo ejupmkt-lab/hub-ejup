@@ -118,11 +118,11 @@ function Conteudo() {
                   ))}
                 </select>
                 {jaTemProjeto.length > 0 && (
-                  <span className="mt-1.5 block text-[13px] text-latao">
+                  <span className="mt-1.5 block text-[13px] text-laranja">
                     Este cliente já tem {jaTemProjeto.length === 1 ? "um projeto" : `${jaTemProjeto.length} projetos`}. Confira se não é o mesmo.
                   </span>
                 )}
-                <Link href={`/${slug}/clientes?novo=1&voltar=novo-projeto`} className="mt-1.5 inline-block text-[13px] text-garrafa underline-offset-4 hover:underline">
+                <Link href={`/${slug}/clientes?novo=1&voltar=novo-projeto`} className="mt-1.5 inline-block text-[13px] text-azul underline-offset-4 hover:underline">
                   Cadastrar outro cliente
                 </Link>
               </Campo>
@@ -167,11 +167,11 @@ function Conteudo() {
 
           {modelo && (
             <aside className="lg:pt-9">
-              <p className="font-serif text-lg">O projeto nasce com</p>
+              <p className="text-base font-semibold">O projeto nasce com</p>
               <ol className="mt-4 space-y-3 border-l border-linha pl-5">
                 {modelo.etapas.map((e) => (
                   <li key={e.ordem} className="text-[15px]">
-                    <span className="num font-serif">{String(e.ordem).padStart(2, "0")}</span>{" "}
+                    <span className="num font-semibold">{String(e.ordem).padStart(2, "0")}</span>{" "}
                     {e.nome.charAt(0) + e.nome.slice(1).toLowerCase()}
                     <span className="num block text-[13px] text-tinta-2">
                       {e.horasPrevistas} h, {e.entregaveis.length} entregáveis

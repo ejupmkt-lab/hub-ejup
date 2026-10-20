@@ -72,14 +72,14 @@ export function RelatorioAssinado({
 
   return (
     <section>
-      <h3 className="mb-1 font-serif text-xl">PDF assinado</h3>
+      <h3 className="mb-1 text-lg font-semibold">PDF assinado</h3>
       <p className="mb-4 text-[15px] text-tinta-2">
         Depois de assinar no gov.br, guarde aqui o PDF final. Fica arquivado com o projeto e as datas de assinatura em branco são preenchidas com a de hoje.
       </p>
       {atual ? (
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-bloco)] border border-linha bg-folha px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)] px-4 py-4 sm:px-5">
           <span className="min-w-0">
-            <button onClick={() => abrirAssinado(atual.caminho, atual.nome)} className="block truncate text-left text-[15px] text-garrafa underline-offset-4 hover:underline">
+            <button onClick={() => abrirAssinado(atual.caminho, atual.nome)} className="block truncate text-left text-[15px] text-azul underline-offset-4 hover:underline">
               {atual.nome}
             </button>
             <span className="num block text-[13px] text-tinta-2">
@@ -90,7 +90,7 @@ export function RelatorioAssinado({
             <button onClick={() => entrada.current?.click()} disabled={enviando} className="text-tinta-2 hover:text-tinta">
               {enviando ? "Enviando…" : "Substituir"}
             </button>
-            <button onClick={remover} className="text-tinta-2 hover:text-vinho">
+            <button onClick={remover} className="text-tinta-2 hover:text-vermelho">
               Remover
             </button>
           </span>
@@ -111,7 +111,7 @@ export function RelatorioAssinado({
         </div>
       )}
       <input ref={entrada} type="file" accept="application/pdf" hidden onChange={(e) => enviar(e.target.files?.[0])} />
-      {erro && <p className="mt-2 text-[13px] text-vinho">{erro}</p>}
+      {erro && <p className="mt-2 text-[13px] text-vermelho">{erro}</p>}
     </section>
   );
 }

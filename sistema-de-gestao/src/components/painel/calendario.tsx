@@ -36,7 +36,7 @@ export function Calendario({ projetos }: { projetos: Projeto[] }) {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between gap-3">
-        <p className="font-serif text-[1.15rem]">
+        <p className="text-[17px] font-semibold">
           {nomesMeses[Number(mes.slice(5)) - 1]} de {mes.slice(0, 4)}
         </p>
         <span className="flex items-center gap-1">
@@ -76,24 +76,24 @@ export function Calendario({ projetos }: { projetos: Projeto[] }) {
               aria-pressed={selecionado}
               aria-label={`${dataPorExtenso(d)}: ${evs.length ? `${evs.length} ${evs.length === 1 ? "evento" : "eventos"}` : "sem eventos"}`}
               className={`flex min-h-[3.75rem] flex-col sm:min-h-[5.25rem] items-stretch gap-1 border-b border-r border-linha p-1.5 text-left transition-colors ${
-                selecionado ? "bg-garrafa-claro/60" : "hover:bg-pedra/50"
+                selecionado ? "bg-azul-claro/60" : "hover:bg-pedra/50"
               } ${foraDoMes ? "text-tinta-2/50" : ""}`}
             >
               <span
                 className={`num grid h-6 w-6 place-items-center rounded-full text-[12px] ${
-                  d === hoje ? "bg-garrafa font-medium text-folha" : foraDoMes ? "" : "text-tinta"
+                  d === hoje ? "bg-azul font-medium text-folha" : foraDoMes ? "" : "text-tinta"
                 }`}
               >
                 {Number(d.slice(8))}
               </span>
               {evs.slice(0, 2).map((ev, i) => (
-                <span key={i} className="flex min-w-0 items-center gap-1.5 text-[11px] leading-tight text-tinta">
+                <span key={i} className="flex min-w-0 items-start gap-1.5 text-[11px] leading-tight text-tinta">
                   <span
                     aria-hidden
-                    className={`h-2 w-2 shrink-0 ${ev.tipo === "prazo" ? "rounded-[2px]" : "rounded-full border-2 bg-transparent"}`}
+                    className={`mt-[1px] h-2 w-2 shrink-0 ${ev.tipo === "prazo" ? "rounded-[2px]" : "rounded-full border-2 bg-transparent"}`}
                     style={ev.tipo === "prazo" ? { background: grupos[ev.grupo].cor } : { borderColor: grupos[ev.grupo].cor }}
                   />
-                  <span className="hidden truncate sm:inline">
+                  <span className="hidden min-w-0 break-words lg:inline">
                     {doisDigitos(ev.etapa.ordem)} {nome(ev.projeto)}
                   </span>
                 </span>
@@ -113,7 +113,7 @@ export function Calendario({ projetos }: { projetos: Projeto[] }) {
           <span aria-hidden className="h-2.5 w-2.5 rounded-full border-2 border-tinta-2" />
           Início da etapa
         </span>
-        <span>A cor segue a situação da etapa, como no cronograma.</span>
+        <span>A cor segue a situação da etapa, como no cronograma. Toque num dia para ver o que há nele.</span>
       </div>
 
       <div className="mt-5 border-t border-linha pt-4">
@@ -126,7 +126,7 @@ export function Calendario({ projetos }: { projetos: Projeto[] }) {
               <li key={i}>
                 <Link
                   href={`/${ev.projeto.empresa}/projetos/${ev.projeto.id}/etapas/${ev.etapa.ordem}`}
-                  className="flex items-center gap-2.5 text-sm text-tinta hover:text-garrafa hover:underline"
+                  className="flex items-center gap-2.5 text-sm text-tinta hover:text-azul hover:underline"
                 >
                   <span aria-hidden className="h-2.5 w-2.5 shrink-0 rounded-[2px]" style={{ background: grupos[ev.grupo].cor }} />
                   {ev.tipo === "prazo" ? "Prazo da" : "Início da"} etapa {doisDigitos(ev.etapa.ordem)}, {nome(ev.projeto)}

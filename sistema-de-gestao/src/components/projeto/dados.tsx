@@ -48,8 +48,8 @@ export function DadosProjeto({ projeto }: { projeto: Projeto }) {
 
   return (
     <>
-      <Cartao className="p-6 sm:p-8">
-        <h2 className="font-serif text-2xl">Ficha de identificação</h2>
+      <Cartao className="p-4 sm:p-8">
+        <h2 className="text-xl font-semibold">Ficha de identificação</h2>
         <p className="mb-6 mt-1 text-[15px] text-tinta-2">
           Estes dados e os do cliente ({cliente?.razaoSocial}) preenchem a ficha no topo de todos os relatórios.
         </p>

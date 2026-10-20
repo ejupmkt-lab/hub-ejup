@@ -44,7 +44,7 @@ export function TelaCodigo({ aoConfirmar, sair }: { aoConfirmar: () => Promise<v
             onChange={(e) => setCodigo(e.target.value.replace(/\D/g, ""))}
           />
         </Campo>
-        {erro && <p className="rounded-[var(--radius-campo)] bg-vinho-claro p-3 text-sm text-vinho">{erro}</p>}
+        {erro && <p className="rounded-[var(--radius-campo)] bg-vermelho-claro p-3 text-sm text-vermelho">{erro}</p>}
         <Botao type="submit" disabled={enviando || codigo.length !== 6} className="w-full">
           {enviando ? "Conferindo…" : "Entrar"}
         </Botao>

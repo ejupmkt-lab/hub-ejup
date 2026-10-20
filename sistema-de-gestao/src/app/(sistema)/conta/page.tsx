@@ -76,9 +76,9 @@ function DuasEtapas() {
   };
 
   return (
-    <Cartao className="p-6 sm:p-8">
+    <Cartao className="p-4 sm:p-8">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <h2 className="font-serif text-2xl">Verificação em duas etapas</h2>
+        <h2 className="text-xl font-semibold">Verificação em duas etapas</h2>
         {ativo !== undefined && <Status tom={ativo ? "ok" : "neutro"}>{ativo ? "Ativada" : "Desativada"}</Status>}
       </div>
       <p className="mt-1 text-[15px] text-tinta-2">
@@ -130,7 +130,7 @@ function DuasEtapas() {
       ) : null}
 
       {msg && (
-        <p className={`mt-4 rounded-[var(--radius-campo)] p-3 text-sm ${msg.tipo === "ok" ? "bg-musgo-claro text-musgo" : "bg-vinho-claro text-vinho"}`}>{msg.texto}</p>
+        <p className={`mt-4 rounded-[var(--radius-campo)] p-3 text-sm ${msg.tipo === "ok" ? "bg-verde-claro text-verde" : "bg-vermelho-claro text-vermelho"}`}>{msg.texto}</p>
       )}
     </Cartao>
   );
@@ -157,8 +157,8 @@ function AlterarSenha() {
   };
 
   return (
-    <Cartao className="p-6 sm:p-8">
-      <h2 className="font-serif text-2xl">Alterar senha</h2>
+    <Cartao className="p-4 sm:p-8">
+      <h2 className="text-xl font-semibold">Alterar senha</h2>
       <form onSubmit={salvar} className="mt-5 flex flex-wrap items-end gap-3">
         <Campo rotulo="Nova senha" className="w-72 max-w-full">
           <input type="password" placeholder="Mínimo de 8 caracteres" required minLength={8} autoComplete="new-password" className="campo" value={senha} onChange={(e) => setSenha(e.target.value)} />
@@ -168,7 +168,7 @@ function AlterarSenha() {
         </Botao>
       </form>
       {msg && (
-        <p className={`mt-4 rounded-[var(--radius-campo)] p-3 text-sm ${msg.tipo === "ok" ? "bg-musgo-claro text-musgo" : "bg-vinho-claro text-vinho"}`}>{msg.texto}</p>
+        <p className={`mt-4 rounded-[var(--radius-campo)] p-3 text-sm ${msg.tipo === "ok" ? "bg-verde-claro text-verde" : "bg-vermelho-claro text-vermelho"}`}>{msg.texto}</p>
       )}
     </Cartao>
   );

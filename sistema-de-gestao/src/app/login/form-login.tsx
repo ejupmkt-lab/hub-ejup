@@ -73,7 +73,7 @@ export function FormLogin({ erroLink }: { erroLink: boolean }) {
           </Campo>
         )}
         {msg && (
-          <p className={`rounded-[var(--radius-campo)] p-3 text-sm ${msg.tipo === "ok" ? "bg-musgo-claro text-musgo" : "bg-vinho-claro text-vinho"}`}>{msg.texto}</p>
+          <p className={`rounded-[var(--radius-campo)] p-3 text-sm ${msg.tipo === "ok" ? "bg-verde-claro text-verde" : "bg-vermelho-claro text-vermelho"}`}>{msg.texto}</p>
         )}
         <Botao type="submit" disabled={enviando} className="w-full">
           {enviando ? "Aguarde…" : modo === "entrar" ? "Entrar" : modo === "criar" ? "Criar conta" : "Enviar link"}
@@ -81,13 +81,13 @@ export function FormLogin({ erroLink }: { erroLink: boolean }) {
       </form>
       <div className="mt-6 flex flex-col items-start gap-2 text-[15px]">
         {modo !== "entrar" && (
-          <button className="text-garrafa underline-offset-4 hover:underline" onClick={() => (setModo("entrar"), setMsg(null))}>
+          <button className="text-azul underline-offset-4 hover:underline" onClick={() => (setModo("entrar"), setMsg(null))}>
             Já tenho conta
           </button>
         )}
         {modo === "entrar" && (
           <>
-            <button className="text-garrafa underline-offset-4 hover:underline" onClick={() => (setModo("criar"), setMsg(null))}>
+            <button className="text-azul underline-offset-4 hover:underline" onClick={() => (setModo("criar"), setMsg(null))}>
               Primeiro acesso? Criar conta
             </button>
             <button className="text-tinta-2 underline-offset-4 hover:underline" onClick={() => (setModo("esqueci"), setMsg(null))}>

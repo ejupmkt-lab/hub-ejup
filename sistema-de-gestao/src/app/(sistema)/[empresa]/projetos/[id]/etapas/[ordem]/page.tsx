@@ -36,7 +36,7 @@ const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 export default function PaginaEtapa() {
   const { ordem } = useParams<{ ordem: string }>();
   const { projeto, cliente, consultor, alterar } = useProjeto();
-  const { estado, salvarAgora } = useEstado();
+  const { salvarAgora } = useEstado();
   const [redigindo, setRedigindo] = useState<string | null>(null); // "todas" ou a chave da seção
   const { empresa: slugEmpresa } = useParams<{ empresa: string }>();
   const biblioteca = useBiblioteca(slugEmpresa, Number(ordem));
@@ -69,7 +69,6 @@ export default function PaginaEtapa() {
   const etapa = projeto.etapas.find((e) => e.ordem === Number(ordem));
   if (!etapa) return <NaoEncontrado projeto={`/${projeto.empresa}/projetos/${projeto.id}`} />;
 
-  const empresa = estado.empresas.find((e) => e.slug === projeto.empresa)!;
   const pendencias = verificarCompletude(projeto, etapa);
   const sit = projeto.planoFechadoEm && projeto.status !== "encerrado" ? situacaoPrazo(etapa) : null;
   const encerrado = projeto.status === "encerrado";
@@ -214,21 +213,21 @@ export default function PaginaEtapa() {
     <>
       <Cabecalho
         migalhas={[
-          { rotulo: empresa.nome, href: `/${projeto.empresa}` },
+          { rotulo: "Projetos", href: `/${projeto.empresa}` },
           { rotulo: cliente.nomeFantasia || cliente.razaoSocial, href: base },
           { rotulo: `Etapa ${doisDigitos(etapa.ordem)}` },
         ]}
-        titulo={`${doisDigitos(etapa.ordem)} ${capitalizar(etapa.nome)}`}
+        titulo={`Etapa ${doisDigitos(etapa.ordem)} · ${capitalizar(etapa.nome)}`}
         subtitulo={
           <span className="num">
             Etapa {etapa.ordem} de {projeto.etapas.length}, {periodoCurto(etapa.dataInicio, etapa.dataFim)}, {etapa.horasPrevistas} h previstas
           </span>
         }
         abas={
-          <section aria-label="Andamento da etapa" className="pb-6">
+          <section aria-label="Andamento da etapa" className="rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)] p-4 sm:p-5">
             {etapa.status === "devolvida" ? (
-              <div className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-bloco)] bg-vinho-claro px-5 py-3">
-                <p className="text-[15px] text-vinho">O SEBRAE devolveu esta entrega para ajuste.</p>
+              <div className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-bloco)] bg-vermelho-claro px-5 py-3">
+                <p className="text-[15px] text-vermelho">O SEBRAE devolveu esta entrega para ajuste.</p>
                 <Botao variante="secundario" tamanho="pequeno" onClick={() => definirStatus("em_redacao")}>
                   Voltar para redação
                 </Botao>
@@ -243,7 +242,7 @@ export default function PaginaEtapa() {
                     return (
                       <li key={s} className="relative min-w-[6.25rem] flex-1">
                         {i < fluxo.length - 1 && (
-                          <span aria-hidden className={`absolute left-7 right-1 top-[11px] h-[2px] rounded-full ${feito ? "bg-garrafa" : "bg-linha"}`} />
+                          <span aria-hidden className={`absolute left-7 right-1 top-[11px] h-[2px] rounded-full ${feito ? "bg-azul" : "bg-linha"}`} />
                         )}
                         <button
                           onClick={() => !motivo && definirStatus(s)}
@@ -255,12 +254,12 @@ export default function PaginaEtapa() {
                           <span
                             className={`num grid h-6 w-6 place-items-center rounded-full text-[12px] font-medium ${
                               feito
-                                ? "bg-garrafa text-folha"
+                                ? "bg-azul text-folha"
                                 : atual
-                                  ? "bg-folha text-garrafa ring-2 ring-garrafa"
+                                  ? "bg-folha text-azul ring-2 ring-azul"
                                   : motivo
                                     ? "bg-folha text-tinta-2/50 ring-1 ring-linha"
-                                    : "bg-folha text-tinta-2 ring-1 ring-linha-forte group-hover:ring-garrafa"
+                                    : "bg-folha text-tinta-2 ring-1 ring-linha-forte group-hover:ring-azul"
                             }`}
                           >
                             {feito ? (
@@ -273,7 +272,7 @@ export default function PaginaEtapa() {
                           </span>
                           <span
                             className={`mt-2 block pr-3 text-[13px] leading-tight ${
-                              atual ? "font-medium text-tinta" : motivo ? "text-tinta-2/50" : feito ? "text-tinta-2" : "text-tinta-2 group-hover:text-garrafa"
+                              atual ? "font-medium text-tinta" : motivo ? "text-tinta-2/50" : feito ? "text-tinta-2" : "text-tinta-2 group-hover:text-azul"
                             }`}
                           >
                             {statusEtapa[s].curto}
@@ -284,7 +283,7 @@ export default function PaginaEtapa() {
                   })}
                 </ol>
                 {(etapa.status === "enviada" || etapa.status === "aprovada") && (
-                  <button onClick={() => definirStatus("devolvida")} className="mt-3 text-[13px] text-tinta-2 underline-offset-4 hover:text-vinho hover:underline">
+                  <button onClick={() => definirStatus("devolvida")} className="mt-3 text-[13px] text-tinta-2 underline-offset-4 hover:text-vermelho hover:underline">
                     O SEBRAE devolveu para ajuste
                   </button>
                 )}
@@ -295,7 +294,7 @@ export default function PaginaEtapa() {
       />
 
       {encerrado && (
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-bloco)] border border-linha bg-folha px-6 py-4">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)] px-6 py-4">
           <p className="text-[15px] text-tinta-2">Este projeto está encerrado. O conteúdo fica disponível para consulta e para baixar os relatórios.</p>
           <BotaoLink href={base} variante="secundario" tamanho="pequeno">
             Abrir o projeto
@@ -338,16 +337,16 @@ export default function PaginaEtapa() {
                   {prog.feitas}/{prog.total}
                 </span>
               ),
-              Fechamento: pendencias.length > 0 && <span className="num text-[13px] text-vinho">{pendencias.length}</span>,
+              Fechamento: pendencias.length > 0 && <span className="num text-[13px] text-vermelho">{pendencias.length}</span>,
             }}
           />
 
           {aba === "Checklist" && (
-            <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha px-5">
+            <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)] px-4 sm:px-5">
               {etapa.atividades.map((a, i) => (
                 <li key={a.codigo} className={`flex flex-wrap items-start gap-x-6 gap-y-3 py-3.5 ${a.nivel > 1 ? "pl-8" : ""}`}>
                   <div className="min-w-0 flex-1 basis-56 text-[15px] leading-relaxed">
-                    <span className={`num mr-2 ${a.nivel === 1 ? "font-serif text-tinta" : "text-tinta-2"}`}>{a.codigo}</span>
+                    <span className={`num mr-2 ${a.nivel === 1 ? "font-semibold text-tinta" : "text-tinta-2"}`}>{a.codigo}</span>
                     <span className={a.status === "feito" ? "text-tinta-2" : a.nivel === 1 ? "text-tinta" : "text-tinta"}>{a.texto}</span>
                     {a.status === "nao_aplicavel" && (
                       <input
@@ -368,10 +367,10 @@ export default function PaginaEtapa() {
                         className={`px-3 py-1.5 first:rounded-l-[4px] last:rounded-r-[4px] ${
                           a.status === s
                             ? s === "feito"
-                              ? "bg-garrafa text-folha"
+                              ? "bg-azul text-folha"
                               : s === "pendente"
                                 ? "bg-pedra text-tinta"
-                                : "bg-latao-claro text-latao"
+                                : "bg-laranja-claro text-laranja"
                             : "text-tinta-2 hover:text-tinta"
                         }`}
                       >
@@ -434,7 +433,7 @@ export default function PaginaEtapa() {
                   }}
                 />
               ))}
-              <div className="rounded-[var(--radius-bloco)] border border-linha bg-folha p-5">
+              <div className="rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)] p-4 sm:p-5">
                 <Evidencias projeto={projeto} etapa={etapa} alterarEtapa={mudarEtapa} />
               </div>
             </div>
@@ -450,11 +449,11 @@ export default function PaginaEtapa() {
                 const n = etapa.entregaveis.slice(0, i + 1).filter((x) => x.tipo === "entregavel").length;
                 const rotulo = ent.tipo === "entregavel" ? `Entregável ${n}` : etapa.ordem === 1 ? "Instrumento complementar" : "Instrumento operacional";
                 return (
-                  <section key={ent.titulo} className="rounded-[var(--radius-bloco)] border border-linha bg-folha p-5">
+                  <section key={ent.titulo} className="rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)] p-4 sm:p-5">
                     <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
                       <div>
                         <p className="text-[13px] text-tinta-2">{rotulo}</p>
-                        <h3 className="mt-0.5 font-serif text-xl leading-snug">{ent.titulo}</h3>
+                        <h3 className="mt-0.5 text-lg font-semibold leading-snug">{ent.titulo}</h3>
                       </div>
                       <SugestoesBiblioteca
                         sugestoes={sugestoes(chaveEntregavel(ent.titulo))}
@@ -479,9 +478,9 @@ export default function PaginaEtapa() {
           )}
 
           {aba === "Fechamento" && (
-            <div className="space-y-10 rounded-[var(--radius-bloco)] border border-linha bg-folha p-6">
+            <div className="space-y-10 rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)] p-6">
               <section>
-                <h3 className="mb-4 font-serif text-xl">Local e data</h3>
+                <h3 className="mb-4 text-lg font-semibold">Local e data</h3>
                 <Campo rotulo={`${projeto.localAssinatura || "Local (defina na ficha de identificação)"}, em`} className="max-w-xs">
                   <input
                     type="date"
@@ -492,7 +491,7 @@ export default function PaginaEtapa() {
                 </Campo>
               </section>
               <section>
-                <h3 className="mb-1 font-serif text-xl">Assinaturas no gov.br</h3>
+                <h3 className="mb-1 text-lg font-semibold">Assinaturas no gov.br</h3>
                 <p className="mb-4 text-[15px] text-tinta-2">Registre a data em que cada um assinou. A etapa só pode ir para “Enviada” com as duas.</p>
                 <ul className="divide-y divide-linha border-y border-linha">
                   {(
@@ -521,9 +520,9 @@ export default function PaginaEtapa() {
               </section>
               <RelatorioAssinado projeto={projeto} etapa={etapa} alterarEtapa={mudarEtapa} />
               <section>
-                <h3 className="mb-4 font-serif text-xl">Pendências</h3>
+                <h3 className="mb-4 text-lg font-semibold">Pendências</h3>
                 {pendencias.length === 0 ? (
-                  <p className={`text-[15px] ${etapa.assinaturaConsultor && etapa.assinaturaCliente ? "text-musgo" : "text-tinta"}`}>
+                  <p className={`text-[15px] ${etapa.assinaturaConsultor && etapa.assinaturaCliente ? "text-verde" : "text-tinta"}`}>
                     {etapa.assinaturaConsultor && etapa.assinaturaCliente
                       ? "Relatório completo e assinado. A etapa pode ser marcada como pronta para enviar."
                       : "Relatório completo. Falta assinar no gov.br e registrar as datas (ou anexar o PDF assinado)."}
@@ -537,11 +536,11 @@ export default function PaginaEtapa() {
                         <li key={i} className="grid grid-cols-[6.5rem_1fr] gap-4">
                           <span className="text-[13px] text-tinta-2">{p.onde}</span>
                           {doProjeto ? (
-                            <Link href={`${base}#${doProjeto}`} className="underline decoration-linha-forte underline-offset-4 hover:text-garrafa hover:decoration-garrafa">
+                            <Link href={`${base}#${doProjeto}`} className="underline decoration-linha-forte underline-offset-4 hover:text-azul hover:decoration-azul">
                               {p.texto}
                             </Link>
                           ) : destino && destino !== aba ? (
-                            <button onClick={() => setAba(destino)} className="text-left underline decoration-linha-forte underline-offset-4 hover:text-garrafa hover:decoration-garrafa">
+                            <button onClick={() => setAba(destino)} className="text-left underline decoration-linha-forte underline-offset-4 hover:text-azul hover:decoration-azul">
                               {p.texto}
                             </button>
                           ) : (
@@ -559,10 +558,10 @@ export default function PaginaEtapa() {
 
         {/* Painel lateral: prazo, andamento e relatório sempre à vista */}
         <aside className="lg:sticky lg:top-6 lg:self-start">
-          <div className="space-y-6 rounded-[var(--radius-bloco)] border border-linha bg-folha p-5">
+          <div className="space-y-6 rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)] p-4 sm:p-5">
             <div>
               <p className="text-[13px] text-tinta-2">Prazo</p>
-              <p className="num mt-1 font-serif text-xl">{periodoCurto(etapa.dataInicio, etapa.dataFim)}</p>
+              <p className="num mt-1 text-lg font-semibold">{periodoCurto(etapa.dataInicio, etapa.dataFim)}</p>
               {sit && sit.tom !== "neutro" ? (
                 <div className="mt-2">
                   <Selo tom={sit.tom}>{sit.texto}</Selo>
@@ -581,7 +580,7 @@ export default function PaginaEtapa() {
                   {horasFmt(horasEtapa)} / {etapa.horasPrevistas} h
                 </span>
               </div>
-              <button onClick={() => irPara("Visitas e horas")} className="mt-1.5 text-left text-[13px] text-garrafa underline-offset-4 hover:underline">
+              <button onClick={() => irPara("Visitas e horas")} className="mt-1.5 text-left text-[13px] text-azul underline-offset-4 hover:underline">
                 Registrar visita ou horas
               </button>
             </div>
@@ -601,7 +600,7 @@ export default function PaginaEtapa() {
                   Completo
                 </Status>
               ) : (
-                <button onClick={() => setAba("Fechamento")} className="mt-1 text-left text-sm text-vinho underline-offset-4 hover:underline">
+                <button onClick={() => setAba("Fechamento")} className="mt-1 text-left text-sm text-vermelho underline-offset-4 hover:underline">
                   {pendencias.length === 1 ? "1 pendência" : `${pendencias.length} pendências`}
                 </button>
               )}
@@ -615,12 +614,12 @@ export default function PaginaEtapa() {
               {etapa.relatorioAssinado ? (
                 <button
                   onClick={() => abrirAssinado(etapa.relatorioAssinado!.caminho, etapa.relatorioAssinado!.nome)}
-                  className="mt-3 block text-left text-sm text-garrafa underline-offset-4 hover:underline"
+                  className="mt-3 block text-left text-sm text-azul underline-offset-4 hover:underline"
                 >
                   Abrir o PDF assinado
                 </button>
               ) : (
-                <button onClick={() => setAba("Fechamento")} className="mt-3 block text-left text-sm text-tinta-2 underline-offset-4 hover:text-garrafa hover:underline">
+                <button onClick={() => setAba("Fechamento")} className="mt-3 block text-left text-sm text-tinta-2 underline-offset-4 hover:text-azul hover:underline">
                   Já assinou? Anexe o PDF
                 </button>
               )}
@@ -629,14 +628,14 @@ export default function PaginaEtapa() {
           </div>
           <nav className="mt-4 flex justify-between text-sm" aria-label="Outras etapas">
             {anterior ? (
-              <Link href={`${base}/etapas/${anterior.ordem}`} className="text-tinta-2 hover:text-garrafa">
+              <Link href={`${base}/etapas/${anterior.ordem}`} className="text-tinta-2 hover:text-azul">
                 Etapa {doisDigitos(anterior.ordem)}
               </Link>
             ) : (
               <span />
             )}
             {proxima && (
-              <Link href={`${base}/etapas/${proxima.ordem}`} className="text-tinta-2 hover:text-garrafa">
+              <Link href={`${base}/etapas/${proxima.ordem}`} className="text-tinta-2 hover:text-azul">
                 Etapa {doisDigitos(proxima.ordem)}
               </Link>
             )}
@@ -649,7 +648,7 @@ export default function PaginaEtapa() {
 
 function PreencherPadroes({ vazias, aoUsar }: { vazias: number; aoUsar: () => void }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-bloco)] border border-garrafa/20 bg-garrafa-claro px-5 py-4">
+    <div className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-bloco)] border border-azul/20 bg-azul-claro px-5 py-4">
       <p className="max-w-xl text-[15px] text-tinta">
         {vazias === 1 ? "1 parte do relatório está em branco." : `${vazias} partes do relatório estão em branco.`} O sistema escreve todas com textos de relatórios já aprovados (quando houver) e com os textos-padrão,
         já com os dados deste cliente e desta etapa. Depois é só revisar.
@@ -701,19 +700,19 @@ function EditorSecao({
   };
 
   return (
-    <section className={`rounded-[var(--radius-bloco)] border bg-folha ${aberta ? "border-linha-forte" : "border-linha"}`}>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5">
-        <button onClick={() => setAberta(!aberta)} aria-expanded={aberta} className="group flex min-w-0 flex-1 items-center gap-3 text-left">
+    <section className={`rounded-[var(--radius-bloco)] border bg-folha shadow-[var(--shadow-cartao)] ${aberta ? "border-linha-forte" : "border-linha"}`}>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3.5 sm:px-5">
+        <button onClick={() => setAberta(!aberta)} aria-expanded={aberta} className="group flex min-w-0 flex-1 basis-56 items-center gap-3 text-left">
           <svg viewBox="0 0 12 12" aria-hidden className={`h-3 w-3 shrink-0 text-tinta-2 transition-transform ${aberta ? "rotate-90" : ""}`}>
             <path d="M4 2.5 7.5 6 4 9.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <span className="min-w-0">
-            <span className={`block font-serif text-[1.1rem] leading-snug group-hover:text-garrafa ${def.quadro ? "text-garrafa" : "text-tinta"}`}>{titulo}</span>
-            {!aberta && !vazio && <span className="mt-0.5 line-clamp-1 text-sm text-tinta-2">{valor.replace(/\s+/g, " ")}</span>}
+            <span className={`block text-[16px] font-semibold leading-snug group-hover:text-azul ${def.quadro ? "text-azul" : "text-tinta"}`}>{titulo}</span>
+            {!aberta && !vazio && <span className="mt-0.5 line-clamp-2 text-sm text-tinta-2">{valor.replace(/\s+/g, " ")}</span>}
           </span>
         </button>
         {sugestoes}
-        <span className="flex items-center gap-3">
+        <span className="flex flex-wrap items-center gap-2">
           {gerado && (vazio || doChecklist) && (
             <Botao variante={vazio ? "secundario" : "fantasma"} tamanho="pequeno" onClick={usarGerado}>
               {doChecklist ? "Gerar do checklist" : "Usar texto-padrão"}
@@ -726,7 +725,7 @@ function EditorSecao({
         </span>
       </div>
       {aberta && (
-        <div className="border-t border-linha px-5 pb-5 pt-4">
+        <div className="border-t border-linha px-4 pb-5 pt-4 sm:px-5">
           <p className="mb-3 text-sm text-tinta-2">
             {def.quadro ? "Quadro de destaque no relatório. " : ""}
             {def.ajuda}
@@ -774,7 +773,7 @@ function RedigirComIA({
   aoRegistrar: () => void;
 }) {
   return (
-    <div className="rounded-[var(--radius-bloco)] border border-linha bg-folha px-5 py-4">
+    <div className="rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)] px-4 py-4 sm:px-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="max-w-xl">
           <p className="text-[15px] text-tinta">

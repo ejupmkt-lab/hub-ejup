@@ -275,12 +275,12 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
     [carga, atualizar, salvamento, sair, excluir, recarregar, salvarAgora],
   );
 
-  if (carga.tipo === "carregando") return <div className="flex min-h-screen items-center justify-center font-serif text-xl text-tinta-2">Pivotto</div>;
+  if (carga.tipo === "carregando") return <div className="flex min-h-screen items-center justify-center text-lg font-semibold text-tinta-2">Pivotto</div>;
   if (carga.tipo === "codigo") return <TelaCodigo aoConfirmar={recarregar} sair={sair} />;
   if (carga.tipo !== "pronto")
     return (
       <div className="mx-auto mt-24 max-w-md px-6 text-center">
-        <h1 className="font-serif text-2xl">{carga.tipo === "sem_acesso" ? "Conta sem acesso" : "Não foi possível carregar"}</h1>
+        <h1 className="text-xl font-semibold">{carga.tipo === "sem_acesso" ? "Conta sem acesso" : "Não foi possível carregar"}</h1>
         <p className="mt-2 text-sm text-tinta-2">
           {carga.tipo === "sem_acesso"
             ? carga.temPerfil
@@ -288,7 +288,7 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
               : `O e-mail ${carga.email} ainda não foi liberado. Peça ao administrador do grupo para cadastrar o seu acesso.`
             : carga.mensagem}
         </p>
-        <button onClick={sair} className="mt-6 text-sm text-garrafa underline">
+        <button onClick={sair} className="mt-6 text-sm text-azul underline">
           Sair
         </button>
       </div>
@@ -316,9 +316,9 @@ export function useAcesso() {
   );
   const podeVer = (slug: EmpresaSlug) => empresasVisiveis.some((e) => e.slug === slug);
   const gerencia = (slug: EmpresaSlug) => usuario.adminGrupo || usuario.acessos[slug] === "gestor";
-  // Página inicial de cada pessoa: o painel (admin) ou a primeira empresa ativa
+  // Página inicial: o painel, com os projetos que a pessoa pode ver
   const ativa = empresasVisiveis.find((e) => e.status === "ativo");
-  const inicio = usuario.adminGrupo ? "/" : ativa ? `/${ativa.slug}` : "/sem-empresa";
+  const inicio = usuario.adminGrupo || ativa ? "/" : "/sem-empresa";
   const novoProjeto = ativa ? `/${ativa.slug}/projetos/novo` : null;
   return { usuario, empresasVisiveis, podeVer, gerencia, inicio, novoProjeto };
 }

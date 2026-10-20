@@ -1,126 +1,119 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAcesso, useEstado } from "@/lib/dados/store";
 import { alertasDoProjeto } from "@/lib/projeto";
 import { dataPorExtenso, hojeIso } from "@/lib/datas";
-import { statusEmpresa } from "@/lib/rotulos";
-import { BotaoLink, Cabecalho, Cartao, Status, Vazio } from "@/components/ui";
-import { LinhaProjeto } from "@/components/linha-projeto";
+import { horasDoProjeto, horasFmt } from "@/lib/horas";
+import { tarefasPendentes } from "@/lib/tarefas";
 import { indicadores } from "@/lib/painel";
-import { Cronograma } from "@/components/painel/cronograma";
-import { Calendario } from "@/components/painel/calendario";
+import { BotaoLink, Cartao, Cabecalho, Indicador, Vazio } from "@/components/ui";
+import { CartaoProjeto } from "@/components/cartao-projeto";
 import { Pendencias } from "@/components/painel/pendencias";
-import { GraficoCarga, GraficoChecklist, GraficoSituacao } from "@/components/painel/graficos";
-import type { Tom } from "@/lib/rotulos";
+import { GraficoCarga, GraficoSituacao } from "@/components/painel/graficos";
+import { IconeMaisSinal } from "@/components/icones";
 
 export default function Painel() {
   const { estado } = useEstado();
-  const { usuario, empresasVisiveis, inicio, novoProjeto } = useAcesso();
+  const { empresasVisiveis, inicio, novoProjeto } = useAcesso();
   const router = useRouter();
 
+  // Sem empresa ativa liberada, não há painel a mostrar
   useEffect(() => {
-    if (!usuario.adminGrupo) router.replace(inicio);
-  }, [usuario, router, inicio]);
-  if (!usuario.adminGrupo) return null;
+    if (inicio !== "/") router.replace(inicio);
+  }, [router, inicio]);
+  if (inicio !== "/") return null;
 
   // Em andamento e sem plano; os que pedem ação urgente primeiro
   const urgencia = (p: (typeof estado.projetos)[number]) => Math.min(9, ...alertasDoProjeto(p).map((a) => a.ordem));
   const ativos = estado.projetos.filter((p) => p.status !== "encerrado").sort((a, b) => urgencia(a) - urgencia(b));
-  const inativas = empresasVisiveis.filter((e) => e.status !== "ativo");
   const ind = indicadores(estado.projetos);
-  const atrasados = ativos.filter((p) => alertasDoProjeto(p).some((a) => a.tom === "critico")).length;
+  const tarefas = tarefasPendentes(estado.projetos);
+  const tarefasAtrasadas = tarefas.filter((t) => t.atrasada).length;
+  const horas = ativos
+    .map(horasDoProjeto)
+    .reduce((a, h) => ({ previstas: a.previstas + h.previstas, realizadas: a.realizadas + h.realizadas }), { previstas: 0, realizadas: 0 });
+  const ativa = empresasVisiveis.find((e) => e.status === "ativo");
+  const variasEmpresas = empresasVisiveis.filter((e) => e.status === "ativo").length > 1;
+  const hoje = dataPorExtenso(hojeIso()).replace(/^0/, "");
 
   return (
     <>
-      <Cabecalho
-        titulo="Painel"
-        subtitulo={
-          <span className="num">
-            {dataPorExtenso(hojeIso()).replace(/^0/, "")}.{" "}
-            {ativos.length === 0
-              ? "Nenhum projeto em andamento."
-              : `${ativos.length} ${ativos.length === 1 ? "projeto em andamento" : "projetos em andamento"}${
-                  atrasados ? `, ${atrasados} ${atrasados === 1 ? "pede" : "pedem"} atenção` : ""
-                }.`}
-          </span>
-        }
-      >
-        {novoProjeto && <BotaoLink href={novoProjeto}>Novo projeto</BotaoLink>}
+      <Cabecalho titulo="Painel" subtitulo={`Todos os projetos em andamento · ${hoje}`}>
+        {/* No celular, o novo projeto fica na página de projetos */}
+        {novoProjeto && (
+          <div className="hidden sm:block">
+            <BotaoLink href={novoProjeto}>
+              <IconeMaisSinal className="h-4 w-4" />
+              Novo projeto
+            </BotaoLink>
+          </div>
+        )}
       </Cabecalho>
 
       {ativos.length === 0 ? (
         <Vazio titulo="Nenhum projeto em andamento" acao={novoProjeto && <BotaoLink href={novoProjeto}>Novo projeto</BotaoLink>}>
-          Projetos novos aparecem aqui com o cronograma, o calendário de prazos, os gráficos e o próximo passo de cada um.
+          Cada contratação do HUB SEBRAE vira um projeto, com o avanço, as etapas atrasadas e o próximo passo aqui no painel.
         </Vazio>
       ) : (
         <div className="space-y-6">
           <section aria-label="Indicadores" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <Indicador rotulo="Projetos em andamento" valor={ind.projetos} detalhe={ind.semPlano ? `${ind.semPlano} sem plano de trabalho` : "Todos com plano de trabalho"} />
             <Indicador
-              rotulo="Atrasadas ou devolvidas"
-              valor={ind.acao}
-              detalhe={ind.acao ? "Etapas que pedem ação agora" : "Nenhuma etapa atrasada"}
-              tom={ind.acao ? "critico" : "ok"}
+              rotulo="Projetos em andamento"
+              valor={ind.projetos}
+              detalhe={ind.semPlano ? `${ind.semPlano} sem plano de trabalho` : "Todos com plano de trabalho"}
+              href={ativa ? `/${ativa.slug}` : undefined}
             />
-            <Indicador rotulo="Prazos nos próximos 7 dias" valor={ind.proximos7} detalhe={ind.proximos7 === 1 ? "Etapa a entregar" : "Etapas a entregar"} />
-            <Indicador rotulo="Horas previstas nesta semana" valor={`${ind.horasSemana} h`} detalhe="Somando todos os projetos" />
+            <Indicador
+              rotulo="Tarefas pendentes"
+              valor={tarefas.length}
+              detalhe={tarefasAtrasadas ? `${tarefasAtrasadas} ${tarefasAtrasadas === 1 ? "atrasada" : "atrasadas"}` : "Nenhuma atrasada"}
+              tom={tarefasAtrasadas ? "atencao" : undefined}
+              href="/tarefas"
+            />
+            <Indicador rotulo="Horas registradas" valor={horasFmt(horas.realizadas)} detalhe={`de ${horas.previstas.toLocaleString("pt-BR")} h previstas`} />
+            <Indicador
+              rotulo="Etapas atrasadas"
+              valor={ind.atrasadas}
+              detalhe={ind.devolvidas ? `e ${ind.devolvidas} ${ind.devolvidas === 1 ? "devolvida" : "devolvidas"} pelo SEBRAE` : "fora do cronograma"}
+              tom={ind.devolvidas ? "critico" : ind.atrasadas ? "atencao" : undefined}
+            />
           </section>
 
-          <Secao titulo="Cronograma" descricao="Cada linha é um projeto; cada barra, uma etapa no período do plano de trabalho. Clique numa barra para abrir a etapa.">
-            <Cronograma projetos={estado.projetos} />
-          </Secao>
+          <ul aria-label="Legenda das cores" className="flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-tinta-2">
+            <li className="flex items-center gap-2">
+              <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-vermelho-vivo" />
+              Ponto crítico (devolução)
+            </li>
+            <li className="flex items-center gap-2">
+              <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-laranja-vivo" />
+              Atraso (etapa ou tarefa)
+            </li>
+            <li className="flex items-center gap-2">
+              <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-verde-vivo" />
+              Em dia
+            </li>
+          </ul>
 
-          <div className="grid gap-6 lg:grid-cols-[1fr_21rem]">
-            <Secao titulo="Calendário de prazos">
-              <Calendario projetos={estado.projetos} />
-            </Secao>
-            <Secao titulo="Pendências" descricao="Atrasos, devoluções, envios e prazos da semana.">
+          <section aria-label="Projetos" className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {ativos.map((p) => (
+              <CartaoProjeto key={p.id} projeto={p} mostrarEmpresa={variasEmpresas} />
+            ))}
+          </section>
+
+          <div className="grid gap-4 lg:grid-cols-3">
+            <Secao titulo="Pendências" descricao="Devoluções, atrasos, envios e prazos da semana.">
               <Pendencias projetos={estado.projetos} />
             </Secao>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-3">
             <Secao titulo="Situação das etapas">
               <GraficoSituacao projetos={estado.projetos} />
             </Secao>
             <Secao titulo="Carga de trabalho por semana">
               <GraficoCarga projetos={estado.projetos} />
             </Secao>
-            <Secao titulo="Checklist da etapa em curso">
-              <GraficoChecklist projetos={estado.projetos} />
-            </Secao>
           </div>
-
-          <section>
-            <h2 className="mb-3 mt-4 font-serif text-[1.35rem]">Projetos e próximos passos</h2>
-            <Cartao>
-              <ul className="divide-y divide-linha">
-                {ativos.map((p) => (
-                  <LinhaProjeto key={p.id} projeto={p} mostrarEmpresa={empresasVisiveis.filter((e) => e.status === "ativo").length > 1} />
-                ))}
-              </ul>
-            </Cartao>
-          </section>
         </div>
-      )}
-
-      {inativas.length > 0 && (
-        <section className="mt-12">
-          <h2 className="mb-3 text-[13px] font-medium text-tinta-2">Outras empresas</h2>
-          <ul className="flex flex-wrap gap-3">
-            {inativas.map((e) => (
-              <li key={e.slug}>
-                <Link href={`/${e.slug}`} className="flex items-center gap-3 rounded-[var(--radius-bloco)] border border-linha bg-folha px-4 py-3 hover:border-linha-forte">
-                  <span className="text-[15px]">{e.nome}</span>
-                  <Status tom="neutro">{statusEmpresa[e.status]}</Status>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
       )}
     </>
   );
@@ -128,21 +121,10 @@ export default function Painel() {
 
 function Secao({ titulo, descricao, children }: { titulo: string; descricao?: string; children: React.ReactNode }) {
   return (
-    <Cartao className="p-6">
-      <h2 className="font-serif text-[1.35rem] leading-snug">{titulo}</h2>
-      {descricao && <p className="mt-1 text-sm text-tinta-2">{descricao}</p>}
-      <div className="mt-5">{children}</div>
+    <Cartao className="min-w-0 p-4 sm:p-5">
+      <h2 className="text-[17px] font-bold">{titulo}</h2>
+      {descricao && <p className="mt-0.5 text-sm text-tinta-2">{descricao}</p>}
+      <div className="mt-4">{children}</div>
     </Cartao>
-  );
-}
-
-function Indicador({ rotulo, valor, detalhe, tom }: { rotulo: string; valor: number | string; detalhe: string; tom?: Tom }) {
-  const cor = tom === "critico" ? "text-vinho" : "text-tinta";
-  return (
-    <div className="rounded-[var(--radius-bloco)] border border-linha bg-folha px-5 py-4">
-      <p className="text-[13px] text-tinta-2">{rotulo}</p>
-      <p className={`mt-1 text-[2.1rem] font-semibold leading-tight ${cor}`}>{valor}</p>
-      <p className={`mt-0.5 text-[13px] ${tom === "critico" ? "text-vinho" : "text-tinta-2"}`}>{detalhe}</p>
-    </div>
   );
 }

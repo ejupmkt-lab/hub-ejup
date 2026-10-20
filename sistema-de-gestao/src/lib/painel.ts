@@ -5,22 +5,25 @@ import { etapaConcluida } from "./projeto";
 // Números, cronograma, calendário e gráficos do painel, calculados a partir
 // das datas do plano de trabalho e do status de cada etapa.
 
-// Situação de uma etapa para os gráficos. Paleta validada para daltonismo
-// (verde, âmbar, azul, vermelho) e cinza para o que ainda não começou.
-export type Grupo = "nao_iniciada" | "andamento" | "a_enviar" | "concluida" | "acao";
+// Situação de uma etapa para o cronograma, o calendário e os gráficos. As
+// mesmas cores do painel: vermelho para devolução (ponto crítico), laranja
+// para atraso, verde para o que foi entregue; azul para o que está em curso.
+export type Grupo = "nao_iniciada" | "andamento" | "a_enviar" | "concluida" | "atrasada" | "devolvida";
 export const grupos: Record<Grupo, { rotulo: string; cor: string; texto: string }> = {
-  nao_iniciada: { rotulo: "Não iniciada", cor: "#cfd6cf", texto: "#17201b" },
-  andamento: { rotulo: "Em andamento", cor: "#13805a", texto: "#ffffff" },
-  a_enviar: { rotulo: "Pronta para enviar", cor: "#bd8526", texto: "#ffffff" },
-  concluida: { rotulo: "Enviada ou aprovada", cor: "#3a7fbf", texto: "#ffffff" },
-  acao: { rotulo: "Atrasada ou devolvida", cor: "#b5452f", texto: "#ffffff" },
+  nao_iniciada: { rotulo: "Não iniciada", cor: "#d3d9e3", texto: "#121a2b" },
+  andamento: { rotulo: "Em andamento", cor: "#2563eb", texto: "#ffffff" },
+  a_enviar: { rotulo: "Pronta para enviar", cor: "#7c3aed", texto: "#ffffff" },
+  concluida: { rotulo: "Enviada ou aprovada", cor: "#16a34a", texto: "#ffffff" },
+  atrasada: { rotulo: "Atrasada", cor: "#f97316", texto: "#ffffff" },
+  devolvida: { rotulo: "Devolvida", cor: "#dc2626", texto: "#ffffff" },
 };
-export const ordemGrupos: Grupo[] = ["nao_iniciada", "andamento", "a_enviar", "concluida", "acao"];
+export const ordemGrupos: Grupo[] = ["nao_iniciada", "andamento", "a_enviar", "concluida", "atrasada", "devolvida"];
+export const pedeAcao = (g: Grupo) => g === "atrasada" || g === "devolvida";
 
 export function grupoDaEtapa(e: Etapa, hoje = hojeIso()): Grupo {
-  if (e.status === "devolvida") return "acao";
+  if (e.status === "devolvida") return "devolvida";
   if (etapaConcluida(e)) return "concluida";
-  if (e.dataFim && e.dataFim < hoje) return "acao"; // atrasada, mesmo se já pronta
+  if (e.dataFim && e.dataFim < hoje) return "atrasada"; // mesmo se já pronta
   if (e.status === "a_enviar") return "a_enviar";
   if (e.status === "nao_iniciada" && (!e.dataInicio || e.dataInicio > hoje)) return "nao_iniciada";
   return "andamento";
@@ -37,10 +40,12 @@ export function indicadores(projetos: Projeto[]) {
   const semPlano = lista.filter((p) => !p.planoFechadoEm).length;
   const comPlano = lista.filter((p) => p.planoFechadoEm).flatMap((p) => p.etapas);
   const proximos7 = comPlano.filter((e) => !etapaConcluida(e) && e.dataFim && e.dataFim >= hoje && e.dataFim <= somarDias(hoje, 7)).length;
-  const acao = comPlano.filter((e) => grupoDaEtapa(e, hoje) === "acao").length;
+  const acao = comPlano.filter((e) => pedeAcao(grupoDaEtapa(e, hoje))).length;
+  const atrasadas = comPlano.filter((e) => grupoDaEtapa(e, hoje) === "atrasada").length;
+  const devolvidas = comPlano.filter((e) => e.status === "devolvida").length;
   const concluidas = etapas.filter(etapaConcluida).length;
   const semana = cargaSemanal(projetos, 0, 1)[0]?.horas ?? 0;
-  return { projetos: lista.length, semPlano, proximos7, acao, concluidas, totalEtapas: etapas.length, horasSemana: Math.round(semana) };
+  return { projetos: lista.length, semPlano, proximos7, acao, atrasadas, devolvidas, concluidas, totalEtapas: etapas.length, horasSemana: Math.round(semana) };
 }
 
 // ─── Cronograma (Gantt) ───────────────────────────────────────────────────
@@ -110,12 +115,12 @@ export function pendenciasDoGrupo(projetos: Projeto[]): Pendencia[] {
     }
     for (const e of p.etapas) {
       const g = grupoDaEtapa(e, hoje);
-      if (e.status === "devolvida") lista.push({ projeto: p, etapa: e, texto: "Devolvida pelo SEBRAE", grupo: "acao" });
-      else if (g === "acao" && e.status === "a_enviar")
-        lista.push({ projeto: p, etapa: e, texto: "Pronta para enviar, com o prazo vencido", grupo: "acao", data: e.dataFim! });
-      else if (g === "acao") {
+      if (e.status === "devolvida") lista.push({ projeto: p, etapa: e, texto: "Devolvida pelo SEBRAE", grupo: "devolvida" });
+      else if (g === "atrasada" && e.status === "a_enviar")
+        lista.push({ projeto: p, etapa: e, texto: "Pronta para enviar, com o prazo vencido", grupo: "atrasada", data: e.dataFim! });
+      else if (g === "atrasada") {
         const d = diferencaDias(e.dataFim!, hoje);
-        lista.push({ projeto: p, etapa: e, texto: d === 1 ? "1 dia de atraso" : `${d} dias de atraso`, grupo: "acao", data: e.dataFim! });
+        lista.push({ projeto: p, etapa: e, texto: d === 1 ? "1 dia de atraso" : `${d} dias de atraso`, grupo: "atrasada", data: e.dataFim! });
       } else if (g === "a_enviar") lista.push({ projeto: p, etapa: e, texto: "Pronta para enviar no HUB", grupo: "a_enviar" });
       else if (!etapaConcluida(e) && e.dataFim && e.dataFim >= hoje && e.dataFim <= somarDias(hoje, 7)) {
         const d = diferencaDias(hoje, e.dataFim);
@@ -129,7 +134,7 @@ export function pendenciasDoGrupo(projetos: Projeto[]): Pendencia[] {
       }
     }
   }
-  const peso: Record<Grupo, number> = { acao: 0, a_enviar: 1, andamento: 2, nao_iniciada: 3, concluida: 4 };
+  const peso: Record<Grupo, number> = { devolvida: 0, atrasada: 0, a_enviar: 1, andamento: 2, nao_iniciada: 3, concluida: 4 };
   return lista.sort((a, b) => peso[a.grupo] - peso[b.grupo] || (a.data ?? "").localeCompare(b.data ?? ""));
 }
 

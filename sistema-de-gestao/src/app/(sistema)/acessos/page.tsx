@@ -171,8 +171,8 @@ export default function Acessos() {
       </Cabecalho>
 
       {convite && (
-        <Cartao className="mb-8 border-musgo/30 p-6">
-          <p className="font-serif text-xl">Acesso liberado para {convite.nome}</p>
+        <Cartao className="mb-8 border-verde/30 p-6">
+          <p className="text-lg font-semibold">Acesso liberado para {convite.nome}</p>
           <p className="mt-1 text-[15px] text-tinta-2">
             Falta a pessoa criar a conta com o e-mail {convite.email}. Copie a mensagem abaixo e envie por WhatsApp ou e-mail.
           </p>
@@ -188,7 +188,7 @@ export default function Acessos() {
 
       {editando && (
         <Cartao className="mb-10 p-6 sm:p-8">
-          <h2 className="font-serif text-2xl">{editando === "novo" ? "Liberar acesso" : `Acesso de ${form.nome}`}</h2>
+          <h2 className="text-xl font-semibold">{editando === "novo" ? "Liberar acesso" : `Acesso de ${form.nome}`}</h2>
           <form onSubmit={salvar} className="mt-6 space-y-8">
             <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
               <Campo rotulo="E-mail" dica={editando === "novo" ? "O mesmo que a pessoa vai usar para criar a conta." : undefined} className="sm:col-span-2">
@@ -210,8 +210,8 @@ export default function Acessos() {
             </div>
 
             <fieldset>
-              <legend className="mb-3 font-serif text-lg">Empresas</legend>
-              <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha">
+              <legend className="mb-3 text-base font-semibold">Empresas</legend>
+              <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)]">
                 {estado.empresas.map((emp) => (
                   <li key={emp.slug} className="flex flex-wrap items-center justify-between gap-4 px-1 py-3">
                     <span>
@@ -243,7 +243,7 @@ export default function Acessos() {
             <label className="flex items-start gap-3">
               <input
                 type="checkbox"
-                className="mt-1 h-4 w-4 accent-[var(--color-garrafa)]"
+                className="mt-1 h-4 w-4 accent-[var(--color-azul)]"
                 checked={form.admin}
                 disabled={proprio}
                 onChange={(e) => setForm({ ...form, admin: e.target.checked })}
@@ -256,7 +256,7 @@ export default function Acessos() {
               </span>
             </label>
 
-            {erro && <p className="rounded-[var(--radius-campo)] bg-vinho-claro p-3 text-sm text-vinho">{erro}</p>}
+            {erro && <p className="rounded-[var(--radius-campo)] bg-vermelho-claro p-3 text-sm text-vermelho">{erro}</p>}
 
             <div className="flex flex-wrap items-center gap-3 border-t border-linha pt-6">
               <Botao type="submit" disabled={salvando || semEmpresa}>
@@ -267,7 +267,7 @@ export default function Acessos() {
               </Botao>
               {semEmpresa && <span className="text-sm text-tinta-2">Escolha ao menos uma empresa.</span>}
               {!semEmpresa && !form.admin && Object.keys(form.acessos).every((s) => estado.empresas.find((e) => e.slug === s)?.status !== "ativo") && (
-                <span className="text-sm text-latao">As empresas escolhidas ainda não estão ativas: a pessoa entra, mas não vê nada por enquanto.</span>
+                <span className="text-sm text-laranja">As empresas escolhidas ainda não estão ativas: a pessoa entra, mas não vê nada por enquanto.</span>
               )}
               {editando !== "novo" && !proprio && pessoas?.find((p) => p.email === editando)?.situacao !== "sem_acesso" && (
                 <Botao type="button" variante="perigo" onClick={retirar} disabled={salvando} className="ml-auto">
@@ -279,16 +279,16 @@ export default function Acessos() {
         </Cartao>
       )}
 
-      {!editando && erro && <p className="mb-6 rounded-[var(--radius-campo)] bg-vinho-claro p-3 text-sm text-vinho">{erro}</p>}
+      {!editando && erro && <p className="mb-6 rounded-[var(--radius-campo)] bg-vermelho-claro p-3 text-sm text-vermelho">{erro}</p>}
 
       {pessoas === null ? (
         <p className="text-[15px] text-tinta-2">Carregando…</p>
       ) : (
-        <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha">
+        <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)]">
           {pessoas.map((p) => (
             <li key={p.email} className="flex flex-wrap items-center justify-between gap-x-8 gap-y-2 px-6 py-4">
               <div className="min-w-0">
-                <p className="font-serif text-[18px] text-tinta">
+                <p className="text-[17px] font-semibold text-tinta">
                   {p.nomeCompleto}
                   {p.email === usuario.email && <span className="ml-2 font-sans text-[13px] text-tinta-2">você</span>}
                 </p>
@@ -305,7 +305,7 @@ export default function Acessos() {
               <div className="flex items-center gap-5 text-sm">
                 <Status tom={situacoes[p.situacao].tom}>{situacoes[p.situacao].rotulo}</Status>
                 {p.situacao === "pendente" && (
-                  <button onClick={() => copiar(p)} className="text-tinta-2 underline-offset-4 hover:text-garrafa hover:underline">
+                  <button onClick={() => copiar(p)} className="text-tinta-2 underline-offset-4 hover:text-azul hover:underline">
                     {copiado === p.email ? "Copiada" : "Copiar convite"}
                   </button>
                 )}

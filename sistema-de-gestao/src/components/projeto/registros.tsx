@@ -58,7 +58,7 @@ export function Registros({ projeto }: { projeto: Projeto }) {
       <Cartao className="min-w-0 p-6">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h2 className="font-serif text-2xl">{def.nome}</h2>
+            <h2 className="text-xl font-semibold">{def.nome}</h2>
             <p className="text-[13px] text-tinta-2">
               No relatório: escreva <code className="rounded bg-pedra px-1">[[tabela:{def.tipo}]]</code> em qualquer seção ou entregável.
             </p>
@@ -99,7 +99,7 @@ export function Registros({ projeto }: { projeto: Projeto }) {
                     ))}
                     <td className="py-2 text-[13px] text-tinta-2">{String(r.etapaOrigem).padStart(2, "0")}</td>
                     <td className="py-2">
-                      <button title="Remover" onClick={() => confirm("Remover esta linha do registro?") && remover(r.id)} aria-label="Remover linha" className="text-tinta-2 hover:text-vinho">✕</button>
+                      <button title="Remover" onClick={() => confirm("Remover esta linha do registro?") && remover(r.id)} aria-label="Remover linha" className="text-tinta-2 hover:text-vermelho">✕</button>
                     </td>
                   </tr>
                 ))}

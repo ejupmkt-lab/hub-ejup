@@ -92,10 +92,10 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
   };
 
   return (
-    <section className="rounded-[var(--radius-bloco)] border border-linha bg-folha p-6 sm:p-8">
+    <section className="rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)] p-4 sm:p-8">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-serif text-2xl">Plano de trabalho</h2>
+          <h2 className="text-xl font-semibold">Plano de trabalho</h2>
           <p className="mt-2 max-w-2xl text-[15px] text-tinta-2">
             O gestor define o início e o fim depois da contratação; as etapas dividem o período na proporção da carga horária ({horasTotal} h no total). As datas
             fechadas aqui são a base dos prazos e avisos, e a mensagem abaixo sai pronta para enviar.
@@ -144,7 +144,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
               const mudou = fechado && (e.dataInicio !== e.dataInicioPlano || e.dataFim !== e.dataFimPlano);
               return (
                 <tr key={e.ordem} className="border-b border-linha last:border-0">
-                  <td className="py-3 pr-4"><span className="num font-serif">{doisDigitos(e.ordem)}</span> {e.nome.charAt(0) + e.nome.slice(1).toLowerCase()}</td>
+                  <td className="py-3 pr-4"><span className="num font-semibold">{doisDigitos(e.ordem)}</span> {e.nome.charAt(0) + e.nome.slice(1).toLowerCase()}</td>
                   <td className="num py-3 pr-4">{e.horasPrevistas} h</td>
                   <td className="num py-3 pr-4 text-tinta-2">
                     {(() => {
@@ -160,7 +160,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
                     {editando ? <input type="date" className="campo" value={linhas[i].fim} onChange={(ev) => setLinha(i, "fim", ev.target.value)} /> : formatarData(e.dataFim)}
                   </td>
                   {fechado && (
-                    <td className={`py-2 text-[13px] ${mudou ? "text-vinho" : "text-tinta-2"}`}>
+                    <td className={`py-2 text-[13px] ${mudou ? "text-vermelho" : "text-tinta-2"}`}>
                       {mudou ? `${formatarData(e.dataInicioPlano)} a ${formatarData(e.dataFimPlano)}` : "sem alteração"}
                     </td>
                   )}
@@ -182,7 +182,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
       </div>
 
       {editando && erros.length > 0 && (
-        <ul className="mt-3 list-disc pl-5 text-[13px] text-vinho">{erros.map((e) => <li key={e}>{e}</li>)}</ul>
+        <ul className="mt-3 list-disc pl-5 text-[13px] text-vermelho">{erros.map((e) => <li key={e}>{e}</li>)}</ul>
       )}
 
       <div className="mt-4 flex flex-wrap items-end gap-3">
@@ -202,11 +202,11 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
       {fechado && !editando && (
         <div className="mt-10 border-t border-linha pt-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="font-serif text-xl">Mensagem do plano de trabalho</h3>
+            <h3 className="text-lg font-semibold">Mensagem do plano de trabalho</h3>
             <Botao onClick={copiar}>{copiado ? "Copiada" : "Copiar mensagem"}</Botao>
           </div>
           {faltandoNoPlano(projeto).length > 0 && (
-            <p className="mt-2 text-sm text-latao">
+            <p className="mt-2 text-sm text-laranja">
               Falta preencher na ficha de identificação: {faltandoNoPlano(projeto).join(" e ")}. Até lá, a mensagem sai com “a definir”.
             </p>
           )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Evidencia, Projeto, RegistroAtividade, TipoAtividade } from "@/lib/dados/tipos";
 import { novoId } from "@/lib/dados/store";
 import { formatarData, hojeIso } from "@/lib/datas";
@@ -15,8 +15,8 @@ type Form = Omit<RegistroAtividade, "id" | "registradoPor" | "horas"> & { horas:
 
 // Visitas, reuniões e trabalho interno do projeto: somam as horas contra as
 // previstas na ficha e as anotações alimentam a redação do relatório.
-// Com `etapa`, mostra e registra só a daquela etapa.
-export function Visitas({ projeto, etapa }: { projeto: Projeto; etapa?: number }) {
+// Com `etapa`, mostra e registra só a daquela etapa; com `abrirNovo`, já abre o formulário.
+export function Visitas({ projeto, etapa, abrirNovo = false }: { projeto: Projeto; etapa?: number; abrirNovo?: boolean }) {
   const { alterar, usuario } = useProjeto();
   const h = horasDoProjeto(projeto);
   const lista = registros(projeto)
@@ -24,12 +24,18 @@ export function Visitas({ projeto, etapa }: { projeto: Projeto; etapa?: number }
     .sort((a, b) => b.data.localeCompare(a.data));
   const etapaPadrao = etapa ?? etapaAtual(projeto)?.ordem ?? 1;
   const vazio: Form = { data: hojeIso(), etapa: etapaPadrao, tipo: "visita", horas: "", participantes: "", anotacoes: "" };
-  const [editando, setEditando] = useState<string | null>(null); // id, "novo" ou null
+  const [editando, setEditando] = useState<string | null>(abrirNovo ? "novo" : null); // id, "novo" ou null
   const [form, setForm] = useState<Form>(vazio);
   const [fotos, setFotos] = useState<File[]>([]);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const entradaFotos = useRef<HTMLInputElement>(null);
+  const formulario = useRef<HTMLDivElement>(null);
+
+  // Aberto pelo botão "Registrar": o formulário vem à vista
+  useEffect(() => {
+    if (abrirNovo) formulario.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [abrirNovo]);
 
   const abrir = (r?: RegistroAtividade) => {
     setEditando(r ? r.id : "novo");
@@ -138,8 +144,9 @@ export function Visitas({ projeto, etapa }: { projeto: Projeto; etapa?: number }
       )}
 
       {editando && (
-        <Cartao className="p-6">
-          <h3 className="font-serif text-xl">{editando === "novo" ? "Registrar atividade" : "Editar registro"}</h3>
+        <div ref={formulario} className="scroll-mt-4">
+        <Cartao className="p-4 sm:p-6">
+          <h3 className="text-lg font-semibold">{editando === "novo" ? "Registrar atividade" : "Editar registro"}</h3>
           <form onSubmit={salvar} className="mt-5 space-y-5">
             <div role="radiogroup" aria-label="Tipo de atividade" className="flex flex-wrap gap-2">
               {(Object.keys(tiposAtividade) as TipoAtividade[]).map((t) => (
@@ -150,7 +157,7 @@ export function Visitas({ projeto, etapa }: { projeto: Projeto; etapa?: number }
                   aria-checked={form.tipo === t}
                   onClick={() => setForm({ ...form, tipo: t })}
                   className={`rounded-[var(--radius-campo)] border px-3.5 py-1.5 text-sm ${
-                    form.tipo === t ? "border-garrafa bg-garrafa text-folha" : "border-linha-forte bg-folha text-tinta-2 hover:text-tinta"
+                    form.tipo === t ? "border-azul bg-azul text-folha" : "border-linha-forte bg-folha text-tinta-2 hover:text-tinta"
                   }`}
                 >
                   {tiposAtividade[t].rotulo}
@@ -214,7 +221,7 @@ export function Visitas({ projeto, etapa }: { projeto: Projeto; etapa?: number }
                 />
               </div>
             )}
-            {erro && <p className="rounded-[var(--radius-campo)] bg-vinho-claro p-3 text-sm text-vinho">{erro}</p>}
+            {erro && <p className="rounded-[var(--radius-campo)] bg-vermelho-claro p-3 text-sm text-vermelho">{erro}</p>}
             <div className="flex flex-wrap items-center gap-3 border-t border-linha pt-5">
               <Botao type="submit" disabled={!valido || salvando}>
                 {salvando ? "Salvando…" : "Salvar registro"}
@@ -222,23 +229,24 @@ export function Visitas({ projeto, etapa }: { projeto: Projeto; etapa?: number }
               <Botao type="button" variante="secundario" onClick={() => setEditando(null)}>
                 Cancelar
               </Botao>
-              {!valido && form.horas && <span className="text-sm text-vinho">Informe as horas entre 0 e 24.</span>}
+              {!valido && form.horas && <span className="text-sm text-vermelho">Informe as horas entre 0 e 24.</span>}
             </div>
           </form>
         </Cartao>
+        </div>
       )}
 
       {/* Horas por etapa (só na visão do projeto) */}
       {etapa === undefined && (
-        <Cartao className="px-6 py-5">
-          <h3 className="mb-4 font-serif text-lg">Horas por etapa</h3>
+        <Cartao className="px-4 py-5 sm:px-6">
+          <h3 className="mb-4 text-base font-semibold">Horas por etapa</h3>
           <ul className="space-y-3">
             {h.porEtapa.map((x) => {
               const et = projeto.etapas.find((e) => e.ordem === x.ordem)!;
               return (
                 <li key={x.ordem} className="grid grid-cols-[minmax(0,12rem)_1fr_7rem] items-center gap-4 text-sm">
                   <span className="truncate">
-                    <span className="num font-serif">{doisDigitos(x.ordem)}</span> {et.nome.charAt(0) + et.nome.slice(1).toLowerCase()}
+                    <span className="num font-semibold">{doisDigitos(x.ordem)}</span> {et.nome.charAt(0) + et.nome.slice(1).toLowerCase()}
                   </span>
                   <Barra valor={x.realizadas} total={x.previstas} tom={x.realizadas > x.previstas ? "atencao" : "andamento"} />
                   <span className="num text-right text-tinta-2">
@@ -259,7 +267,7 @@ export function Visitas({ projeto, etapa }: { projeto: Projeto; etapa?: number }
           </Vazio>
         )
       ) : (
-        <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha">
+        <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)]">
           {lista.map((r) => (
             <li key={r.id} className="px-6 py-4">
               <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
@@ -278,7 +286,7 @@ export function Visitas({ projeto, etapa }: { projeto: Projeto; etapa?: number }
                   <Botao variante="fantasma" tamanho="pequeno" onClick={() => abrir(r)}>
                     Editar
                   </Botao>
-                  <Botao variante="fantasma" tamanho="pequeno" className="!text-tinta-2 hover:!text-vinho" onClick={() => remover(r)}>
+                  <Botao variante="fantasma" tamanho="pequeno" className="!text-tinta-2 hover:!text-vermelho" onClick={() => remover(r)}>
                     Remover
                   </Botao>
                 </span>

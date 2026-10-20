@@ -107,7 +107,7 @@ export default function Biblioteca() {
 
       {novo && (
         <Cartao className="mb-8 p-6 sm:p-8">
-          <h2 className="font-serif text-2xl">Incluir texto de um relatório antigo</h2>
+          <h2 className="text-xl font-semibold">Incluir texto de um relatório antigo</h2>
           <p className="mt-1 text-[15px] text-tinta-2">
             Cole uma seção de um relatório já aprovado. O nome da empresa, do responsável e as datas são trocados por marcadores antes de salvar.
           </p>
@@ -169,7 +169,7 @@ export default function Biblioteca() {
       )}
 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div role="radiogroup" aria-label="Filtrar por etapa" className="flex max-w-full gap-0.5 overflow-x-auto rounded-[var(--radius-bloco)] border border-linha bg-folha p-1">
+        <div role="radiogroup" aria-label="Filtrar por etapa" className="flex max-w-full gap-0.5 overflow-x-auto rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)] p-1">
           {[0, ...(modelo?.etapas ?? []).map((e) => e.ordem)].map((n) => (
             <button
               key={n}
@@ -177,7 +177,7 @@ export default function Biblioteca() {
               aria-checked={filtroEtapa === n}
               onClick={() => setFiltroEtapa(n)}
               className={`whitespace-nowrap rounded-[var(--radius-campo)] px-3 py-1.5 text-sm ${
-                filtroEtapa === n ? "bg-garrafa font-medium text-folha" : "text-tinta-2 hover:bg-pedra hover:text-tinta"
+                filtroEtapa === n ? "bg-azul font-medium text-folha" : "text-tinta-2 hover:bg-pedra hover:text-tinta"
               }`}
             >
               {n === 0 ? "Todas" : `Etapa ${doisDigitos(n)}`} <span className="num opacity-70">{n === 0 ? lista.length : lista.filter((t) => t.etapa === n).length}</span>
@@ -204,13 +204,13 @@ export default function Biblioteca() {
       ) : visiveis.length === 0 ? (
         <p className="rounded-[var(--radius-bloco)] border border-dashed border-linha-forte py-10 text-center text-[15px] text-tinta-2">Nenhum texto neste filtro.</p>
       ) : (
-        <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha">
+        <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)]">
           {visiveis.map((t) => (
             <li key={t.id} className="px-6 py-4">
               <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
                 <div className="min-w-0">
                   <p className="text-[15px] text-tinta">
-                    <span className="num font-serif">{doisDigitos(t.etapa)}</span> {t.titulo}
+                    <span className="num font-semibold">{doisDigitos(t.etapa)}</span> {t.titulo}
                   </p>
                   <p className="mt-0.5 text-[13px] text-tinta-2">
                     {t.ramo || "Ramo não informado"}
@@ -230,7 +230,7 @@ export default function Biblioteca() {
                     {aberto === t.id ? "Fechar" : "Ver e editar"}
                   </Botao>
                   {gerencia(slug) && (
-                    <Botao variante="fantasma" tamanho="pequeno" className="!text-tinta-2 hover:!text-vinho" onClick={() => excluir(t)}>
+                    <Botao variante="fantasma" tamanho="pequeno" className="!text-tinta-2 hover:!text-vermelho" onClick={() => excluir(t)}>
                       Excluir
                     </Botao>
                   )}

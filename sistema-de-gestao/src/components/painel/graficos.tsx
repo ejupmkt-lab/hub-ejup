@@ -1,12 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import type { Projeto } from "@/lib/dados/tipos";
-import { useEstado } from "@/lib/dados/store";
 import { dataCurta, hojeIso } from "@/lib/datas";
-import { ativos, cargaSemanal, contagemPorGrupo, grupos, ordemGrupos, segunda } from "@/lib/painel";
-import { progressoAtividades, etapaAtual } from "@/lib/projeto";
-import { doisDigitos } from "@/lib/rotulos";
+import { cargaSemanal, contagemPorGrupo, grupos, ordemGrupos, segunda } from "@/lib/painel";
 import { useDica } from "./dica";
 import { Legenda } from "./legenda";
 
@@ -92,7 +88,7 @@ export function GraficoCarga({ projetos }: { projetos: Projeto[] }) {
                   className="relative flex h-full w-full max-w-[2.5rem] items-end justify-center"
                 >
                   <span
-                    className={`block w-full max-w-6 rounded-t-[4px] ${d.semana === atual ? "bg-garrafa" : d.semana < atual ? "bg-linha-forte" : "bg-[#13805a]"}`}
+                    className={`block w-full max-w-6 rounded-t-[4px] ${d.semana === atual ? "bg-azul" : d.semana < atual ? "bg-linha-forte" : "bg-azul/40"}`}
                     style={{ height: `${(d.horas / teto) * 100}%`, minHeight: d.horas > 0 ? 2 : 0 }}
                   />
                 </span>
@@ -121,41 +117,5 @@ export function GraficoCarga({ projetos }: { projetos: Projeto[] }) {
       </table>
       {elemento}
     </div>
-  );
-}
-
-// Checklist da etapa atual de cada projeto
-export function GraficoChecklist({ projetos }: { projetos: Projeto[] }) {
-  const { estado } = useEstado();
-  const lista = ativos(projetos)
-    .map((p) => ({ p, et: etapaAtual(p) }))
-    .filter((x): x is { p: Projeto; et: NonNullable<ReturnType<typeof etapaAtual>> } => !!x.et);
-  if (!lista.length) return <p className="text-sm text-tinta-2">Nenhuma etapa em curso.</p>;
-  return (
-    <ul className="space-y-4">
-      {lista.map(({ p, et }) => {
-        const c = estado.clientes.find((x) => x.id === p.clienteId);
-        const { feitas, total } = progressoAtividades(et);
-        const pct = total ? Math.round((feitas / total) * 100) : 0;
-        return (
-          <li key={p.id}>
-            <Link href={`/${p.empresa}/projetos/${p.id}/etapas/${et.ordem}#checklist`} className="group block">
-              <span className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
-                <span className="truncate text-tinta group-hover:text-garrafa group-hover:underline">
-                  {c?.nomeFantasia || c?.razaoSocial}
-                  <span className="text-tinta-2">, etapa {doisDigitos(et.ordem)}</span>
-                </span>
-                <span className="num shrink-0 font-medium text-tinta">
-                  {feitas}/{total}
-                </span>
-              </span>
-              <span className="block h-2 overflow-hidden rounded-full bg-garrafa-claro" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
-                <span className="block h-full rounded-full bg-[#13805a]" style={{ width: `${pct}%` }} />
-              </span>
-            </Link>
-          </li>
-        );
-      })}
-    </ul>
   );
 }

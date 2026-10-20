@@ -53,3 +53,66 @@ export function alertasDoProjeto(p: Projeto): Alerta[] {
   }
   return lista;
 }
+
+// ─── Avanço ───────────────────────────────────────────────────────────────
+
+// Quanto do caminho da etapa o status representa (enviada = 100%)
+const pesoStatus: Record<Etapa["status"], number> = {
+  nao_iniciada: 0,
+  em_levantamento: 0.2,
+  em_redacao: 0.45,
+  em_revisao: 0.65,
+  aguardando_assinaturas: 0.8,
+  a_enviar: 0.95,
+  enviada: 1,
+  aprovada: 1,
+  devolvida: 0.8,
+};
+
+// Andamento de uma etapa (0 a 1): 40% pelo checklist e 60% pelo status do relatório
+export function avancoEtapa(e: Etapa) {
+  if (concluidas.has(e.status)) return 1;
+  const { feitas, total } = progressoAtividades(e);
+  return 0.4 * (total ? feitas / total : 0) + 0.6 * pesoStatus[e.status];
+}
+
+// Avanço do projeto em %: o andamento de cada etapa pesado pelas horas dela
+export function avancoProjeto(p: Projeto) {
+  const horas = p.etapas.reduce((a, e) => a + e.horasPrevistas, 0) || 1;
+  return Math.round((p.etapas.reduce((a, e) => a + e.horasPrevistas * avancoEtapa(e), 0) / horas) * 100);
+}
+
+// Quanto já deveria estar pronto hoje pelo plano de trabalho, em % (nulo sem plano)
+export function previstoProjeto(p: Projeto, hoje = hojeIso()) {
+  if (!p.planoFechadoEm || !p.etapas.every((e) => e.dataInicio && e.dataFim)) return null;
+  const horas = p.etapas.reduce((a, e) => a + e.horasPrevistas, 0) || 1;
+  const soma = p.etapas.reduce((a, e) => {
+    const dias = diferencaDias(e.dataInicio!, e.dataFim!) + 1;
+    const corridos = Math.min(dias, Math.max(0, diferencaDias(e.dataInicio!, hoje) + 1));
+    return a + e.horasPrevistas * (corridos / dias);
+  }, 0);
+  return Math.round((soma / horas) * 100);
+}
+
+export function etapaAtrasada(e: Etapa, hoje = hojeIso()) {
+  return !concluidas.has(e.status) && !!e.dataFim && e.dataFim < hoje;
+}
+
+// Fim previsto do projeto: o fim da última etapa
+export const entregaFinal = (p: Projeto) => p.etapas[p.etapas.length - 1]?.dataFim ?? null;
+
+// Dias desde o último registro de visita, reunião ou trabalho (nulo se nunca houve)
+export function diasSemRegistro(p: Projeto, hoje = hojeIso()) {
+  const ultima = (p.atividadesRegistradas ?? []).map((r) => r.data).sort().pop();
+  return ultima ? Math.max(0, diferencaDias(ultima, hoje)) : null;
+}
+
+// Situação geral, nas três cores do painel: ponto crítico (devolução), atraso, em dia
+export type SituacaoProjeto = { tom: Tom; rotulo: string };
+export function situacaoProjeto(p: Projeto, hoje = hojeIso()): SituacaoProjeto {
+  if (p.status === "encerrado") return { tom: "ok", rotulo: "Encerrado" };
+  if (p.etapas.some((e) => e.status === "devolvida")) return { tom: "critico", rotulo: "Devolvida pelo SEBRAE" };
+  if (!p.planoFechadoEm) return { tom: "neutro", rotulo: "Sem plano de trabalho" };
+  if (p.etapas.some((e) => etapaAtrasada(e, hoje))) return { tom: "atencao", rotulo: "Atrasado" };
+  return { tom: "ok", rotulo: "Em dia" };
+}

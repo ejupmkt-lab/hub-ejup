@@ -28,7 +28,7 @@ export default function LayoutEmpresa({ children }: { children: React.ReactNode 
       <>
         <Cabecalho titulo={empresa.nome} subtitulo={standby ? "Módulo em standby" : "Módulo em estruturação"} />
         <div className="max-w-2xl border-l-2 border-linha-forte pl-6">
-          <p className="font-serif text-xl leading-relaxed text-tinta">{empresa.descricao}</p>
+          <p className="text-lg font-semibold leading-relaxed text-tinta">{empresa.descricao}</p>
           <dl className="mt-8 grid grid-cols-[8rem_1fr] gap-y-3 text-[15px]">
             <dt className="text-tinta-2">Sócios</dt>
             <dd>{empresa.socios}</dd>

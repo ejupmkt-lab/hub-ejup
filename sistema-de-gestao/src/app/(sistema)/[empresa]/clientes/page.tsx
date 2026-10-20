@@ -141,7 +141,7 @@ function Conteudo() {
       {editando && (
         <Cartao className="mb-10 p-6 sm:p-8">
           <form onSubmit={salvar}>
-            <h2 className="mb-1 font-serif text-2xl">{editando === "novo" ? "Novo cliente" : form.razaoSocial || "Editar cliente"}</h2>
+            <h2 className="mb-1 text-xl font-semibold">{editando === "novo" ? "Novo cliente" : form.razaoSocial || "Editar cliente"}</h2>
             <p className="mb-6 text-[15px] text-tinta-2">Comece pelo CNPJ: o resto do cadastro é preenchido com os dados públicos da Receita Federal.</p>
             <div className="space-y-8">
               {gruposCliente.map((g) => (
@@ -178,7 +178,7 @@ function Conteudo() {
                           </span>
                         </Campo>
                         {duplicado && (
-                          <p className="mt-1.5 text-[13px] text-vinho">
+                          <p className="mt-1.5 text-[13px] text-vermelho">
                             Este CNPJ já está cadastrado.{" "}
                             <button type="button" className="underline underline-offset-4" onClick={() => abrir(duplicado)}>
                               Abrir o cadastro existente
@@ -186,7 +186,7 @@ function Conteudo() {
                           </p>
                         )}
                         {consulta && !duplicado && (
-                          <p className={`mt-1.5 text-[13px] ${consulta.estado === "erro" ? "text-vinho" : consulta.estado === "ok" ? "text-musgo" : "text-tinta-2"}`}>
+                          <p className={`mt-1.5 text-[13px] ${consulta.estado === "erro" ? "text-vermelho" : consulta.estado === "ok" ? "text-verde" : "text-tinta-2"}`}>
                             {consulta.texto}
                           </p>
                         )}
@@ -258,13 +258,13 @@ function Conteudo() {
               aria-label="Buscar clientes"
             />
           </div>
-          <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha">
+          <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)]">
             {lista.map((c) => {
               const projetos = estado.projetos.filter((p) => p.clienteId === c.id);
               return (
                 <li key={c.id} className="flex flex-wrap items-center justify-between gap-x-8 gap-y-2 px-6 py-4">
                   <div className="min-w-0">
-                    <p className="font-serif text-[18px] text-tinta">{c.razaoSocial}</p>
+                    <p className="text-[17px] font-semibold text-tinta">{c.razaoSocial}</p>
                     <p className="num mt-0.5 text-sm text-tinta-2">{[c.nomeFantasia, c.cnpj, c.responsavel].filter(Boolean).join(", ")}</p>
                   </div>
                   <div className="flex items-center gap-5 text-sm">

@@ -1,37 +1,41 @@
 @import "tailwindcss";
 
-/* Verde-garrafa sobre papel. O menu é a capa escura do processo; o trabalho
-   acontece em folhas brancas. Latão só para prazo; vinho só para atraso e erro. */
+/* Fundo cinza-claro, cartões brancos e azul para o que é clicável. As cores de
+   situação são sempre as mesmas: vermelho para ponto crítico (devolução),
+   laranja para atraso, verde para em dia. */
 @theme {
-  --color-pedra: #eceee9;
+  --color-pedra: #f3f5f9;
   --color-folha: #ffffff;
-  --color-linha: #dde2dc;
-  --color-linha-forte: #bec6be;
-  --color-tinta: #17201b;
-  --color-tinta-2: #59655f;
-  --color-capa: #183029;
-  --color-capa-2: #224039;
-  --color-garrafa: #1f3d35;
-  --color-garrafa-escuro: #162d27;
-  --color-garrafa-claro: #e1e9e5;
-  --color-latao: #9c7631;
-  --color-latao-claro: #f2ebdd;
-  --color-musgo: #3c6e52;
-  --color-musgo-claro: #e3ede6;
-  --color-vinho: #8a3a2e;
-  --color-vinho-claro: #f3e3df;
+  --color-linha: #e4e8ef;
+  --color-linha-forte: #cbd2de;
+  --color-tinta: #121a2b;
+  --color-tinta-2: #5b6578;
+  --color-marinho: #0f2a6b;
+  --color-marinho-2: #17398c;
+  --color-azul: #1d4ed8;
+  --color-azul-escuro: #1e40af;
+  --color-azul-claro: #eaf0fe;
+  --color-laranja: #c2410c;
+  --color-laranja-vivo: #f97316;
+  --color-laranja-claro: #fff3e8;
+  --color-verde: #15803d;
+  --color-verde-vivo: #22a55a;
+  --color-verde-claro: #e8f6ee;
+  --color-vermelho: #b91c1c;
+  --color-vermelho-vivo: #e03131;
+  --color-vermelho-claro: #fdeeee;
 
-  --font-sans: var(--font-instrument), system-ui, sans-serif;
-  --font-serif: var(--font-newsreader), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
 
-  --radius-campo: 5px;
-  --radius-bloco: 8px;
+  --radius-campo: 10px;
+  --radius-bloco: 14px;
+
+  --shadow-cartao: 0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.05);
 }
 
 body {
   background: var(--color-pedra);
   color: var(--color-tinta);
-  font-feature-settings: "ss01";
 }
 
 /* Datas, horas e contagens alinhadas em colunas */
@@ -40,19 +44,36 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-garrafa);
+  outline: 2px solid var(--color-azul);
   outline-offset: 2px;
 }
 
 .campo {
-  @apply w-full rounded-[var(--radius-campo)] border border-linha-forte/70 bg-white px-3 py-2 text-[15px] text-tinta outline-none transition-colors placeholder:text-tinta-2/70 hover:border-linha-forte focus:border-garrafa focus:bg-white;
+  @apply w-full rounded-[var(--radius-campo)] border border-linha-forte bg-white px-3 py-2.5 text-[15px] text-tinta outline-none transition-colors placeholder:text-tinta-2/70 hover:border-tinta-2/50 focus:border-azul focus:ring-2 focus:ring-azul/15;
 }
 textarea.campo {
   @apply leading-relaxed;
-  font-family: var(--font-sans);
 }
 select.campo {
   @apply pr-8;
+}
+
+/* Abas e seletores que rolam de lado no celular: sem barra visível */
+.sem-barra {
+  scrollbar-width: none;
+}
+.sem-barra::-webkit-scrollbar {
+  display: none;
+}
+
+/* Espaço do menu inferior do celular (e da barra do sistema no iPhone) */
+.respiro-menu {
+  padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+}
+@media (min-width: 1024px) {
+  .respiro-menu {
+    padding-bottom: 4rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
