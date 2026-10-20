@@ -14,7 +14,7 @@ import { CartaoProjeto } from "@/components/cartao-projeto";
 import { Calendario } from "@/components/painel/calendario";
 import { IconeBusca, IconeCalendario, IconeCronograma, IconeLista, IconeMaisSinal, IconeQuadro } from "@/components/icones";
 
-const situacoes = { andamento: "Em andamento", atrasados: "Atrasados", sem_plano: "Sem plano", encerrados: "Encerrados", todos: "Todos" } as const;
+const situacoes = { andamento: "Ativos", atrasados: "Atrasados", sem_plano: "Sem plano", encerrados: "Encerrados", todos: "Todos" } as const;
 type Situacao = keyof typeof situacoes;
 
 const ordens = { urgencia: "Por urgência", nome: "Por nome", entrega: "Por entrega", avanco: "Por avanço" } as const;
@@ -86,7 +86,7 @@ export default function Projetos() {
           <Cartao className="grid grid-cols-2 gap-2 p-2 sm:grid-cols-[minmax(0,13rem)_minmax(0,13rem)_1fr]">
             <label className="min-w-0">
               <span className="sr-only">Situação</span>
-              <select className="campo" value={situacao} onChange={(e) => setSituacao(e.target.value as Situacao)}>
+              <select className="campo !pl-2.5 !pr-7 !text-sm sm:!pl-3 sm:!text-[15px]" value={situacao} onChange={(e) => setSituacao(e.target.value as Situacao)}>
                 {(Object.keys(situacoes) as Situacao[]).map((s) => (
                   <option key={s} value={s}>
                     {situacoes[s]}
@@ -96,7 +96,7 @@ export default function Projetos() {
             </label>
             <label className="min-w-0">
               <span className="sr-only">Ordenar</span>
-              <select className="campo" value={ordem} onChange={(e) => setOrdem(e.target.value as Ordem)}>
+              <select className="campo !pl-2.5 !pr-7 !text-sm sm:!pl-3 sm:!text-[15px]" value={ordem} onChange={(e) => setOrdem(e.target.value as Ordem)}>
                 {(Object.keys(ordens) as Ordem[]).map((o) => (
                   <option key={o} value={o}>
                     {ordens[o]}
@@ -212,7 +212,8 @@ function Lista({ projetos, nome }: { projetos: Projeto[]; nome: (p: Projeto) => 
   );
 }
 
-// Quadro: uma coluna por etapa em curso (como um kanban); rola de lado
+// Quadro: uma coluna por etapa em curso, como um kanban. No celular as colunas
+// ficam empilhadas; nas telas maiores, lado a lado, rolando de lado
 function Quadro({ projetos, nome }: { projetos: Projeto[]; nome: (p: Projeto) => string }) {
   const modelo = projetos[0]?.etapas ?? [];
   const coluna = (p: Projeto) => (p.status === "encerrado" ? "encerrado" : !p.planoFechadoEm ? "sem_plano" : String(etapaAtual(p)?.ordem ?? "enviadas"));
