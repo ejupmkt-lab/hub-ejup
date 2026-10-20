@@ -167,6 +167,44 @@ export const IconeEmpresa = (p: P) => (
   </Svg>
 );
 
+export const IconeMicrofone = (p: P) => (
+  <Svg {...p}>
+    <rect x="9" y="3" width="6" height="11.5" rx="3" />
+    <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7" />
+  </Svg>
+);
+
+export const IconeAnexo = (p: P) => (
+  <Svg {...p}>
+    <path d="m20 11.5-7.8 7.8a5 5 0 0 1-7.1-7.1l8.2-8.2a3.4 3.4 0 0 1 4.8 4.8l-8.2 8.2a1.7 1.7 0 0 1-2.4-2.4l7.4-7.4" />
+  </Svg>
+);
+
+export const IconeEnviar = (p: P) => (
+  <Svg {...p}>
+    <path d="M4.5 12h11M11 6l6.5 6-6.5 6" strokeWidth="2.2" />
+  </Svg>
+);
+
+export const IconeIA = (p: P) => (
+  <Svg {...p}>
+    <path d="M12 3.5c.6 3.9 2.6 5.9 6.5 6.5-3.9.6-5.9 2.6-6.5 6.5-.6-3.9-2.6-5.9-6.5-6.5 3.9-.6 5.9-2.6 6.5-6.5Z" />
+    <path d="M18.5 15.5c.3 1.6 1 2.3 2.5 2.5-1.5.3-2.2 1-2.5 2.5-.3-1.5-1-2.2-2.5-2.5 1.5-.2 2.2-.9 2.5-2.5Z" />
+  </Svg>
+);
+
+export const IconeConversa = (p: P) => (
+  <Svg {...p}>
+    <path d="M20.5 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 20.5 12Z" />
+  </Svg>
+);
+
+export const IconeCheck = (p: P) => (
+  <Svg {...p}>
+    <path d="m5 12.5 4.5 4.5L19 7.5" strokeWidth="2.2" />
+  </Svg>
+);
+
 // Marca: quadrado azul com o "P"
 export function Marca({ className = "h-9 w-9", claro = false }: P & { claro?: boolean }) {
   return (

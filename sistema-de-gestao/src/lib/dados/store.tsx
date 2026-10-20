@@ -218,7 +218,13 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
           ...(e.evidencias ?? []).map((ev) => ev.caminho),
           ...(e.relatorioAssinado ? [e.relatorioAssinado.caminho] : []),
         ]);
-        if (arquivos.length) await sb.storage.from("evidencias").remove(arquivos);
+        // Fotos e PDFs mandados na conversa do projeto
+        if (p) {
+          const pasta = `${p.empresa}/${id}/conversa`;
+          const { data: daConversa } = await sb.storage.from("evidencias").list(pasta, { limit: 1000 });
+          arquivos.push(...(daConversa ?? []).map((f) => `${pasta}/${f.name}`));
+        }
+        if (arquivos.length) await sb.storage.from("evidencias").remove([...new Set(arquivos)]);
       }
       gravado.current.delete(chave);
       versoes.delete(id);

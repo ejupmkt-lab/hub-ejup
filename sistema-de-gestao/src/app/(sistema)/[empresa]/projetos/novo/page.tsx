@@ -7,6 +7,7 @@ import { novoId, registrarEvento, useEstado, useUsuario } from "@/lib/dados/stor
 import type { EmpresaSlug, Projeto } from "@/lib/dados/tipos";
 import { modelosDaEmpresa } from "@/lib/modelos";
 import { etapasDoModelo } from "@/lib/modelos/instanciar";
+import { LIMITE_PROJETOS_CLIENTE } from "@/lib/projeto";
 import { normasPadrao, referenciasPadrao } from "@/lib/relatorio/padroes";
 import { Botao, BotaoLink, Cabecalho, Campo, Vazio } from "@/components/ui";
 
@@ -43,10 +44,13 @@ function Conteudo() {
     : "Governança em privacidade e proteção de dados pessoais";
 
   const [criando, setCriando] = useState(false);
-  const jaTemProjeto = estado.projetos.filter((p) => p.clienteId === clienteId);
+  // Até 3 projetos em andamento por cliente; um 4º só excepcionalmente, e nunca um 5º
+  const emAndamento = estado.projetos.filter((p) => p.clienteId === clienteId && p.status !== "encerrado");
+  const mesmoServico = emAndamento.some((p) => p.modeloId === f.modeloId);
+  const bloqueado = emAndamento.length > LIMITE_PROJETOS_CLIENTE;
 
   const criar = () => {
-    if (!modelo || criando) return;
+    if (!modelo || criando || bloqueado) return;
     setCriando(true);
     const id = novoId("prj");
     atualizar((r) => {
@@ -117,9 +121,13 @@ function Conteudo() {
                     </option>
                   ))}
                 </select>
-                {jaTemProjeto.length > 0 && (
-                  <span className="mt-1.5 block text-[13px] text-laranja">
-                    Este cliente já tem {jaTemProjeto.length === 1 ? "um projeto" : `${jaTemProjeto.length} projetos`}. Confira se não é o mesmo.
+                {emAndamento.length > 0 && (
+                  <span className={`mt-1.5 block text-[13px] ${bloqueado ? "text-vermelho" : "text-laranja"}`}>
+                    {bloqueado
+                      ? `Este cliente já tem ${emAndamento.length} projetos em andamento, o máximo permitido. Encerre um antes de abrir outro.`
+                      : emAndamento.length >= LIMITE_PROJETOS_CLIENTE
+                        ? `Este cliente já tem ${emAndamento.length} projetos em andamento. Um 4º só excepcionalmente.`
+                        : `Este cliente já tem ${emAndamento.length === 1 ? "um projeto" : `${emAndamento.length} projetos`} em andamento${mesmoServico ? ", um deles deste mesmo serviço. Confira se não é o mesmo" : ""}.`}
                   </span>
                 )}
                 <Link href={`/${slug}/clientes?novo=1&voltar=novo-projeto`} className="mt-1.5 inline-block text-[13px] text-azul underline-offset-4 hover:underline">
@@ -158,7 +166,7 @@ function Conteudo() {
               </Campo>
             </fieldset>
             <div className="border-t border-linha pt-6">
-              <Botao type="submit" disabled={!clienteId || !modelo || criando}>
+              <Botao type="submit" disabled={!clienteId || !modelo || criando || bloqueado}>
                 {criando ? "Criando…" : "Criar projeto"}
               </Botao>
               {!modelo && <span className="ml-3 text-sm text-tinta-2">Esta empresa ainda não tem serviço cadastrado.</span>}

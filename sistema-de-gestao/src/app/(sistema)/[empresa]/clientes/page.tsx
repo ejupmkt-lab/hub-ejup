@@ -7,7 +7,9 @@ import { novoId, useAcesso, useEstado } from "@/lib/dados/store";
 import type { Cliente, EmpresaSlug } from "@/lib/dados/tipos";
 import { camposCliente, gruposCliente } from "@/lib/campos-cliente";
 import { formatarCnpj, tempoDeAtividade, type DadosCnpj } from "@/lib/cnpj";
-import { Botao, BotaoLink, Cabecalho, Campo, Cartao, Vazio } from "@/components/ui";
+import Link from "next/link";
+import { servicoDoProjeto } from "@/lib/projeto";
+import { Botao, Cabecalho, Campo, Cartao, Chip, Vazio } from "@/components/ui";
 
 const vazio = Object.fromEntries(camposCliente.map((c) => [c.chave, ""])) as Record<string, string>;
 
@@ -111,7 +113,7 @@ function Conteudo() {
     setEditando(null);
     if (voltarParaProjeto) router.push(`/${slug}/projetos/novo?cliente=${id}`);
     else if (projetoDeOrigem) router.push(`/${slug}/projetos/${projetoDeOrigem}`);
-    else router.replace(`/${slug}/clientes`);
+    else router.push(`/${slug}/clientes/${id}`);
   };
 
   const excluirCliente = async () => {
@@ -218,7 +220,9 @@ function Conteudo() {
                     ? router.push(`/${slug}/projetos/novo`)
                     : projetoDeOrigem
                       ? router.push(`/${slug}/projetos/${projetoDeOrigem}`)
-                      : (setEditando(null), router.replace(`/${slug}/clientes`))
+                      : editando !== "novo"
+                        ? router.push(`/${slug}/clientes/${editando}`)
+                        : (setEditando(null), router.replace(`/${slug}/clientes`))
                 }
               >
                 Cancelar
@@ -261,28 +265,30 @@ function Conteudo() {
           <ul className="divide-y divide-linha rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)]">
             {lista.map((c) => {
               const projetos = estado.projetos.filter((p) => p.clienteId === c.id);
+              const ativos = projetos.filter((p) => p.status !== "encerrado");
               return (
-                <li key={c.id} className="flex flex-wrap items-center justify-between gap-x-8 gap-y-2 px-6 py-4">
+                <li key={c.id} className="relative flex flex-wrap items-center justify-between gap-x-8 gap-y-2 px-4 py-4 hover:bg-pedra/50 sm:px-6">
                   <div className="min-w-0">
-                    <p className="text-[17px] font-semibold text-tinta">{c.razaoSocial}</p>
-                    <p className="num mt-0.5 text-sm text-tinta-2">{[c.nomeFantasia, c.cnpj, c.responsavel].filter(Boolean).join(", ")}</p>
-                  </div>
-                  <div className="flex items-center gap-5 text-sm">
-                    {projetos.length === 1 ? (
-                      <BotaoLink href={`/${slug}/projetos/${projetos[0].id}`} variante="secundario" tamanho="pequeno">
-                        Abrir projeto
-                      </BotaoLink>
-                    ) : projetos.length === 0 ? (
-                      <BotaoLink href={`/${slug}/projetos/novo?cliente=${c.id}`} variante="secundario" tamanho="pequeno">
-                        Criar projeto
-                      </BotaoLink>
-                    ) : (
-                      <span className="num text-tinta-2">{`${projetos.length} projetos`}</span>
+                    <Link href={`/${slug}/clientes/${c.id}`} className="break-words text-[17px] font-semibold text-tinta after:absolute after:inset-0 after:content-[''] hover:text-azul">
+                      {c.nomeFantasia || c.razaoSocial}
+                    </Link>
+                    <p className="num mt-0.5 break-words text-sm text-tinta-2">{[c.nomeFantasia && c.razaoSocial, c.cnpj, c.responsavel].filter(Boolean).join(", ")}</p>
+                    {ativos.length > 0 && (
+                      <p className="mt-2 flex flex-wrap gap-1.5">
+                        {ativos.map((p) => (
+                          <Chip key={p.id} tom="andamento">
+                            {servicoDoProjeto(p)}
+                          </Chip>
+                        ))}
+                      </p>
                     )}
+                  </div>
+                  <span className="relative z-10 flex items-center gap-2 text-sm">
+                    <span className="num text-tinta-2">{projetos.length === 0 ? "Sem projetos" : `${ativos.length} em andamento`}</span>
                     <Botao variante="fantasma" tamanho="pequeno" onClick={() => abrir(c)}>
                       Editar
                     </Botao>
-                  </div>
+                  </span>
                 </li>
               );
             })}

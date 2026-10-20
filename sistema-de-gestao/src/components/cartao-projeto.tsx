@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { Projeto } from "@/lib/dados/tipos";
 import { useEstado } from "@/lib/dados/store";
 import { formatarData } from "@/lib/datas";
-import { avancoProjeto, diasSemRegistro, entregaFinal, etapaAtrasada, etapaAtual, previstoProjeto, situacaoProjeto } from "@/lib/projeto";
+import { avancoProjeto, diasSemRegistro, entregaFinal, etapaAtrasada, etapaAtual, previstoProjeto, servicoDoProjeto, situacaoProjeto } from "@/lib/projeto";
 import { passoDoProjeto } from "@/lib/proximo-passo";
 import { doisDigitos, statusEtapa, type Tom } from "@/lib/rotulos";
 import { Barra, Chip, corTom } from "@/components/ui";
@@ -15,7 +15,15 @@ const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 // Um projeto no painel: cliente, avanço contra o previsto, etapa, entrega e
 // alertas. A borda da esquerda tem a cor da situação. O cartão inteiro abre o
 // projeto; a linha de baixo leva direto ao próximo passo.
-export function CartaoProjeto({ projeto: p, mostrarEmpresa = false }: { projeto: Projeto; mostrarEmpresa?: boolean }) {
+export function CartaoProjeto({
+  projeto: p,
+  mostrarEmpresa = false,
+  titulo = "cliente",
+}: {
+  projeto: Projeto;
+  mostrarEmpresa?: boolean;
+  titulo?: "cliente" | "servico"; // na página do cliente, o título é o serviço
+}) {
   const { estado } = useEstado();
   const c = estado.clientes.find((x) => x.id === p.clienteId);
   const empresa = estado.empresas.find((e) => e.slug === p.empresa);
@@ -29,7 +37,9 @@ export function CartaoProjeto({ projeto: p, mostrarEmpresa = false }: { projeto:
   const entrega = entregaFinal(p);
   const passo = passoDoProjeto(p);
   const href = `/${p.empresa}/projetos/${p.id}`;
-  const subtitulo = [mostrarEmpresa && empresa?.nome, c?.nomeFantasia && c.razaoSocial, `Projeto HUB ${p.numeroProjetoHub || "sem número"}`]
+  const servico = servicoDoProjeto(p);
+  const nomeCliente = c?.nomeFantasia || c?.razaoSocial || "Cliente";
+  const subtitulo = [mostrarEmpresa && empresa?.nome, titulo === "cliente" ? servico : null, `Projeto HUB ${p.numeroProjetoHub || "sem número"}`]
     .filter(Boolean)
     .join(" · ");
 
@@ -51,7 +61,7 @@ export function CartaoProjeto({ projeto: p, mostrarEmpresa = false }: { projeto:
           href={href}
           className="after:absolute after:inset-0 after:rounded-[inherit] after:content-[''] hover:text-azul focus-visible:outline-none focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-azul"
         >
-          {c?.nomeFantasia || c?.razaoSocial || "Cliente"}
+          {titulo === "cliente" ? nomeCliente : servico}
         </Link>
       </h3>
       <p className="num mt-0.5 break-words text-sm text-tinta-2">{subtitulo}</p>

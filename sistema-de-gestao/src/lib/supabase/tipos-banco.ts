@@ -123,6 +123,38 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"mensagens_projeto": {
+                  Row: {
+                    "acoes": NonNullable<Json>,"anexos": NonNullable<Json>,"autor": string | null,"autor_nome": string,"created_at": string,"desfazer": NonNullable<Json>,"desfeita": boolean,"empresa": string,"id": string,"papel": string,"projeto_id": string,"texto": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "acoes"?: NonNullable<Json>,"anexos"?: NonNullable<Json>,"autor"?: string | null,"autor_nome"?: string,"created_at"?: string,"desfazer"?: NonNullable<Json>,"desfeita"?: boolean,"empresa": string,"id"?: string,"papel": string,"projeto_id": string,"texto"?: string
+                  }
+                  Update: {
+                    "acoes"?: NonNullable<Json>,"anexos"?: NonNullable<Json>,"autor"?: string | null,"autor_nome"?: string,"created_at"?: string,"desfazer"?: NonNullable<Json>,"desfeita"?: boolean,"empresa"?: string,"id"?: string,"papel"?: string,"projeto_id"?: string,"texto"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "mensagens_projeto_autor_fkey"
+      columns: ["autor"]
+isOneToOne: false
+      referencedRelation: "perfis"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "mensagens_projeto_empresa_fkey"
+      columns: ["empresa"]
+isOneToOne: false
+      referencedRelation: "empresas"
+      referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "mensagens_projeto_projeto_id_fkey"
+      columns: ["projeto_id"]
+isOneToOne: false
+      referencedRelation: "projetos"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"perfis": {
                   Row: {
                     "admin_grupo": boolean,"created_at": string,"email": string,"id": string,"nome": string,"nome_completo": string

@@ -24,7 +24,7 @@ function contagens(e: Etapa) {
 }
 
 // Diagnósticos e relatórios do projeto, um por etapa, sempre no modelo do
-// Relatório Técnico de Nª Entrega da ficha 13070-5. A etapa em curso fica em destaque.
+// Relatório Técnico de Nª Entrega da ficha técnica do projeto. A etapa em curso fica em destaque.
 export function Relatorios({ projeto }: { projeto: Projeto }) {
   const base = `/${projeto.empresa}/projetos/${projeto.id}`;
   const destaque = projeto.etapas.find((e) => e.status === "devolvida") ?? etapaAtual(projeto);
@@ -32,7 +32,7 @@ export function Relatorios({ projeto }: { projeto: Projeto }) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-tinta-2">
-        Cada etapa tem o seu relatório técnico, no modelo da ficha 13070-5: as seções do relatório, os entregáveis da etapa e as evidências. O relatório é
+        Cada etapa tem o seu relatório técnico, no modelo da ficha {projeto.codigoFichaTecnica}: as seções do relatório, os entregáveis da etapa e as evidências. O relatório é
         baixado em Word, assinado no gov.br e enviado no HUB.
       </p>
 

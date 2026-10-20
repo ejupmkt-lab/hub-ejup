@@ -8,6 +8,7 @@ export const modeloLgpdSebrae: ModeloFluxo = {
   versao: 1,
   empresa: "pivotto",
   nome: "Adequação à LGPD · HUB SEBRAE",
+  nomeCurto: "Adequação à LGPD",
   fichaTecnica: "Adequação à Lei Geral de Proteção de Dados Pessoais (LGPD)",
   codigoFichaTecnica: "13070-5",
   prestadoraVinculada: "FUNCERN",

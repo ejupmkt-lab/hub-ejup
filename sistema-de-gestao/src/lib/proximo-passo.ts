@@ -8,25 +8,26 @@ import { verificarCompletude } from "./relatorio/secoes";
 // O que fazer agora, em uma frase e um botão. Usado no painel, na lista de
 // projetos, no projeto e na etapa, para ninguém precisar adivinhar o caminho.
 
-export type AbaEtapa = "Checklist" | "Visitas e horas" | "Redação do relatório" | "Entregáveis" | "Fechamento";
+export type AbaEtapa = "Checklist" | "Redação do relatório" | "Entregáveis" | "Fechamento";
 export const ancoraAba: Record<AbaEtapa, string> = {
   Checklist: "checklist",
-  "Visitas e horas": "visitas",
   "Redação do relatório": "redacao",
   Entregáveis: "entregaveis",
   Fechamento: "fechamento",
 };
 
-// Abas do projeto que podem ser abertas pelo endereço (#plano, #referencias…)
+// Abas do projeto que podem ser abertas pelo endereço (#plano, #conversa…)
 export const ancoraAbaProjeto = {
+  conversa: "Conversa",
+  registrar: "Conversa",
   cronograma: "Cronograma",
-  relatorios: "Relatórios",
-  plano: "Plano de trabalho",
-  visitas: "Visitas e horas",
-  registrar: "Visitas e horas",
-  registros: "Registros",
+  plano: "Cronograma",
+  entregas: "Entregas",
+  relatorios: "Entregas",
+  ficha: "Ficha do projeto",
+  registros: "Tabelas do relatório",
   referencias: "Referências",
-  ficha: "Ficha",
+  visitas: "Horas e visitas",
   historico: "Histórico",
 } as const;
 

@@ -1,6 +1,7 @@
 import { diferencaDias, hojeIso } from "./datas";
 import type { Etapa, Projeto } from "./dados/tipos";
 import type { Tom } from "./rotulos";
+import { modeloPorId } from "./modelos";
 
 const concluidas = new Set(["enviada", "aprovada"]);
 
@@ -116,3 +117,9 @@ export function situacaoProjeto(p: Projeto, hoje = hojeIso()): SituacaoProjeto {
   if (p.etapas.some((e) => etapaAtrasada(e, hoje))) return { tom: "atencao", rotulo: "Atrasado" };
   return { tom: "ok", rotulo: "Em dia" };
 }
+
+// Nome do serviço contratado, para distinguir os projetos de um mesmo cliente
+export const servicoDoProjeto = (p: Projeto) => modeloPorId(p.modeloId)?.nomeCurto ?? p.fichaTecnica;
+
+// Até 3 projetos em andamento por cliente; um 4º só excepcionalmente
+export const LIMITE_PROJETOS_CLIENTE = 3;

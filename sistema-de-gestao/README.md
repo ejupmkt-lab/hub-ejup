@@ -25,9 +25,17 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Projetos** a partir do modelo *Adequação à LGPD · HUB SEBRAE* (ficha 13070-5): 5 etapas, 333 h,
   checklist de atividades e 23 entregáveis.
 - **Plano de trabalho**: datas sugeridas e fechadas por Roberto; alteração posterior exige justificativa.
-- **Dentro do projeto**: Cronograma (avanço, etapa atual, horas e Gantt das etapas), Relatórios (o
-  relatório técnico de cada etapa, a etapa em curso em destaque), Plano de trabalho, Visitas e horas,
-  Registros, Referências, Ficha e Histórico.
+- **Clientes e projetos**: cada cliente tem a sua página com todos os projetos (até 3 em andamento ao
+  mesmo tempo; um 4º só excepcionalmente), cada um com o seu serviço e as suas etapas, conforme o modelo
+  em `src/lib/modelos/` (hoje, Adequação à LGPD).
+- **Dentro do projeto**: Conversa, Cronograma (avanço, Gantt das etapas e o plano de trabalho, que define
+  as datas) e Entregas (o relatório técnico de cada etapa). Ficha, tabelas do relatório, referências,
+  horas e visitas e histórico ficam no menu "Mais".
+- **Conversa com a IA** (`src/components/projeto/conversa.tsx`, rota `/api/conversa`, tabela
+  `mensagens_projeto`): o consultor escreve ou dita (reconhecimento de voz do navegador), manda fotos e
+  PDFs; a IA identifica a etapa, marca o checklist, guarda as fotos como evidência, registra visitas e
+  horas e escreve seções e entregáveis no modelo. Cada resposta mostra o que mudou e pode ser desfeita
+  (`src/lib/conversa.ts`). Precisa da `ANTHROPIC_API_KEY` na Vercel.
 - **Etapas no formato do HUB SEBRAE**, registros do programa, redação por seção, checagem de completude.
 - **Relatório Técnico em Word (.docx)** no papel timbrado do modelo (`public/modelos/relatorio-base.docx`).
 - **Cadastro pelo CNPJ**: razão social, nome fantasia, endereço, CEP, porte, atividade e data de abertura

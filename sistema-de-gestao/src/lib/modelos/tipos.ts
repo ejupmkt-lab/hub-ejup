@@ -16,6 +16,7 @@ export type ModeloFluxo = {
   versao: number;
   empresa: string;
   nome: string;
+  nomeCurto: string; // para distinguir os projetos de um mesmo cliente
   fichaTecnica: string;
   codigoFichaTecnica: string;
   prestadoraVinculada: string;

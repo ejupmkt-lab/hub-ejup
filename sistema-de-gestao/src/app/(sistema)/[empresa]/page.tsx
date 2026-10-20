@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useEstado } from "@/lib/dados/store";
 import type { Projeto } from "@/lib/dados/tipos";
 import { formatarData } from "@/lib/datas";
-import { alertasDoProjeto, avancoProjeto, entregaFinal, etapaAtrasada, etapaAtual, previstoProjeto, situacaoProjeto } from "@/lib/projeto";
+import { alertasDoProjeto, avancoProjeto, entregaFinal, etapaAtrasada, etapaAtual, previstoProjeto, servicoDoProjeto, situacaoProjeto } from "@/lib/projeto";
 import { doisDigitos } from "@/lib/rotulos";
 import { Barra, BotaoLink, Cartao, Cabecalho, Status, Segmentos, Vazio, corTom } from "@/components/ui";
 import { Cronograma } from "@/components/painel/cronograma";
@@ -145,7 +145,6 @@ export default function Projetos() {
 
 // Lista: tabela nas telas largas; nas menores, os mesmos cartões do painel
 function Lista({ projetos, nome }: { projetos: Projeto[]; nome: (p: Projeto) => string }) {
-  const { estado } = useEstado();
   const colunas = "grid grid-cols-[minmax(0,1.5fr)_minmax(0,1.2fr)_10rem_6.5rem_12rem] items-center gap-5";
   return (
     <>
@@ -164,7 +163,6 @@ function Lista({ projetos, nome }: { projetos: Projeto[]; nome: (p: Projeto) => 
         </div>
         <ul className="divide-y divide-linha">
           {projetos.map((p) => {
-            const c = estado.clientes.find((x) => x.id === p.clienteId);
             const et = etapaAtual(p);
             const avanco = avancoProjeto(p);
             const previsto = previstoProjeto(p);
@@ -182,7 +180,7 @@ function Lista({ projetos, nome }: { projetos: Projeto[]; nome: (p: Projeto) => 
                       {nome(p)}
                     </Link>
                     <p className="num break-words text-[13px] text-tinta-2">
-                      {c?.nomeFantasia ? `${c.razaoSocial} · ` : ""}HUB {p.numeroProjetoHub || "sem número"}
+                      {servicoDoProjeto(p)} · HUB {p.numeroProjetoHub || "sem número"}
                     </p>
                   </div>
                   <p className="flex min-w-0 items-start gap-2 text-sm text-tinta">
@@ -246,6 +244,7 @@ function Quadro({ projetos, nome }: { projetos: Projeto[]; nome: (p: Projeto) =>
                         className={`block rounded-[var(--radius-campo)] border border-l-4 border-linha bg-folha p-3 shadow-[var(--shadow-cartao)] hover:border-azul/40 ${corTom[sit.tom].borda}`}
                       >
                         <span className="block break-words text-[15px] font-bold text-tinta">{nome(p)}</span>
+                        <span className="block text-[13px] text-tinta-2">{servicoDoProjeto(p)}</span>
                         <span className="mt-2 flex items-center gap-2">
                           <span className="flex-1">
                             <Barra valor={avanco} total={100} marca={previstoProjeto(p)} />

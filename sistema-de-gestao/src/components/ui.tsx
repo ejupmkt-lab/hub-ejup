@@ -170,14 +170,14 @@ export function Abas<T extends string>({
   }, [atual]);
   return (
     <div className={`relative border-b border-linha ${naFaixa ? "" : "mb-6"}`}>
-      <div ref={ref} role="tablist" className="sem-barra -mb-px flex gap-6 overflow-x-auto pr-8 lg:pr-0">
+      <div ref={ref} role="tablist" className="sem-barra -mb-px flex gap-4 overflow-x-auto pr-8 sm:gap-6 lg:pr-0">
         {abas.map((a) => (
           <button
             key={a}
             role="tab"
             aria-selected={a === atual}
             onClick={() => aoTrocar(a)}
-            className={`flex shrink-0 items-center gap-2 whitespace-nowrap border-b-2 pb-3 pt-1 text-[15px] transition-colors ${
+            className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 pb-3 pt-1 text-[14px] transition-colors sm:gap-2 sm:text-[15px] ${
               a === atual ? "border-azul font-semibold text-azul" : "border-transparent font-medium text-tinta-2 hover:border-linha-forte hover:text-tinta"
             }`}
           >
@@ -187,7 +187,7 @@ export function Abas<T extends string>({
         ))}
       </div>
       {/* Indica que há mais abas para o lado */}
-      <span aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-pedra to-transparent lg:hidden" />
+      <span aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-pedra to-transparent lg:hidden" />
     </div>
   );
 }

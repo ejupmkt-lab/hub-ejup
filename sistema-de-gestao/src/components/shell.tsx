@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAcesso, useEstado, type Salvamento } from "@/lib/dados/store";
 import { statusEmpresa } from "@/lib/rotulos";
-import { etapaAtual } from "@/lib/projeto";
+import { etapaAtual, servicoDoProjeto } from "@/lib/projeto";
 import { doisDigitos } from "@/lib/rotulos";
 import {
   IconeAcessos,
@@ -320,7 +320,7 @@ function EscolherProjeto({ aoFechar }: { aoFechar: () => void }) {
   };
   return (
     <FolhaSobreposta titulo="Registrar atividade" aoFechar={aoFechar}>
-      <p className="mb-3 text-sm text-tinta-2">Visita, reunião remota ou trabalho interno. Escolha o projeto:</p>
+      <p className="mb-3 text-sm text-tinta-2">Conte o que aconteceu (visita, reunião, fotos, documentos) na conversa do projeto. Escolha qual:</p>
       {projetos.length === 0 ? (
         <div className="rounded-[var(--radius-campo)] bg-pedra px-4 py-6 text-center text-sm text-tinta-2">
           Nenhum projeto em andamento.
@@ -340,7 +340,7 @@ function EscolherProjeto({ aoFechar }: { aoFechar: () => void }) {
                   <span className="min-w-0 flex-1">
                     <span className="block break-words text-[15px] font-semibold text-tinta">{nome(p.clienteId)}</span>
                     <span className="block text-[13px] text-tinta-2">
-                      {et ? `Etapa ${doisDigitos(et.ordem)} ${et.nome.charAt(0) + et.nome.slice(1).toLowerCase()}` : "Todas as etapas enviadas"}
+                      {servicoDoProjeto(p)} · {et ? `Etapa ${doisDigitos(et.ordem)} ${et.nome.charAt(0) + et.nome.slice(1).toLowerCase()}` : "todas as etapas enviadas"}
                     </span>
                   </span>
                   <IconeSeta className="h-5 w-5 shrink-0 text-tinta-2" />
