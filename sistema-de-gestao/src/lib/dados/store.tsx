@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { supabaseNavegador } from "../supabase/navegador";
 import { TelaCodigo } from "@/components/tela-codigo";
+import { MarcaBlimp } from "@/components/logo";
 import type { Cliente, Empresa, EmpresaSlug, Estado, Papel, Projeto, Servico, Usuario } from "./tipos";
 
 // Estado do sistema carregado do Supabase. As telas alteram uma cópia local
@@ -300,7 +301,12 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
     [carga, atualizar, salvamento, sair, excluir, recarregar, salvarAgora],
   );
 
-  if (carga.tipo === "carregando") return <div className="flex min-h-screen items-center justify-center text-lg font-semibold text-tinta-2">Blimp</div>;
+  if (carga.tipo === "carregando")
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <MarcaBlimp className="h-12 w-auto animate-pulse" />
+      </div>
+    );
   if (carga.tipo === "codigo") return <TelaCodigo aoConfirmar={recarregar} sair={sair} />;
   if (carga.tipo !== "pronto")
     return (

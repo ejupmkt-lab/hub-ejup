@@ -6,7 +6,17 @@ import { useState } from "react";
 import { useEstado } from "@/lib/dados/store";
 import type { Projeto } from "@/lib/dados/tipos";
 import { formatarData } from "@/lib/datas";
-import { alertasDoProjeto, avancoProjeto, entregaFinal, etapaAtrasada, etapaAtual, previstoProjeto, servicoDoProjeto, situacaoProjeto } from "@/lib/projeto";
+import {
+  codigoHub,
+  alertasDoProjeto,
+  avancoProjeto,
+  entregaFinal,
+  etapaAtrasada,
+  etapaAtual,
+  previstoProjeto,
+  servicoDoProjeto,
+  situacaoProjeto,
+} from "@/lib/projeto";
 import { doisDigitos } from "@/lib/rotulos";
 import { Barra, BotaoLink, Cartao, Cabecalho, Status, Segmentos, Vazio, corTom } from "@/components/ui";
 import { Cronograma } from "@/components/painel/cronograma";
@@ -45,7 +55,7 @@ export default function Projetos() {
   const urgencia = (p: Projeto) => Math.min(9, ...alertasDoProjeto(p).map((a) => a.ordem));
   const projetos = daEmpresa
     .filter((p) => passa(p, situacao))
-    .filter((p) => !termo || `${cliente(p)?.razaoSocial} ${cliente(p)?.nomeFantasia} ${p.numeroProjetoHub}`.toLowerCase().includes(termo))
+    .filter((p) => !termo || `${cliente(p)?.razaoSocial} ${cliente(p)?.nomeFantasia} ${codigoHub(p)}`.toLowerCase().includes(termo))
     .sort((a, b) =>
       ordem === "nome"
         ? nome(a).localeCompare(nome(b))
@@ -86,7 +96,11 @@ export default function Projetos() {
           <Cartao className="grid grid-cols-2 gap-2 p-2 sm:grid-cols-[minmax(0,13rem)_minmax(0,13rem)_1fr]">
             <label className="min-w-0">
               <span className="sr-only">Situação</span>
-              <select className="campo !pl-2.5 !pr-7 !text-sm sm:!pl-3 sm:!text-[15px]" value={situacao} onChange={(e) => setSituacao(e.target.value as Situacao)}>
+              <select
+                className="campo !pl-2.5 !pr-7 !text-sm sm:!pl-3 sm:!text-[15px]"
+                value={situacao}
+                onChange={(e) => setSituacao(e.target.value as Situacao)}
+              >
                 {(Object.keys(situacoes) as Situacao[]).map((s) => (
                   <option key={s} value={s}>
                     {situacoes[s]}
@@ -180,7 +194,7 @@ function Lista({ projetos, nome }: { projetos: Projeto[]; nome: (p: Projeto) => 
                       {nome(p)}
                     </Link>
                     <p className="num break-words text-[13px] text-tinta-2">
-                      {servicoDoProjeto(p)} · HUB {p.numeroProjetoHub || "sem número"}
+                      {servicoDoProjeto(p)} · HUB {codigoHub(p) || "sem número"}
                     </p>
                   </div>
                   <p className="flex min-w-0 items-start gap-2 text-sm text-tinta">

@@ -21,8 +21,8 @@ import {
   IconeSair,
   IconeSeta,
   IconeTarefas,
-  Marca,
 } from "@/components/icones";
+import { LogoBlimp } from "@/components/logo";
 
 type Folha = "mais" | "registrar" | null;
 
@@ -87,12 +87,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen">
       {/* Menu lateral (computador) */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-linha bg-folha lg:flex">
-        <Link href="/" className="flex items-center gap-3 px-5 pb-5 pt-6">
-          <Marca />
-          <span className="min-w-0">
-            <span className="block text-[17px] font-bold leading-tight text-tinta">Blimp</span>
-            <span className="block text-[13px] text-tinta-2">Sistema de gestão</span>
-          </span>
+        <Link href="/" className="block px-5 pb-5 pt-6" aria-label="Blimp, ir para o painel">
+          <LogoBlimp className="h-8 w-auto" />
+          <span className="mt-1.5 block text-[13px] text-tinta-2">Sistema de gestão</span>
         </Link>
         <nav className="flex-1 space-y-1 overflow-y-auto px-3" aria-label="Principal">
           {principais.map(itemLateral)}

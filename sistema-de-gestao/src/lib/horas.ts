@@ -16,7 +16,7 @@ export function horasDoProjeto(p: Projeto) {
   const realizadas = somar(registros(p));
   const porEtapa = p.etapas.map((e) => ({ ordem: e.ordem, previstas: e.horasPrevistas, realizadas: somar(registrosDaEtapa(p, e.ordem)) }));
   const visitas = registros(p).filter((r) => r.tipo === "visita").length;
-  const visitasPrevistas = Number(p.numeroVisitas) || null;
+  const visitasPrevistas = p.etapas.length || null; // uma visita por etapa
   return { previstas, realizadas, porEtapa, visitas, visitasPrevistas };
 }
 

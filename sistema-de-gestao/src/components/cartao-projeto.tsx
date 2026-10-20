@@ -4,7 +4,17 @@ import Link from "next/link";
 import type { Projeto } from "@/lib/dados/tipos";
 import { useEstado } from "@/lib/dados/store";
 import { formatarData } from "@/lib/datas";
-import { avancoProjeto, diasSemRegistro, entregaFinal, etapaAtrasada, etapaAtual, previstoProjeto, servicoDoProjeto, situacaoProjeto } from "@/lib/projeto";
+import {
+  codigoHub,
+  avancoProjeto,
+  diasSemRegistro,
+  entregaFinal,
+  etapaAtrasada,
+  etapaAtual,
+  previstoProjeto,
+  servicoDoProjeto,
+  situacaoProjeto,
+} from "@/lib/projeto";
 import { passoDoProjeto } from "@/lib/proximo-passo";
 import { doisDigitos, statusEtapa, type Tom } from "@/lib/rotulos";
 import { Barra, Chip, corTom } from "@/components/ui";
@@ -39,7 +49,7 @@ export function CartaoProjeto({
   const href = `/${p.empresa}/projetos/${p.id}`;
   const servico = servicoDoProjeto(p);
   const nomeCliente = c?.nomeFantasia || c?.razaoSocial || "Cliente";
-  const subtitulo = [mostrarEmpresa && empresa?.nome, titulo === "cliente" ? servico : null, `Projeto HUB ${p.numeroProjetoHub || "sem número"}`]
+  const subtitulo = [mostrarEmpresa && empresa?.nome, titulo === "cliente" ? servico : null, `Projeto HUB ${codigoHub(p) || "sem número"}`]
     .filter(Boolean)
     .join(" · ");
 

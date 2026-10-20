@@ -275,7 +275,7 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>) {
     "",
     "## Projeto",
     `Serviço: ${p.fichaTecnica} (ficha técnica ${p.codigoFichaTecnica})`,
-    linha("Projeto no HUB", p.numeroProjetoHub),
+    linha("Código do pedido no HUB", p.codigoSolicitacaoHub || p.numeroProjetoHub),
     `Plano de trabalho: ${p.planoFechadoEm ? "definido" : "ainda não definido"}`,
     `Etapa em curso: ${emCurso ? `${emCurso.ordem} (${emCurso.nome})` : "todas enviadas"}`,
   ];

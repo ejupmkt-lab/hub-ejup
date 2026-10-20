@@ -1,6 +1,8 @@
 # Blimp — sistema de gestão de projetos
 
 Blimp é o sistema de gestão de projetos e consultorias usado pelas empresas Pivotto & Pivotto, ORB e EJUP.
+A logomarca fica em `src/components/logo.tsx` (completa e só o B), vetorizada do arquivo oficial; o ícone
+do navegador está em `src/app/icon.svg`, `favicon.ico` e `apple-icon.png`.
 Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.md).
 
 - **Produção:** https://sistema-de-gestao-alpha.vercel.app (Vercel, time EJUP, projeto `sistema-de-gestao`)
@@ -31,6 +33,10 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Clientes** com os campos do Modelo de Diagnóstico do HUB SEBRAE.
 - **Projetos** a partir dos serviços cadastrados; o primeiro é *Adequação à LGPD* (ficha 13070-5): 5
   etapas, 333 h, checklist de atividades e 23 entregáveis, com textos-padrão e referências próprios.
+- **Projeto novo**: escolhe o serviço, o cliente e o consultor; o código do pedido no HUB é um campo só (o
+  mesmo número do projeto no HUB); o número de visitas é o de etapas do serviço (uma por etapa); o gestor
+  ou gestora do SEBRAE vem de uma lista da empresa (tabela `gestores_sebrae`), com a opção de digitar
+  outro nome e salvá-lo na lista.
 - **Plano de trabalho**: definido pela IA a partir do início e do fim contados no Desenvolvimento, ou à
   mão na aba Plano de trabalho; alteração posterior exige justificativa.
 - **Clientes e projetos**: cada cliente tem a sua página com todos os projetos (até 3 em andamento ao

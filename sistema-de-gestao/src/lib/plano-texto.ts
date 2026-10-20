@@ -16,10 +16,10 @@ export function textoPlano(p: Projeto, cliente: Cliente | undefined) {
   const total = p.etapas.reduce((a, e) => a + e.horasPrevistas, 0);
   const linhas = [
     `Plano de Trabalho — ${cliente?.nomeFantasia || cliente?.razaoSocial || "Cliente"}`,
-    `Código do pedido no Hub: ${p.codigoSolicitacaoHub || "a definir"}`,
+    `Código do pedido no Hub: ${p.codigoSolicitacaoHub || p.numeroProjetoHub || "a definir"}`,
     `Ficha: ${p.fichaTecnica}`,
     `Código da ficha técnica: ${p.codigoFichaTecnica}`,
-    `Número de Visitas: ${p.numeroVisitas || "a definir"}`,
+    `Número de Visitas: ${p.etapas.length}`,
     ...p.etapas.map(
       (e) => `Etapa ${e.ordem} – ${tituloEtapa(e.nome)}: ${formatarData(e.dataInicio)} a ${formatarData(e.dataFim)} - carga horária - ${e.horasPrevistas}h`,
     ),
@@ -31,8 +31,7 @@ export function textoPlano(p: Projeto, cliente: Cliente | undefined) {
 // O que falta para a mensagem sair completa
 export function faltandoNoPlano(p: Projeto) {
   const f: string[] = [];
-  if (!p.codigoSolicitacaoHub) f.push("código do pedido no HUB");
-  if (!p.numeroVisitas) f.push("número de visitas");
+  if (!p.codigoSolicitacaoHub && !p.numeroProjetoHub) f.push("código do pedido no HUB");
   if (p.etapas.some((e) => !e.dataInicio || !e.dataFim)) f.push("datas das etapas");
   return f;
 }

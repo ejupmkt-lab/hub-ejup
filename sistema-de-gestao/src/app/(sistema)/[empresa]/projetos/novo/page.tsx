@@ -10,6 +10,7 @@ import { LIMITE_PROJETOS_CLIENTE } from "@/lib/projeto";
 import { horasDoServico, ID_SERVICO_LGPD, servicosDaEmpresa } from "@/lib/servicos";
 import { normasPadrao, referenciasPadrao } from "@/lib/relatorio/padroes";
 import { Botao, BotaoLink, Cabecalho, Campo, Vazio } from "@/components/ui";
+import { EscolherGestorSebrae } from "@/components/projeto/gestor-sebrae";
 
 function Conteudo() {
   const { empresa: slug } = useParams<{ empresa: EmpresaSlug }>();
@@ -25,9 +26,7 @@ function Conteudo() {
     modeloId: (modelos.find((m) => m.id === params.get("servico")) ?? modelos[0])?.id ?? "",
     clienteId: "", // em branco = cliente indicado no endereço (?cliente=) ou o mais recente
     consultorId: (consultores.find((u) => u.id === usuario.id) ?? consultores[0])?.id ?? "",
-    numeroProjetoHub: "",
-    codigoSolicitacaoHub: "",
-    numeroVisitas: "",
+    codigoHub: "", // código do pedido = nº do projeto no HUB
     gestorSebrae: "",
     segmento: "",
     areaAtuacao: "",
@@ -65,10 +64,10 @@ function Conteudo() {
         consultorId: f.consultorId,
         status: "aguardando_plano",
         prestadoraVinculada: modelo.prestadoraVinculada,
-        numeroProjetoHub: f.numeroProjetoHub,
-        codigoSolicitacaoHub: f.codigoSolicitacaoHub,
-        numeroVisitas: f.numeroVisitas,
-        gestorSebrae: f.gestorSebrae,
+        numeroProjetoHub: f.codigoHub.trim(),
+        codigoSolicitacaoHub: f.codigoHub.trim(),
+        numeroVisitas: String(modelo.etapas.length), // uma visita por etapa
+        gestorSebrae: f.gestorSebrae.trim(),
         fichaTecnica: modelo.fichaTecnica,
         codigoFichaTecnica: modelo.codigoFichaTecnica,
         segmento: f.segmento.trim() || segmentoSugerido,
@@ -156,18 +155,27 @@ function Conteudo() {
             </fieldset>
             <fieldset className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
               <legend className="mb-3 text-[15px] font-medium">Dados do HUB SEBRAE</legend>
-              <Campo rotulo="Nº do projeto no HUB">
-                <input className="campo num" value={f.numeroProjetoHub} onChange={set("numeroProjetoHub")} />
+              <Campo rotulo="Código do pedido no HUB" dica="É o mesmo número do projeto no HUB.">
+                <input className="campo num" value={f.codigoHub} onChange={set("codigoHub")} />
               </Campo>
-              <Campo rotulo="Código do pedido no HUB">
-                <input className="campo num" value={f.codigoSolicitacaoHub} onChange={set("codigoSolicitacaoHub")} />
-              </Campo>
-              <Campo rotulo="Número de visitas">
-                <input className="campo num" inputMode="numeric" value={f.numeroVisitas} onChange={set("numeroVisitas")} />
-              </Campo>
-              <Campo rotulo="Gestor ou gestora SEBRAE">
-                <input className="campo" value={f.gestorSebrae} onChange={set("gestorSebrae")} />
-              </Campo>
+              <div>
+                <span className="mb-1.5 block text-[13px] font-semibold text-tinta">Número de visitas</span>
+                <p className="flex min-h-10 items-center rounded-[var(--radius-campo)] bg-pedra px-3 text-[15px] text-tinta">
+                  {modelo ? (
+                    <span>
+                      <span className="num font-semibold">{modelo.etapas.length}</span>, uma por etapa do serviço
+                    </span>
+                  ) : (
+                    "Escolha o serviço"
+                  )}
+                </p>
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="gestor-sebrae" className="mb-1.5 block text-[13px] font-semibold text-tinta">
+                  Gestor ou gestora SEBRAE
+                </label>
+                <EscolherGestorSebrae id="gestor-sebrae" empresa={slug} valor={f.gestorSebrae} aoMudar={(nome) => setF((x) => ({ ...x, gestorSebrae: nome }))} />
+              </div>
               <Campo rotulo="Segmento do cliente">
                 <input className="campo" placeholder={segmentoSugerido} value={f.segmento} onChange={set("segmento")} />
               </Campo>

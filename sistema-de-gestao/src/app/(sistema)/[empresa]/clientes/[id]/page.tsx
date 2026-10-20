@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEstado } from "@/lib/dados/store";
-import { LIMITE_PROJETOS_CLIENTE, servicoDoProjeto } from "@/lib/projeto";
+import { codigoHub, LIMITE_PROJETOS_CLIENTE, servicoDoProjeto } from "@/lib/projeto";
 import { formatarData } from "@/lib/datas";
 import { BotaoLink, Cabecalho, Cartao, Chip, Vazio } from "@/components/ui";
 import { CartaoProjeto } from "@/components/cartao-projeto";
@@ -88,11 +88,14 @@ export default function PaginaCliente() {
                 <ul className="divide-y divide-linha">
                   {encerrados.map((p) => (
                     <li key={p.id}>
-                      <Link href={`/${slug}/projetos/${p.id}`} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 hover:bg-pedra/60 sm:px-5">
+                      <Link
+                        href={`/${slug}/projetos/${p.id}`}
+                        className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 hover:bg-pedra/60 sm:px-5"
+                      >
                         <span className="min-w-0">
                           <span className="block font-semibold text-tinta">{servicoDoProjeto(p)}</span>
                           <span className="num block text-[13px] text-tinta-2">
-                            Projeto HUB {p.numeroProjetoHub || "sem número"} · {formatarData(p.etapas[0]?.dataInicio)} a{" "}
+                            Projeto HUB {codigoHub(p) || "sem número"} · {formatarData(p.etapas[0]?.dataInicio)} a{" "}
                             {formatarData(p.etapas[p.etapas.length - 1]?.dataFim)}
                           </span>
                         </span>

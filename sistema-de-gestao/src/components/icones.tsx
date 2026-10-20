@@ -211,15 +211,3 @@ export const IconeCheck = (p: P) => (
     <path d="m5 12.5 4.5 4.5L19 7.5" strokeWidth="2.2" />
   </Svg>
 );
-
-// Marca: quadrado azul com o "P"
-export function Marca({ className = "h-9 w-9", claro = false }: P & { claro?: boolean }) {
-  return (
-    <span
-      aria-hidden
-      className={`grid shrink-0 place-items-center rounded-[10px] text-[1.05rem] font-bold ${claro ? "bg-folha text-azul" : "bg-azul text-folha"} ${className}`}
-    >
-      B
-    </span>
-  );
-}

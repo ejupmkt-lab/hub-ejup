@@ -14,7 +14,17 @@ import { Relatorios } from "@/components/projeto/relatorios";
 import { Conversa } from "@/components/projeto/conversa";
 import { formatarData, diferencaDias, hojeIso } from "@/lib/datas";
 import { horasDoProjeto, horasFmt } from "@/lib/horas";
-import { avancoEtapa, avancoProjeto, entregaFinal, etapaAtrasada, etapaAtual, previstoProjeto, servicoDoProjeto, situacaoProjeto } from "@/lib/projeto";
+import {
+  codigoHub,
+  avancoEtapa,
+  avancoProjeto,
+  entregaFinal,
+  etapaAtrasada,
+  etapaAtual,
+  previstoProjeto,
+  servicoDoProjeto,
+  situacaoProjeto,
+} from "@/lib/projeto";
 import { doisDigitos, statusEtapa } from "@/lib/rotulos";
 import { ancoraAbaProjeto, passoDoProjeto } from "@/lib/proximo-passo";
 import { Abas, Barra, Botao, BotaoLink, Cabecalho, Cartao, Chip, ProximoPasso, Vazio } from "@/components/ui";
@@ -115,7 +125,7 @@ export default function PaginaProjeto() {
           <p className="num flex flex-wrap items-center gap-x-2 gap-y-1.5 break-words">
             <span className="font-semibold text-tinta">{servico}</span>
             <span aria-hidden>·</span>
-            <span>HUB {projeto.numeroProjetoHub || "sem número"}</span>
+            <span>HUB {codigoHub(projeto) || "sem número"}</span>
             <span aria-hidden>·</span>
             <span>ficha {projeto.codigoFichaTecnica}</span>
             <Chip tom={situacao.tom}>{situacao.rotulo}</Chip>
@@ -229,8 +239,8 @@ export default function PaginaProjeto() {
           {!projeto.planoFechadoEm && projeto.status !== "encerrado" && (
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-[var(--radius-bloco)] border border-azul/20 bg-azul-claro px-4 py-4 sm:px-5">
               <p className="min-w-0 flex-1 basis-64 text-[15px] text-tinta">
-                <span className="font-semibold">O plano de trabalho ainda não foi definido.</span> Diga à IA quando o projeto começa e termina, e ela divide as etapas
-                pela carga horária. Ou preencha as datas abaixo.
+                <span className="font-semibold">O plano de trabalho ainda não foi definido.</span> Diga à IA quando o projeto começa e termina, e ela divide as
+                etapas pela carga horária. Ou preencha as datas abaixo.
               </p>
               <Botao onClick={desenvolver} className="w-full sm:w-auto">
                 Definir com a IA

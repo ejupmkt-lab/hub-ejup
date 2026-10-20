@@ -121,5 +121,12 @@ export function situacaoProjeto(p: Projeto, hoje = hojeIso()): SituacaoProjeto {
 // Nome do serviço contratado, para distinguir os projetos de um mesmo cliente
 export const servicoDoProjeto = (p: Projeto) => p.servicoNome || modeloPorId(p.modeloId)?.nomeCurto || p.fichaTecnica;
 
+// Código do pedido no HUB: é o mesmo número do projeto no HUB (projetos
+// antigos podem ter só um dos dois campos preenchidos)
+export const codigoHub = (p: Projeto) => (p.codigoSolicitacaoHub || p.numeroProjetoHub || "").trim();
+
+// Uma visita por etapa do serviço (cada etapa tem o seu relatório)
+export const visitasDoProjeto = (p: Projeto) => p.etapas.length;
+
 // Até 3 projetos em andamento por cliente; um 4º só excepcionalmente
 export const LIMITE_PROJETOS_CLIENTE = 3;

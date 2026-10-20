@@ -1,4 +1,4 @@
-import { Marca } from "@/components/icones";
+import { LogoBlimp } from "@/components/logo";
 
 // Tela de entrada: à esquerda a identidade e as etapas da consultoria; à direita o formulário.
 const etapas = [
@@ -11,14 +11,11 @@ const etapas = [
 
 export function TelaAcesso({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
-    <div className="grid min-h-screen bg-pedra lg:grid-cols-[1.1fr_1fr]">
+    <div className="grid min-h-screen grid-rows-[auto_1fr] bg-pedra lg:grid-cols-[1.1fr_1fr] lg:grid-rows-none">
       <div className="flex flex-col justify-between bg-gradient-to-br from-marinho to-azul px-6 py-8 text-folha sm:px-14 lg:py-14">
-        <div className="flex items-center gap-3">
-          <Marca className="h-10 w-10" claro />
-          <div>
-            <p className="text-xl font-bold leading-none">Blimp</p>
-            <p className="mt-1 text-[13px] text-folha/75">Sistema de gestão de projetos e consultorias</p>
-          </div>
+        <div>
+          <LogoBlimp className="h-10 w-auto" claro />
+          <p className="mt-2 text-[13px] text-folha/75">Sistema de gestão de projetos e consultorias</p>
         </div>
         <div className="mt-16 hidden lg:block" aria-hidden>
           <div className="flex gap-1.5">

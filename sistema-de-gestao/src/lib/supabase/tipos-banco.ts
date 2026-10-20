@@ -103,6 +103,26 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"gestores_sebrae": {
+                  Row: {
+                    "created_at": string,"empresa": string,"id": string,"nome": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"empresa": string,"id"?: string,"nome": string
+                  }
+                  Update: {
+                    "created_at"?: string,"empresa"?: string,"id"?: string,"nome"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "gestores_sebrae_empresa_fkey"
+      columns: ["empresa"]
+isOneToOne: false
+      referencedRelation: "empresas"
+      referencedColumns: ["slug"]
+    }
+                  ]
                 },"membros": {
                   Row: {
                     "empresa": string,"papel": Database["public"]['Enums']["papel_membro"],"user_id": string

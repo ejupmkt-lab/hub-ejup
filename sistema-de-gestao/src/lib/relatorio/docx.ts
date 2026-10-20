@@ -229,7 +229,7 @@ export function corpoRelatorio({ projeto, etapa, cliente, consultor, imagens = [
     ["Contato", cliente.email],
     ["Endereço", [cliente.endereco, cliente.cidadeUf, cliente.cep && `CEP ${cliente.cep}`].filter(Boolean).join(", ")],
     ["Gestora Sebrae", projeto.gestorSebrae],
-    ["Projeto HUB", projeto.numeroProjetoHub],
+    ["Projeto HUB", projeto.codigoSolicitacaoHub || projeto.numeroProjetoHub],
     ["Ficha técnica", projeto.fichaTecnica],
     ["Código da ficha técnica", projeto.codigoFichaTecnica],
     ["Segmento", projeto.segmento],
