@@ -131,15 +131,30 @@ export type RegistroAtividade = {
   registradoPor: string;
 };
 
-// Antes da consultoria: o diagnóstico (pré-contratual, assinado só pelo
-// consultor) vai ao HUB, o gestor do SEBRAE aprova e o cliente paga. Projetos
-// sem este campo são anteriores a ele e já estavam contratados.
+// Onde o projeto está no HUB SEBRAE: as 6 etapas do HUB, cada uma dividida
+// em passos que dizem com quem está a bola (consultor, gestor do SEBRAE,
+// FUNCERN ou cliente). Guarda a data em que o projeto chegou a cada passo.
+export type PassoHub =
+  | "solicitacao" // 1 Solicitação aberta: o gestor analisa o pedido do cliente
+  | "diagnostico" // 2 Diagnóstico: o consultor elabora
+  | "diagnostico_enviado" // 2 Diagnóstico: o gestor analisa a viabilidade
+  | "proposta" // 3 Proposta: o consultor monta o plano de trabalho
+  | "proposta_funcern" // 3 Proposta: a FUNCERN lança o plano no HUB
+  | "proposta_cliente" // 3 Proposta: o cliente analisa e paga
+  | "execucao" // 4 Em execução: as etapas do serviço
+  | "finalizado" // 5 Projeto finalizado: o cliente avalia a consultoria
+  | "avaliado" // 5 Projeto finalizado: o gestor analisa as entregas
+  | "concluido"; // 6 Projeto concluído
+export type Hub = { passo: PassoHub; datas: Partial<Record<PassoHub, string>> };
+
+// Formato antigo (até a régua do HUB): só a fase pré-contratual. Lido para
+// os projetos que ainda o têm; ao mudar de passo, vira o campo "hub".
 export type SituacaoContratacao = "diagnostico" | "aguardando_aprovacao" | "aguardando_pagamento" | "contratado";
 export type Contratacao = {
   situacao: SituacaoContratacao;
-  enviadoEm: string | null; // diagnóstico enviado no HUB
-  aprovadoEm: string | null; // gestor aprovou a contratação
-  pagoEm: string | null; // cliente pagou: a consultoria começa
+  enviadoEm: string | null;
+  aprovadoEm: string | null;
+  pagoEm: string | null;
 };
 
 export type Projeto = {
@@ -149,7 +164,8 @@ export type Projeto = {
   modeloId: string; // id do serviço (área de Serviços)
   modeloVersao: number;
   servicoNome?: string; // nome curto do serviço quando o projeto foi criado
-  contratacao?: Contratacao;
+  hub?: Hub;
+  contratacao?: Contratacao; // formato antigo, só leitura
   consultorId: string;
   status: "aguardando_plano" | "em_andamento" | "encerrado";
   prestadoraVinculada: string;

@@ -10,13 +10,14 @@ import { automatizarEtapa, marcarAtividade } from "@/lib/regras-etapa";
 import { pendenciasDoGrupo } from "@/lib/painel";
 import { doisDigitos } from "@/lib/rotulos";
 import { servicoDoProjeto } from "@/lib/projeto";
-import { fases, faseDoProjeto } from "@/lib/fase";
+import { comQuem, comQuemTexto, diasNoPasso, fases, faseDoProjeto, tempoNoPasso } from "@/lib/fase";
+import { mensagemCobranca } from "@/lib/cobranca";
 import { useEmpresaAtual } from "@/lib/dados/empresa-atual";
-import { BotaoLink, Cabecalho, Cartao, Chip, Indicador, Segmentos, Vazio } from "@/components/ui";
+import { Botao, BotaoLink, Cabecalho, Cartao, Chip, Indicador, Segmentos, Vazio } from "@/components/ui";
 import { Pendencias } from "@/components/painel/pendencias";
 import { IconeSeta } from "@/components/icones";
 
-type Filtro = "todas" | "atrasadas";
+type Filtro = "comigo" | "atrasadas" | "aguardando";
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
 // Tarefas de cada projeto, só da fase em que ele está: o checklist pendente da
@@ -25,7 +26,8 @@ const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 export default function Tarefas() {
   const { estado, atualizar } = useEstado();
   const { empresa } = useEmpresaAtual();
-  const [filtro, setFiltro] = useState<Filtro>("todas");
+  const [filtro, setFiltro] = useState<Filtro>("comigo");
+  const [copiado, setCopiado] = useState<string | null>(null);
   // Marcadas nesta visita continuam à vista (riscadas) para dar para desfazer
   const [recentes, setRecentes] = useState<Set<string>>(new Set());
 
@@ -34,10 +36,10 @@ export default function Tarefas() {
   const entregas = pendenciasDoGrupo(projetos).filter((x) => x.grupo !== "andamento" && x.grupo !== "nao_iniciada").length;
   const chave = (p: Projeto, e: Etapa, codigo: string) => `${p.id}:${e.ordem}:${codigo}`;
 
-  const grupos = projetos
-    .map((p) => tarefasDoProjeto(p))
-    .filter((t): t is TarefasDoProjeto => !!t)
-    .filter((t) => filtro === "todas" || t.atrasada)
+  const todos = projetos.map((p) => tarefasDoProjeto(p)).filter((t): t is TarefasDoProjeto => !!t);
+  const nAguardando = todos.filter((t) => t.aguardando).length;
+  const grupos = todos
+    .filter((t) => (filtro === "aguardando" ? t.aguardando : filtro === "atrasadas" ? t.atrasada : !t.aguardando))
     .sort(
       (a, b) =>
         Number(b.atrasada) - Number(a.atrasada) ||
@@ -45,9 +47,20 @@ export default function Tarefas() {
         (a.etapa?.dataFim ?? "9").localeCompare(b.etapa?.dataFim ?? "9"),
     );
 
-  const nome = (p: Projeto) => {
-    const c = estado.clientes.find((x) => x.id === p.clienteId);
-    return c?.nomeFantasia || c?.razaoSocial || "Cliente";
+  const clienteDe = (p: Projeto) => estado.clientes.find((x) => x.id === p.clienteId);
+  const nome = (p: Projeto) => clienteDe(p)?.nomeFantasia || clienteDe(p)?.razaoSocial || "Cliente";
+
+  // Cobrar quem está com a bola: a mensagem vai para a área de transferência
+  const cobrar = async (p: Projeto) => {
+    const texto = mensagemCobranca(p, clienteDe(p));
+    if (!texto) return;
+    try {
+      await navigator.clipboard.writeText(texto);
+      setCopiado(p.id);
+      setTimeout(() => setCopiado(null), 2500);
+    } catch {
+      prompt("Copie a mensagem:", texto);
+    }
   };
 
   // Marcar a mãe marca as filhas pendentes; todas continuam à vista, riscadas
@@ -93,14 +106,21 @@ export default function Tarefas() {
             atual={filtro}
             aoTrocar={setFiltro}
             opcoes={[
-              { valor: "todas", rotulo: `Todas (${conta.total})` },
+              { valor: "comigo", rotulo: `Com você (${conta.total})` },
               { valor: "atrasadas", rotulo: `Atrasadas (${conta.atrasadas})` },
+              { valor: "aguardando", rotulo: `Aguardando outros (${nAguardando})` },
             ]}
           />
 
           {grupos.length === 0 ? (
-            <Vazio titulo={filtro === "atrasadas" ? "Nenhuma tarefa atrasada" : "Nenhuma tarefa pendente"}>
-              {filtro === "atrasadas" ? "Todas as tarefas estão dentro do prazo das etapas." : "Nenhum projeto em andamento nesta empresa."}
+            <Vazio
+              titulo={filtro === "atrasadas" ? "Nenhuma tarefa atrasada" : filtro === "aguardando" ? "Nenhum projeto aguardando outros" : "Nenhuma tarefa com você"}
+            >
+              {filtro === "atrasadas"
+                ? "Todas as tarefas estão dentro do prazo das etapas."
+                : filtro === "aguardando"
+                  ? "Nada parado com o gestor do SEBRAE, a FUNCERN ou o cliente."
+                  : "Nenhum projeto depende de você agora nesta empresa."}
             </Vazio>
           ) : (
             grupos.map((t) => {
@@ -108,9 +128,11 @@ export default function Tarefas() {
               const fase = faseDoProjeto(p);
               const itens = e ? e.atividades.filter((a) => a.status === "pendente" || recentes.has(chave(p, e, a.codigo))) : [];
               const feitas = e ? e.atividades.filter((a) => a.status !== "pendente").length : 0;
+              const com = comQuem(p);
+              const dias = diasNoPasso(p);
               const resumo =
-                fase !== "execucao"
-                  ? `${fases[fase].rotulo} · antes da contratação`
+                fase !== "execucao" || t.aguardando
+                  ? `${fases[fase].numero} ${fases[fase].rotulo}${com && com !== "consultor" ? ` · ${comQuemTexto(com)}` : ""}${dias !== null ? ` · ${tempoNoPasso(dias)}` : ""}`
                   : !p.planoFechadoEm
                     ? "Contratado · sem plano de trabalho"
                     : e
@@ -158,10 +180,21 @@ export default function Tarefas() {
                     </div>
                   ) : null}
                   <div className="flex flex-wrap items-center justify-between gap-3 border-t border-linha px-4 py-3 sm:px-5">
-                    <BotaoLink href={`/${p.empresa}/projetos/${p.id}#registrar`} tamanho="pequeno" className="w-full sm:w-auto">
-                      Continuar no Desenvolvimento
-                      <IconeSeta className="h-4 w-4" />
-                    </BotaoLink>
+                    {t.aguardando && mensagemCobranca(p, clienteDe(p)) ? (
+                      <span className="flex w-full flex-wrap gap-2 sm:w-auto">
+                        <Botao tamanho="pequeno" onClick={() => void cobrar(p)} className="flex-1 sm:flex-none">
+                          {copiado === p.id ? "Mensagem copiada" : `Cobrar ${com === "cliente" ? "o cliente" : com === "funcern" ? "a FUNCERN" : "o gestor"}`}
+                        </Botao>
+                        <BotaoLink href={`/${p.empresa}/projetos/${p.id}`} variante="secundario" tamanho="pequeno" className="flex-1 sm:flex-none">
+                          Abrir o projeto
+                        </BotaoLink>
+                      </span>
+                    ) : (
+                      <BotaoLink href={`/${p.empresa}/projetos/${p.id}#registrar`} tamanho="pequeno" className="w-full sm:w-auto">
+                        Continuar no Desenvolvimento
+                        <IconeSeta className="h-4 w-4" />
+                      </BotaoLink>
+                    )}
                     {e && itens.length > 0 && (
                       <Link href={`/${p.empresa}/projetos/${p.id}/etapas/${e.ordem}#checklist`} className="text-[13px] font-semibold text-azul hover:underline">
                         Checklist completo da etapa

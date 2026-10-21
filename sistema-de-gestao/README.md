@@ -23,14 +23,14 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   define a situação da empresa. Cada pessoa edita o próprio nome em "Meu perfil" (`atualizar_meu_perfil`).
 - **Tarefas**: o que fazer agora em cada projeto, só na fase em que ele está: o checklist pendente da
   etapa em curso ou o próximo passo (diagnóstico, plano de trabalho, relatório, envio), com "Continuar no
-  Desenvolvimento". Marcar uma atividade-mãe marca as filhas pendentes; a filha não marca a mãe.
+  Desenvolvimento"; o que depende do gestor, da FUNCERN ou do cliente fica em "Aguardando outros", com "Cobrar". Marcar uma atividade-mãe marca as filhas pendentes; a filha não marca a mãe.
 - **Painel** (página inicial de todos): projetos em andamento, tarefas pendentes do plano de trabalho,
   horas registradas e etapas atrasadas; depois, pendências, situação das etapas e carga por semana; por
   fim, um cartão por projeto com o avanço contra o previsto,
   a etapa, a entrega, os alertas (vermelho = devolução, laranja = atraso, verde = em dia) e o próximo
   passo. O avanço pesa cada etapa pelas horas: 40% pelo checklist e 60% pelo status do relatório
   (`avancoProjeto` em `src/lib/projeto.ts`); o previsto vem das datas do plano.
-- **Projetos** em lista, quadro (por etapa), plano de trabalho de todos (linha do tempo) e calendário de prazos.
+- **Projetos** em lista, quadro (por etapa do HUB), plano de trabalho de todos (linha do tempo) e calendário de prazos.
 - **Menu**: lateral no computador; no celular, menu inferior com o botão central **Desenvolver projeto**
   (abre o Desenvolvimento de qualquer projeto em andamento).
 - **Serviços** (tabela `servicos`, menu "Serviços"): as fichas técnicas que a empresa presta, em cartões
@@ -42,12 +42,17 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Clientes** com os campos do Modelo de Diagnóstico do HUB SEBRAE.
 - **Projetos** a partir dos serviços cadastrados; o primeiro é *Adequação à LGPD* (ficha 13070-5): 5
   etapas, 333 h, checklist de atividades e 23 entregáveis, com textos-padrão e referências próprios.
-- **Fases do projeto** (`src/lib/fase.ts`): antes da consultoria, a fase pré-contratual (diagnóstico no
-  modelo do SEBRAE, assinado só pelo consultor e enviado no HUB → aprovação do gestor → pagamento do
-  cliente), registrada no próprio projeto (cartão "Antes da consultoria", ficha do projeto ou conversa com a
-  IA); depois, a execução, com as etapas do serviço (2, 5, 8…). O painel mostra a fase de cada projeto e
-  uma linha por projeto com o diagnóstico (D) e as etapas do serviço dele; o quadro de projetos tem
-  colunas para as fases e para as etapas até a do maior serviço.
+- **Régua do HUB** (`src/lib/fase.ts`): todo projeto segue as 6 etapas do HUB SEBRAE (1 Solicitação
+  aberta, 2 Diagnóstico, 3 Proposta, 4 Em execução, 5 Projeto finalizado, 6 Projeto concluído), cada uma
+  com passos que dizem com quem está a bola (você, o gestor do SEBRAE, a FUNCERN ou o cliente) e há
+  quantos dias. Cada passo é registrado com a data na linha do tempo do Desenvolvimento, pelo botão do
+  próximo passo ou pela conversa com a IA (`avancar_hub`); dá para voltar um passo. O plano de trabalho é
+  montado na proposta e enviado à FUNCERN, que lança no HUB; as datas dele são as oficiais e não são
+  recalculadas quando o cliente paga. O sistema avisa quando o pagamento sai depois do início previsto e
+  pede confirmação para enviar uma etapa ou finalizar o projeto antes do fim previsto (o gestor recusa a
+  nota quando muitas horas são entregues em poucos dias). Projetos do formato antigo (`contratacao`) são
+  lidos como o passo equivalente. Em Tarefas, "Aguardando outros" junta o que está com terceiros, com a
+  mensagem pronta para cobrar (`src/lib/cobranca.ts`); o quadro de projetos tem uma coluna por etapa do HUB.
 - **Projeto novo**: escolhe o serviço, o cliente, o consultor e onde o projeto está no HUB (começa no
   diagnóstico); as horas de cada etapa vêm da ficha ou da proposta (editáveis também no plano de trabalho); o código do pedido no HUB é um campo só (o
   mesmo número do projeto no HUB); o número de visitas é o de etapas do serviço (uma por etapa); o gestor

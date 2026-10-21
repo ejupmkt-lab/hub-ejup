@@ -3,7 +3,8 @@ import { dataCurta } from "./datas";
 import { doisDigitos, type StatusEtapa, type Tom } from "./rotulos";
 import { etapaAtual, progressoAtividades } from "./projeto";
 import { assinada } from "./regras-etapa";
-import { faseDoProjeto } from "./fase";
+import { avisoFinalizarAntecipado, passoHubDoProjeto } from "./fase";
+import type { PassoHub } from "./dados/tipos";
 import { verificarCompletude } from "./relatorio/secoes";
 
 // O que fazer agora, em uma frase e um botão. Usado no painel, na lista de
@@ -41,7 +42,7 @@ export type Passo = {
   href: string;
   aba?: AbaEtapa; // na própria etapa: aba a abrir
   acao?: StatusEtapa; // na própria etapa: muda o status direto
-  encerrar?: boolean; // no projeto: encerra (com confirmação)
+  hub?: PassoHub; // no projeto: registra o próximo passo do HUB (com a data de hoje)
 };
 
 // Onde cada tipo de pendência se resolve: aba da etapa ou aba do projeto
@@ -81,12 +82,11 @@ export function passoDaEtapa(p: Projeto, e: Etapa): Passo | null {
     };
   if (e.status === "enviada")
     return {
-      texto: "Enviada no HUB, aguardando o SEBRAE",
-      detalhe: "Quando o SEBRAE aprovar, registre aqui. Se devolver, use o aviso abaixo da sequência.",
-      rotulo: "Marcar como aprovada",
+      texto: "Enviada no Plano de Entrega do HUB",
+      detalhe: "O gestor analisa as entregas depois que o projeto é finalizado e o cliente avalia. Se ele devolver, registre aqui.",
+      rotulo: "Abrir o projeto",
       tom: "ok",
-      href: daEtapa("Fechamento"),
-      acao: "aprovada",
+      href: base,
     };
 
   // Etapa futura, ainda não começada, enquanto outra está em curso
@@ -168,54 +168,101 @@ export function passoDaEtapa(p: Projeto, e: Etapa): Passo | null {
 export function passoDoProjeto(p: Projeto): (Passo & { etapa?: Etapa }) | null {
   if (p.status === "encerrado") return null;
   const base = `/${p.empresa}/projetos/${p.id}`;
-  // Antes da contratação: diagnóstico, aprovação do gestor e pagamento
-  const fase = faseDoProjeto(p);
-  if (fase === "diagnostico")
+  // A régua do HUB: antes e depois da execução, o passo é o do HUB
+  const hub = passoHubDoProjeto(p);
+  const desenvolvimento = `${base}#desenvolvimento`;
+  if (hub === "solicitacao")
+    return {
+      texto: "Aguardando o gestor do SEBRAE enviar a demanda",
+      detalhe: "O cliente pediu no HUB e o gestor analisa se é viável.",
+      rotulo: "O gestor me enviou",
+      tom: "neutro",
+      href: desenvolvimento,
+      hub: "diagnostico",
+    };
+  if (hub === "diagnostico")
     return {
       texto: "Elabore o diagnóstico e envie no HUB",
-      detalhe: "Fase pré-contratual: o diagnóstico segue o modelo do SEBRAE e é assinado só pelo consultor.",
+      detalhe: "O diagnóstico segue o modelo do SEBRAE e é assinado só pelo consultor.",
       rotulo: "Abrir o diagnóstico",
       tom: "atencao",
-      href: `${base}#desenvolvimento`,
+      href: desenvolvimento,
     };
-  if (fase === "aguardando_aprovacao")
+  if (hub === "diagnostico_enviado")
     return {
-      texto: "Aguardando o gestor aprovar o diagnóstico no HUB",
-      detalhe: "Quando o gestor liberar a contratação, registre aqui.",
-      rotulo: "Registrar a aprovação",
+      texto: "Aguardando o gestor analisar a viabilidade do diagnóstico",
+      detalhe: "Quando ele pedir a proposta, registre aqui e monte o plano de trabalho.",
+      rotulo: "O gestor pediu a proposta",
       tom: "neutro",
-      href: `${base}#desenvolvimento`,
+      href: desenvolvimento,
+      hub: "proposta",
     };
-  if (fase === "aguardando_pagamento")
+  if (hub === "proposta")
+    return p.planoFechadoEm
+      ? {
+          texto: "Envie o plano de trabalho à FUNCERN",
+          detalhe: "A FUNCERN é quem lança a proposta no HUB.",
+          rotulo: "Enviei à FUNCERN",
+          tom: "atencao",
+          href: desenvolvimento,
+          hub: "proposta_funcern",
+        }
+      : {
+          texto: "Monte o plano de trabalho da proposta",
+          detalhe: "As horas e as datas de cada etapa. Essas datas são as oficiais: o gestor confere as entregas com elas.",
+          rotulo: "Montar o plano de trabalho",
+          tom: "atencao",
+          href: `${base}#plano`,
+        };
+  if (hub === "proposta_funcern")
     return {
-      texto: "Aguardando o cliente pagar no HUB",
-      detalhe: "Com o pagamento, a consultoria começa: registre aqui e defina o plano de trabalho.",
-      rotulo: "Registrar o pagamento",
+      texto: "Aguardando a FUNCERN lançar a proposta no HUB",
+      detalhe: "Depois, o cliente analisa o valor e paga.",
+      rotulo: "A FUNCERN lançou",
       tom: "neutro",
-      href: `${base}#desenvolvimento`,
+      href: desenvolvimento,
+      hub: "proposta_cliente",
+    };
+  if (hub === "proposta_cliente")
+    return {
+      texto: "Aguardando o cliente analisar a proposta e pagar no HUB",
+      detalhe: "Com o pagamento, a execução começa. As datas do plano de trabalho não mudam.",
+      rotulo: "O cliente pagou",
+      tom: "neutro",
+      href: desenvolvimento,
+      hub: "execucao",
     };
   if (p.status === "aguardando_plano" || !p.planoFechadoEm) return passoDaEtapa(p, p.etapas[0]);
   // Devolução tem prioridade sobre a etapa em curso
   const devolvida = p.etapas.find((e) => e.status === "devolvida");
   const et = devolvida ?? etapaAtual(p);
   if (!et) {
-    const aguardando = p.etapas.find((e) => e.status === "enviada");
-    if (aguardando)
+    if (hub === "finalizado")
       return {
-        texto: "Todas as entregas foram enviadas",
-        detalhe: `Falta o SEBRAE aprovar a etapa ${doisDigitos(aguardando.ordem)}. Depois, encerre o projeto.`,
-        rotulo: `Abrir a etapa ${doisDigitos(aguardando.ordem)}`,
-        tom: "ok",
-        href: `${base}/etapas/${aguardando.ordem}`,
-        etapa: aguardando,
+        texto: "Aguardando o cliente avaliar a consultoria no HUB",
+        detalhe: "Só depois da avaliação o gestor analisa as entregas e conclui o projeto.",
+        rotulo: "O cliente avaliou",
+        tom: "neutro",
+        href: base,
+        hub: "avaliado",
       };
+    if (hub === "avaliado")
+      return {
+        texto: "Aguardando o gestor analisar as entregas e concluir",
+        detalhe: "Projetos concluídos até o dia 20 entram no recebimento do mês seguinte.",
+        rotulo: "O gestor concluiu",
+        tom: "neutro",
+        href: base,
+        hub: "concluido",
+      };
+    const cedo = avisoFinalizarAntecipado(p);
     return {
-      texto: "Todas as entregas foram aprovadas",
-      detalhe: "Encerre o projeto para tirá-lo da lista de projetos em andamento.",
-      rotulo: "Encerrar projeto",
-      tom: "ok",
+      texto: "Todas as etapas foram enviadas: finalize o projeto no HUB",
+      detalhe: cedo ?? "Depois de finalizar, o cliente avalia a consultoria.",
+      rotulo: "Finalizei no HUB",
+      tom: cedo ? "atencao" : "ok",
       href: base,
-      encerrar: true,
+      hub: "finalizado",
     };
   }
   const passo = passoDaEtapa(p, et);

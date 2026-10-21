@@ -20,7 +20,7 @@ export const ordemStatusEtapa = Object.keys(statusEtapa) as StatusEtapa[];
 export const statusProjeto = {
   aguardando_plano: "Aguardando plano de trabalho",
   em_andamento: "Em andamento",
-  encerrado: "Encerrado",
+  encerrado: "Concluído",
 } as const;
 
 export const statusEmpresa = {

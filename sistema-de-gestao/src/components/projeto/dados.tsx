@@ -3,8 +3,8 @@
 import { traduzirErro } from "@/lib/erros";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { Projeto, SituacaoContratacao } from "@/lib/dados/tipos";
-import { mudarContratacao } from "@/lib/fase";
+import type { PassoHub, Projeto } from "@/lib/dados/tipos";
+import { mudarHub, ordemPassos, passoHubDoProjeto, rotuloPassoHub } from "@/lib/fase";
 import { hojeIso } from "@/lib/datas";
 import { useAcesso, useEstado } from "@/lib/dados/store";
 import { Botao, Campo, Cartao } from "@/components/ui";
@@ -77,22 +77,24 @@ export function DadosProjeto({ projeto }: { projeto: Projeto }) {
               ))}
             </select>
           </Campo>
-          <Campo rotulo="Onde o projeto está no HUB" className="sm:col-span-2" dica="Antes da contratação: diagnóstico, aprovação do gestor e pagamento do cliente.">
+          <Campo
+            rotulo="Onde o projeto está no HUB"
+            className="sm:col-span-2"
+            dica="Para corrigir. No dia a dia, registre cada passo na linha do tempo do Desenvolvimento."
+          >
             <select
               className="campo"
-              value={projeto.contratacao?.situacao ?? "contratado"}
+              value={passoHubDoProjeto(projeto)}
               onChange={(e) => {
-                const para = e.target.value as SituacaoContratacao;
-                alterar((p) => void (p.contratacao = mudarContratacao(p.contratacao, para, hojeIso())), {
-                  acao: "Situação no HUB alterada",
-                  detalhe: e.target.selectedOptions[0]?.text,
-                });
+                const para = e.target.value as PassoHub;
+                alterar((p) => mudarHub(p, para, hojeIso()), { acao: "Passo no HUB corrigido", detalhe: rotuloPassoHub(para) });
               }}
             >
-              <option value="diagnostico">Diagnóstico em elaboração (pré-contratual)</option>
-              <option value="aguardando_aprovacao">Diagnóstico enviado, aguardando o gestor</option>
-              <option value="aguardando_pagamento">Aprovado, aguardando o pagamento do cliente</option>
-              <option value="contratado">Contratado: o cliente já pagou</option>
+              {ordemPassos.map((s) => (
+                <option key={s} value={s}>
+                  {rotuloPassoHub(s)}
+                </option>
+              ))}
             </select>
           </Campo>
           <Campo rotulo="Código do pedido no HUB" dica="É o mesmo número do projeto no HUB.">

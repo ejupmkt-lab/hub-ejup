@@ -8,9 +8,9 @@ import type { EmpresaSlug, Projeto } from "@/lib/dados/tipos";
 import { etapasDoModelo } from "@/lib/modelos/instanciar";
 import { LIMITE_PROJETOS_CLIENTE } from "@/lib/projeto";
 import { horasDoServico, ID_SERVICO_LGPD, servicosDaEmpresa } from "@/lib/servicos";
-import { contratacaoInicial, fases } from "@/lib/fase";
+import { fases, hubInicial, ordemPassos, passosHub, rotuloPassoHub } from "@/lib/fase";
 import { hojeIso } from "@/lib/datas";
-import type { SituacaoContratacao } from "@/lib/dados/tipos";
+import type { PassoHub } from "@/lib/dados/tipos";
 import { normasPadrao, referenciasPadrao } from "@/lib/relatorio/padroes";
 import { Botao, BotaoLink, Cabecalho, Campo, Vazio } from "@/components/ui";
 import { EscolherGestorSebrae } from "@/components/projeto/gestor-sebrae";
@@ -33,7 +33,7 @@ function Conteudo() {
     gestorSebrae: "",
     segmento: "",
     areaAtuacao: "",
-    situacao: "diagnostico" as SituacaoContratacao, // onde o projeto está no HUB
+    situacao: "diagnostico" as PassoHub, // onde o projeto está no HUB
   });
   // Horas de cada etapa: as da ficha do serviço, ou as da proposta (quando a ficha não traz)
   const [horas, setHoras] = useState<Record<string, string>>({});
@@ -82,7 +82,7 @@ function Conteudo() {
         localAssinatura: "Natal/RN",
         planoFechadoEm: null,
         etapas: etapasDoModelo(modelo).map((e) => ({ ...e, horasPrevistas: Number(horaDaEtapa(e.ordem, e.horasPrevistas).replace(",", ".")) || 0 })),
-        contratacao: contratacaoInicial(f.situacao, hojeIso()),
+        hub: hubInicial(f.situacao, hojeIso()),
         registros: lgpd ? normasPadrao().map((r) => ({ ...r, id: novoId("reg") })) : [],
         referencias: lgpd ? referenciasPadrao().map((r) => ({ ...r, id: novoId("ref") })) : [],
         historico: [],
@@ -163,12 +163,13 @@ function Conteudo() {
             </fieldset>
             <fieldset className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
               <legend className="mb-3 text-[15px] font-medium">Dados do HUB SEBRAE</legend>
-              <Campo rotulo="Onde o projeto está no HUB" className="sm:col-span-2" dica={fases[f.situacao === "contratado" ? "execucao" : f.situacao].descricao}>
+              <Campo rotulo="Onde o projeto está no HUB" className="sm:col-span-2" dica={fases[passosHub[f.situacao].fase].descricao}>
                 <select className="campo" value={f.situacao} onChange={set("situacao")}>
-                  <option value="diagnostico">Diagnóstico em elaboração (pré-contratual)</option>
-                  <option value="aguardando_aprovacao">Diagnóstico enviado, aguardando o gestor</option>
-                  <option value="aguardando_pagamento">Aprovado, aguardando o pagamento do cliente</option>
-                  <option value="contratado">Contratado: o cliente já pagou</option>
+                  {ordemPassos.slice(0, ordemPassos.indexOf("execucao") + 1).map((s) => (
+                    <option key={s} value={s}>
+                      {rotuloPassoHub(s)}
+                    </option>
+                  ))}
                 </select>
               </Campo>
               <Campo rotulo="Código do pedido no HUB" dica="É o mesmo número do projeto no HUB.">

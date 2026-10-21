@@ -94,7 +94,7 @@ export default function Painel() {
             <Secao titulo="Pendências" descricao="Devoluções, atrasos, envios e prazos da semana.">
               <Pendencias projetos={projetos} />
             </Secao>
-            <Secao titulo="Fase dos projetos" descricao="Do diagnóstico à execução da consultoria.">
+            <Secao titulo="Situação no HUB" descricao="As etapas do HUB SEBRAE, da solicitação à conclusão.">
               <FasesDosProjetos projetos={projetos} />
             </Secao>
             <Secao titulo="Carga de trabalho por semana">

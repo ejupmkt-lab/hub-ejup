@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { supabaseServidor } from "@/lib/supabase/servidor";
 import type { Cliente, Etapa, Projeto, Servico } from "@/lib/dados/tipos";
-import { antesDaContratacao, faseDoProjeto, fases } from "@/lib/fase";
+import { antesDaContratacao, comQuem, faseDoProjeto, fases, passoHubDoProjeto, passosHub } from "@/lib/fase";
 import type { Anexo, ItemAcao } from "@/lib/conversa";
 import { todasSecoes } from "@/lib/relatorio/secoes";
 import { formatarData, hojeIso } from "@/lib/datas";
@@ -26,9 +26,16 @@ O que fazer com cada mensagem:
 4. Guarde cada foto anexada como evidência da etapa certa, com uma legenda curta no estilo do relatório (ex.: "Reunião de levantamento com a diretoria em 20/10/2026"). Se a foto não servir de evidência (ex.: foto de tela sem relação), não guarde e diga por quê.
 5. Quando a mensagem trouxer conteúdo suficiente, escreva ou atualize as seções do relatório e os entregáveis da etapa, seguindo o modelo (título e orientação de cada seção). Ao atualizar, devolva o texto completo da seção, juntando o que já existia com o novo. Não reescreva seções sem necessidade.
 6. Plano de trabalho (as datas das etapas): se ele ainda não foi definido e o consultor disser quando o projeto começa (e, se souber, quando termina), use "definir_cronograma" com as datas; o sistema divide o período entre as etapas pela carga horária (sem a data de fim, pela duração de referência). Deixe "fim" vazio se ele não disser. Se o plano já existe e uma etapa mudar de datas, use "alterar_datas_etapa" com a justificativa dele, mandando as novas datas de todas as etapas afetadas, para que continuem em sequência e sem sobreposição.
-7. Fechamento da etapa: quando o consultor mandar o PDF do relatório assinado no gov.br, ou disser as datas das assinaturas, use "registrar_assinatura" (anexo = id do PDF, ou vazio; datas vazias quando não ditas). Quando ele disser que enviou o relatório no HUB, use "mudar_situacao_etapa" com "enviada"; quando disser que o SEBRAE aprovou, "aprovada"; quando disser que o SEBRAE devolveu, "devolvida", com o pedido de ajuste na observação. O sistema confere se o relatório está completo e assinado antes de aceitar.
-8. Nunca altere etapas enviadas ou aprovadas, a não ser para registrar a aprovação ou a devolução do SEBRAE.
-9. Antes da consultoria há a fase pré-contratual: o consultor elabora o diagnóstico no modelo do SEBRAE (justificando por que a solicitação do cliente é válida, com o que ele mapeou), assina sozinho e envia no HUB; o gestor do SEBRAE aprova a contratação; o cliente paga no HUB. Quando o consultor disser que enviou o diagnóstico, que o gestor aprovou ou que o cliente pagou, use "atualizar_contratacao" com a nova situação ("aguardando_aprovacao", "aguardando_pagamento" ou "contratado") e a data. Nessa fase, ajude a escrever o diagnóstico usando o que ele contar e as perguntas do pré-diagnóstico da ficha; não marque checklist nem escreva relatórios de etapa antes da contratação.
+7. Fechamento da etapa: quando o consultor mandar o PDF do relatório assinado no gov.br, ou disser as datas das assinaturas, use "registrar_assinatura" (anexo = id do PDF, ou vazio; datas vazias quando não ditas). Quando ele disser que enviou o relatório no Plano de Entrega do HUB, use "mudar_situacao_etapa" com "enviada"; quando disser que o gestor devolveu uma entrega, "devolvida", com o pedido de ajuste na observação ("aprovada" só se ele disser que o gestor aprovou aquela etapa). O sistema confere se o relatório está completo e assinado antes de aceitar.
+8. Nunca altere etapas enviadas ou aprovadas, a não ser para registrar uma devolução ou aprovação do gestor.
+9. O projeto segue as 6 etapas do HUB SEBRAE, e você registra cada passo com "avancar_hub" (o passo novo e a data) quando o consultor contar que aconteceu:
+   - 1 Solicitação aberta ("solicitacao"): o cliente pediu e o gestor do SEBRAE analisa. Quando o gestor enviar a demanda ao consultor: "diagnostico".
+   - 2 Diagnóstico: o consultor elabora o diagnóstico no modelo do SEBRAE (justificando por que a solicitação do cliente é válida, com o que ele mapeou), assina sozinho e envia no HUB: "diagnostico_enviado". O gestor analisa a viabilidade e pede a proposta: "proposta".
+   - 3 Proposta: o consultor monta o plano de trabalho (horas e datas de cada etapa) e envia à FUNCERN, não ao HUB: "proposta_funcern". A FUNCERN lança no HUB: "proposta_cliente". O cliente analisa e paga: "execucao".
+   - 4 Em execução: as etapas do serviço, cada uma enviada no Plano de Entrega do HUB. Com todas enviadas, o consultor finaliza no HUB: "finalizado".
+   - 5 Projeto finalizado: o cliente avalia a consultoria ("avaliado") e depois o gestor analisa as entregas e conclui ("concluido"). Se o gestor devolver uma entrega, use "mudar_situacao_etapa" com "devolvida".
+   As datas do plano de trabalho são as oficiais: o gestor confere se as entregas são compatíveis com o período e recusa a nota quando muitas horas são entregues em poucos dias. Nunca recalcule o plano porque o cliente pagou mais tarde; avise se uma entrega estiver saindo antes do fim previsto da etapa.
+   Antes da execução, ajude a escrever o diagnóstico (usando o que ele contar e as perguntas do pré-diagnóstico da ficha) e a montar o plano de trabalho; não marque checklist nem escreva relatórios de etapa. Quando algo depender do gestor, da FUNCERN ou do cliente, ofereça uma mensagem curta e cordial para cobrar.
 
 A resposta ao consultor ("resposta"): português claro e direto, em poucas linhas, sem Markdown. Diga o que você fez e qual é o próximo passo concreto para a etapa avançar (até a entrega final do projeto), e faça as perguntas necessárias. Se a mensagem for só uma pergunta, responda sem ações. Não repita a lista de ações em detalhe: o sistema já mostra cada alteração.
 
@@ -141,11 +148,11 @@ const ESQUEMA = {
           {
             type: "object",
             properties: {
-              tipo: { type: "string", const: "atualizar_contratacao" },
-              situacao: { type: "string", enum: ["aguardando_aprovacao", "aguardando_pagamento", "contratado"] },
+              tipo: { type: "string", const: "avancar_hub" },
+              passo: { type: "string", enum: ["diagnostico", "diagnostico_enviado", "proposta", "proposta_funcern", "proposta_cliente", "execucao", "finalizado", "avaliado", "concluido"] },
               data: { type: "string", format: "date" },
             },
-            required: ["tipo", "situacao", "data"],
+            required: ["tipo", "passo", "data"],
             additionalProperties: false,
           },
         ],
@@ -290,7 +297,7 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>, preDiagnostico: stri
     "## Projeto",
     `Serviço: ${p.fichaTecnica} (ficha técnica ${p.codigoFichaTecnica})`,
     linha("Código do pedido no HUB", p.codigoSolicitacaoHub || p.numeroProjetoHub),
-    `Fase: ${fases[faseDoProjeto(p)].rotulo}${antesDaContratacao(p) ? " (antes da contratação)" : ""}`,
+    `Etapa do HUB: ${fases[faseDoProjeto(p)].numero} ${fases[faseDoProjeto(p)].rotulo}; passo atual: "${passoHubDoProjeto(p)}" (${passosHub[passoHubDoProjeto(p)].rotulo}${comQuem(p) ? `; com quem está: ${comQuem(p)}` : ""})${antesDaContratacao(p) ? ", antes da contratação" : ""}`,
     preDiagnostico.length ? `Perguntas do pré-diagnóstico da ficha:\n${preDiagnostico.map((q, i) => `${i + 1}. ${q}`).join("\n")}` : null,
     `Plano de trabalho: ${p.planoFechadoEm ? "definido" : "ainda não definido"}`,
     `Etapa em curso: ${emCurso ? `${emCurso.ordem} (${emCurso.nome})` : "todas enviadas"}`,

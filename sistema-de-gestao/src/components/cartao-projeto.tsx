@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { faseDoProjeto, fases } from "@/lib/fase";
+import { comQuem, comQuemTexto, faseDoProjeto, fases } from "@/lib/fase";
 import type { Projeto } from "@/lib/dados/tipos";
 import { useEstado } from "@/lib/dados/store";
 import { formatarData } from "@/lib/datas";
@@ -88,9 +88,10 @@ export function CartaoProjeto({
 
       <div className="mt-3 space-y-1 text-sm text-tinta-2">
         <p>
-          {fase !== "execucao" && fase !== "encerrado" ? (
+          {fase !== "execucao" && fase !== "concluido" ? (
             <>
-              Fase: <span className="font-semibold text-tinta">{fases[fase].rotulo}</span>
+              No HUB: <span className="font-semibold text-tinta">{fases[fase].numero} {fases[fase].rotulo}</span>
+              {comQuem(p) && <span> · {comQuemTexto(comQuem(p)!)}</span>}
             </>
           ) : (
             <>

@@ -2,7 +2,7 @@ import { diferencaDias, hojeIso } from "./datas";
 import type { Etapa, Projeto } from "./dados/tipos";
 import type { Tom } from "./rotulos";
 import { modeloPorId } from "./modelos";
-import { faseDoProjeto, fases } from "./fase";
+import { comQuem, faseDoProjeto, fases, ondeEsta } from "./fase";
 
 const concluidas = new Set(["enviada", "aprovada"]);
 
@@ -40,8 +40,9 @@ export type Alerta = { projeto: Projeto; etapa?: Etapa; texto: string; tom: Tom;
 export function alertasDoProjeto(p: Projeto): Alerta[] {
   if (p.status === "encerrado") return [];
   const fase = faseDoProjeto(p);
-  if (fase !== "execucao") return [{ projeto: p, texto: fases[fase].rotulo, tom: fase === "diagnostico" ? "atencao" : "neutro", ordem: 3 }];
-  if (p.status === "aguardando_plano")
+  if (fase !== "execucao" && fase !== "finalizado")
+    return [{ projeto: p, texto: ondeEsta(p), tom: comQuem(p) === "consultor" ? "atencao" : "neutro", ordem: 3 }];
+  if (fase === "execucao" && p.status === "aguardando_plano")
     return [{ projeto: p, texto: "Definir o plano de trabalho para as etapas ganharem datas", tom: "atencao", ordem: 3 }];
   const lista: Alerta[] = [];
   for (const e of p.etapas) {
@@ -122,10 +123,11 @@ export function diasSemRegistro(p: Projeto, hoje = hojeIso()) {
 // Situação geral, nas três cores do painel: ponto crítico (devolução), atraso, em dia
 export type SituacaoProjeto = { tom: Tom; rotulo: string };
 export function situacaoProjeto(p: Projeto, hoje = hojeIso()): SituacaoProjeto {
-  if (p.status === "encerrado") return { tom: "ok", rotulo: "Encerrado" };
+  if (p.status === "encerrado") return { tom: "ok", rotulo: "Concluído" };
   const fase = faseDoProjeto(p);
-  if (fase !== "execucao") return { tom: "neutro", rotulo: fases[fase].curto };
+  if (fase !== "execucao" && fase !== "finalizado") return { tom: "neutro", rotulo: fases[fase].rotulo };
   if (p.etapas.some((e) => e.status === "devolvida")) return { tom: "critico", rotulo: "Devolvida pelo SEBRAE" };
+  if (fase === "finalizado") return { tom: "neutro", rotulo: "Finalizado" };
   if (!p.planoFechadoEm) return { tom: "neutro", rotulo: "Sem plano de trabalho" };
   if (p.etapas.some((e) => etapaAtrasada(e, hoje))) return { tom: "atencao", rotulo: "Atrasado" };
   return { tom: "ok", rotulo: "Em dia" };

@@ -83,7 +83,7 @@ export default function PaginaCliente() {
 
           {encerrados.length > 0 && (
             <section className="pt-2">
-              <h2 className="mb-2 text-lg font-bold">Encerrados</h2>
+              <h2 className="mb-2 text-lg font-bold">Concluídos</h2>
               <Cartao className="overflow-hidden">
                 <ul className="divide-y divide-linha">
                   {encerrados.map((p) => (
@@ -99,7 +99,7 @@ export default function PaginaCliente() {
                             {formatarData(p.etapas[p.etapas.length - 1]?.dataFim)}
                           </span>
                         </span>
-                        <Chip tom="ok">Encerrado</Chip>
+                        <Chip tom="ok">Concluído</Chip>
                       </Link>
                     </li>
                   ))}

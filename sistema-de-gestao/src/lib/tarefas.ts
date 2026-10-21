@@ -1,7 +1,7 @@
 import type { Atividade, Etapa, Projeto } from "./dados/tipos";
 import { hojeIso } from "./datas";
 import { etapaAtrasada, etapaAtual } from "./projeto";
-import { faseDoProjeto } from "./fase";
+import { aguardandoOutros, faseDoProjeto } from "./fase";
 import { passoDoProjeto, type Passo } from "./proximo-passo";
 
 // Tarefas: o que fazer agora em cada projeto, só na fase em que ele está.
@@ -15,7 +15,7 @@ export type TarefasDoProjeto = {
   etapa?: Etapa; // etapa em curso (ou devolvida), quando há
   itens: Tarefa[]; // checklist pendente da etapa
   passo: Passo | null; // quando não há checklist pendente: o próximo passo
-  aguardando: boolean; // depende do gestor, do cliente ou do SEBRAE
+  aguardando: boolean; // depende do gestor do SEBRAE, da FUNCERN ou do cliente
   atrasada: boolean;
 };
 
@@ -28,10 +28,10 @@ export function tarefasDoProjeto(p: Projeto, hoje = hojeIso()): TarefasDoProjeto
   if (p.status === "encerrado") return null;
   const fase = faseDoProjeto(p);
   const passo = passoDoProjeto(p);
-  const aguardando = fase === "aguardando_aprovacao" || fase === "aguardando_pagamento";
-  if (fase !== "execucao" || !p.planoFechadoEm) return { projeto: p, itens: [], passo, aguardando, atrasada: false };
+  const aguardando = aguardandoOutros(p);
+  if ((fase !== "execucao" && fase !== "finalizado") || !p.planoFechadoEm) return { projeto: p, itens: [], passo, aguardando, atrasada: false };
   const e = etapaDoMomento(p);
-  if (!e) return { projeto: p, itens: [], passo, aguardando: true, atrasada: false };
+  if (!e) return { projeto: p, itens: [], passo, aguardando, atrasada: false };
   const atrasada = etapaAtrasada(e, hoje);
   const itens = e.atividades.flatMap((atividade, indice) => (atividade.status === "pendente" ? [{ projeto: p, etapa: e, atividade, indice, atrasada }] : []));
   return { projeto: p, etapa: e, itens, passo, aguardando: e.status === "enviada", atrasada };

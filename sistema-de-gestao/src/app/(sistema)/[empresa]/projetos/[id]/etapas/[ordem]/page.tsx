@@ -17,6 +17,7 @@ import { gerarDocx } from "@/lib/relatorio/docx";
 import { periodoCurto } from "@/lib/datas";
 import { doisDigitos, statusEtapa, type StatusEtapa } from "@/lib/rotulos";
 import { progressoAtividades, situacaoPrazo } from "@/lib/projeto";
+import { avisoEnvioAntecipado } from "@/lib/fase";
 import { useEstado } from "@/lib/dados/store";
 import type { Etapa } from "@/lib/dados/tipos";
 import { Abas, Barra, Botao, BotaoLink, Cabecalho, Campo, ProximoPasso, Selo, Status, Vazio } from "@/components/ui";
@@ -112,6 +113,9 @@ export default function PaginaEtapa() {
   // Voltar de uma devolução descarta as assinaturas e o PDF antigos.
   const definirStatus = (s: StatusEtapa) => {
     if (s === "devolvida" && !confirm("Registrar que o SEBRAE devolveu esta entrega para ajuste?")) return;
+    // As datas do plano são as oficiais: enviar antes do fim previsto pode levar o gestor a recusar a nota
+    const cedo = s === "enviada" ? avisoEnvioAntecipado(etapa) : null;
+    if (cedo && !confirm(`${cedo}\n\nMarcar como enviada mesmo assim?`)) return;
     const retomando = etapa.status === "devolvida" && s === "em_redacao";
     if (
       retomando &&

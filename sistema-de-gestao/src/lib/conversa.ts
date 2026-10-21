@@ -1,5 +1,5 @@
-import type { Atividade, Contratacao, Etapa, Projeto, RelatorioAssinado, TipoAtividade } from "./dados/tipos";
-import { faseDoProjeto, mudarContratacao, ordemContratacao } from "./fase";
+import type { Atividade, Contratacao, Etapa, Hub, PassoHub, Projeto, RelatorioAssinado, TipoAtividade } from "./dados/tipos";
+import { avisoEnvioAntecipado, avisoFinalizarAntecipado, avisoPagamentoTardio, bloqueioAte, mudarHub, ordemPassos, passoHubDoProjeto, registroHub } from "./fase";
 import { todasSecoes, verificarCompletude } from "./relatorio/secoes";
 import { assinada, automatizarEtapa, bloqueioStatus, marcarAtividade } from "./regras-etapa";
 import { doisDigitos, statusEtapa, type StatusEtapa as StatusEtapaTipo } from "./rotulos";
@@ -23,7 +23,7 @@ export type AcaoIA =
   | { tipo: "alterar_datas_etapa"; etapa: number; inicio: string; fim: string; justificativa: string }
   | { tipo: "registrar_assinatura"; etapa: number; anexo: string; data_consultor: string; data_cliente: string }
   | { tipo: "mudar_situacao_etapa"; etapa: number; situacao: "a_enviar" | "enviada" | "aprovada" | "devolvida"; observacao: string }
-  | { tipo: "atualizar_contratacao"; situacao: "aguardando_aprovacao" | "aguardando_pagamento" | "contratado"; data: string };
+  | { tipo: "avancar_hub"; passo: PassoHub; data: string };
 
 // O que a IA fez (ou tentou e o sistema não deixou, com o motivo)
 export type ItemAcao = { descricao: string; aviso?: boolean };
@@ -46,7 +46,7 @@ export type Desfazer =
       dataRelatorio: string | null;
     }
   | { tipo: "plano"; planoFechadoEm: string | null; status: Projeto["status"] }
-  | { tipo: "contratacao"; anterior: Contratacao | null }
+  | { tipo: "hub"; hub: Hub | null; contratacao: Contratacao | null; status: Projeto["status"] }
   | { tipo: "assinatura"; etapa: number; assinaturaConsultor: string | null; assinaturaCliente: string | null; relatorioAssinado: RelatorioAssinado | null };
 
 const concluida = (s: StatusEtapaTipo) => s === "enviada" || s === "aprovada";
@@ -82,20 +82,19 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
   if (p.status === "encerrado") return { itens, desfazer };
 
   acoes.forEach((a, i) => {
-    // Antes da consultoria: diagnóstico enviado, gestor aprovou, cliente pagou
-    if (a.tipo === "atualizar_contratacao") {
-      const antes = p.contratacao?.situacao ?? "contratado";
-      if (!ordemContratacao.includes(a.situacao) || ordemContratacao.indexOf(a.situacao) <= ordemContratacao.indexOf(antes)) return;
+    // Passos do HUB: diagnóstico enviado, proposta, FUNCERN, pagamento, finalização…
+    if (a.tipo === "avancar_hub") {
+      const atual = passoHubDoProjeto(p);
+      if (!ordemPassos.includes(a.passo) || ordemPassos.indexOf(a.passo) <= ordemPassos.indexOf(atual)) return;
+      const motivo = bloqueioAte(p, a.passo);
+      if (motivo) return avisar(`Não registrei “${registroHub[a.passo](a.data).split(" em ")[0]}”: ${motivo}`);
       const data = dataValida(a.data) ? a.data : hojeIso();
-      desfazer.push({ tipo: "contratacao", anterior: p.contratacao ? { ...p.contratacao } : null });
-      p.contratacao = mudarContratacao(p.contratacao, a.situacao, data);
-      feito(
-        a.situacao === "aguardando_aprovacao"
-          ? `Diagnóstico enviado no HUB em ${formatarData(data)}; aguardando o gestor`
-          : a.situacao === "aguardando_pagamento"
-            ? `Gestor aprovou a contratação em ${formatarData(data)}; aguardando o pagamento`
-            : `Cliente pagou em ${formatarData(data)}: a consultoria começou`,
-      );
+      const cedo = a.passo === "finalizado" ? avisoFinalizarAntecipado(p, data) : null;
+      desfazer.push({ tipo: "hub", hub: p.hub ? structuredClone(p.hub) : null, contratacao: p.contratacao ?? null, status: p.status });
+      mudarHub(p, a.passo, data);
+      feito(registroHub[a.passo](data));
+      const tarde = a.passo === "execucao" ? avisoPagamentoTardio(p) : null;
+      if (cedo ?? tarde) avisar((cedo ?? tarde)!);
       return;
     }
     // Cronograma do projeto inteiro: só enquanto o plano não foi definido
@@ -158,9 +157,11 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
         e.assinaturaCliente = null;
         e.relatorioAssinado = null;
       }
+      const cedo = a.situacao === "enviada" ? avisoEnvioAntecipado(e) : null;
       e.status = a.situacao;
       situacaoDefinida.add(e.ordem);
       feito(`${et} marcada como “${rotulo}”${a.observacao.trim() ? ` (${resumo(a.observacao.trim(), 120)})` : ""}`);
+      if (cedo) avisar(cedo);
       return;
     }
 
@@ -297,9 +298,12 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
 // Volta cada passo, do último para o primeiro
 export function desfazerAcoes(p: Projeto, passos: Desfazer[]) {
   for (const d of [...passos].reverse()) {
-    if (d.tipo === "contratacao") {
-      if (d.anterior) p.contratacao = d.anterior;
+    if (d.tipo === "hub") {
+      if (d.hub) p.hub = d.hub;
+      else delete p.hub;
+      if (d.contratacao) p.contratacao = d.contratacao;
       else delete p.contratacao;
+      p.status = d.status;
       continue;
     }
     if (d.tipo === "plano") {
@@ -348,16 +352,30 @@ export function desfazerAcoes(p: Projeto, passos: Desfazer[]) {
 export function sugestoesConversa(p: Projeto): string[] {
   if (p.status === "encerrado") return [];
   const nomeEtapa = (e: Etapa) => `Etapa ${doisDigitos(e.ordem)} (${e.nome.charAt(0)}${e.nome.slice(1).toLowerCase()})`;
-  const fase = faseDoProjeto(p);
-  if (fase === "diagnostico")
+  const hoje = formatarData(hojeIso());
+  const passo = passoHubDoProjeto(p);
+  if (passo === "solicitacao") return [`O gestor me enviou a demanda hoje (${hoje}).`, "O que preciso para começar o diagnóstico?"];
+  if (passo === "diagnostico")
     return [
       "Me ajude a montar o diagnóstico. O cliente pediu: __. O que mapeei: __.",
       "Por que esta solicitação se justifica para o cliente? Monte os argumentos.",
-      `Enviei o diagnóstico no HUB hoje (${formatarData(hojeIso())}).`,
+      `Enviei o diagnóstico no HUB hoje (${hoje}).`,
     ];
-  if (fase === "aguardando_aprovacao") return ["O gestor aprovou o diagnóstico hoje.", "O que acontece depois que o gestor aprovar?"];
-  if (fase === "aguardando_pagamento")
-    return [`O cliente pagou hoje (${formatarData(hojeIso())}).`, "O cliente pagou. A consultoria começa em __/__/____ e termina em __/__/____."];
+  if (passo === "diagnostico_enviado") return [`O gestor pediu a proposta hoje (${hoje}).`, "Como cobrar o gestor sobre a análise do diagnóstico?"];
+  if (passo === "proposta" && !p.planoFechadoEm)
+    return [
+      "O projeto começa em __/__/____ e termina em __/__/____. Monte o plano de trabalho da proposta.",
+      "Monte o plano de trabalho da proposta a partir de __/__/____, com a duração de referência das etapas.",
+      "Quantas horas vai cada etapa e por quê?",
+    ];
+  if (passo === "proposta") return [`Enviei o plano de trabalho à FUNCERN hoje (${hoje}).`, "Escreva a mensagem para enviar o plano de trabalho à FUNCERN."];
+  if (passo === "proposta_funcern") return [`A FUNCERN lançou a proposta no HUB hoje (${hoje}).`, "Escreva uma mensagem cobrando a FUNCERN sobre o lançamento da proposta."];
+  if (passo === "proposta_cliente")
+    return [`O cliente pagou hoje (${hoje}).`, "Escreva uma mensagem lembrando o cliente de analisar a proposta e pagar no HUB."];
+  if (passo === "finalizado" && etapaAtual(p)?.status !== "devolvida")
+    return [`O cliente avaliou a consultoria hoje (${hoje}).`, "Escreva uma mensagem pedindo ao cliente que avalie a consultoria no HUB."];
+  if (passo === "avaliado" && etapaAtual(p)?.status !== "devolvida")
+    return [`O gestor concluiu o projeto hoje (${hoje}).`, `O gestor devolveu a Etapa __ pedindo: __.`, "Faça um resumo final do projeto: o que foi feito em cada etapa e as horas."];
   if (!p.planoFechadoEm)
     return [
       `O projeto começa em ${formatarData(hojeIso())} e termina em __/__/____. Monte o plano de trabalho.`,
@@ -373,16 +391,10 @@ export function sugestoesConversa(p: Projeto): string[] {
     ];
 
   const e = etapaAtual(p);
-  if (!e) {
-    const enviada = p.etapas.find((x) => x.status === "enviada");
-    if (enviada) return [`O SEBRAE aprovou a Etapa ${doisDigitos(enviada.ordem)}.`, `O SEBRAE devolveu a Etapa ${doisDigitos(enviada.ordem)} pedindo: __.`];
-    return ["Faça um resumo final do projeto: o que foi feito em cada etapa e as horas."];
-  }
+  if (!e) return [`Finalizei o projeto no HUB hoje (${hoje}).`, "Faça um resumo final do projeto: o que foi feito em cada etapa e as horas."];
 
   const n = doisDigitos(e.ordem);
-  // Etapa anterior ainda aguardando o SEBRAE: lembrar da aprovação junto
-  const anterior = p.etapas.find((x) => x.ordem < e.ordem && x.status === "enviada");
-  const extra = anterior ? [`O SEBRAE aprovou a Etapa ${doisDigitos(anterior.ordem)}.`] : [];
+  const extra: string[] = [];
 
   // A atividade-mãe tem o texto mais curto; sem ela, a primeira subatividade pendente
   const pendente = e.atividades.find((a) => a.status === "pendente" && !a.codigo.includes(".")) ?? e.atividades.find((a) => a.status === "pendente");

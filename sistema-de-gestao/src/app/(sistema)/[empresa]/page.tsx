@@ -18,14 +18,21 @@ import {
   situacaoProjeto,
 } from "@/lib/projeto";
 import { doisDigitos } from "@/lib/rotulos";
-import { antesDaContratacao, faseDoProjeto, fases } from "@/lib/fase";
+import { aguardandoOutros, comQuem, diasNoPasso, faseDoProjeto, fases, ondeEsta, ordemFases, responsaveis, tempoNoPasso } from "@/lib/fase";
 import { Barra, BotaoLink, Cartao, Cabecalho, Status, Segmentos, Vazio, corTom } from "@/components/ui";
 import { Cronograma } from "@/components/painel/cronograma";
 import { CartaoProjeto } from "@/components/cartao-projeto";
 import { Calendario } from "@/components/painel/calendario";
 import { IconeBusca, IconeCalendario, IconeCronograma, IconeLista, IconeMaisSinal, IconeQuadro } from "@/components/icones";
 
-const situacoes = { andamento: "Ativos", diagnostico: "Diagnóstico", atrasados: "Atrasados", sem_plano: "Sem plano", encerrados: "Encerrados", todos: "Todos" } as const;
+const situacoes = {
+  andamento: "Ativos",
+  comigo: "Comigo",
+  aguardando: "Aguardando outros",
+  atrasados: "Atrasados",
+  encerrados: "Concluídos",
+  todos: "Todos",
+} as const;
 type Situacao = keyof typeof situacoes;
 
 const ordens = { urgencia: "Por urgência", nome: "Por nome", entrega: "Por entrega", avanco: "Por avanço" } as const;
@@ -50,8 +57,8 @@ export default function Projetos() {
     s === "todos" ||
     (s === "andamento" && p.status !== "encerrado") ||
     (s === "atrasados" && p.status !== "encerrado" && p.etapas.some((e) => etapaAtrasada(e) || e.status === "devolvida")) ||
-    (s === "diagnostico" && antesDaContratacao(p)) ||
-    (s === "sem_plano" && p.status === "aguardando_plano" && !antesDaContratacao(p)) ||
+    (s === "comigo" && p.status !== "encerrado" && comQuem(p) === "consultor") ||
+    (s === "aguardando" && aguardandoOutros(p)) ||
     (s === "encerrados" && p.status === "encerrado");
   const termo = busca.trim().toLowerCase();
   const urgencia = (p: Projeto) => Math.min(9, ...alertasDoProjeto(p).map((a) => a.ordem));
@@ -226,27 +233,12 @@ function Lista({ projetos, nome }: { projetos: Projeto[]; nome: (p: Projeto) => 
   );
 }
 
-// Quadro: uma coluna por fase e por número de etapa, como um kanban. Os
-// serviços têm quantidades de etapas diferentes, então as colunas vão até a
-// maior; cada cartão diz qual etapa e de quantas. No celular as colunas ficam
-// empilhadas; nas telas maiores, lado a lado, rolando de lado.
+// Quadro: uma coluna para cada etapa do HUB SEBRAE, como no próprio HUB. Cada
+// cartão diz o passo (ou a etapa do serviço), com quem está e há quantos dias.
+// No celular as colunas ficam empilhadas; nas telas maiores, lado a lado.
 function Quadro({ projetos, nome }: { projetos: Projeto[]; nome: (p: Projeto) => string }) {
-  const maxEtapas = Math.max(0, ...projetos.map((p) => p.etapas.length));
-  const coluna = (p: Projeto) => {
-    const fase = faseDoProjeto(p);
-    if (fase !== "execucao") return fase;
-    return !p.planoFechadoEm ? "sem_plano" : String(etapaAtual(p)?.ordem ?? "enviadas");
-  };
-  const fixas = ["diagnostico", "aguardando_aprovacao", "aguardando_pagamento", "sem_plano", "enviadas", "encerrado"];
-  const colunas = [
-    { id: "diagnostico", titulo: fases.diagnostico.rotulo },
-    { id: "aguardando_aprovacao", titulo: fases.aguardando_aprovacao.rotulo },
-    { id: "aguardando_pagamento", titulo: fases.aguardando_pagamento.rotulo },
-    { id: "sem_plano", titulo: "Sem plano de trabalho" },
-    ...Array.from({ length: maxEtapas }, (_, i) => ({ id: String(i + 1), titulo: `Etapa ${doisDigitos(i + 1)}` })),
-    { id: "enviadas", titulo: "Todas enviadas" },
-    { id: "encerrado", titulo: "Encerrados" },
-  ].filter((c) => !fixas.includes(c.id) || projetos.some((p) => coluna(p) === c.id));
+  const coluna = (p: Projeto) => faseDoProjeto(p);
+  const colunas = ordemFases.map((f) => ({ id: f, titulo: `${fases[f].numero} ${fases[f].rotulo}` }));
 
   return (
     <div className="md:overflow-x-auto md:pb-2">
@@ -271,9 +263,17 @@ function Quadro({ projetos, nome }: { projetos: Projeto[]; nome: (p: Projeto) =>
                       >
                         <span className="block break-words text-[15px] font-bold text-tinta">{nome(p)}</span>
                         <span className="block text-[13px] text-tinta-2">{servicoDoProjeto(p)}</span>
-                        {faseDoProjeto(p) === "execucao" && etapaAtual(p) && (
+                        {faseDoProjeto(p) === "execucao" && etapaAtual(p) ? (
                           <span className="mt-1 block break-words text-[13px] text-tinta">
                             {capitalizar(etapaAtual(p)!.nome)}, {etapaAtual(p)!.ordem} de {p.etapas.length}
+                          </span>
+                        ) : (
+                          p.status !== "encerrado" && <span className="mt-1 block break-words text-[13px] text-tinta">{ondeEsta(p)}</span>
+                        )}
+                        {comQuem(p) && comQuem(p) !== "consultor" && (
+                          <span className="num mt-0.5 block text-[12px] text-tinta-2">
+                            {responsaveis[comQuem(p)!]}
+                            {diasNoPasso(p) !== null && ` · ${tempoNoPasso(diasNoPasso(p)!)}`}
                           </span>
                         )}
                         <span className="mt-2 flex items-center gap-2">

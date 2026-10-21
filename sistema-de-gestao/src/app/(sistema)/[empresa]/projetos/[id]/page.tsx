@@ -12,8 +12,10 @@ import { DadosProjeto } from "@/components/projeto/dados";
 import { CronogramaProjeto } from "@/components/projeto/cronograma-projeto";
 import { Relatorios } from "@/components/projeto/relatorios";
 import { Conversa } from "@/components/projeto/conversa";
-import { ContratacaoProjeto } from "@/components/projeto/contratacao";
-import { antesDaContratacao, faseDoProjeto, fases } from "@/lib/fase";
+import { LinhaDoHub } from "@/components/projeto/linha-hub";
+import { guardarProjetoNaBiblioteca } from "@/components/projeto/sugestoes-biblioteca";
+import { antesDaContratacao, avisoFinalizarAntecipado, faseDoProjeto, fases, mudarHub, passoHubDoProjeto, passosHub, registroHub } from "@/lib/fase";
+import type { PassoHub } from "@/lib/dados/tipos";
 import { formatarData, diferencaDias, hojeIso } from "@/lib/datas";
 import { horasDoProjeto, horasFmt } from "@/lib/horas";
 import {
@@ -84,11 +86,12 @@ export default function PaginaProjeto() {
   const servico = servicoDoProjeto(projeto);
   const nomeCliente = cliente.nomeFantasia || cliente.razaoSocial;
 
-  // Encerrar só depois que o SEBRAE aprovar todas as entregas
-  const encerravel = projeto.status === "em_andamento" && projeto.etapas.every((e) => e.status === "aprovada");
-  const encerrar = () => {
-    if (confirm("Encerrar o projeto? Ele sai da lista de projetos em andamento; dá para reabrir depois."))
-      alterar((p) => void (p.status = "encerrado"), { acao: "Projeto encerrado" });
+  // Próximo passo do HUB registrado direto pelo botão do próximo passo, com a data de hoje
+  const registrarHub = (para: PassoHub) => {
+    const cedo = para === "finalizado" ? avisoFinalizarAntecipado(projeto) : null;
+    if (cedo && !confirm(`${cedo}\n\nRegistrar a finalização mesmo assim?`)) return;
+    alterar((p) => mudarHub(p, para, hojeIso()), { acao: `HUB: ${passosHub[passoHubDoProjeto(projeto)].acao ?? "passo registrado"}`, detalhe: registroHub[para](hojeIso()) });
+    if (para === "concluido") void guardarProjetoNaBiblioteca(projeto, cliente).then((erro) => erro && alert(erro));
   };
   const irPara = (a: Aba) => {
     setAba(a);
@@ -118,7 +121,10 @@ export default function PaginaProjeto() {
   const tomAvanco = previsto === null ? undefined : avanco >= previsto ? "ok" : previsto - avanco >= 10 ? "atencao" : undefined;
   const diasEntrega = entrega ? diferencaDias(hoje, entrega) : null;
   const proximoPasso = passo && (
-    <ProximoPasso passo={passo} aoAgir={passo.href.endsWith("#desenvolvimento") ? desenvolver : passo.encerrar ? encerrar : undefined} />
+    <ProximoPasso
+      passo={passo}
+      aoAgir={passo.hub ? () => registrarHub(passo.hub!) : passo.href.endsWith("#plano") ? abrirPlano : passo.href.endsWith("#desenvolvimento") ? desenvolver : undefined}
+    />
   );
   const abaMais = (secundarias as readonly string[]).includes(aba) ? aba : "Mais";
 
@@ -162,11 +168,11 @@ export default function PaginaProjeto() {
                 </div>
               </div>
               <div className={celula}>
-                {preContrato ? (
+                {fase !== "execucao" ? (
                   <>
-                    <p className="text-[12px] font-semibold text-tinta-2">Fase</p>
-                    <p className="mt-0.5 break-words font-semibold leading-snug text-tinta">{fases[fase].curto}</p>
-                    <p className="text-[13px] text-tinta-2">antes da contratação</p>
+                    <p className="text-[12px] font-semibold text-tinta-2">No HUB (etapa {fases[fase].numero} de 6)</p>
+                    <p className="mt-0.5 break-words font-semibold leading-snug text-tinta">{fases[fase].rotulo}</p>
+                    <p className="text-[13px] text-tinta-2">{fase === "concluido" ? "projeto concluído" : passosHub[passoHubDoProjeto(projeto)].rotulo.toLowerCase()}</p>
                   </>
                 ) : (
                   <>
@@ -174,7 +180,7 @@ export default function PaginaProjeto() {
                       Etapa atual{et ? ` (${et.ordem} de ${projeto.etapas.length})` : ""}
                     </p>
                     <p className="mt-0.5 break-words font-semibold leading-snug text-tinta">
-                      {et ? `${doisDigitos(et.ordem)} · ${capitalizar(et.nome)}` : projeto.status === "encerrado" ? "Encerrado" : "Todas enviadas"}
+                      {et ? `${doisDigitos(et.ordem)} · ${capitalizar(et.nome)}` : "Todas enviadas"}
                     </p>
                     {et && (
                       <p className={`num text-[13px] ${corEtapa}`}>
@@ -217,16 +223,6 @@ export default function PaginaProjeto() {
                 <p className="mt-0.5 break-words font-semibold leading-snug text-tinta">{consultor?.nome ?? "A definir"}</p>
               </div>
             </Cartao>
-            {(encerravel || projeto.status === "encerrado") && (
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                {encerravel && <Botao onClick={encerrar}>Encerrar projeto</Botao>}
-                {projeto.status === "encerrado" && (
-                  <Botao variante="secundario" onClick={() => alterar((p) => void (p.status = "em_andamento"), { acao: "Projeto reaberto" })}>
-                    Reabrir projeto
-                  </Botao>
-                )}
-              </div>
-            )}
             <div className="relative mt-5" data-faixa-abas>
               <Abas
                 abas={[...principais, abaMais]}
@@ -264,7 +260,7 @@ export default function PaginaProjeto() {
 
       {aba === "Desenvolvimento" && (
         <>
-          <ContratacaoProjeto projeto={projeto} />
+          <LinhaDoHub projeto={projeto} aoAbrirPlano={abrirPlano} />
           <Conversa projeto={projeto} passo={passo?.texto} focar={focar} />
         </>
       )}

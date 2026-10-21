@@ -1,7 +1,7 @@
 import type { Etapa, Projeto } from "./dados/tipos";
 import { diferencaDias, hojeIso, somarDias } from "./datas";
 import { etapaConcluida } from "./projeto";
-import { antesDaContratacao, faseDoProjeto, fases } from "./fase";
+import { antesDaContratacao, comQuem, etapasTodasEnviadas, faseDoProjeto, ondeEsta, comQuemTexto } from "./fase";
 
 // Números, cronograma, calendário e gráficos do painel, calculados a partir
 // das datas do plano de trabalho e do status de cada etapa.
@@ -39,7 +39,7 @@ export function indicadores(projetos: Projeto[]) {
   const lista = ativos(projetos);
   const etapas = lista.flatMap((p) => p.etapas);
   const semPlano = lista.filter((p) => !p.planoFechadoEm && !antesDaContratacao(p)).length;
-  const comPlano = lista.filter((p) => p.planoFechadoEm).flatMap((p) => p.etapas);
+  const comPlano = lista.filter((p) => p.planoFechadoEm && !antesDaContratacao(p)).flatMap((p) => p.etapas);
   const proximos7 = comPlano.filter((e) => !etapaConcluida(e) && e.dataFim && e.dataFim >= hoje && e.dataFim <= somarDias(hoje, 7)).length;
   const acao = comPlano.filter((e) => pedeAcao(grupoDaEtapa(e, hoje))).length;
   const atrasadas = comPlano.filter((e) => grupoDaEtapa(e, hoje) === "atrasada").length;
@@ -112,8 +112,14 @@ export function pendenciasDoGrupo(projetos: Projeto[]): Pendencia[] {
   const lista: Pendencia[] = [];
   for (const p of ativos(projetos)) {
     const fase = faseDoProjeto(p);
-    if (fase !== "execucao") {
-      lista.push({ projeto: p, texto: fases[fase].rotulo, grupo: fase === "diagnostico" ? "andamento" : "nao_iniciada" });
+    const devolvida = p.etapas.find((e) => e.status === "devolvida");
+    if (fase !== "execucao" && !(fase === "finalizado" && devolvida)) {
+      const com = comQuem(p);
+      lista.push({ projeto: p, texto: `${ondeEsta(p)}${com && com !== "consultor" ? ` (${comQuemTexto(com)})` : ""}`, grupo: com === "consultor" ? "andamento" : "nao_iniciada" });
+      continue;
+    }
+    if (fase === "execucao" && etapasTodasEnviadas(p)) {
+      lista.push({ projeto: p, texto: "Todas as etapas enviadas: finalize no HUB", grupo: "a_enviar" });
       continue;
     }
     if (!p.planoFechadoEm) {

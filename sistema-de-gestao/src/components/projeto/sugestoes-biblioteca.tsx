@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
-import type { Cliente } from "@/lib/dados/tipos";
-import { preencherMarcadores, type TextoBiblioteca } from "@/lib/biblioteca";
+import type { Cliente, Projeto } from "@/lib/dados/tipos";
+import { preencherMarcadores, textosParaBiblioteca, type TextoBiblioteca } from "@/lib/biblioteca";
+import { etapaConcluida } from "@/lib/projeto";
+import { traduzirErro } from "@/lib/erros";
 import { formatarData } from "@/lib/datas";
 import { Botao } from "@/components/ui";
 
@@ -27,6 +29,15 @@ export function useBiblioteca(empresa: string, servico: string, etapa?: number) 
     void Promise.resolve().then(carregar);
   }, [carregar]);
   return { lista, carregado, recarregar: carregar };
+}
+
+// Projeto concluído pelo gestor: os textos completos de cada etapa enviada vão,
+// anonimizados, para a biblioteca do serviço. Devolve o erro, se houver.
+export async function guardarProjetoNaBiblioteca(p: Projeto, cliente: Partial<Cliente>): Promise<string | null> {
+  const linhas = p.etapas.filter(etapaConcluida).flatMap((e) => textosParaBiblioteca(p, e, cliente));
+  if (!linhas.length) return null;
+  const { error } = await supabaseNavegador().from("biblioteca_textos").upsert(linhas, { onConflict: "projeto_origem,etapa,chave" });
+  return error ? `O projeto foi concluído, mas os textos não entraram na biblioteca. ${traduzirErro(error, "Tente de novo mais tarde.")}` : null;
 }
 
 // Botão "Da biblioteca (N)" e a lista de textos aprovados parecidos
