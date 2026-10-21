@@ -57,8 +57,8 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   mensagem pronta para cobrar (`src/lib/cobranca.ts`); o quadro de projetos tem uma coluna por etapa do HUB.
 - **Valores e recebimento** (`src/lib/financeiro.ts`, tabelas `financeiro_servicos` e
   `financeiro_projetos`): só quem tem a permissão "vê o financeiro" (`perfis.ve_financeiro`, função
-  `privado.ve_financeiro`) lê ou altera; os demais não recebem nada do banco. A permissão é dada na Equipe
-  (Acessos) por quem já a tem (`definir_financeiro`). No serviço: teto, valor da hora (R$ 90) e a parte da
+  `privado.ve_financeiro`) lê ou altera; os demais não recebem nada do banco. A permissão é só do gestor
+  master (Roberto Pivotto) e não pode ser dada pelo sistema: muda apenas direto no banco. No serviço: teto, valor da hora (R$ 90) e a parte da
   FUNCERN (10%); as horas são as que cabem no teto (R$ 30.000 ÷ 90 = 333 h) e podem ser distribuídas nas
   etapas pela complexidade. No projeto ("Dados do projeto"): valor, FUNCERN, o que fica para o consultor e
   as parcelas: o SEBRAE paga até o dia 5 o que ficou pronto até o dia 20 do mês anterior; 30% quando o
