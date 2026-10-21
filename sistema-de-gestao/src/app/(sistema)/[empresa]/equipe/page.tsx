@@ -4,11 +4,11 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { useAcesso, useEstado } from "@/lib/dados/store";
-import type { EmpresaSlug, Papel } from "@/lib/dados/tipos";
+import type { Empresa, EmpresaSlug, Papel } from "@/lib/dados/tipos";
 import { papelMembro, statusEmpresa } from "@/lib/rotulos";
 import { traduzirErro } from "@/lib/erros";
 import { Botao, Cabecalho, Campo, Cartao, Chip, Vazio } from "@/components/ui";
-import { IconeConta, IconeMaisSinal } from "@/components/icones";
+import { IconeAcessos, IconeConta, IconeMaisSinal } from "@/components/icones";
 
 type Membro = { email: string; nome: string; nome_completo: string; papel: Papel; situacao: "ativo" | "convidado"; admin_grupo: boolean; membro: boolean };
 type Form = { email: string; nome: string; nomeCompleto: string; papel: Papel };
@@ -42,6 +42,9 @@ export default function Equipe() {
   const [form, setForm] = useState<Form | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [aviso, setAviso] = useState<{ tom: "ok" | "erro"; texto: string } | null>(null);
+  const [abertoEm, setAbertoEm] = useState<string | null>(null); // e-mail de quem está com os acessos abertos
+  // O gestor cuida de quem é da empresa; o administrador, de todos. Ninguém mexe no próprio acesso.
+  const podeEditar = (m: Membro) => m.email !== usuario.email && (usuario.adminGrupo || (podeGerir && m.membro && !m.admin_grupo));
 
   const carregar = useCallback(async () => {
     const { data, error } = await supabaseNavegador().rpc("equipe_da_empresa", { p_empresa: slug });
@@ -53,7 +56,7 @@ export default function Equipe() {
     void Promise.resolve().then(carregar);
   }, [carregar]);
 
-  const salvar = async (m: Form, novo: boolean) => {
+  const incluir = async (m: Form) => {
     setOcupado(true);
     setAviso(null);
     const { error } = await supabaseNavegador().rpc("salvar_membro", {
@@ -65,28 +68,15 @@ export default function Equipe() {
     });
     setOcupado(false);
     if (error) return setAviso({ tom: "erro", texto: traduzirErro(error) });
-    if (novo) {
-      setForm(null);
-      try {
-        await navigator.clipboard.writeText(mensagemConvite(m, empresa.nome));
-        setAviso({ tom: "ok", texto: `${m.nome} incluído na equipe. A mensagem de convite foi copiada: é só colar no WhatsApp ou no e-mail.` });
-      } catch {
-        setAviso({ tom: "ok", texto: `${m.nome} incluído na equipe. Peça para entrar em ${window.location.origin}/login e criar a conta com ${m.email}.` });
-      }
-    } else setAviso({ tom: "ok", texto: `Função de ${m.nome} alterada para ${papelMembro[m.papel].toLowerCase()}.` });
+    setForm(null);
+    try {
+      await navigator.clipboard.writeText(mensagemConvite(m, empresa.nome));
+      setAviso({ tom: "ok", texto: `${m.nome} incluído na equipe. A mensagem de convite foi copiada: é só colar no WhatsApp ou no e-mail.` });
+    } catch {
+      setAviso({ tom: "ok", texto: `${m.nome} incluído na equipe. Peça para entrar em ${window.location.origin}/login e criar a conta com ${m.email}.` });
+    }
     await carregar();
     await recarregar(); // a lista de consultores dos projetos muda
-  };
-
-  const retirar = async (m: Membro) => {
-    if (!confirm(`Retirar ${m.nome} da ${empresa.nome}? O acesso às outras empresas continua.`)) return;
-    setOcupado(true);
-    const { error } = await supabaseNavegador().rpc("retirar_membro", { p_empresa: slug, p_email: m.email });
-    setOcupado(false);
-    if (error) return setAviso({ tom: "erro", texto: traduzirErro(error) });
-    setAviso({ tom: "ok", texto: `${m.nome} não tem mais acesso à ${empresa.nome}.` });
-    await carregar();
-    await recarregar();
   };
 
   const mudarSituacao = async (status: string) => {
@@ -100,7 +90,7 @@ export default function Equipe() {
       <Cabecalho
         migalhas={[{ rotulo: empresa.nome, href: `/${slug}` }, { rotulo: "Equipe" }]}
         titulo="Equipe"
-        subtitulo={`Quem trabalha na ${empresa.nome} e com qual função. Cada empresa tem a sua equipe.`}
+        subtitulo={`Quem trabalha na ${empresa.nome}, com qual função e o que cada pessoa acessa.`}
       >
         {podeGerir && !form && (
           <Botao onClick={() => setForm(formVazio)} className="w-full sm:w-auto">
@@ -128,7 +118,7 @@ export default function Equipe() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              void salvar(form, true);
+              void incluir(form);
             }}
             className="mt-4 grid gap-x-5 gap-y-4 sm:grid-cols-2"
           >
@@ -199,33 +189,36 @@ export default function Equipe() {
                         </div>
                       </div>
                       <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
-                        {podeGerir && !eu && m.membro ? (
-                          <>
-                            <label className="min-w-0 flex-1 sm:flex-none">
-                              <span className="sr-only">Função de {m.nome}</span>
-                              <select
-                                className="campo !py-2 sm:!w-40"
-                                value={m.papel}
-                                disabled={ocupado}
-                                onChange={(e) =>
-                                  void salvar({ email: m.email, nome: m.nome, nomeCompleto: m.nome_completo, papel: e.target.value as Papel }, false)
-                                }
-                              >
-                                {(Object.keys(funcoes) as Papel[]).map((p) => (
-                                  <option key={p} value={p}>
-                                    {papelMembro[p]}
-                                  </option>
-                                ))}
-                              </select>
-                            </label>
-                            <Botao variante="fantasma" tamanho="pequeno" onClick={() => void retirar(m)} disabled={ocupado} className="hover:!text-vermelho">
-                              Retirar
-                            </Botao>
-                          </>
-                        ) : (
-                          !m.membro ? null : <Chip tom="neutro">{papelMembro[m.papel]}</Chip>
+                        {m.membro && <Chip tom="neutro">{papelMembro[m.papel]}</Chip>}
+                        {podeEditar(m) && (
+                          <Botao
+                            variante="secundario"
+                            tamanho="pequeno"
+                            aria-expanded={abertoEm === m.email}
+                            onClick={() => setAbertoEm(abertoEm === m.email ? null : m.email)}
+                            className="ml-auto sm:ml-0"
+                          >
+                            <IconeAcessos className="h-4 w-4" />
+                            Acessos
+                          </Botao>
                         )}
                       </div>
+                      {abertoEm === m.email && (
+                        <EditorAcessos
+                          key={m.email}
+                          membro={m}
+                          empresa={empresa}
+                          outras={estado.empresas.filter((e) => e.slug !== slug)}
+                          admin={usuario.adminGrupo}
+                          aoFechar={() => setAbertoEm(null)}
+                          aoSalvar={async (texto) => {
+                            setAbertoEm(null);
+                            setAviso({ tom: "ok", texto });
+                            await carregar();
+                            await recarregar(); // a lista de consultores e o menu mudam
+                          }}
+                        />
+                      )}
                     </li>
                   );
                 })}
@@ -261,5 +254,183 @@ export default function Equipe() {
         </aside>
       </div>
     </>
+  );
+}
+
+// Acessos de uma pessoa, abertos na própria linha da equipe. O gestor muda a
+// função nesta empresa ou retira a pessoa dela; o administrador do grupo vê
+// também as outras empresas e o acesso de administrador.
+function EditorAcessos({
+  membro,
+  empresa,
+  outras,
+  admin,
+  aoFechar,
+  aoSalvar,
+}: {
+  membro: Membro;
+  empresa: Empresa;
+  outras: Empresa[];
+  admin: boolean;
+  aoFechar: () => void;
+  aoSalvar: (aviso: string) => Promise<void>;
+}) {
+  const [papel, setPapel] = useState<Papel | "">(membro.membro ? membro.papel : "");
+  // Só o administrador vê e muda o acesso às outras empresas (carregado ao abrir)
+  const [demais, setDemais] = useState<Partial<Record<EmpresaSlug, Papel>> | null>(admin ? null : {});
+  const [adminGrupo, setAdminGrupo] = useState(membro.admin_grupo);
+  const [ocupado, setOcupado] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+  const [copiado, setCopiado] = useState(false);
+
+  useEffect(() => {
+    if (!admin) return;
+    void (async () => {
+      const sb = supabaseNavegador();
+      const { data: perfil } = await sb.from("perfis").select("id").eq("email", membro.email).maybeSingle();
+      let acessos: Record<string, string> = {};
+      if (perfil) {
+        const { data, error } = await sb.from("membros").select("empresa, papel").eq("user_id", perfil.id);
+        if (error) return setErro(traduzirErro(error));
+        acessos = Object.fromEntries((data ?? []).map((x) => [x.empresa, x.papel]));
+      } else {
+        const { data, error } = await sb.from("convites").select("acessos").eq("email", membro.email).maybeSingle();
+        if (error) return setErro(traduzirErro(error));
+        acessos = (data?.acessos ?? {}) as Record<string, string>;
+      }
+      delete acessos[empresa.slug];
+      setDemais(acessos as Partial<Record<EmpresaSlug, Papel>>);
+    })();
+  }, [admin, membro.email, empresa.slug]);
+
+  const rodar = async (chamada: PromiseLike<{ error: unknown }>, aviso: string) => {
+    setOcupado(true);
+    setErro(null);
+    const { error } = await chamada;
+    setOcupado(false);
+    if (error) return setErro(traduzirErro(error));
+    await aoSalvar(aviso);
+  };
+
+  const sb = supabaseNavegador();
+  const salvar = () => {
+    if (admin) {
+      const acessos = { ...demais, ...(papel ? { [empresa.slug]: papel } : {}) };
+      return rodar(
+        sb.rpc("salvar_acesso", { p_email: membro.email, p_nome: membro.nome, p_nome_completo: membro.nome_completo, p_admin: adminGrupo, p_acessos: acessos }),
+        `Acessos de ${membro.nome} atualizados.`,
+      );
+    }
+    if (!papel) return retirarDaEmpresa();
+    return rodar(
+      sb.rpc("salvar_membro", { p_empresa: empresa.slug, p_email: membro.email, p_nome: membro.nome, p_nome_completo: membro.nome_completo, p_papel: papel }),
+      `Função de ${membro.nome} na ${empresa.nome}: ${papelMembro[papel].toLowerCase()}.`,
+    );
+  };
+  const retirarDaEmpresa = () => {
+    if (!confirm(`Retirar ${membro.nome} da ${empresa.nome}? O acesso às outras empresas continua.`)) return;
+    return rodar(sb.rpc("retirar_membro", { p_empresa: empresa.slug, p_email: membro.email }), `${membro.nome} não tem mais acesso à ${empresa.nome}.`);
+  };
+  const retirarTudo = () => {
+    if (!confirm(`Retirar todo o acesso de ${membro.nome}? A pessoa deixa de ver qualquer empresa. O nome continua no histórico dos projetos.`)) return;
+    return rodar(sb.rpc("retirar_acesso", { p_email: membro.email }), `${membro.nome} não tem mais acesso ao Blimp.`);
+  };
+  const copiarConvite = async () => {
+    try {
+      await navigator.clipboard.writeText(mensagemConvite(membro, empresa.nome));
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2500);
+    } catch {
+      setErro(`Não foi possível copiar. Peça para entrar em ${window.location.origin}/login e criar a conta com ${membro.email}.`);
+    }
+  };
+
+  const opcoes: (Papel | "")[] = [...(Object.keys(funcoes) as Papel[]), ""];
+  return (
+    <section aria-label={`Acessos de ${membro.nome}`} className="w-full rounded-[var(--radius-bloco)] border border-linha bg-pedra/60 p-4 sm:p-5">
+      <fieldset>
+        <legend className="mb-2 text-[15px] font-semibold text-tinta">Na {empresa.nome}</legend>
+        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+          {opcoes.map((p) => (
+            <label
+              key={p || "nenhum"}
+              className={`cursor-pointer rounded-[var(--radius-campo)] border bg-folha p-3 ${papel === p ? "border-azul ring-2 ring-azul/15" : "border-linha hover:border-azul/40"}`}
+            >
+              <span className="flex items-center gap-2 text-[15px] font-semibold text-tinta">
+                <input type="radio" name={`papel-${membro.email}`} className="accent-azul" checked={papel === p} onChange={() => setPapel(p)} />
+                {p ? papelMembro[p] : "Sem acesso"}
+              </span>
+              <span className="mt-1 block text-[13px] text-tinta-2">{p ? funcoes[p] : "Não vê nada desta empresa."}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      {admin && (
+        <fieldset className="mt-5">
+          <legend className="mb-2 text-[15px] font-semibold text-tinta">Outras empresas</legend>
+          {demais === null ? (
+            <p className="text-sm text-tinta-2">Carregando…</p>
+          ) : (
+            <ul className="divide-y divide-linha rounded-[var(--radius-campo)] border border-linha bg-folha">
+              {outras.map((e) => (
+                <li key={e.slug} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-3 py-2.5">
+                  <span className="min-w-0">
+                    <span className="block text-[15px] text-tinta">{e.nome}</span>
+                    {e.status !== "ativo" && <span className="block text-[13px] text-tinta-2">{statusEmpresa[e.status].toLowerCase()}</span>}
+                  </span>
+                  <select
+                    aria-label={`Acesso de ${membro.nome} à ${e.nome}`}
+                    className="campo !w-full !py-2 sm:!w-44"
+                    value={demais[e.slug] ?? ""}
+                    onChange={(ev) => {
+                      const novo = { ...demais };
+                      if (ev.target.value) novo[e.slug] = ev.target.value as Papel;
+                      else delete novo[e.slug];
+                      setDemais(novo);
+                    }}
+                  >
+                    <option value="">Sem acesso</option>
+                    {(Object.keys(funcoes) as Papel[]).map((p) => (
+                      <option key={p} value={p}>
+                        {papelMembro[p]}
+                      </option>
+                    ))}
+                  </select>
+                </li>
+              ))}
+            </ul>
+          )}
+          <label className="mt-4 flex items-start gap-3">
+            <input type="checkbox" className="mt-1 h-4 w-4 accent-azul" checked={adminGrupo} onChange={(e) => setAdminGrupo(e.target.checked)} />
+            <span>
+              <span className="block text-[15px] font-semibold text-tinta">Administrador do grupo</span>
+              <span className="block text-[13px] text-tinta-2">Vê e cuida de todas as empresas, inclusive das que ainda não estão ativas.</span>
+            </span>
+          </label>
+        </fieldset>
+      )}
+
+      {erro && <p className="mt-4 rounded-[var(--radius-campo)] bg-vermelho-claro p-3 text-sm text-vermelho">{erro}</p>}
+
+      <div className="mt-5 flex flex-wrap items-center gap-3">
+        <Botao onClick={() => void salvar()} disabled={ocupado || demais === null}>
+          {ocupado ? "Salvando…" : "Salvar acessos"}
+        </Botao>
+        <Botao variante="secundario" onClick={aoFechar}>
+          Cancelar
+        </Botao>
+        {membro.situacao === "convidado" && (
+          <Botao variante="fantasma" onClick={() => void copiarConvite()}>
+            {copiado ? "Convite copiado" : "Copiar convite"}
+          </Botao>
+        )}
+        {admin && (
+          <Botao variante="fantasma" onClick={() => void retirarTudo()} disabled={ocupado} className="!text-vermelho sm:ml-auto">
+            Retirar todo o acesso
+          </Botao>
+        )}
+      </div>
+    </section>
   );
 }

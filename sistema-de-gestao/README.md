@@ -118,11 +118,11 @@ fora da API.
 
 ### Liberar o acesso de alguém
 
-Pelo próprio sistema, em **Acessos** (menu lateral, só administrador do grupo): e-mail, nome, nome
-completo, papel em cada empresa e, se for o caso, administrador do grupo. Se a pessoa ainda não tem
-conta, a tela gera a mensagem de convite para copiar e enviar; se já tem, o acesso vale na hora. Na mesma
-tela dá para alterar papéis e retirar acessos (`public.salvar_acesso` e `public.retirar_acesso`, que
-conferem se quem chama é administrador).
+Pela **Equipe** de cada empresa (menu lateral). O gestor da empresa inclui a pessoa (e-mail, nome, nome
+completo e função) e, no botão **Acessos** de cada linha, muda a função ou retira a pessoa da empresa
+(`public.salvar_membro` e `public.retirar_membro`). O administrador do grupo vê ali também o acesso às outras
+empresas, o de administrador e "Retirar todo o acesso" (`public.salvar_acesso` e `public.retirar_acesso`).
+Se a pessoa ainda não tem conta, a mensagem de convite é copiada; se já tem, o acesso vale na hora.
 
 Papéis: `gestor`, `consultor`, `equipe`. Empresas: `pivotto`, `orb`, `ejup`.
 

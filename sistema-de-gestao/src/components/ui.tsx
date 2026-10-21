@@ -161,7 +161,7 @@ export function Abas<T extends string>({
 }: {
   abas: readonly T[];
   atual: T;
-  aoTrocar: (a: T) => void;
+  aoTrocar: (a: T, botao: HTMLElement) => void;
   extra?: Partial<Record<T, React.ReactNode>>;
   naFaixa?: boolean;
   gradeNoCelular?: boolean; // no celular, botões em duas colunas em vez de rolar de lado
@@ -180,7 +180,7 @@ export function Abas<T extends string>({
           key={a}
           role="tab"
           aria-selected={a === atual}
-          onClick={() => aoTrocar(a)}
+          onClick={(e) => aoTrocar(a, e.currentTarget)}
           className={`flex min-h-11 items-center justify-center gap-1.5 rounded-[var(--radius-campo)] px-2 py-2 text-center text-[14px] font-semibold leading-tight transition-colors ${
             a === atual ? "bg-azul text-folha shadow-sm" : "text-tinta-2 hover:bg-pedra hover:text-tinta"
           }`}
@@ -201,7 +201,7 @@ export function Abas<T extends string>({
               key={a}
               role="tab"
               aria-selected={a === atual}
-              onClick={() => aoTrocar(a)}
+              onClick={(e) => aoTrocar(a, e.currentTarget)}
               className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 pb-3 pt-1 text-[14px] transition-colors sm:gap-2 sm:text-[15px] ${
                 a === atual ? "border-azul font-semibold text-azul" : "border-transparent font-medium text-tinta-2 hover:border-linha-forte hover:text-tinta"
               }`}

@@ -58,6 +58,71 @@ select.campo {
   @apply pr-8;
 }
 
+/* Lista aberta das escolhas com a mesma cara do sistema: cantos arredondados,
+   sombra e a opção escolhida em azul. Nos navegadores que ainda não permitem
+   (Safari e Firefox), fica a lista do próprio sistema. */
+@supports (appearance: base-select) {
+  select.campo,
+  select.campo::picker(select) {
+    appearance: base-select;
+  }
+  select.campo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-right: 0.75rem;
+    cursor: pointer;
+  }
+  select.campo:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+  select.campo::picker-icon {
+    content: "";
+    margin-left: auto;
+    width: 0.65rem;
+    height: 0.65rem;
+    flex-shrink: 0;
+    background: currentColor;
+    color: var(--color-tinta-2);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4.5 6 8.5 10 4.5' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    transition: rotate 0.15s;
+  }
+  select.campo:open::picker-icon {
+    rotate: 180deg;
+  }
+  select.campo::picker(select) {
+    margin-block: 6px;
+    padding: 6px;
+    border: 1px solid var(--color-linha);
+    border-radius: var(--radius-bloco);
+    background: var(--color-folha);
+    box-shadow: 0 12px 32px rgb(16 24 40 / 0.14), 0 2px 6px rgb(16 24 40 / 0.06);
+    max-height: min(22rem, 60dvh);
+  }
+  select.campo option {
+    padding: 0.55rem 0.75rem;
+    border-radius: var(--radius-campo);
+    font-size: 15px;
+    color: var(--color-tinta);
+    cursor: pointer;
+  }
+  select.campo option::checkmark {
+    display: none;
+  }
+  select.campo option:hover,
+  select.campo option:focus-visible {
+    background: var(--color-pedra);
+    outline: none;
+  }
+  select.campo option:checked {
+    background: var(--color-azul-claro);
+    color: var(--color-azul);
+    font-weight: 600;
+  }
+}
+
 /* Abas e seletores que rolam de lado no celular: sem barra visível */
 .sem-barra {
   scrollbar-width: none;

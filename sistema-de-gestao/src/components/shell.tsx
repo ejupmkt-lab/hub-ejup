@@ -8,7 +8,6 @@ import { statusEmpresa } from "@/lib/rotulos";
 import { etapaAtual, servicoDoProjeto } from "@/lib/projeto";
 import { doisDigitos } from "@/lib/rotulos";
 import {
-  IconeAcessos,
   IconeServicos,
   IconeClientes,
   IconeConta,
@@ -69,7 +68,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
           { href: `${base}/equipe`, rotulo: "Equipe", icone: IconeClientes, ativo: em(`${base}/equipe`) },
         ]
       : []),
-    ...(usuario.adminGrupo ? [{ href: "/acessos", rotulo: "Acessos", icone: IconeAcessos, ativo: em("/acessos") }] : []),
   ];
 
   const itemLateral = (i: (typeof principais)[number]) => (

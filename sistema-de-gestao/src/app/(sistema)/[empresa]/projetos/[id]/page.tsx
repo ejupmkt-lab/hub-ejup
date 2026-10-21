@@ -42,7 +42,8 @@ export default function PaginaProjeto() {
   const { empresa: slug } = useParams<{ empresa: string }>();
   // O projeto abre sempre no Desenvolvimento (a conversa com a IA)
   const [aba, setAba] = useState<Aba>("Desenvolvimento");
-  const [menuMais, setMenuMais] = useState(false);
+  // Menu "Mais" aberto logo abaixo da aba que o abriu (posição dentro da faixa de abas)
+  const [menuMais, setMenuMais] = useState<{ left: number; top: number } | null>(null);
   // Atalho "Registrar" do menu (#registrar) traz a caixa de mensagem à vista
   const [focar, setFocar] = useState(0);
 
@@ -91,7 +92,16 @@ export default function PaginaProjeto() {
   };
   const irPara = (a: Aba) => {
     setAba(a);
-    setMenuMais(false);
+    setMenuMais(null);
+  };
+  const abrirMais = (botao: HTMLElement) => {
+    if (menuMais) return setMenuMais(null);
+    const faixa = botao.closest("[data-faixa-abas]")!.getBoundingClientRect();
+    const b = botao.getBoundingClientRect();
+    const largura = 240;
+    // Alinha pela esquerda da aba; se não couber, pela direita
+    const left = b.left - faixa.left + largura <= faixa.width ? b.left - faixa.left : Math.max(0, b.right - faixa.left - largura);
+    setMenuMais({ left, top: b.bottom - faixa.top + 6 });
   };
   const abrirPlano = () => {
     setAba("Plano de trabalho");
@@ -217,19 +227,23 @@ export default function PaginaProjeto() {
                 )}
               </div>
             )}
-            <div className="relative mt-5">
+            <div className="relative mt-5" data-faixa-abas>
               <Abas
                 abas={[...principais, abaMais]}
                 atual={aba === abaMais ? abaMais : aba}
-                aoTrocar={(a) => (a === abaMais ? setMenuMais(!menuMais) : irPara(a as Aba))}
+                aoTrocar={(a, botao) => (a === abaMais ? abrirMais(botao) : irPara(a as Aba))}
                 extra={{ [abaMais]: <span aria-hidden>▾</span> }}
                 naFaixa
                 gradeNoCelular
               />
               {menuMais && (
                 <>
-                  <div aria-hidden className="fixed inset-0 z-30" onClick={() => setMenuMais(false)} />
-                  <ul className="absolute right-0 top-full z-40 mt-2 w-60 rounded-[var(--radius-bloco)] border border-linha bg-folha p-1.5 shadow-lg">
+                  <div aria-hidden className="fixed inset-0 z-30" onClick={() => setMenuMais(null)} />
+                  <ul
+                    style={menuMais}
+                    onKeyDown={(e) => e.key === "Escape" && setMenuMais(null)}
+                    className="absolute z-40 w-60 rounded-[var(--radius-bloco)] border border-linha bg-folha p-1.5 shadow-lg"
+                  >
                     {secundarias.map((s) => (
                       <li key={s}>
                         <button
