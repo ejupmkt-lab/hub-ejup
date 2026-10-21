@@ -55,6 +55,16 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   Planejamento Tecnológico). Projetos do formato antigo (`contratacao`) são
   lidos como o passo equivalente. Em Tarefas, "Aguardando outros" junta o que está com terceiros, com a
   mensagem pronta para cobrar (`src/lib/cobranca.ts`); o quadro de projetos tem uma coluna por etapa do HUB.
+- **Valores e recebimento** (`src/lib/financeiro.ts`, tabelas `financeiro_servicos` e
+  `financeiro_projetos`): só quem tem a permissão "vê o financeiro" (`perfis.ve_financeiro`, função
+  `privado.ve_financeiro`) lê ou altera; os demais não recebem nada do banco. A permissão é dada na Equipe
+  (Acessos) por quem já a tem (`definir_financeiro`). No serviço: teto, valor da hora (R$ 90) e a parte da
+  FUNCERN (10%); as horas são as que cabem no teto (R$ 30.000 ÷ 90 = 333 h) e podem ser distribuídas nas
+  etapas pela complexidade. No projeto ("Dados do projeto"): valor, FUNCERN, o que fica para o consultor e
+  as parcelas: o SEBRAE paga até o dia 5 o que ficou pronto até o dia 20 do mês anterior; 30% quando o
+  Relatório 1 foi enviado e o projeto ainda não foi finalizado, o restante (70%, ou 100% no mesmo mês)
+  quando o projeto é finalizado no HUB (último relatório e avaliação do cliente). O Painel mostra o que cai
+  em cada dia 5 e o que ainda dá para garantir até o próximo dia 20.
 - **Projeto novo**: escolhe o serviço, o cliente, o consultor e onde o projeto está no HUB (começa no
   diagnóstico); as horas de cada etapa vêm da ficha ou da proposta (editáveis também no plano de trabalho); o código do pedido no HUB é um campo só (o
   mesmo número do projeto no HUB); o número de visitas é o de etapas do serviço (uma por etapa); o gestor

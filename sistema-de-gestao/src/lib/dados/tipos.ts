@@ -18,6 +18,7 @@ export type Usuario = {
   nome: string;
   nomeCompleto: string;
   adminGrupo: boolean;
+  veFinanceiro?: boolean; // vê valores e recebimentos (permissão à parte)
   acessos: Partial<Record<EmpresaSlug, Papel>>;
 };
 
@@ -85,6 +86,7 @@ export type Etapa = {
   assinaturaCliente: string | null;
   evidencias?: Evidencia[];
   relatorioAssinado?: RelatorioAssinado | null;
+  enviadaEm?: string | null; // data em que o relatório foi enviado no Plano de Entrega do HUB
 };
 
 // PDF final, já assinado no gov.br, guardado junto da etapa

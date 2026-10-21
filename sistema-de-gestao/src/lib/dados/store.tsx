@@ -45,7 +45,7 @@ async function carregarDoBanco(): Promise<Carga> {
   if (nivel?.nextLevel === "aal2" && nivel.currentLevel !== "aal2") return { tipo: "codigo" };
 
   const [perfis, membros, empresas, clientes, projetos, servicos] = await Promise.all([
-    sb.from("perfis").select("id, email, nome, nome_completo, admin_grupo"),
+    sb.from("perfis").select("id, email, nome, nome_completo, admin_grupo, ve_financeiro"),
     sb.from("membros").select("empresa, user_id, papel"),
     sb.from("empresas").select("slug, nome, status, descricao, socios").order("ordem"),
     sb.from("clientes").select("id, dados").order("created_at"),
@@ -66,6 +66,7 @@ async function carregarDoBanco(): Promise<Carga> {
     nome: p.nome,
     nomeCompleto: p.nome_completo,
     adminGrupo: p.admin_grupo,
+    veFinanceiro: p.ve_financeiro,
     acessos: Object.fromEntries(
       membros.data!.filter((m) => m.user_id === p.id).map((m) => [m.empresa as EmpresaSlug, m.papel as Papel]),
     ),

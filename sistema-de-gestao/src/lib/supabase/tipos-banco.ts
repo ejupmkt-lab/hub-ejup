@@ -103,6 +103,58 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"financeiro_projetos": {
+                  Row: {
+                    "empresa": string,"perc_funcern": number | null,"projeto_id": string,"recebidos": NonNullable<Json>,"updated_at": string,"valor_hora": number | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "empresa": string,"perc_funcern"?: number | null,"projeto_id": string,"recebidos"?: NonNullable<Json>,"updated_at"?: string,"valor_hora"?: number | null
+                  }
+                  Update: {
+                    "empresa"?: string,"perc_funcern"?: number | null,"projeto_id"?: string,"recebidos"?: NonNullable<Json>,"updated_at"?: string,"valor_hora"?: number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "financeiro_projetos_empresa_fkey"
+      columns: ["empresa"]
+isOneToOne: false
+      referencedRelation: "empresas"
+      referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "financeiro_projetos_projeto_id_fkey"
+      columns: ["projeto_id"]
+isOneToOne: true
+      referencedRelation: "projetos"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"financeiro_servicos": {
+                  Row: {
+                    "empresa": string,"perc_funcern": number,"servico_id": string,"teto": number,"updated_at": string,"valor_hora": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "empresa": string,"perc_funcern"?: number,"servico_id": string,"teto"?: number,"updated_at"?: string,"valor_hora"?: number
+                  }
+                  Update: {
+                    "empresa"?: string,"perc_funcern"?: number,"servico_id"?: string,"teto"?: number,"updated_at"?: string,"valor_hora"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "financeiro_servicos_empresa_fkey"
+      columns: ["empresa"]
+isOneToOne: false
+      referencedRelation: "empresas"
+      referencedColumns: ["slug"]
+    },{
+      foreignKeyName: "financeiro_servicos_servico_id_fkey"
+      columns: ["servico_id"]
+isOneToOne: true
+      referencedRelation: "servicos"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"gestores_sebrae": {
                   Row: {
                     "created_at": string,"empresa": string,"id": string,"nome": string
@@ -183,14 +235,14 @@ isOneToOne: false
                   ]
                 },"perfis": {
                   Row: {
-                    "admin_grupo": boolean,"created_at": string,"email": string,"id": string,"nome": string,"nome_completo": string
+                    "admin_grupo": boolean,"created_at": string,"email": string,"id": string,"nome": string,"nome_completo": string,"ve_financeiro": boolean
                   }
                   ComputedFields: never
                   Insert: {
-                    "admin_grupo"?: boolean,"created_at"?: string,"email": string,"id": string,"nome": string,"nome_completo": string
+                    "admin_grupo"?: boolean,"created_at"?: string,"email": string,"id": string,"nome": string,"nome_completo": string,"ve_financeiro"?: boolean
                   }
                   Update: {
-                    "admin_grupo"?: boolean,"created_at"?: string,"email"?: string,"id"?: string,"nome"?: string,"nome_completo"?: string
+                    "admin_grupo"?: boolean,"created_at"?: string,"email"?: string,"id"?: string,"nome"?: string,"nome_completo"?: string,"ve_financeiro"?: boolean
                   }
                   Relationships: [
                     
@@ -255,6 +307,9 @@ isOneToOne: false
           Functions: {
             "atualizar_meu_perfil":
 { Args: { "p_nome": string,"p_nome_completo": string }; Returns: undefined
+                           },
+"definir_financeiro":
+{ Args: { "p_email": string,"p_ve": boolean }; Returns: undefined
                            },
 "definir_situacao_empresa":
 { Args: { "p_empresa": string,"p_status": string }; Returns: undefined

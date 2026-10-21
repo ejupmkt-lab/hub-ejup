@@ -10,6 +10,7 @@ import { useAcesso, useEstado } from "@/lib/dados/store";
 import { Botao, Campo, Cartao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 import { EscolherGestorSebrae } from "./gestor-sebrae";
+import { ValoresProjeto } from "@/components/financeiro/valores-projeto";
 
 // Só o que é deste projeto; a ficha técnica, os textos e as referências vêm do serviço
 const campos: { k: keyof Projeto; r: string; largo?: boolean }[] = [{ k: "localAssinatura", r: "Local (fechamento do relatório)" }];
@@ -135,6 +136,7 @@ export function DadosProjeto({ projeto, aoFechar }: { projeto: Projeto; aoFechar
             </Campo>
           ))}
         </div>
+        <ValoresProjeto projeto={projeto} />
       </Cartao>
       {gerencia(projeto.empresa) && (
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-linha pt-6">

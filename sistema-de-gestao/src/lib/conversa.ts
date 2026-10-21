@@ -189,6 +189,7 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
       }
       const cedo = a.situacao === "enviada" ? avisoEnvioAntecipado(e) : null;
       e.status = a.situacao;
+      if (a.situacao === "enviada") e.enviadaEm = hojeIso();
       situacaoDefinida.add(e.ordem);
       feito(`${et} marcada como “${rotulo}”${a.observacao.trim() ? ` (${resumo(a.observacao.trim(), 120)})` : ""}`);
       if (cedo) avisar(cedo);

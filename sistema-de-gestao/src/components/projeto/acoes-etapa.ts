@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Cliente, Etapa, Projeto } from "@/lib/dados/tipos";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
+import { hojeIso } from "@/lib/datas";
 import { textosParaBiblioteca } from "@/lib/biblioteca";
 import { traduzirErro } from "@/lib/erros";
 import { avisoEnvioAntecipado } from "@/lib/fase";
@@ -64,6 +65,7 @@ export function useAcoesEtapa() {
       (p) => {
         const e = p.etapas.find((x) => x.ordem === ordem)!;
         e.status = s;
+        if (s === "enviada") e.enviadaEm = hojeIso();
         if (retomando) {
           e.assinaturaConsultor = null;
           e.assinaturaCliente = null;

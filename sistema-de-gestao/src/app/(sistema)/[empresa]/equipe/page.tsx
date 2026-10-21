@@ -210,6 +210,7 @@ export default function Equipe() {
                           empresa={empresa}
                           outras={estado.empresas.filter((e) => e.slug !== slug)}
                           admin={usuario.adminGrupo}
+                          financeiro={!!usuario.veFinanceiro}
                           aoFechar={() => setAbertoEm(null)}
                           aoSalvar={async (texto) => {
                             setAbertoEm(null);
@@ -265,6 +266,7 @@ function EditorAcessos({
   empresa,
   outras,
   admin,
+  financeiro,
   aoFechar,
   aoSalvar,
 }: {
@@ -272,6 +274,7 @@ function EditorAcessos({
   empresa: Empresa;
   outras: Empresa[];
   admin: boolean;
+  financeiro: boolean; // quem salva vê o financeiro e pode liberar para a pessoa
   aoFechar: () => void;
   aoSalvar: (aviso: string) => Promise<void>;
 }) {
@@ -282,6 +285,17 @@ function EditorAcessos({
   const [ocupado, setOcupado] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [copiado, setCopiado] = useState(false);
+  // Acesso aos valores e recebimentos: só aparece para quem já o tem, e só para quem já criou a conta
+  const [veFin, setVeFin] = useState<{ antes: boolean; agora: boolean } | null>(null);
+  useEffect(() => {
+    if (!financeiro || membro.situacao !== "ativo") return;
+    void supabaseNavegador()
+      .from("perfis")
+      .select("ve_financeiro")
+      .eq("email", membro.email)
+      .maybeSingle()
+      .then(({ data }) => data && setVeFin({ antes: data.ve_financeiro, agora: data.ve_financeiro }));
+  }, [financeiro, membro.email, membro.situacao]);
 
   useEffect(() => {
     if (!admin) return;
@@ -313,7 +327,12 @@ function EditorAcessos({
   };
 
   const sb = supabaseNavegador();
-  const salvar = () => {
+  const salvar = async () => {
+    if (veFin && veFin.agora !== veFin.antes) {
+      const { error } = await sb.rpc("definir_financeiro", { p_email: membro.email, p_ve: veFin.agora });
+      if (error) return setErro(traduzirErro(error));
+      setVeFin({ antes: veFin.agora, agora: veFin.agora });
+    }
     if (admin) {
       const acessos = { ...demais, ...(papel ? { [empresa.slug]: papel } : {}) };
       return rodar(
@@ -409,6 +428,16 @@ function EditorAcessos({
             </span>
           </label>
         </fieldset>
+      )}
+
+      {veFin && (
+        <label className="mt-5 flex items-start gap-3">
+          <input type="checkbox" className="mt-1 h-4 w-4 accent-azul" checked={veFin.agora} onChange={(e) => setVeFin({ ...veFin, agora: e.target.checked })} />
+          <span>
+            <span className="block text-[15px] font-semibold text-tinta">Vê valores e recebimentos</span>
+            <span className="block text-[13px] text-tinta-2">Valores dos serviços e dos projetos e o que cai em cada dia 5. Em todas as empresas a que a pessoa tem acesso.</span>
+          </span>
+        </label>
       )}
 
       {erro && <p className="mt-4 rounded-[var(--radius-campo)] bg-vermelho-claro p-3 text-sm text-vermelho">{erro}</p>}

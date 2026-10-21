@@ -11,6 +11,7 @@ import { traduzirErro } from "@/lib/erros";
 import { Abas, Botao, BotaoLink, Cabecalho, Cartao, Chip, Vazio } from "@/components/ui";
 import { BibliotecaServico } from "@/components/servicos/biblioteca-servico";
 import { ReferenciasServico } from "@/components/servicos/referencias-servico";
+import { ValoresServico } from "@/components/financeiro/valores-servico";
 import { IconeMaisSinal } from "@/components/icones";
 
 const abas = ["Ficha técnica", "Biblioteca de textos", "Referências"] as const;
@@ -110,6 +111,7 @@ export default function PaginaServico() {
               </dl>
               {s.descricao && <p className="mt-4 border-t border-linha pt-3 text-sm text-tinta-2">{s.descricao}</p>}
             </Cartao>
+            <ValoresServico servico={s} />
             <p className="text-[13px] text-tinta-2">
               Mudanças na ficha valem para os projetos criados depois. Os projetos em andamento mantêm as etapas com que nasceram.
             </p>

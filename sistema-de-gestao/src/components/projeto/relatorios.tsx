@@ -142,6 +142,18 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
               </Botao>
             )}
             {!concluida && e.status !== "devolvida" && bloqueioEnvio && <span className="text-[13px] text-tinta-2">{bloqueioEnvio}.</span>}
+            {concluida && (
+              <label className="flex items-center gap-2 text-[13px] text-tinta-2">
+                Enviada em
+                <input
+                  type="date"
+                  className="campo num !w-auto !py-1 !text-[13px]"
+                  value={e.enviadaEm ?? ""}
+                  max={hojeIso()}
+                  onChange={(ev) => alterarEtapa(e.ordem)((x) => void (x.enviadaEm = ev.target.value || null), { acao: `Etapa ${doisDigitos(e.ordem)}: data do envio` })}
+                />
+              </label>
+            )}
             {concluida && e.dataFim && <span className="num text-[13px] text-tinta-2">fim previsto {formatarData(e.dataFim)}</span>}
           </div>
         )}
