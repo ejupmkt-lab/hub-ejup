@@ -5,76 +5,76 @@ import { useState } from "react";
 import { useEstado } from "@/lib/dados/store";
 import type { Etapa, Projeto } from "@/lib/dados/tipos";
 import { formatarData } from "@/lib/datas";
-import { tarefasPendentes } from "@/lib/tarefas";
-import { automatizarEtapa } from "@/lib/regras-etapa";
+import { contarTarefas, tarefasDoProjeto, type TarefasDoProjeto } from "@/lib/tarefas";
+import { automatizarEtapa, marcarAtividade } from "@/lib/regras-etapa";
 import { pendenciasDoGrupo } from "@/lib/painel";
 import { doisDigitos } from "@/lib/rotulos";
-import { Cabecalho, Cartao, Chip, Indicador, Segmentos, Vazio } from "@/components/ui";
+import { servicoDoProjeto } from "@/lib/projeto";
+import { fases, faseDoProjeto } from "@/lib/fase";
+import { useEmpresaAtual } from "@/lib/dados/empresa-atual";
+import { BotaoLink, Cabecalho, Cartao, Chip, Indicador, Segmentos, Vazio } from "@/components/ui";
 import { Pendencias } from "@/components/painel/pendencias";
 import { IconeSeta } from "@/components/icones";
 
 type Filtro = "todas" | "atrasadas";
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
-// Tarefas do plano de trabalho de todos os projetos: as atividades do
-// checklist ainda pendentes nas etapas em curso, marcáveis aqui mesmo.
+// Tarefas de cada projeto, só da fase em que ele está: o checklist pendente da
+// etapa em curso (marcável aqui mesmo) ou o próximo passo. "Continuar" leva ao
+// Desenvolvimento do projeto, onde a IA ajuda a produzir o relatório.
 export default function Tarefas() {
   const { estado, atualizar } = useEstado();
+  const { empresa } = useEmpresaAtual();
   const [filtro, setFiltro] = useState<Filtro>("todas");
   // Marcadas nesta visita continuam à vista (riscadas) para dar para desfazer
   const [recentes, setRecentes] = useState<Set<string>>(new Set());
 
-  const tarefas = tarefasPendentes(estado.projetos);
-  const atrasadas = tarefas.filter((t) => t.atrasada).length;
-  const entregas = pendenciasDoGrupo(estado.projetos).filter((x) => x.grupo !== "andamento" && x.grupo !== "nao_iniciada").length;
-  const chave = (p: Projeto, e: Etapa, i: number) => `${p.id}:${e.ordem}:${i}`;
+  const projetos = estado.projetos.filter((p) => !empresa || p.empresa === empresa.slug);
+  const conta = contarTarefas(projetos);
+  const entregas = pendenciasDoGrupo(projetos).filter((x) => x.grupo !== "andamento" && x.grupo !== "nao_iniciada").length;
+  const chave = (p: Projeto, e: Etapa, codigo: string) => `${p.id}:${e.ordem}:${codigo}`;
 
-  // Grupos projeto + etapa, os atrasados primeiro
-  const grupos = new Map<string, { projeto: Projeto; etapa: Etapa; atrasada: boolean }>();
-  for (const t of tarefas) grupos.set(`${t.projeto.id}:${t.etapa.ordem}`, { projeto: t.projeto, etapa: t.etapa, atrasada: t.atrasada });
-  for (const k of recentes) {
-    const [id, ordem] = k.split(":");
-    const projeto = estado.projetos.find((p) => p.id === id);
-    const etapa = projeto?.etapas.find((e) => e.ordem === Number(ordem));
-    if (projeto && etapa && !grupos.has(`${id}:${ordem}`)) grupos.set(`${id}:${ordem}`, { projeto, etapa, atrasada: false });
-  }
-  const lista = [...grupos.values()]
-    .filter((g) => filtro === "todas" || g.atrasada)
-    .sort((a, b) => Number(b.atrasada) - Number(a.atrasada) || (a.etapa.dataFim ?? "9").localeCompare(b.etapa.dataFim ?? "9"));
+  const grupos = projetos
+    .map((p) => tarefasDoProjeto(p))
+    .filter((t): t is TarefasDoProjeto => !!t)
+    .filter((t) => filtro === "todas" || t.atrasada)
+    .sort(
+      (a, b) =>
+        Number(b.atrasada) - Number(a.atrasada) ||
+        Number(a.aguardando) - Number(b.aguardando) ||
+        (a.etapa?.dataFim ?? "9").localeCompare(b.etapa?.dataFim ?? "9"),
+    );
 
   const nome = (p: Projeto) => {
     const c = estado.clientes.find((x) => x.id === p.clienteId);
     return c?.nomeFantasia || c?.razaoSocial || "Cliente";
   };
 
-  const marcar = (p: Projeto, e: Etapa, indice: number, feito: boolean) => {
-    const k = chave(p, e, indice);
-    setRecentes((r) => {
-      const n = new Set(r);
-      if (feito) n.add(k);
-      else n.delete(k);
-      return n;
-    });
+  // Marcar a mãe marca as filhas pendentes; todas continuam à vista, riscadas
+  const marcar = (p: Projeto, e: Etapa, codigo: string, feito: boolean) => {
+    const status = feito ? "feito" : "pendente";
+    const mudaram = marcarAtividade(structuredClone(e), codigo, status);
+    setRecentes((rs) => new Set([...rs, ...mudaram.map((c) => chave(p, e, c))]));
     atualizar((r) => {
       const proj = r.projetos.find((x) => x.id === p.id);
       const et = proj?.etapas.find((x) => x.ordem === e.ordem);
       if (!proj || !et) return;
-      et.atividades[indice].status = feito ? "feito" : "pendente";
+      marcarAtividade(et, codigo, status);
       automatizarEtapa(proj, et);
     });
   };
 
   return (
     <>
-      <Cabecalho titulo="Tarefas" subtitulo="As atividades do plano de trabalho ainda pendentes nas etapas em curso" />
+      <Cabecalho titulo="Tarefas" subtitulo={`O que fazer agora em cada projeto${empresa ? ` da ${empresa.nome}` : ""}, na fase em que ele está`} />
 
       <section aria-label="Resumo" className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-3">
-        <Indicador rotulo="Tarefas pendentes" valor={tarefas.length} detalhe="no checklist das etapas em curso" />
+        <Indicador rotulo="Tarefas pendentes" valor={conta.total} detalhe="da fase atual de cada projeto" />
         <Indicador
           rotulo="Atrasadas"
-          valor={atrasadas}
-          detalhe={atrasadas ? "de etapas com o prazo vencido" : "nenhuma fora do prazo"}
-          tom={atrasadas ? "atencao" : undefined}
+          valor={conta.atrasadas}
+          detalhe={conta.atrasadas ? "de etapas com o prazo vencido" : "nenhuma fora do prazo"}
+          tom={conta.atrasadas ? "atencao" : undefined}
         />
         <div className="col-span-2 lg:col-span-1">
           <Indicador
@@ -93,62 +93,80 @@ export default function Tarefas() {
             atual={filtro}
             aoTrocar={setFiltro}
             opcoes={[
-              { valor: "todas", rotulo: `Todas (${tarefas.length})` },
-              { valor: "atrasadas", rotulo: `Atrasadas (${atrasadas})` },
+              { valor: "todas", rotulo: `Todas (${conta.total})` },
+              { valor: "atrasadas", rotulo: `Atrasadas (${conta.atrasadas})` },
             ]}
           />
 
-          {lista.length === 0 ? (
+          {grupos.length === 0 ? (
             <Vazio titulo={filtro === "atrasadas" ? "Nenhuma tarefa atrasada" : "Nenhuma tarefa pendente"}>
-              {filtro === "atrasadas"
-                ? "Todas as tarefas pendentes estão dentro do prazo das etapas."
-                : "O checklist das etapas em curso está completo. As próximas tarefas aparecem quando cada etapa começar."}
+              {filtro === "atrasadas" ? "Todas as tarefas estão dentro do prazo das etapas." : "Nenhum projeto em andamento nesta empresa."}
             </Vazio>
           ) : (
-            lista.map(({ projeto: p, etapa: e, atrasada }) => {
-              const itens = e.atividades.map((a, i) => ({ a, i })).filter(({ a, i }) => a.status === "pendente" || recentes.has(chave(p, e, i)));
-              const feitas = e.atividades.filter((a) => a.status !== "pendente").length;
+            grupos.map((t) => {
+              const { projeto: p, etapa: e } = t;
+              const fase = faseDoProjeto(p);
+              const itens = e ? e.atividades.filter((a) => a.status === "pendente" || recentes.has(chave(p, e, a.codigo))) : [];
+              const feitas = e ? e.atividades.filter((a) => a.status !== "pendente").length : 0;
+              const resumo =
+                fase !== "execucao"
+                  ? `${fases[fase].rotulo} · antes da contratação`
+                  : !p.planoFechadoEm
+                    ? "Contratado · sem plano de trabalho"
+                    : e
+                      ? `Etapa ${doisDigitos(e.ordem)} de ${doisDigitos(p.etapas.length)} · ${capitalizar(e.nome)} · ${feitas} de ${e.atividades.length} feitas${e.dataFim ? ` · prazo ${formatarData(e.dataFim)}` : ""}`
+                      : "Todas as etapas enviadas";
               return (
-                <Cartao key={`${p.id}:${e.ordem}`} className={`overflow-hidden border-l-4 ${atrasada ? "border-l-laranja-vivo" : "border-l-azul"}`}>
+                <Cartao
+                  key={p.id}
+                  className={`overflow-hidden border-l-4 ${t.atrasada ? "border-l-laranja-vivo" : t.aguardando ? "border-l-linha-forte" : "border-l-azul"}`}
+                >
                   <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 border-b border-linha px-4 py-3 sm:px-5">
                     <div className="min-w-0">
                       <p className="break-words text-[15px] font-bold text-tinta">{nome(p)}</p>
-                      <p className="num text-[13px] text-tinta-2">
-                        Etapa {doisDigitos(e.ordem)} {capitalizar(e.nome)} · {feitas} de {e.atividades.length} feitas
-                        {e.dataFim && ` · prazo ${formatarData(e.dataFim)}`}
-                      </p>
+                      <p className="break-words text-[13px] text-tinta-2">{servicoDoProjeto(p)}</p>
+                      <p className="num mt-0.5 break-words text-[13px] text-tinta-2">{resumo}</p>
                     </div>
-                    {atrasada && <Chip tom="atencao">Atrasada</Chip>}
+                    {t.atrasada ? <Chip tom="atencao">Atrasada</Chip> : t.aguardando ? <Chip tom="neutro">Aguardando</Chip> : null}
                   </div>
-                  <ul className="divide-y divide-linha">
-                    {itens.map(({ a, i }) => {
-                      const feito = a.status !== "pendente";
-                      return (
-                        <li key={a.codigo} className={a.nivel > 1 ? "pl-6 sm:pl-8" : ""}>
-                          <label className="flex cursor-pointer items-start gap-3 px-4 py-3 hover:bg-pedra/60 sm:px-5">
-                            <input
-                              type="checkbox"
-                              checked={feito}
-                              onChange={(ev) => marcar(p, e, i, ev.target.checked)}
-                              className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded accent-[var(--color-azul)]"
-                            />
-                            <span className={`min-w-0 text-[15px] leading-snug ${feito ? "text-tinta-2 line-through" : "text-tinta"}`}>
-                              <span className="num mr-1.5 font-semibold">{a.codigo}</span>
-                              {a.texto}
-                            </span>
-                          </label>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                  <div className="border-t border-linha px-4 py-2.5 sm:px-5">
-                    <Link
-                      href={`/${p.empresa}/projetos/${p.id}/etapas/${e.ordem}#checklist`}
-                      className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-azul hover:underline"
-                    >
-                      Abrir o checklist da etapa (para marcar &ldquo;não se aplica&rdquo;)
+                  {e && itens.length > 0 ? (
+                    <ul className="divide-y divide-linha">
+                      {itens.map((a) => {
+                        const feito = a.status !== "pendente";
+                        return (
+                          <li key={a.codigo} className={a.nivel > 1 ? "pl-6 sm:pl-8" : ""}>
+                            <label className="flex cursor-pointer items-start gap-3 px-4 py-3 hover:bg-pedra/60 sm:px-5">
+                              <input
+                                type="checkbox"
+                                checked={feito}
+                                onChange={(ev) => marcar(p, e, a.codigo, ev.target.checked)}
+                                className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer rounded accent-[var(--color-azul)]"
+                              />
+                              <span className={`min-w-0 text-[15px] leading-snug ${feito ? "text-tinta-2 line-through" : "text-tinta"}`}>
+                                <span className="num mr-1.5 font-semibold">{a.codigo}</span>
+                                {a.texto}
+                              </span>
+                            </label>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : t.passo ? (
+                    <div className="px-4 py-3 sm:px-5">
+                      <p className="text-[15px] font-semibold text-tinta">{t.passo.texto}</p>
+                      {t.passo.detalhe && <p className="mt-0.5 text-sm text-tinta-2">{t.passo.detalhe}</p>}
+                    </div>
+                  ) : null}
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-t border-linha px-4 py-3 sm:px-5">
+                    <BotaoLink href={`/${p.empresa}/projetos/${p.id}#registrar`} tamanho="pequeno" className="w-full sm:w-auto">
+                      Continuar no Desenvolvimento
                       <IconeSeta className="h-4 w-4" />
-                    </Link>
+                    </BotaoLink>
+                    {e && itens.length > 0 && (
+                      <Link href={`/${p.empresa}/projetos/${p.id}/etapas/${e.ordem}#checklist`} className="text-[13px] font-semibold text-azul hover:underline">
+                        Checklist completo da etapa
+                      </Link>
+                    )}
                   </div>
                 </Cartao>
               );
@@ -161,7 +179,7 @@ export default function Tarefas() {
             <h2 className="text-[17px] font-bold">Entregas</h2>
             <p className="mt-0.5 text-sm text-tinta-2">Devoluções, atrasos, envios e prazos da semana.</p>
             <div className="mt-4">
-              <Pendencias projetos={estado.projetos} />
+              <Pendencias projetos={projetos} />
             </div>
           </Cartao>
         </aside>

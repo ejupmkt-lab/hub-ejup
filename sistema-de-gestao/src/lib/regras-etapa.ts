@@ -1,4 +1,4 @@
-import type { Etapa, Projeto } from "./dados/tipos";
+import type { Atividade, Etapa, Projeto } from "./dados/tipos";
 import type { StatusEtapa } from "./rotulos";
 import { verificarCompletude } from "./relatorio/secoes";
 
@@ -31,4 +31,20 @@ export function bloqueioStatus(p: Projeto, e: Etapa, s: StatusEtapa): string | n
     if (!assinada(e)) return "Registre as datas das duas assinaturas";
   }
   return null;
+}
+
+// Marcar a atividade-mãe ("1") vale também para as filhas ainda pendentes
+// ("1.1", "1.2"…); marcar uma filha não mexe na mãe. Devolve os códigos que mudaram.
+export function marcarAtividade(e: Etapa, codigo: string, status: Atividade["status"], justificativa?: string) {
+  const mudaram: string[] = [];
+  for (const a of e.atividades) {
+    const filha = a.codigo.startsWith(`${codigo}.`);
+    if (a.codigo !== codigo && !(filha && status !== "pendente" && a.status === "pendente")) continue;
+    if (a.status === status) continue;
+    a.status = status;
+    if (status === "nao_aplicavel")
+      a.justificativa = a.codigo === codigo ? (justificativa ?? a.justificativa) : `Segue a atividade ${codigo}, que não se aplica.`;
+    mudaram.push(a.codigo);
+  }
+  return mudaram;
 }

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
-import { useUsuario } from "@/lib/dados/store";
+import { useEstado, useUsuario } from "@/lib/dados/store";
 import { MSG_SENHA_VAZADA, senhaVazada } from "@/lib/senha";
 import { traduzirErro } from "@/lib/erros";
 import { Botao, Cabecalho, Campo, Cartao, Status } from "@/components/ui";
@@ -13,12 +13,58 @@ export default function MinhaConta() {
   const usuario = useUsuario();
   return (
     <>
-      <Cabecalho titulo="Minha conta" subtitulo={`${usuario.nomeCompleto}, ${usuario.email}`} />
+      <Cabecalho titulo="Meu perfil" subtitulo={`${usuario.nomeCompleto} · ${usuario.email}`} />
       <div className="grid max-w-3xl gap-8">
+        <Perfil />
         <DuasEtapas />
         <AlterarSenha />
       </div>
     </>
+  );
+}
+
+// Nome no sistema e nome completo (o que assina os relatórios)
+function Perfil() {
+  const usuario = useUsuario();
+  const { recarregar } = useEstado();
+  const [nome, setNome] = useState(usuario.nome);
+  const [completo, setCompleto] = useState(usuario.nomeCompleto);
+  const [msg, setMsg] = useState<{ tipo: "ok" | "erro"; texto: string } | null>(null);
+  const [ocupado, setOcupado] = useState(false);
+  const mudou = nome.trim() !== usuario.nome || completo.trim() !== usuario.nomeCompleto;
+
+  const salvar = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setOcupado(true);
+    const { error } = await supabaseNavegador().rpc("atualizar_meu_perfil", { p_nome: nome, p_nome_completo: completo });
+    setOcupado(false);
+    if (error) return setMsg({ tipo: "erro", texto: traduzirErro(error) });
+    setMsg({ tipo: "ok", texto: "Perfil atualizado." });
+    await recarregar();
+  };
+
+  return (
+    <Cartao className="p-4 sm:p-8">
+      <h2 className="text-xl font-semibold">Seus dados</h2>
+      <p className="mt-1 text-[15px] text-tinta-2">O nome aparece no menu e no histórico; o nome completo assina os relatórios como consultor.</p>
+      <form onSubmit={salvar} className="mt-6 grid gap-x-5 gap-y-4 sm:grid-cols-2">
+        <Campo rotulo="Nome (como aparece no sistema)">
+          <input required className="campo" value={nome} onChange={(e) => setNome(e.target.value)} />
+        </Campo>
+        <Campo rotulo="Nome completo">
+          <input required className="campo" value={completo} onChange={(e) => setCompleto(e.target.value)} />
+        </Campo>
+        <Campo rotulo="E-mail" dica="Para mudar o e-mail de acesso, fale com o administrador do grupo." className="sm:col-span-2">
+          <input className="campo" value={usuario.email} readOnly disabled />
+        </Campo>
+        <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
+          <Botao type="submit" disabled={ocupado || !mudou || !nome.trim() || !completo.trim()}>
+            {ocupado ? "Salvando…" : "Salvar"}
+          </Botao>
+          {msg && <span className={`text-sm ${msg.tipo === "ok" ? "text-verde" : "text-vermelho"}`}>{msg.texto}</span>}
+        </div>
+      </form>
+    </Cartao>
   );
 }
 

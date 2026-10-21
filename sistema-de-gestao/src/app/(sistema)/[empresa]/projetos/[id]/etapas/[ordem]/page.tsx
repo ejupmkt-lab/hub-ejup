@@ -21,7 +21,7 @@ import { useEstado } from "@/lib/dados/store";
 import type { Etapa } from "@/lib/dados/tipos";
 import { Abas, Barra, Botao, BotaoLink, Cabecalho, Campo, ProximoPasso, Selo, Status, Vazio } from "@/components/ui";
 import { abaDaPendencia, ancoraAba, ancoraProjetoDaPendencia, passoDaEtapa } from "@/lib/proximo-passo";
-import { automatizarEtapa, bloqueioStatus, fluxoEtapa } from "@/lib/regras-etapa";
+import { marcarAtividade, automatizarEtapa, bloqueioStatus, fluxoEtapa } from "@/lib/regras-etapa";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 
 const abas = ["Checklist", "Redação do relatório", "Entregáveis", "Fechamento"] as const;
@@ -363,7 +363,7 @@ export default function PaginaEtapa() {
                         key={s}
                         role="radio"
                         aria-checked={a.status === s}
-                        onClick={() => mudarEtapa((x) => void (x.atividades[i].status = s))}
+                        onClick={() => mudarEtapa((x) => void marcarAtividade(x, a.codigo, s))}
                         className={`px-3 py-1.5 first:rounded-l-[4px] last:rounded-r-[4px] ${
                           a.status === s
                             ? s === "feito"

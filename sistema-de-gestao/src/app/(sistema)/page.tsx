@@ -6,7 +6,8 @@ import { useAcesso, useEstado } from "@/lib/dados/store";
 import { alertasDoProjeto } from "@/lib/projeto";
 import { dataPorExtenso, hojeIso } from "@/lib/datas";
 import { horasDoProjeto, horasFmt } from "@/lib/horas";
-import { tarefasPendentes } from "@/lib/tarefas";
+import { contarTarefas } from "@/lib/tarefas";
+import { useEmpresaAtual } from "@/lib/dados/empresa-atual";
 import { indicadores } from "@/lib/painel";
 import { BotaoLink, Cartao, Cabecalho, Indicador, Vazio } from "@/components/ui";
 import { CartaoProjeto } from "@/components/cartao-projeto";
@@ -17,7 +18,9 @@ import { IconeMaisSinal } from "@/components/icones";
 
 export default function Painel() {
   const { estado } = useEstado();
-  const { empresasVisiveis, inicio, novoProjeto } = useAcesso();
+  const { inicio } = useAcesso();
+  const { empresa } = useEmpresaAtual();
+  const novoProjeto = empresa ? `/${empresa.slug}/projetos/novo` : null;
   const router = useRouter();
 
   // Sem empresa ativa liberada, não há painel a mostrar
@@ -28,20 +31,19 @@ export default function Painel() {
 
   // Em andamento e sem plano; os que pedem ação urgente primeiro
   const urgencia = (p: (typeof estado.projetos)[number]) => Math.min(9, ...alertasDoProjeto(p).map((a) => a.ordem));
-  const ativos = estado.projetos.filter((p) => p.status !== "encerrado").sort((a, b) => urgencia(a) - urgencia(b));
-  const ind = indicadores(estado.projetos);
-  const tarefas = tarefasPendentes(estado.projetos);
-  const tarefasAtrasadas = tarefas.filter((t) => t.atrasada).length;
+  // Só os projetos da empresa escolhida no menu
+  const projetos = estado.projetos.filter((p) => p.empresa === empresa?.slug);
+  const ativos = projetos.filter((p) => p.status !== "encerrado").sort((a, b) => urgencia(a) - urgencia(b));
+  const ind = indicadores(projetos);
+  const conta = contarTarefas(projetos);
   const horas = ativos
     .map(horasDoProjeto)
     .reduce((a, h) => ({ previstas: a.previstas + h.previstas, realizadas: a.realizadas + h.realizadas }), { previstas: 0, realizadas: 0 });
-  const ativa = empresasVisiveis.find((e) => e.status === "ativo");
-  const variasEmpresas = empresasVisiveis.filter((e) => e.status === "ativo").length > 1;
   const hoje = dataPorExtenso(hojeIso()).replace(/^0/, "");
 
   return (
     <>
-      <Cabecalho titulo="Painel" subtitulo={`Todos os projetos em andamento · ${hoje}`}>
+      <Cabecalho titulo="Painel" subtitulo={`${empresa?.nome ?? "Projetos em andamento"} · ${hoje}`}>
         {/* No celular, o novo projeto fica na página de projetos */}
         {novoProjeto && (
           <div className="hidden sm:block">
@@ -70,13 +72,13 @@ export default function Painel() {
                     ? `${ind.semPlano} sem plano de trabalho`
                     : "Todos com plano de trabalho"
               }
-              href={ativa ? `/${ativa.slug}` : undefined}
+              href={empresa ? `/${empresa.slug}` : undefined}
             />
             <Indicador
               rotulo="Tarefas pendentes"
-              valor={tarefas.length}
-              detalhe={tarefasAtrasadas ? `${tarefasAtrasadas} ${tarefasAtrasadas === 1 ? "atrasada" : "atrasadas"}` : "Nenhuma atrasada"}
-              tom={tarefasAtrasadas ? "atencao" : undefined}
+              valor={conta.total}
+              detalhe={conta.atrasadas ? `${conta.atrasadas} ${conta.atrasadas === 1 ? "atrasada" : "atrasadas"}` : "Nenhuma atrasada"}
+              tom={conta.atrasadas ? "atencao" : undefined}
               href="/tarefas"
             />
             <Indicador rotulo="Horas registradas" valor={horasFmt(horas.realizadas)} detalhe={`de ${horas.previstas.toLocaleString("pt-BR")} h previstas`} />
@@ -90,13 +92,13 @@ export default function Painel() {
 
           <div className="grid gap-4 lg:grid-cols-3">
             <Secao titulo="Pendências" descricao="Devoluções, atrasos, envios e prazos da semana.">
-              <Pendencias projetos={estado.projetos} />
+              <Pendencias projetos={projetos} />
             </Secao>
             <Secao titulo="Fase dos projetos" descricao="Do diagnóstico à execução da consultoria.">
-              <FasesDosProjetos projetos={estado.projetos} />
+              <FasesDosProjetos projetos={projetos} />
             </Secao>
             <Secao titulo="Carga de trabalho por semana">
-              <GraficoCarga projetos={estado.projetos} />
+              <GraficoCarga projetos={projetos} />
             </Secao>
           </div>
 
@@ -104,7 +106,7 @@ export default function Painel() {
             titulo="Etapas de cada projeto"
             descricao="D é o diagnóstico (antes da contratação); depois, as etapas do serviço de cada projeto, que variam de um serviço para outro."
           >
-            <EtapasDosProjetos projetos={estado.projetos} />
+            <EtapasDosProjetos projetos={projetos} />
           </Secao>
 
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 pt-2">
@@ -127,7 +129,7 @@ export default function Painel() {
 
           <section aria-label="Projetos" className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {ativos.map((p) => (
-              <CartaoProjeto key={p.id} projeto={p} mostrarEmpresa={variasEmpresas} />
+              <CartaoProjeto key={p.id} projeto={p} />
             ))}
           </section>
         </div>

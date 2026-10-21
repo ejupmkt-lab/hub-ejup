@@ -1,27 +1,62 @@
 import type { Atividade, Etapa, Projeto } from "./dados/tipos";
 import { hojeIso } from "./datas";
-import { etapaAtrasada, etapaAtual, etapaConcluida } from "./projeto";
-import { antesDaContratacao } from "./fase";
+import { etapaAtrasada, etapaAtual } from "./projeto";
+import { faseDoProjeto } from "./fase";
+import { passoDoProjeto, type Passo } from "./proximo-passo";
 
-// Tarefas do plano de trabalho: as atividades do checklist ainda pendentes nas
-// etapas já começadas (pelas datas do plano) e na etapa em curso. Atrasada é a
-// tarefa de uma etapa cujo prazo já passou.
+// Tarefas: o que fazer agora em cada projeto, só na fase em que ele está.
+// Na etapa em curso (pelo plano de trabalho e pela ficha do serviço), as
+// atividades do checklist ainda pendentes; fora disso (diagnóstico, plano de
+// trabalho, relatório, envio), o próximo passo do projeto.
 export type Tarefa = { projeto: Projeto; etapa: Etapa; atividade: Atividade; indice: number; atrasada: boolean };
 
+export type TarefasDoProjeto = {
+  projeto: Projeto;
+  etapa?: Etapa; // etapa em curso (ou devolvida), quando há
+  itens: Tarefa[]; // checklist pendente da etapa
+  passo: Passo | null; // quando não há checklist pendente: o próximo passo
+  aguardando: boolean; // depende do gestor, do cliente ou do SEBRAE
+  atrasada: boolean;
+};
+
+// Etapa em que o trabalho está agora: a devolvida primeiro, senão a em curso
+function etapaDoMomento(p: Projeto) {
+  return p.etapas.find((e) => e.status === "devolvida") ?? etapaAtual(p);
+}
+
+export function tarefasDoProjeto(p: Projeto, hoje = hojeIso()): TarefasDoProjeto | null {
+  if (p.status === "encerrado") return null;
+  const fase = faseDoProjeto(p);
+  const passo = passoDoProjeto(p);
+  const aguardando = fase === "aguardando_aprovacao" || fase === "aguardando_pagamento";
+  if (fase !== "execucao" || !p.planoFechadoEm) return { projeto: p, itens: [], passo, aguardando, atrasada: false };
+  const e = etapaDoMomento(p);
+  if (!e) return { projeto: p, itens: [], passo, aguardando: true, atrasada: false };
+  const atrasada = etapaAtrasada(e, hoje);
+  const itens = e.atividades.flatMap((atividade, indice) => (atividade.status === "pendente" ? [{ projeto: p, etapa: e, atividade, indice, atrasada }] : []));
+  return { projeto: p, etapa: e, itens, passo, aguardando: e.status === "enviada", atrasada };
+}
+
+// Atividades pendentes do checklist das etapas em curso (para os números do painel)
 export function tarefasPendentes(projetos: Projeto[], hoje = hojeIso()): Tarefa[] {
-  const lista: Tarefa[] = [];
+  return projetos.flatMap((p) => tarefasDoProjeto(p, hoje)?.itens ?? []);
+}
+
+// Quantas tarefas há: cada atividade pendente da etapa em curso, ou 1 pelo
+// próximo passo quando ele depende de quem usa o sistema (não de terceiros)
+export function contarTarefas(projetos: Projeto[], hoje = hojeIso()) {
+  let total = 0;
+  let atrasadas = 0;
   for (const p of projetos) {
-    if (p.status === "encerrado" || antesDaContratacao(p)) continue; // antes de contratado, não há tarefas da consultoria
-    const atual = etapaAtual(p);
-    for (const e of p.etapas) {
-      if (etapaConcluida(e)) continue;
-      const comecou = (e.dataInicio && e.dataInicio <= hoje) || e.ordem === atual?.ordem;
-      if (!comecou) continue;
-      const atrasada = etapaAtrasada(e, hoje);
-      e.atividades.forEach((a, indice) => {
-        if (a.status === "pendente") lista.push({ projeto: p, etapa: e, atividade: a, indice, atrasada });
-      });
+    const t = tarefasDoProjeto(p, hoje);
+    if (!t) continue;
+    if (t.itens.length) {
+      total += t.itens.length;
+      if (t.atrasada) atrasadas += t.itens.length;
+    } else if (t.passo && !t.aguardando) {
+      total += 1;
+      if (t.atrasada) atrasadas += 1;
     }
   }
-  return lista;
+  return { total, atrasadas };
 }

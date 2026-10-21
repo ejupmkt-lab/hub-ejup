@@ -23,6 +23,8 @@ import {
   IconeTarefas,
 } from "@/components/icones";
 import { LogoBlimp } from "@/components/logo";
+import { useEmpresaAtual } from "@/lib/dados/empresa-atual";
+import type { Empresa } from "@/lib/dados/tipos";
 
 type Folha = "mais" | "registrar" | null;
 
@@ -30,7 +32,7 @@ type Folha = "mais" | "registrar" | null;
 // inferior com o botão central de registrar visita, reunião ou horas.
 export function Shell({ children }: { children: React.ReactNode }) {
   const { salvamento, sair } = useEstado();
-  const { usuario, empresasVisiveis } = useAcesso();
+  const { usuario } = useAcesso();
   const caminho = usePathname();
   const [folha, setFolha] = useState<Folha>(null);
 
@@ -45,11 +47,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
     };
   }, [folha]);
 
-  const ativa = empresasVisiveis.find((e) => e.status === "ativo");
-  const base = ativa ? `/${ativa.slug}` : null;
-  const outras = empresasVisiveis.filter((e) => e.status !== "ativo");
+  const { empresa, empresas, trocar } = useEmpresaAtual();
+  const [menuEmpresas, setMenuEmpresas] = useState(false);
+  const base = empresa ? `/${empresa.slug}` : null;
   const em = (p: string) => caminho === p || caminho.startsWith(`${p}/`);
-  const emProjetos = !!base && em(base) && !em(`${base}/clientes`) && !em(`${base}/servicos`);
+  const emProjetos = !!base && em(base) && !em(`${base}/clientes`) && !em(`${base}/servicos`) && !em(`${base}/equipe`);
 
   const principais = [
     { href: "/", rotulo: "Painel", icone: IconePainel, ativo: caminho === "/" },
@@ -62,8 +64,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const secundarios = [
     ...(base
       ? [
-          { href: `${base}/clientes`, rotulo: "Clientes", icone: IconeClientes, ativo: em(`${base}/clientes`) },
+          { href: `${base}/clientes`, rotulo: "Clientes", icone: IconeEmpresa, ativo: em(`${base}/clientes`) },
           { href: `${base}/servicos`, rotulo: "Serviços", icone: IconeServicos, ativo: em(`${base}/servicos`) },
+          { href: `${base}/equipe`, rotulo: "Equipe", icone: IconeClientes, ativo: em(`${base}/equipe`) },
         ]
       : []),
     ...(usuario.adminGrupo ? [{ href: "/acessos", rotulo: "Acessos", icone: IconeAcessos, ativo: em("/acessos") }] : []),
@@ -91,41 +94,33 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <LogoBlimp className="h-8 w-auto" />
           <span className="mt-1.5 block text-[13px] text-tinta-2">Sistema de gestão</span>
         </Link>
+        <SeletorEmpresa empresa={empresa} empresas={empresas} trocar={trocar} aberto={menuEmpresas} setAberto={setMenuEmpresas} />
         <nav className="flex-1 space-y-1 overflow-y-auto px-3" aria-label="Principal">
           {principais.map(itemLateral)}
           {secundarios.length > 0 && <div className="!mt-4 border-t border-linha pt-4">{secundarios.map(itemLateral)}</div>}
-          {outras.length > 0 && (
-            <div className="!mt-4 border-t border-linha pt-4">
-              <p className="px-3 pb-1.5 text-[12px] font-semibold uppercase tracking-wide text-tinta-2">Outras empresas</p>
-              {outras.map((e) => (
-                <Link
-                  key={e.slug}
-                  href={`/${e.slug}`}
-                  aria-current={em(`/${e.slug}`) ? "page" : undefined}
-                  className={`flex items-center justify-between gap-2 rounded-[var(--radius-campo)] px-3 py-2 text-[15px] ${
-                    em(`/${e.slug}`) ? "bg-azul-claro font-semibold text-azul" : "font-medium text-tinta-2 hover:bg-pedra hover:text-tinta"
-                  }`}
-                >
-                  <span className="flex min-w-0 items-center gap-3">
-                    <IconeEmpresa className="h-5 w-5 shrink-0" />
-                    <span className="truncate">{e.nome}</span>
-                  </span>
-                  <span className="shrink-0 text-xs font-normal text-tinta-2">{statusEmpresa[e.status].toLowerCase()}</span>
-                </Link>
-              ))}
-            </div>
-          )}
         </nav>
-        <div className="border-t border-linha px-5 py-4">
-          <IndicadorSalvamento estado={salvamento} />
-          <p className="mt-3 truncate text-sm font-semibold text-tinta">{usuario.nomeCompleto}</p>
-          <p className="truncate text-[13px] text-tinta-2">{usuario.email}</p>
-          <div className="mt-3 flex gap-4 text-[13px] font-medium">
-            <Link href="/conta" aria-current={em("/conta") ? "page" : undefined} className="text-azul hover:underline aria-[current=page]:underline">
-              Minha conta
+        <div className="border-t border-linha px-3 py-3">
+          {/* Só aparece quando há algo a dizer; "tudo salvo" fica só para leitores de tela */}
+          <div className={salvamento === "salvo" ? "sr-only" : "px-3 pb-2"}>
+            <IndicadorSalvamento estado={salvamento} />
+          </div>
+          <div className="flex items-center gap-1">
+            <Link
+              href="/conta"
+              aria-current={em("/conta") ? "page" : undefined}
+              className="flex min-w-0 flex-1 items-center gap-3 rounded-[var(--radius-campo)] px-3 py-2 hover:bg-pedra aria-[current=page]:bg-azul-claro"
+              title="Meu perfil"
+            >
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-azul-claro text-azul">
+                <IconeConta className="h-5 w-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate text-sm font-semibold text-tinta">{usuario.nome}</span>
+                <span className="block text-[12px] text-tinta-2">Meu perfil</span>
+              </span>
             </Link>
-            <button onClick={sair} className="text-tinta-2 hover:text-vermelho hover:underline">
-              Sair
+            <button onClick={sair} aria-label="Sair" title="Sair" className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-tinta-2 hover:bg-vermelho-claro hover:text-vermelho">
+              <IconeSair className="h-5 w-5" />
             </button>
           </div>
         </div>
@@ -180,6 +175,31 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
       {folha === "mais" && (
         <FolhaSobreposta titulo="Mais" aoFechar={() => setFolha(null)} soCelular>
+          {empresas.length > 1 && (
+            <div className="mb-3 border-b border-linha pb-3">
+              <p className="px-3 pb-1.5 text-[12px] font-semibold uppercase tracking-wide text-tinta-2">Empresa</p>
+              <ul className="space-y-1">
+                {empresas.map((e) => (
+                  <li key={e.slug}>
+                    <button
+                      onClick={() => {
+                        trocar(e.slug);
+                        setFolha(null);
+                      }}
+                      aria-current={e.slug === empresa?.slug ? "true" : undefined}
+                      className={`flex w-full items-center gap-3 rounded-[var(--radius-campo)] px-3 py-3 text-left text-[15px] font-medium ${
+                        e.slug === empresa?.slug ? "bg-azul-claro text-azul" : "text-tinta hover:bg-pedra"
+                      }`}
+                    >
+                      <IconeEmpresa className="h-5 w-5 shrink-0" />
+                      <span className="min-w-0 flex-1 truncate">{e.nome}</span>
+                      {e.status !== "ativo" && <span className="shrink-0 text-xs font-normal text-tinta-2">{statusEmpresa[e.status].toLowerCase()}</span>}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <ul className="space-y-1">
             {secundarios.map((i) => (
               <li key={i.href}>
@@ -189,17 +209,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
               </li>
             ))}
             <li>
-              <LinkFolha href="/conta" icone={<IconeConta className="h-5 w-5" />}>
-                Minha conta
+              <LinkFolha href="/conta" icone={<IconeConta className="h-5 w-5" />} detalhe={usuario.nome}>
+                Meu perfil
               </LinkFolha>
             </li>
-            {outras.map((e) => (
-              <li key={e.slug}>
-                <LinkFolha href={`/${e.slug}`} icone={<IconeEmpresa className="h-5 w-5" />} detalhe={statusEmpresa[e.status].toLowerCase()}>
-                  {e.nome}
-                </LinkFolha>
-              </li>
-            ))}
             <li>
               <button
                 onClick={sair}
@@ -210,13 +223,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
               </button>
             </li>
           </ul>
-          <div className="mt-4 border-t border-linha pt-4">
-            <p className="truncate text-sm font-semibold text-tinta">{usuario.nomeCompleto}</p>
-            <p className="truncate text-[13px] text-tinta-2">{usuario.email}</p>
-            <div className="mt-2">
-              <IndicadorSalvamento estado={salvamento} />
-            </div>
-          </div>
         </FolhaSobreposta>
       )}
 
@@ -298,8 +304,9 @@ export function FolhaSobreposta({
 // Registrar: escolher o projeto e abrir o formulário de visita, reunião ou horas
 function EscolherProjeto({ aoFechar }: { aoFechar: () => void }) {
   const { estado } = useEstado();
-  const { novoProjeto } = useAcesso();
-  const projetos = estado.projetos.filter((p) => p.status !== "encerrado");
+  const { empresa } = useEmpresaAtual();
+  const novoProjeto = empresa ? `/${empresa.slug}/projetos/novo` : null;
+  const projetos = estado.projetos.filter((p) => p.status !== "encerrado" && p.empresa === empresa?.slug);
   const nome = (id: string) => {
     const c = estado.clientes.find((x) => x.id === id);
     return c?.nomeFantasia || c?.razaoSocial || "Cliente";
@@ -352,5 +359,66 @@ function IndicadorSalvamento({ estado, curto = false }: { estado: Salvamento; cu
       <span className={`h-2 w-2 shrink-0 rounded-full ${t.ponto}`} aria-hidden />
       {t.texto}
     </span>
+  );
+}
+
+// Seletor da empresa em que se trabalha: o sistema todo mostra só os dados dela
+function SeletorEmpresa({
+  empresa,
+  empresas,
+  trocar,
+  aberto,
+  setAberto,
+}: {
+  empresa: Empresa | null;
+  empresas: Empresa[];
+  trocar: (slug: string) => void;
+  aberto: boolean;
+  setAberto: (v: boolean) => void;
+}) {
+  if (!empresa) return null;
+  return (
+    <div className="relative px-3 pb-4">
+      <button
+        onClick={() => setAberto(!aberto)}
+        disabled={empresas.length < 2}
+        aria-expanded={aberto}
+        aria-haspopup="listbox"
+        aria-label={`Empresa: ${empresa.nome}. Trocar de empresa`}
+        className="flex w-full items-center gap-3 rounded-[var(--radius-campo)] border border-linha bg-pedra/60 px-3 py-2.5 text-left hover:border-azul/40 disabled:cursor-default disabled:hover:border-linha"
+      >
+        <IconeEmpresa className="h-5 w-5 shrink-0 text-azul" />
+        <span className="min-w-0 flex-1">
+          <span className="block text-[11px] font-semibold uppercase tracking-wide text-tinta-2">Empresa</span>
+          <span className="block truncate text-[15px] font-semibold text-tinta">{empresa.nome}</span>
+        </span>
+        {empresas.length > 1 && <span aria-hidden className="text-tinta-2">▾</span>}
+      </button>
+      {aberto && (
+        <>
+          <div aria-hidden className="fixed inset-0 z-30" onClick={() => setAberto(false)} />
+          <ul role="listbox" aria-label="Empresas" className="absolute inset-x-3 top-full z-40 -mt-2 rounded-[var(--radius-bloco)] border border-linha bg-folha p-1.5 shadow-lg">
+            {empresas.map((e) => (
+              <li key={e.slug}>
+                <button
+                  role="option"
+                  aria-selected={e.slug === empresa.slug}
+                  onClick={() => {
+                    setAberto(false);
+                    if (e.slug !== empresa.slug) trocar(e.slug);
+                  }}
+                  className={`flex w-full items-center justify-between gap-2 rounded-[var(--radius-campo)] px-3 py-2.5 text-left text-[15px] ${
+                    e.slug === empresa.slug ? "bg-azul-claro font-semibold text-azul" : "text-tinta hover:bg-pedra"
+                  }`}
+                >
+                  <span className="min-w-0 truncate">{e.nome}</span>
+                  {e.status !== "ativo" && <span className="shrink-0 text-xs font-normal text-tinta-2">{statusEmpresa[e.status].toLowerCase()}</span>}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
   );
 }

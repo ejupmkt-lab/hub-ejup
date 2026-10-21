@@ -253,11 +253,28 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "retirar_acesso":
+            "atualizar_meu_perfil":
+{ Args: { "p_nome": string,"p_nome_completo": string }; Returns: undefined
+                           },
+"definir_situacao_empresa":
+{ Args: { "p_empresa": string,"p_status": string }; Returns: undefined
+                           },
+"equipe_da_empresa":
+{ Args: { "p_empresa": string }; Returns: {
+              "admin_grupo": boolean,"email": string,"membro": boolean,"nome": string,"nome_completo": string,"papel": string,"situacao": string
+            }[]
+                           },
+"retirar_acesso":
 { Args: { "p_email": string }; Returns: undefined
+                           },
+"retirar_membro":
+{ Args: { "p_email": string,"p_empresa": string }; Returns: undefined
                            },
 "salvar_acesso":
 { Args: { "p_acessos": Json,"p_admin": boolean,"p_email": string,"p_nome": string,"p_nome_completo": string }; Returns: undefined
+                           },
+"salvar_membro":
+{ Args: { "p_email": string,"p_empresa": string,"p_nome": string,"p_nome_completo": string,"p_papel": string }; Returns: undefined
                            },
 "salvar_projeto":
 { Args: { "p_dados": Json,"p_id": string,"p_versao": number }; Returns: number

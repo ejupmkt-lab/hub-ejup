@@ -14,6 +14,16 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Três módulos**, um por empresa: Pivotto & Pivotto (ativo), ORB (em estruturação), EJUP (standby).
 - **Isolamento por empresa no banco (RLS):** cada pessoa só recebe os dados das empresas a que tem acesso.
   O administrador do grupo vê todas, inclusive as inativas.
+- **Empresa escolhida no menu** (`src/lib/dados/empresa-atual.tsx`): todo o sistema (painel, projetos,
+  tarefas, clientes, serviços e equipe) mostra só a empresa escolhida no seletor do menu; a escolha fica
+  guardada no navegador e acompanha o endereço (`/pivotto/...`).
+- **Equipe por empresa** (`/[empresa]/equipe`, funções `equipe_da_empresa`, `salvar_membro`,
+  `retirar_membro`): o gestor da empresa inclui pessoas (o convite sai copiado), muda a função
+  (gestor, consultor ou equipe) e retira o acesso, só naquela empresa. O administrador do grupo também
+  define a situação da empresa. Cada pessoa edita o próprio nome em "Meu perfil" (`atualizar_meu_perfil`).
+- **Tarefas**: o que fazer agora em cada projeto, só na fase em que ele está: o checklist pendente da
+  etapa em curso ou o próximo passo (diagnóstico, plano de trabalho, relatório, envio), com "Continuar no
+  Desenvolvimento". Marcar uma atividade-mãe marca as filhas pendentes; a filha não marca a mãe.
 - **Painel** (página inicial de todos): projetos em andamento, tarefas pendentes do plano de trabalho,
   horas registradas e etapas atrasadas; depois, pendências, situação das etapas e carga por semana; por
   fim, um cartão por projeto com o avanço contra o previsto,
@@ -21,7 +31,6 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   passo. O avanço pesa cada etapa pelas horas: 40% pelo checklist e 60% pelo status do relatório
   (`avancoProjeto` em `src/lib/projeto.ts`); o previsto vem das datas do plano.
 - **Projetos** em lista, quadro (por etapa), plano de trabalho de todos (linha do tempo) e calendário de prazos.
-- **Tarefas**: as atividades do checklist ainda pendentes nas etapas em curso, marcáveis ali mesmo.
 - **Menu**: lateral no computador; no celular, menu inferior com o botão central **Desenvolver projeto**
   (abre o Desenvolvimento de qualquer projeto em andamento).
 - **Serviços** (tabela `servicos`, menu "Serviços"): as fichas técnicas que a empresa presta, em cartões

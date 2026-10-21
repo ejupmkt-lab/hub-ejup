@@ -1,7 +1,7 @@
 import type { Atividade, Contratacao, Etapa, Projeto, RelatorioAssinado, TipoAtividade } from "./dados/tipos";
 import { faseDoProjeto, mudarContratacao, ordemContratacao } from "./fase";
 import { todasSecoes, verificarCompletude } from "./relatorio/secoes";
-import { assinada, automatizarEtapa, bloqueioStatus } from "./regras-etapa";
+import { assinada, automatizarEtapa, bloqueioStatus, marcarAtividade } from "./regras-etapa";
 import { doisDigitos, statusEtapa, type StatusEtapa as StatusEtapaTipo } from "./rotulos";
 import { distribuirPorHoras, formatarData, hojeIso, sugerirDatas } from "./datas";
 import { horasFmt, tiposAtividade } from "./horas";
@@ -184,12 +184,13 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
     if (a.tipo === "marcar_atividades") {
       const marcadas: string[] = [];
       for (const codigo of a.codigos) {
-        const at = e.atividades.find((x) => x.codigo === codigo);
-        if (!at || at.status === a.situacao) continue;
-        desfazer.push({ tipo: "atividade", etapa: e.ordem, codigo, status: at.status, justificativa: at.justificativa });
-        at.status = a.situacao;
-        if (a.situacao === "nao_aplicavel") at.justificativa = a.justificativa;
-        marcadas.push(codigo);
+        if (!e.atividades.some((x) => x.codigo === codigo)) continue;
+        // A mãe leva junto as filhas pendentes: guarda como estava cada uma, para desfazer
+        const antes = new Map(e.atividades.map((x) => [x.codigo, { status: x.status, justificativa: x.justificativa }]));
+        for (const c of marcarAtividade(e, codigo, a.situacao, a.justificativa)) {
+          desfazer.push({ tipo: "atividade", etapa: e.ordem, codigo: c, ...antes.get(c)! });
+          if (!marcadas.includes(c)) marcadas.push(c);
+        }
       }
       if (marcadas.length)
         feito(
