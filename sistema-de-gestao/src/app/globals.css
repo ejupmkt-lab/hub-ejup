@@ -43,9 +43,13 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-:focus-visible {
-  outline: 2px solid var(--color-azul);
-  outline-offset: 2px;
+/* Na camada base, para que caixas com o próprio destaque de foco (como a da
+   conversa) possam tirar o contorno */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-azul);
+    outline-offset: 2px;
+  }
 }
 
 .campo {

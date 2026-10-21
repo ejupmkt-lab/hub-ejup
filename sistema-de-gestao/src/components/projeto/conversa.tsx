@@ -39,7 +39,8 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
   const [aviso, setAviso] = useState<string | null>(null);
   const [urls, setUrls] = useState<Record<string, string>>({});
   const caixa = useRef<HTMLTextAreaElement>(null);
-  const fim = useRef<HTMLDivElement>(null);
+  const rodape = useRef<HTMLDivElement>(null);
+  const jaCarregou = useRef(false);
   const entrada = useRef<HTMLInputElement>(null);
   // O projeto mais recente, para aplicar a resposta da IA que chega depois
   const projetoAtual = useRef(projeto);
@@ -77,10 +78,14 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chaveCaminhos]);
 
-  // Mensagem nova ou resposta: rola até o fim
+  // A conversa faz parte da página: ao abrir, nada rola. Mensagem nova ou
+  // resposta da IA traz o fim da conversa e a caixa de mensagem à vista.
   const total = mensagens?.length ?? 0;
   useEffect(() => {
-    if (total) fim.current?.scrollIntoView({ block: "end" });
+    if (mensagens === null) return;
+    if (!jaCarregou.current) return void (jaCarregou.current = true);
+    rodape.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [total, ocupado]);
 
   // "Registrar" (no cabeçalho ou no menu) traz a caixa de mensagem à vista
@@ -248,7 +253,6 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
           )}
         </div>
       )}
-      <div ref={fim} />
 
       {/* Sugestões para avançar: empilhadas no celular, em três colunas no computador */}
       {sugestoes.length > 0 && (
@@ -277,10 +281,8 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
         </div>
       )}
 
-      {/* Caixa de mensagem; com conversa, fica sempre à mão (acima do menu inferior no celular) */}
-      <div
-        className={`z-20 rounded-b-[var(--radius-bloco)] bg-folha px-3 pb-3 pt-3 sm:px-6 sm:pb-5 ${vazia ? "" : "sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] lg:bottom-0"}`}
-      >
+      {/* Caixa de mensagem, no fim da conversa */}
+      <div ref={rodape} className="scroll-mb-[calc(5.5rem+env(safe-area-inset-bottom))] rounded-b-[var(--radius-bloco)] bg-folha px-3 pb-3 pt-3 sm:px-6 sm:pb-5 lg:scroll-mb-6">
         <div className="rounded-[var(--radius-bloco)] border border-linha-forte bg-folha p-2 focus-within:border-azul/60 focus-within:ring-2 focus-within:ring-azul/15 sm:p-2.5">
           {pendentes.length > 0 && (
             <ul className="mb-2 flex flex-wrap gap-2 px-1 pt-1">
