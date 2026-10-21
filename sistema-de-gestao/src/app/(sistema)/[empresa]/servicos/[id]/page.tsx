@@ -10,9 +10,10 @@ import { doisDigitos } from "@/lib/rotulos";
 import { traduzirErro } from "@/lib/erros";
 import { Abas, Botao, BotaoLink, Cabecalho, Cartao, Chip, Vazio } from "@/components/ui";
 import { BibliotecaServico } from "@/components/servicos/biblioteca-servico";
+import { ReferenciasServico } from "@/components/servicos/referencias-servico";
 import { IconeMaisSinal } from "@/components/icones";
 
-const abas = ["Ficha técnica", "Biblioteca de textos"] as const;
+const abas = ["Ficha técnica", "Biblioteca de textos", "Referências"] as const;
 type Aba = (typeof abas)[number];
 
 export default function PaginaServico() {
@@ -124,6 +125,7 @@ export default function PaginaServico() {
         </div>
       )}
       {aba === "Biblioteca de textos" && <BibliotecaServico servico={s} />}
+      {aba === "Referências" && <ReferenciasServico servico={s} />}
     </>
   );
 }

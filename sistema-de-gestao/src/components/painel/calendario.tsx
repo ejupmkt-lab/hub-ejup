@@ -125,7 +125,7 @@ export function Calendario({ projetos }: { projetos: Projeto[] }) {
             {doDia.map((ev, i) => (
               <li key={i}>
                 <Link
-                  href={`/${ev.projeto.empresa}/projetos/${ev.projeto.id}/etapas/${ev.etapa.ordem}`}
+                  href={`/${ev.projeto.empresa}/projetos/${ev.projeto.id}#etapa-${ev.etapa.ordem}`}
                   className="flex items-center gap-2.5 text-sm text-tinta hover:text-azul hover:underline"
                 >
                   <span aria-hidden className="h-2.5 w-2.5 shrink-0 rounded-[2px]" style={{ background: grupos[ev.grupo].cor }} />

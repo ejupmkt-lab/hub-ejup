@@ -71,7 +71,7 @@ export function CronogramaProjeto({ projeto, aoEditar }: { projeto: Projeto; aoE
             const pct = Math.round(avancoEtapa(e) * 100);
             const esquerda = pos(e.dataInicio!);
             const largura = ((diferencaDias(e.dataInicio!, e.dataFim!) + 1) / dias) * 100;
-            const href = `/${projeto.empresa}/projetos/${projeto.id}/etapas/${e.ordem}`;
+            const href = `/${projeto.empresa}/projetos/${projeto.id}#etapa-${e.ordem}`;
             return (
               <li key={e.ordem} className={`${colunas} items-center border-b border-linha/70 py-2.5 last:border-0`}>
                 <Link href={href} className="group min-w-0">

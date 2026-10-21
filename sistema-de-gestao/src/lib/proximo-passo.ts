@@ -10,26 +10,17 @@ import { verificarCompletude } from "./relatorio/secoes";
 // O que fazer agora, em uma frase e um botão. Usado no painel, na lista de
 // projetos, no projeto e na etapa, para ninguém precisar adivinhar o caminho.
 
-export type AbaEtapa = "Checklist" | "Redação do relatório" | "Entregáveis" | "Fechamento";
-export const ancoraAba: Record<AbaEtapa, string> = {
-  Checklist: "checklist",
-  "Redação do relatório": "redacao",
-  Entregáveis: "entregaveis",
-  Fechamento: "fechamento",
-};
-
-// Abas do projeto que podem ser abertas pelo endereço (#plano, #desenvolvimento…)
+// Abas do projeto que podem ser abertas pelo endereço (#plano, #desenvolvimento…).
+// #ficha abre os dados do projeto; #etapa-2 abre a entrega da etapa 2.
 export const ancoraAbaProjeto = {
   desenvolvimento: "Desenvolvimento",
   conversa: "Desenvolvimento",
   registrar: "Desenvolvimento",
+  ficha: "Desenvolvimento",
   cronograma: "Plano de trabalho",
   plano: "Plano de trabalho",
   entregas: "Entregas",
   relatorios: "Entregas",
-  ficha: "Ficha do projeto",
-  registros: "Tabelas do relatório",
-  referencias: "Referências",
   visitas: "Horas e visitas",
   historico: "Histórico",
 } as const;
@@ -40,26 +31,15 @@ export type Passo = {
   rotulo: string;
   tom: Tom;
   href: string;
-  aba?: AbaEtapa; // na própria etapa: aba a abrir
-  acao?: StatusEtapa; // na própria etapa: muda o status direto
+  acao?: StatusEtapa; // muda o status da etapa direto (com as regras e avisos)
   hub?: PassoHub; // no projeto: registra o próximo passo do HUB (com a data de hoje)
-};
-
-// Onde cada tipo de pendência se resolve: aba da etapa ou aba do projeto
-export const abaDaPendencia: Record<string, AbaEtapa> = {
-  Relatório: "Redação do relatório",
-  Evidências: "Redação do relatório",
-  Entregáveis: "Entregáveis",
-  Checklist: "Checklist",
-};
-export const ancoraProjetoDaPendencia: Record<string, keyof typeof ancoraAbaProjeto> = {
-  Referências: "referencias",
-  Registros: "registros",
 };
 
 export function passoDaEtapa(p: Projeto, e: Etapa): Passo | null {
   const base = `/${p.empresa}/projetos/${p.id}`;
-  const daEtapa = (aba: AbaEtapa) => `${base}/etapas/${e.ordem}#${ancoraAba[aba]}`;
+  // A etapa é escrita no Desenvolvimento e enviada pelas Entregas
+  const desenvolvimento = `${base}#desenvolvimento`;
+  const entrega = `${base}#etapa-${e.ordem}`;
   if (p.status === "encerrado") return null;
   if (!p.planoFechadoEm)
     return {
@@ -72,12 +52,11 @@ export function passoDaEtapa(p: Projeto, e: Etapa): Passo | null {
   if (e.status === "aprovada") return null;
   if (e.status === "devolvida")
     return {
-      texto: "O SEBRAE devolveu esta entrega para ajuste",
-      detalhe: "Volte para a redação, ajuste o relatório, assine de novo e reenvie no HUB.",
-      rotulo: "Voltar para redação",
+      texto: "O gestor do SEBRAE devolveu esta entrega para ajuste",
+      detalhe: "Ajuste o relatório no Desenvolvimento, assine de novo e reenvie no HUB.",
+      rotulo: "Voltar a ajustar",
       tom: "critico",
-      href: daEtapa("Redação do relatório"),
-      aba: "Redação do relatório",
+      href: entrega,
       acao: "em_redacao",
     };
   if (e.status === "enviada")
@@ -97,41 +76,37 @@ export function passoDaEtapa(p: Projeto, e: Etapa): Passo | null {
       detalhe: `A etapa em curso é a ${doisDigitos(atual.ordem)}. Dá para adiantar o checklist e a redação desta, se quiser.`,
       rotulo: `Ir para a etapa ${doisDigitos(atual.ordem)}`,
       tom: "neutro",
-      href: `${base}/etapas/${atual.ordem}`,
+      href: `${base}#etapa-${atual.ordem}`,
     };
 
   const prog = progressoAtividades(e);
   if (prog.feitas < prog.total)
     return {
       texto: "Marque as atividades do checklist",
-      detalhe: `${prog.feitas} de ${prog.total} já marcadas.`,
-      rotulo: "Abrir o checklist",
+      detalhe: `${prog.feitas} de ${prog.total} já marcadas. Conte no Desenvolvimento o que foi feito, ou marque em Tarefas.`,
+      rotulo: "Contar no Desenvolvimento",
       tom: "andamento",
-      href: daEtapa("Checklist"),
-      aba: "Checklist",
+      href: desenvolvimento,
     };
 
   const pendencias = verificarCompletude(p, e);
   if (pendencias.length) {
     const primeira = pendencias[0].onde;
     const qtd = pendencias.length === 1 ? "Falta 1 item para o relatório ficar completo." : `Faltam ${pendencias.length} itens para o relatório ficar completo.`;
-    const ancoraProjeto = ancoraProjetoDaPendencia[primeira];
-    if (ancoraProjeto)
+    if (primeira === "Referências")
       return {
-        texto: primeira === "Referências" ? "Complete as referências do projeto" : "Preencha os registros do programa",
+        texto: "Complete as referências do relatório",
         detalhe: `${pendencias[0].texto}. ${qtd}`,
-        rotulo: primeira === "Referências" ? "Abrir as referências" : "Abrir os registros",
+        rotulo: "Abrir a entrega",
         tom: "andamento",
-        href: `${base}#${ancoraProjeto}`,
+        href: entrega,
       };
-    const aba = abaDaPendencia[primeira] ?? "Fechamento";
     return {
-      texto: aba === "Entregáveis" ? "Escreva os entregáveis da etapa" : aba === "Fechamento" ? "Resolva as pendências do relatório" : "Escreva o relatório da etapa",
-      detalhe: qtd,
-      rotulo: aba === "Entregáveis" ? "Abrir os entregáveis" : aba === "Fechamento" ? "Ver as pendências" : "Abrir a redação",
+      texto: primeira === "Registros" ? "Conte os dados das tabelas do relatório" : primeira === "Fechamento" ? "Resolva as pendências do relatório" : "Escreva o relatório da etapa",
+      detalhe: `${pendencias[0].texto}. ${qtd}`,
+      rotulo: "Escrever no Desenvolvimento",
       tom: "andamento",
-      href: daEtapa(aba),
-      aba,
+      href: desenvolvimento,
     };
   }
 
@@ -139,10 +114,9 @@ export function passoDaEtapa(p: Projeto, e: Etapa): Passo | null {
     return {
       texto: "Baixe o relatório, assine no gov.br e anexe o PDF",
       detalhe: "O relatório está completo. Ao anexar o PDF assinado, as datas de assinatura são preenchidas.",
-      rotulo: "Ir para o fechamento",
+      rotulo: "Abrir a entrega",
       tom: "atencao",
-      href: daEtapa("Fechamento"),
-      aba: "Fechamento",
+      href: entrega,
     };
 
   if (e.status !== "a_enviar")
@@ -151,16 +125,16 @@ export function passoDaEtapa(p: Projeto, e: Etapa): Passo | null {
       detalhe: "Marque a etapa como pronta para enviar no HUB.",
       rotulo: "Marcar como pronta",
       tom: "atencao",
-      href: daEtapa("Fechamento"),
+      href: entrega,
       acao: "a_enviar",
     };
 
   return {
-    texto: "Envie o relatório assinado no HUB SEBRAE",
-    detalhe: "Depois de enviar, marque aqui para a próxima etapa começar.",
-    rotulo: "Marcar como enviada",
+    texto: "Envie o relatório assinado no Plano de Entrega do HUB",
+    detalhe: "Depois de enviar, registre aqui para a próxima etapa começar.",
+    rotulo: "Enviei no HUB",
     tom: "atencao",
-    href: daEtapa("Fechamento"),
+    href: entrega,
     acao: "enviada",
   };
 }
@@ -209,7 +183,7 @@ export function passoDoProjeto(p: Projeto): (Passo & { etapa?: Etapa }) | null {
         }
       : {
           texto: "Monte o plano de trabalho da proposta",
-          detalhe: "As horas e as datas de cada etapa. Essas datas são as oficiais: o gestor confere as entregas com elas.",
+          detalhe: "As horas e a duração de cada etapa. Quando o cliente pagar, o plano passa a começar na data do pagamento.",
           rotulo: "Montar o plano de trabalho",
           tom: "atencao",
           href: `${base}#plano`,
@@ -226,7 +200,7 @@ export function passoDoProjeto(p: Projeto): (Passo & { etapa?: Etapa }) | null {
   if (hub === "proposta_cliente")
     return {
       texto: "Aguardando o cliente analisar a proposta e pagar no HUB",
-      detalhe: "Com o pagamento, a execução começa. As datas do plano de trabalho não mudam.",
+      detalhe: "Com o pagamento, a execução começa e o plano de trabalho passa a contar dessa data.",
       rotulo: "O cliente pagou",
       tom: "neutro",
       href: desenvolvimento,

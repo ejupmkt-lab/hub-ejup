@@ -1,12 +1,12 @@
 import type { Etapa, Hub, PassoHub, Projeto } from "./dados/tipos";
 import { doisDigitos } from "./rotulos";
 import { entregaFinal, etapaAtual, etapaConcluida } from "./projeto";
-import { diferencaDias, formatarData, hojeIso } from "./datas";
+import { diferencaDias, formatarData, hojeIso, somarDias } from "./datas";
 
 // A régua do projeto é a do HUB SEBRAE: 6 etapas, as mesmas que aparecem no
 // HUB. Cada uma tem passos que dizem com quem está a bola, para nenhum projeto
 // ficar parado sem que se saiba quem cobrar. As datas do plano de trabalho são
-// as oficiais e não são recalculadas quando o cliente paga.
+// montadas na proposta e, quando o cliente paga, passam a começar no pagamento.
 
 export type Fase = "solicitacao" | "diagnostico" | "proposta" | "execucao" | "finalizado" | "concluido";
 export type Responsavel = "consultor" | "gestor" | "funcern" | "cliente";
@@ -125,6 +125,8 @@ export function mudarHub(p: Projeto, para: PassoHub, data: string) {
   const datas: Hub["datas"] = {};
   for (const s of ordemPassos.slice(0, i + 1)) if (h.datas[s]) datas[s] = h.datas[s];
   datas[para] ??= data;
+  // Pagamento: a consultoria começa nele, e o plano de trabalho anda junto
+  if (para === "execucao" && ordemPassos.indexOf(h.passo) < i) ajustarPlanoAoPagamento(p, data);
   p.hub = { passo: para, datas };
   delete p.contratacao;
   if (para === "concluido") p.status = "encerrado";
@@ -152,8 +154,8 @@ export const proximoPassoHub = (p: Projeto): PassoHub | null => ordemPassos[orde
 
 // ─── Período compatível com as horas ────────────────────────────────────────
 // O gestor recusa a nota quando as entregas saem em poucos dias para muitas
-// horas (ex.: o cliente paga dia 15 e tudo é enviado dia 20). As datas do
-// plano não mudam: o sistema avisa para não enviar antes do fim previsto.
+// horas (ex.: o cliente paga dia 15 e tudo é enviado dia 20). O sistema avisa
+// para não enviar antes do fim previsto no plano.
 
 export function avisoEnvioAntecipado(e: Etapa, hoje = hojeIso()): string | null {
   if (!e.dataFim || hoje >= e.dataFim) return null;
@@ -169,15 +171,25 @@ export function avisoFinalizarAntecipado(p: Projeto, hoje = hojeIso()): string |
   return `O plano de trabalho prevê o fim do projeto em ${formatarData(fim)}. Finalizar antes pode parecer incompatível com as horas contratadas.`;
 }
 
-// Pagamento depois do início previsto no plano: as datas continuam, e a última
-// entrega não deve sair antes do fim previsto
-export function avisoPagamentoTardio(p: Projeto): string | null {
-  const pago = hubDoProjeto(p).datas.execucao;
+// O cliente pagou: a consultoria começa no pagamento. O plano de trabalho é
+// movido para começar nessa data, mantendo a duração e as horas de cada etapa.
+// Devolve quantos dias o plano andou (0 se não mudou).
+export function ajustarPlanoAoPagamento(p: Projeto, pagamento: string): number {
   const inicio = p.etapas[0]?.dataInicio;
-  const fim = entregaFinal(p);
-  if (!pago || !inicio || !p.planoFechadoEm || pago <= inicio) return null;
-  return (
-    `O cliente pagou em ${formatarData(pago)}, depois do início previsto no plano (${formatarData(inicio)}). ` +
-    `As datas do plano continuam as mesmas${fim ? `: não envie a última etapa antes de ${formatarData(fim)}` : ""}.`
-  );
+  if (!p.planoFechadoEm || !inicio) return 0;
+  const delta = diferencaDias(inicio, pagamento);
+  if (!delta) return 0;
+  const mover = (d: string | null) => (d ? somarDias(d, delta) : d);
+  for (const e of p.etapas) {
+    e.dataInicio = mover(e.dataInicio);
+    e.dataFim = mover(e.dataFim);
+    e.dataInicioPlano = mover(e.dataInicioPlano);
+    e.dataFimPlano = mover(e.dataFimPlano);
+    e.dataRelatorio = mover(e.dataRelatorio);
+  }
+  return delta;
 }
+
+// "Plano de trabalho ajustado ao pagamento: 21/10/2026 a 08/01/2027"
+export const textoPlanoAjustado = (p: Projeto) =>
+  `Plano de trabalho ajustado ao pagamento: ${formatarData(p.etapas[0]?.dataInicio)} a ${formatarData(entregaFinal(p))}`;

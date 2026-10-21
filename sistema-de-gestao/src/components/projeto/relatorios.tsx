@@ -1,158 +1,152 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
 import type { Etapa, Projeto } from "@/lib/dados/tipos";
-import { periodoCurto } from "@/lib/datas";
+import { useEstado } from "@/lib/dados/store";
+import { novoId } from "@/lib/dados/store";
+import { formatarData, hojeIso, periodoCurto } from "@/lib/datas";
+import { antesDaContratacao } from "@/lib/fase";
+import { etapaAtrasada, etapaConcluida, progressoAtividades } from "@/lib/projeto";
+import { bloqueioStatus } from "@/lib/regras-etapa";
+import { verificarCompletude } from "@/lib/relatorio/secoes";
 import { doisDigitos } from "@/lib/rotulos";
-import { avancoEtapa, etapaAtrasada, etapaAtual, progressoAtividades, situacaoPrazo } from "@/lib/projeto";
-import { todasSecoes, verificarCompletude } from "@/lib/relatorio/secoes";
-import { Barra, BotaoLink, Cartao, Selo, StatusEtapa } from "@/components/ui";
-import { IconeRelatorio, IconeSeta } from "@/components/icones";
+import { Botao, Cartao } from "@/components/ui";
+import { RelatorioAssinado } from "./assinado";
+import { useAcoesEtapa } from "./acoes-etapa";
+import { useProjeto } from "./use-projeto";
 
-const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
-
-function contagens(e: Etapa) {
-  const secoes = todasSecoes.filter((s) => s.obrigatoria(e));
-  const secoesFeitas = secoes.filter((s) => (e.secoes[s.chave] ?? "").trim()).length;
-  const entregaveis = e.entregaveis.filter((x) => x.tipo === "entregavel");
-  const entregaveisFeitos = entregaveis.filter((x) => x.conteudo.trim()).length;
-  return {
-    checklist: progressoAtividades(e),
-    secoes: { feitas: secoesFeitas, total: secoes.length },
-    entregaveis: { feitas: entregaveisFeitos, total: entregaveis.length },
-  };
+// Situação de cada entrega, nas cores do Plano de Entrega do HUB
+function situacao(p: Projeto, e: Etapa): { rotulo: string; texto: string; faixa: string } {
+  if (antesDaContratacao(p)) return { rotulo: "Depois do pagamento", texto: "text-tinta-2", faixa: "bg-linha" };
+  if (etapaConcluida(e)) return { rotulo: e.status === "aprovada" ? "Aprovada" : "Enviada", texto: "text-verde", faixa: "bg-verde-vivo" };
+  if (e.status === "devolvida") return { rotulo: "Devolvida", texto: "text-vermelho", faixa: "bg-vermelho-vivo" };
+  if (etapaAtrasada(e)) return { rotulo: "A enviar · atrasada", texto: "text-laranja", faixa: "bg-laranja-vivo" };
+  return { rotulo: "A enviar", texto: "text-[#a16207]", faixa: "bg-[#d4a106]" };
 }
 
-// Diagnósticos e relatórios do projeto, um por etapa, sempre no modelo do
-// Relatório Técnico de Nª Entrega da ficha técnica do projeto. A etapa em curso fica em destaque.
-export function Relatorios({ projeto }: { projeto: Projeto }) {
-  const base = `/${projeto.empresa}/projetos/${projeto.id}`;
-  const destaque = projeto.etapas.find((e) => e.status === "devolvida") ?? etapaAtual(projeto);
-
+// Entregas: os relatórios de cada etapa, como no Plano de Entrega do HUB. A
+// elaboração é feita no Desenvolvimento; aqui ficam o relatório em Word, o PDF
+// assinado e o registro do envio (ou da devolução pelo gestor).
+export function Relatorios({ projeto, aoDesenvolver }: { projeto: Projeto; aoDesenvolver: () => void }) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-tinta-2">
-        Cada etapa tem o seu relatório técnico, no modelo da ficha {projeto.codigoFichaTecnica}: as seções do relatório, os entregáveis da etapa e as evidências. O relatório é
-        baixado em Word, assinado no gov.br e enviado no HUB.
+        Os relatórios de cada etapa, no modelo da ficha {projeto.codigoFichaTecnica}. Eles são escritos no{" "}
+        <button type="button" onClick={aoDesenvolver} className="font-semibold text-azul hover:underline">
+          Desenvolvimento
+        </button>
+        ; aqui você baixa o relatório em Word, anexa o PDF assinado no gov.br e registra o envio no Plano de Entrega do HUB.
       </p>
-
-      {destaque && <EtapaEmDestaque projeto={projeto} etapa={destaque} />}
-
-      <Cartao className="overflow-hidden">
-        <h2 className="border-b border-linha px-4 py-3 text-[17px] font-bold sm:px-5">Relatórios das etapas</h2>
-        <ol className="divide-y divide-linha">
-          {projeto.etapas.map((e) => {
-            const pct = Math.round(avancoEtapa(e) * 100);
-            const sit = projeto.status === "em_andamento" && projeto.planoFechadoEm ? situacaoPrazo(e) : null;
-            const atual = destaque?.ordem === e.ordem;
-            return (
-              <li key={e.ordem} className="relative">
-                <div className={`flex items-start gap-3 px-4 py-4 hover:bg-pedra/50 sm:gap-4 sm:px-5 ${atual ? "bg-azul-claro/40" : ""}`}>
-                  <span
-                    className={`num grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-bold ${
-                      e.status === "enviada" || e.status === "aprovada"
-                        ? "bg-verde-claro text-verde"
-                        : e.status === "devolvida"
-                          ? "bg-vermelho-claro text-vermelho"
-                          : etapaAtrasada(e)
-                            ? "bg-laranja-claro text-laranja"
-                            : atual
-                              ? "bg-azul text-folha"
-                              : "bg-pedra text-tinta-2"
-                    }`}
-                  >
-                    {doisDigitos(e.ordem)}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1.5">
-                      <div className="min-w-0">
-                        <Link
-                          href={`${base}/etapas/${e.ordem}`}
-                          className="break-words text-[15px] font-bold text-tinta after:absolute after:inset-0 after:content-[''] hover:text-azul"
-                        >
-                          Relatório da {e.ordem}ª entrega · {capitalizar(e.nome)}
-                        </Link>
-                        <p className="num text-[13px] text-tinta-2">
-                          {periodoCurto(e.dataInicio, e.dataFim)} · {e.horasPrevistas} h
-                        </p>
-                      </div>
-                      <span className="flex flex-wrap items-center gap-2">
-                        {sit && (sit.tom === "critico" || sit.tom === "atencao") && <Selo tom={sit.tom === "critico" ? "atencao" : sit.tom}>{sit.texto}</Selo>}
-                        <StatusEtapa status={e.status} />
-                      </span>
-                    </div>
-                    <div className="mt-2.5 flex items-center gap-3">
-                      <span className="flex-1">
-                        <Barra valor={pct} total={100} tom={pct === 100 ? "ok" : "andamento"} />
-                      </span>
-                      <span className="num w-10 shrink-0 text-right text-[13px] font-semibold">{pct}%</span>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            );
-          })}
+      <Cartao className="p-3 sm:p-4">
+        <h2 className="px-1 pb-3 text-[17px] font-bold">Plano de Entrega</h2>
+        <ol className="space-y-3">
+          {projeto.etapas.map((e) => (
+            <Entrega key={e.ordem} projeto={projeto} etapa={e} aoDesenvolver={aoDesenvolver} />
+          ))}
         </ol>
       </Cartao>
     </div>
   );
 }
 
-function EtapaEmDestaque({ projeto, etapa: e }: { projeto: Projeto; etapa: Etapa }) {
-  const base = `/${projeto.empresa}/projetos/${projeto.id}/etapas/${e.ordem}`;
-  const c = contagens(e);
-  const pendencias = verificarCompletude(projeto, e).length;
-  const item = (rotulo: string, x: { feitas: number; total: number }, href: string) => (
-    <Link href={href} className="block rounded-[var(--radius-campo)] border border-linha bg-folha px-3 py-2.5 hover:border-azul/40">
-      <span className="flex items-baseline justify-between gap-2 text-[13px]">
-        <span className="font-medium text-tinta-2">{rotulo}</span>
-        <span className="num font-semibold text-tinta">
-          {x.feitas}/{x.total}
-        </span>
-      </span>
-      <span className="mt-2 block">
-        <Barra valor={x.feitas} total={x.total} tom={x.total && x.feitas === x.total ? "ok" : "andamento"} />
-      </span>
-    </Link>
-  );
+function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa: Etapa; aoDesenvolver: () => void }) {
+  const { mudarStatus, baixar, gerando, alterarEtapa } = useAcoesEtapa();
+  const { alterar } = useProjeto();
+  const { estado } = useEstado();
+  const [verPendencias, setVerPendencias] = useState(false);
+  const sit = situacao(projeto, e);
+  const antes = antesDaContratacao(projeto);
+  const concluida = etapaConcluida(e);
+  const prog = progressoAtividades(e);
+  const pendencias = verificarCompletude(projeto, e);
+  const bloqueioEnvio = bloqueioStatus(projeto, e, "enviada");
+  const refsServico = estado.servicos.find((s) => s.id === projeto.modeloId)?.referencias ?? [];
+  const semReferencias = pendencias.some((x) => x.onde === "Referências") && projeto.referencias.length === 0 && refsServico.length > 0;
+
+  const usarReferenciasDoServico = () =>
+    alterar((p) => void (p.referencias = refsServico.map((r) => ({ ...r, id: novoId("ref"), consultadoEm: r.url ? hojeIso() : "" }))), {
+      acao: "Referências do serviço aplicadas ao projeto",
+    });
+
   return (
-    <Cartao
-      className={`border-l-4 p-4 sm:p-5 ${e.status === "devolvida" ? "border-l-vermelho-vivo" : etapaAtrasada(e) ? "border-l-laranja-vivo" : "border-l-azul"}`}
-    >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex min-w-0 items-start gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--radius-campo)] bg-azul-claro text-azul">
-            <IconeRelatorio className="h-5 w-5" />
-          </span>
-          <div className="min-w-0">
-            <p className={`text-[12px] font-bold uppercase tracking-wide ${e.status === "devolvida" ? "text-vermelho" : "text-azul"}`}>
-              {e.status === "devolvida" ? "Relatório devolvido" : "Relatório da etapa em curso"}
-            </p>
-            <h2 className="break-words text-lg font-bold leading-snug text-tinta">Relatório Técnico de {e.ordem}ª Entrega</h2>
-            <p className="num text-sm text-tinta-2">
-              Etapa {doisDigitos(e.ordem)} {capitalizar(e.nome)} · {periodoCurto(e.dataInicio, e.dataFim)}
+    <li id={`entrega-${e.ordem}`} className="flex scroll-mt-6 overflow-hidden rounded-[var(--radius-campo)] border border-linha bg-folha">
+      <div className="min-w-0 flex-1 p-4 sm:p-5">
+        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
+          <h3 className="min-w-0 break-words text-[15px] font-bold uppercase tracking-wide text-tinta">
+            Etapa {doisDigitos(e.ordem)} | {e.nome}
+          </h3>
+          <span className={`text-[14px] font-semibold ${sit.texto}`}>{sit.rotulo}</span>
+        </div>
+        {e.descricao && <p className="mt-1 line-clamp-3 text-sm text-tinta-2">{e.descricao}</p>}
+        <p className="num mt-2 text-[13px] text-tinta-2">
+          {periodoCurto(e.dataInicio, e.dataFim)} · {e.horasPrevistas} h · checklist {prog.feitas}/{prog.total}
+          {!concluida && !antes && (
+            <>
+              {" · "}
+              {pendencias.length === 0 ? (
+                <span className="text-verde">relatório completo</span>
+              ) : (
+                <button type="button" onClick={() => setVerPendencias(!verPendencias)} className="text-laranja underline-offset-4 hover:underline" aria-expanded={verPendencias}>
+                  {pendencias.length === 1 ? "1 pendência no relatório" : `${pendencias.length} pendências no relatório`}
+                </button>
+              )}
+            </>
+          )}
+        </p>
+
+        {verPendencias && pendencias.length > 0 && (
+          <div className="mt-2 rounded-[var(--radius-campo)] bg-pedra/70 px-3 py-2.5 text-[13px]">
+            <ul className="space-y-1 text-tinta">
+              {pendencias.slice(0, 8).map((x, i) => (
+                <li key={i}>
+                  <span className="text-tinta-2">{x.onde}:</span> {x.texto}
+                </li>
+              ))}
+              {pendencias.length > 8 && <li className="text-tinta-2">e mais {pendencias.length - 8}</li>}
+            </ul>
+            <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+              <button type="button" onClick={aoDesenvolver} className="font-semibold text-azul hover:underline">
+                Resolver no Desenvolvimento
+              </button>
+              {semReferencias && (
+                <button type="button" onClick={usarReferenciasDoServico} className="font-semibold text-azul hover:underline">
+                  Usar as referências do serviço
+                </button>
+              )}
             </p>
           </div>
-        </div>
-        <StatusEtapa status={e.status} />
-      </div>
+        )}
 
-      <div className="mt-4 grid gap-2 sm:grid-cols-3">
-        {item("Checklist", c.checklist, `${base}#checklist`)}
-        {item("Seções do relatório", c.secoes, `${base}#redacao`)}
-        {item("Entregáveis", c.entregaveis, `${base}#entregaveis`)}
-      </div>
+        {!antes && (
+          <div className="mt-3">
+            <RelatorioAssinado projeto={projeto} etapa={e} alterarEtapa={alterarEtapa(e.ordem)} compacto />
+          </div>
+        )}
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <BotaoLink href={`${base}#redacao`} className="w-full sm:w-auto">
-          {c.secoes.feitas ? "Continuar o relatório" : "Começar o relatório"}
-          <IconeSeta className="h-4 w-4" />
-        </BotaoLink>
-        <BotaoLink href={`${base}#fechamento`} variante="secundario" className="w-full sm:w-auto">
-          Fechamento e envio
-          {pendencias > 0 && <span className="num rounded-full bg-vermelho-claro px-1.5 text-[12px] text-vermelho">{pendencias}</span>}
-        </BotaoLink>
+        {!antes && (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <Botao variante="secundario" tamanho="pequeno" onClick={() => void baixar(e.ordem)} disabled={gerando === e.ordem}>
+              {gerando === e.ordem ? "Gerando…" : "Baixar relatório em Word"}
+            </Botao>
+            {e.status === "devolvida" ? (
+              <Botao tamanho="pequeno" onClick={() => mudarStatus(e.ordem, "em_redacao")}>
+                Voltar a ajustar
+              </Botao>
+            ) : concluida ? (
+              <Botao variante="fantasma" tamanho="pequeno" onClick={() => mudarStatus(e.ordem, "devolvida")} className="hover:!text-vermelho">
+                O gestor devolveu
+              </Botao>
+            ) : (
+              <Botao tamanho="pequeno" onClick={() => mudarStatus(e.ordem, "enviada")} disabled={!!bloqueioEnvio} title={bloqueioEnvio ?? undefined}>
+                Enviei no HUB
+              </Botao>
+            )}
+            {!concluida && e.status !== "devolvida" && bloqueioEnvio && <span className="text-[13px] text-tinta-2">{bloqueioEnvio}.</span>}
+            {concluida && e.dataFim && <span className="num text-[13px] text-tinta-2">fim previsto {formatarData(e.dataFim)}</span>}
+          </div>
+        )}
       </div>
-    </Cartao>
+      <span aria-hidden className={`w-2 shrink-0 ${sit.faixa}`} />
+    </li>
   );
 }

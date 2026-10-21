@@ -1,11 +1,12 @@
-import type { Atividade, Contratacao, Etapa, Hub, PassoHub, Projeto, RelatorioAssinado, TipoAtividade } from "./dados/tipos";
-import { avisoEnvioAntecipado, avisoFinalizarAntecipado, avisoPagamentoTardio, bloqueioAte, mudarHub, ordemPassos, passoHubDoProjeto, registroHub } from "./fase";
+import type { Atividade, Contratacao, Etapa, Hub, PassoHub, Projeto, Registro, RelatorioAssinado, TipoAtividade } from "./dados/tipos";
+import { avisoEnvioAntecipado, avisoFinalizarAntecipado, bloqueioAte, textoPlanoAjustado, mudarHub, ordemPassos, passoHubDoProjeto, registroHub } from "./fase";
 import { todasSecoes, verificarCompletude } from "./relatorio/secoes";
 import { assinada, automatizarEtapa, bloqueioStatus, marcarAtividade } from "./regras-etapa";
 import { doisDigitos, statusEtapa, type StatusEtapa as StatusEtapaTipo } from "./rotulos";
 import { distribuirPorHoras, formatarData, hojeIso, sugerirDatas } from "./datas";
 import { horasFmt, tiposAtividade } from "./horas";
 import { etapaAtual } from "./projeto";
+import { tipoRegistro } from "./registros";
 
 // Conversa do projeto: o que a IA pode fazer no projeto a partir de uma
 // mensagem, e como desfazer. As ações chegam do servidor já no formato
@@ -23,7 +24,8 @@ export type AcaoIA =
   | { tipo: "alterar_datas_etapa"; etapa: number; inicio: string; fim: string; justificativa: string }
   | { tipo: "registrar_assinatura"; etapa: number; anexo: string; data_consultor: string; data_cliente: string }
   | { tipo: "mudar_situacao_etapa"; etapa: number; situacao: "a_enviar" | "enviada" | "aprovada" | "devolvida"; observacao: string }
-  | { tipo: "avancar_hub"; passo: PassoHub; data: string };
+  | { tipo: "avancar_hub"; passo: PassoHub; data: string }
+  | { tipo: "preencher_tabela"; tabela: string; linhas: string[][]; substituir: boolean };
 
 // O que a IA fez (ou tentou e o sistema não deixou, com o motivo)
 export type ItemAcao = { descricao: string; aviso?: boolean };
@@ -47,6 +49,7 @@ export type Desfazer =
     }
   | { tipo: "plano"; planoFechadoEm: string | null; status: Projeto["status"] }
   | { tipo: "hub"; hub: Hub | null; contratacao: Contratacao | null; status: Projeto["status"] }
+  | { tipo: "registros"; registros: Registro[] }
   | { tipo: "assinatura"; etapa: number; assinaturaConsultor: string | null; assinaturaCliente: string | null; relatorioAssinado: RelatorioAssinado | null };
 
 const concluida = (s: StatusEtapaTipo) => s === "enviada" || s === "aprovada";
@@ -82,6 +85,30 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
   if (p.status === "encerrado") return { itens, desfazer };
 
   acoes.forEach((a, i) => {
+    // Tabelas do relatório ([[tabela:tipo]]): linhas com as células na ordem das colunas
+    if (a.tipo === "preencher_tabela") {
+      const t = tipoRegistro(a.tabela);
+      const linhas = (a.linhas ?? []).filter((l) => Array.isArray(l) && l.some((c) => String(c ?? "").trim()));
+      if (!t || !linhas.length) return;
+      desfazer.push({ tipo: "registros", registros: structuredClone(p.registros) });
+      if (a.substituir) p.registros = p.registros.filter((r) => r.tipo !== t.tipo);
+      const usados = p.registros.filter((r) => r.tipo === t.tipo).map((r) => Number(r.codigo.replace(t.prefixo, "")) || 0);
+      let n = Math.max(0, ...usados);
+      const origem = etapaAtual(p)?.ordem ?? 1;
+      linhas.forEach((l, j) => {
+        n += 1;
+        p.registros.push({
+          id: `reg-${mensagemId}-${i}-${j}`,
+          tipo: t.tipo,
+          codigo: `${t.prefixo}${n}`,
+          dados: Object.fromEntries(t.colunas.map((c, k) => [c.chave, String(l[k] ?? "").trim()])),
+          etapaOrigem: origem,
+        });
+      });
+      feito(`Tabela “${t.nome}”: ${linhas.length} ${linhas.length === 1 ? "linha" : "linhas"} ${a.substituir ? "(substituindo as anteriores)" : "acrescentadas"}`);
+      return;
+    }
+
     // Passos do HUB: diagnóstico enviado, proposta, FUNCERN, pagamento, finalização…
     if (a.tipo === "avancar_hub") {
       const atual = passoHubDoProjeto(p);
@@ -91,10 +118,13 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
       const data = dataValida(a.data) ? a.data : hojeIso();
       const cedo = a.passo === "finalizado" ? avisoFinalizarAntecipado(p, data) : null;
       desfazer.push({ tipo: "hub", hub: p.hub ? structuredClone(p.hub) : null, contratacao: p.contratacao ?? null, status: p.status });
+      // O pagamento move o plano de trabalho: guarda as datas para desfazer
+      const inicioAntes = p.etapas[0]?.dataInicio;
+      if (a.passo === "execucao") for (const e of p.etapas) desfazer.push(passoDatas(e));
       mudarHub(p, a.passo, data);
       feito(registroHub[a.passo](data));
-      const tarde = a.passo === "execucao" ? avisoPagamentoTardio(p) : null;
-      if (cedo ?? tarde) avisar((cedo ?? tarde)!);
+      if (a.passo === "execucao" && p.etapas[0]?.dataInicio !== inicioAntes) feito(textoPlanoAjustado(p));
+      if (cedo) avisar(cedo);
       return;
     }
     // Cronograma do projeto inteiro: só enquanto o plano não foi definido
@@ -298,6 +328,10 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
 // Volta cada passo, do último para o primeiro
 export function desfazerAcoes(p: Projeto, passos: Desfazer[]) {
   for (const d of [...passos].reverse()) {
+    if (d.tipo === "registros") {
+      p.registros = d.registros;
+      continue;
+    }
     if (d.tipo === "hub") {
       if (d.hub) p.hub = d.hub;
       else delete p.hub;

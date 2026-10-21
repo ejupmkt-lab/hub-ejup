@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { supabaseServidor } from "@/lib/supabase/servidor";
 import type { Cliente, Etapa, Projeto, Servico } from "@/lib/dados/tipos";
+import { tiposRegistro } from "@/lib/registros";
 import { antesDaContratacao, comQuem, faseDoProjeto, fases, passoHubDoProjeto, passosHub } from "@/lib/fase";
 import type { Anexo, ItemAcao } from "@/lib/conversa";
 import { todasSecoes } from "@/lib/relatorio/secoes";
@@ -28,13 +29,14 @@ O que fazer com cada mensagem:
 6. Plano de trabalho (as datas das etapas): se ele ainda não foi definido e o consultor disser quando o projeto começa (e, se souber, quando termina), use "definir_cronograma" com as datas; o sistema divide o período entre as etapas pela carga horária (sem a data de fim, pela duração de referência). Deixe "fim" vazio se ele não disser. Se o plano já existe e uma etapa mudar de datas, use "alterar_datas_etapa" com a justificativa dele, mandando as novas datas de todas as etapas afetadas, para que continuem em sequência e sem sobreposição.
 7. Fechamento da etapa: quando o consultor mandar o PDF do relatório assinado no gov.br, ou disser as datas das assinaturas, use "registrar_assinatura" (anexo = id do PDF, ou vazio; datas vazias quando não ditas). Quando ele disser que enviou o relatório no Plano de Entrega do HUB, use "mudar_situacao_etapa" com "enviada"; quando disser que o gestor devolveu uma entrega, "devolvida", com o pedido de ajuste na observação ("aprovada" só se ele disser que o gestor aprovou aquela etapa). O sistema confere se o relatório está completo e assinado antes de aceitar.
 8. Nunca altere etapas enviadas ou aprovadas, a não ser para registrar uma devolução ou aprovação do gestor.
-9. O projeto segue as 6 etapas do HUB SEBRAE, e você registra cada passo com "avancar_hub" (o passo novo e a data) quando o consultor contar que aconteceu:
+9. Tabelas do relatório: os textos citam tabelas com o marcador [[tabela:tipo]] (pessoas e responsabilidades, fornecedores, riscos, plano de ação…). Quando o consultor contar esses dados, use "preencher_tabela" com as linhas, cada uma com as células na ordem das colunas; "substituir" verdadeiro troca as linhas atuais pelas novas, falso acrescenta. Se faltar algum dado de uma tabela citada, pergunte.
+10. O projeto segue as 6 etapas do HUB SEBRAE, e você registra cada passo com "avancar_hub" (o passo novo e a data) quando o consultor contar que aconteceu:
    - 1 Solicitação aberta ("solicitacao"): o cliente pediu e o gestor do SEBRAE analisa. Quando o gestor enviar a demanda ao consultor: "diagnostico".
    - 2 Diagnóstico: o consultor elabora o diagnóstico no modelo do SEBRAE (justificando por que a solicitação do cliente é válida, com o que ele mapeou), assina sozinho e envia no HUB: "diagnostico_enviado". O gestor analisa a viabilidade e pede a proposta: "proposta".
    - 3 Proposta: o consultor monta o plano de trabalho (horas e datas de cada etapa) e envia à FUNCERN, não ao HUB: "proposta_funcern". A FUNCERN lança no HUB: "proposta_cliente". O cliente analisa e paga: "execucao".
    - 4 Em execução: as etapas do serviço, cada uma enviada no Plano de Entrega do HUB. Com todas enviadas, o consultor finaliza no HUB: "finalizado".
    - 5 Projeto finalizado: o cliente avalia a consultoria ("avaliado") e depois o gestor analisa as entregas e conclui ("concluido"). Se o gestor devolver uma entrega, use "mudar_situacao_etapa" com "devolvida".
-   As datas do plano de trabalho são as oficiais: o gestor confere se as entregas são compatíveis com o período e recusa a nota quando muitas horas são entregues em poucos dias. Nunca recalcule o plano porque o cliente pagou mais tarde; avise se uma entrega estiver saindo antes do fim previsto da etapa.
+   A consultoria começa quando o cliente paga: ao registrar o pagamento, o sistema move o plano de trabalho para começar nessa data, mantendo a duração e as horas de cada etapa. O gestor confere se as entregas são compatíveis com o período e recusa a nota quando muitas horas são entregues em poucos dias: avise se uma entrega estiver saindo antes do fim previsto da etapa.
    Antes da execução, ajude a escrever o diagnóstico (usando o que ele contar e as perguntas do pré-diagnóstico da ficha) e a montar o plano de trabalho; não marque checklist nem escreva relatórios de etapa. Quando algo depender do gestor, da FUNCERN ou do cliente, ofereça uma mensagem curta e cordial para cobrar.
 
 A resposta ao consultor ("resposta"): português claro e direto, em poucas linhas, sem Markdown. Diga o que você fez e qual é o próximo passo concreto para a etapa avançar (até a entrega final do projeto), e faça as perguntas necessárias. Se a mensagem for só uma pergunta, responda sem ações. Não repita a lista de ações em detalhe: o sistema já mostra cada alteração.
@@ -102,6 +104,17 @@ const ESQUEMA = {
               anotacoes: { type: "string" },
             },
             required: ["tipo", "etapa", "data", "modalidade", "horas", "participantes", "anotacoes"],
+            additionalProperties: false,
+          },
+          {
+            type: "object",
+            properties: {
+              tipo: { type: "string", const: "preencher_tabela" },
+              tabela: { type: "string", enum: tiposRegistro.map((t) => t.tipo) },
+              linhas: { type: "array", items: { type: "array", items: { type: "string" } } },
+              substituir: { type: "boolean" },
+            },
+            required: ["tipo", "tabela", "linhas", "substituir"],
             additionalProperties: false,
           },
           {
@@ -335,6 +348,13 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>, preDiagnostico: stri
           )
         : ["- nenhum"]),
     );
+  }
+  // Tabelas do relatório (marcador [[tabela:tipo]] no texto), com as linhas atuais
+  partes.push("", "## Tabelas do relatório (tipo: nome; colunas na ordem)");
+  for (const t of tiposRegistro) {
+    const linhas = p.registros.filter((r) => r.tipo === t.tipo);
+    partes.push(`- ${t.tipo}: ${t.nome}; colunas: ${t.colunas.map((c) => c.titulo).join(" | ")}; ${linhas.length} ${linhas.length === 1 ? "linha" : "linhas"}`);
+    for (const r of linhas) partes.push(`  ${r.codigo}: ${t.colunas.map((c) => r.dados[c.chave] || "—").join(" | ")}`);
   }
   return partes.filter((l) => l !== null).join("\n");
 }

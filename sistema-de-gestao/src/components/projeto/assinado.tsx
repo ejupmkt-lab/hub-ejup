@@ -23,10 +23,12 @@ export function RelatorioAssinado({
   projeto,
   etapa,
   alterarEtapa,
+  compacto = false,
 }: {
   projeto: Projeto;
   etapa: Etapa;
   alterarEtapa: (fn: (e: Etapa) => void, evento?: { acao: string; detalhe?: string }) => void;
+  compacto?: boolean; // numa linha, sem título (nas Entregas)
 }) {
   const usuario = useUsuario();
   const entrada = useRef<HTMLInputElement>(null);
@@ -72,12 +74,18 @@ export function RelatorioAssinado({
 
   return (
     <section>
-      <h3 className="mb-1 text-lg font-semibold">PDF assinado</h3>
-      <p className="mb-4 text-[15px] text-tinta-2">
-        Depois de assinar no gov.br, guarde aqui o PDF final. Fica arquivado com o projeto e as datas de assinatura em branco são preenchidas com a de hoje.
-      </p>
+      {!compacto && (
+        <>
+          <h3 className="mb-1 text-lg font-semibold">PDF assinado</h3>
+          <p className="mb-4 text-[15px] text-tinta-2">
+            Depois de assinar no gov.br, guarde aqui o PDF final. Fica arquivado com o projeto e as datas de assinatura em branco são preenchidas com a de hoje.
+          </p>
+        </>
+      )}
       {atual ? (
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-bloco)] border border-linha bg-folha shadow-[var(--shadow-cartao)] px-4 py-4 sm:px-5">
+        <div
+          className={`flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-campo)] border border-linha bg-folha ${compacto ? "px-3 py-2.5" : "px-4 py-4 shadow-[var(--shadow-cartao)] sm:px-5"}`}
+        >
           <span className="min-w-0">
             <button onClick={() => abrirAssinado(atual.caminho, atual.nome)} className="block truncate text-left text-[15px] text-azul underline-offset-4 hover:underline">
               {atual.nome}
@@ -102,9 +110,9 @@ export function RelatorioAssinado({
             e.preventDefault();
             void enviar(e.dataTransfer.files[0]);
           }}
-          className="flex flex-wrap items-center gap-4 rounded-[var(--radius-bloco)] border border-dashed border-linha-forte px-5 py-4"
+          className={`flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[var(--radius-campo)] border border-dashed border-linha-forte ${compacto ? "px-3 py-2.5" : "px-5 py-4"}`}
         >
-          <Botao variante="secundario" onClick={() => entrada.current?.click()} disabled={enviando}>
+          <Botao variante="secundario" tamanho={compacto ? "pequeno" : "normal"} onClick={() => entrada.current?.click()} disabled={enviando}>
             {enviando ? "Enviando…" : "Anexar PDF assinado"}
           </Botao>
           <span className="text-[13px] text-tinta-2">ou arraste o arquivo para cá. Até 20 MB.</span>

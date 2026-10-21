@@ -6,16 +6,15 @@ import { useEffect, useState } from "react";
 import { useProjeto } from "@/components/projeto/use-projeto";
 import { PlanoTrabalho } from "@/components/projeto/plano-trabalho";
 import { Visitas } from "@/components/projeto/visitas";
-import { Registros } from "@/components/projeto/registros";
-import { Referencias } from "@/components/projeto/referencias";
 import { DadosProjeto } from "@/components/projeto/dados";
 import { CronogramaProjeto } from "@/components/projeto/cronograma-projeto";
 import { Relatorios } from "@/components/projeto/relatorios";
 import { Conversa } from "@/components/projeto/conversa";
 import { LinhaDoHub } from "@/components/projeto/linha-hub";
-import { guardarProjetoNaBiblioteca } from "@/components/projeto/sugestoes-biblioteca";
-import { antesDaContratacao, avisoFinalizarAntecipado, faseDoProjeto, fases, mudarHub, passoHubDoProjeto, passosHub, registroHub } from "@/lib/fase";
+import { guardarProjetoNaBiblioteca, useAcoesEtapa } from "@/components/projeto/acoes-etapa";
+import { antesDaContratacao, avisoFinalizarAntecipado, faseDoProjeto, fases, mudarHub, passoHubDoProjeto, passosHub, registroHub, textoPlanoAjustado } from "@/lib/fase";
 import type { PassoHub } from "@/lib/dados/tipos";
+import { registrarEvento } from "@/lib/dados/store";
 import { formatarData, diferencaDias, hojeIso } from "@/lib/datas";
 import { horasDoProjeto, horasFmt } from "@/lib/horas";
 import {
@@ -33,14 +32,16 @@ import { doisDigitos, statusEtapa } from "@/lib/rotulos";
 import { ancoraAbaProjeto, passoDoProjeto } from "@/lib/proximo-passo";
 import { Abas, Barra, Botao, BotaoLink, Cabecalho, Cartao, Chip, ProximoPasso, Vazio } from "@/components/ui";
 
-// Três abas para o dia a dia; o resto fica no "Mais"
+// Três abas para o dia a dia; o resto fica no "Mais". O processo (ficha,
+// textos, referências) fica no serviço; aqui, só o que é do projeto.
 const principais = ["Desenvolvimento", "Plano de trabalho", "Entregas"] as const;
-const secundarias = ["Ficha do projeto", "Tabelas do relatório", "Referências", "Horas e visitas", "Histórico"] as const;
+const secundarias = ["Horas e visitas", "Histórico"] as const;
 type Aba = (typeof principais)[number] | (typeof secundarias)[number];
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
 export default function PaginaProjeto() {
   const { projeto, cliente, consultor, alterar } = useProjeto();
+  const { mudarStatus } = useAcoesEtapa();
   const { empresa: slug } = useParams<{ empresa: string }>();
   // O projeto abre sempre no Desenvolvimento (a conversa com a IA)
   const [aba, setAba] = useState<Aba>("Desenvolvimento");
@@ -48,6 +49,8 @@ export default function PaginaProjeto() {
   const [menuMais, setMenuMais] = useState<{ left: number; top: number } | null>(null);
   // Atalho "Registrar" do menu (#registrar) traz a caixa de mensagem à vista
   const [focar, setFocar] = useState(0);
+  // Dados próprios do projeto (código no HUB, gestor, consultor…), abertos pelo cabeçalho
+  const [dados, setDados] = useState(false);
 
   // #plano, #desenvolvimento, #ficha… no endereço abrem a aba certa. Lido
   // depois da navegação, porque o Next atualiza o hash depois de montar.
@@ -56,6 +59,13 @@ export default function PaginaProjeto() {
       const ancora = window.location.hash.slice(1) as keyof typeof ancoraAbaProjeto;
       const a = ancoraAbaProjeto[ancora];
       if (a) setAba(a);
+      if (ancora === "ficha") setDados(true);
+      // #etapa-2: a entrega da etapa 2, nas Entregas
+      const etapa = /^etapa-(\d+)$/.exec(ancora)?.[1];
+      if (etapa) {
+        setAba("Entregas");
+        setTimeout(() => document.getElementById(`entrega-${etapa}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+      }
       if (ancora === "registrar") setFocar((n) => n + 1);
       if (ancora === "plano") setTimeout(() => document.getElementById("plano")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     };
@@ -66,6 +76,14 @@ export default function PaginaProjeto() {
       window.removeEventListener("hashchange", ler);
     };
   }, []);
+
+  // Esc fecha o menu "Mais", onde quer que esteja o foco
+  useEffect(() => {
+    if (!menuMais) return;
+    const fechar = (e: KeyboardEvent) => e.key === "Escape" && setMenuMais(null);
+    window.addEventListener("keydown", fechar);
+    return () => window.removeEventListener("keydown", fechar);
+  }, [menuMais]);
 
   if (!projeto || !cliente)
     return (
@@ -90,7 +108,15 @@ export default function PaginaProjeto() {
   const registrarHub = (para: PassoHub) => {
     const cedo = para === "finalizado" ? avisoFinalizarAntecipado(projeto) : null;
     if (cedo && !confirm(`${cedo}\n\nRegistrar a finalização mesmo assim?`)) return;
-    alterar((p) => mudarHub(p, para, hojeIso()), { acao: `HUB: ${passosHub[passoHubDoProjeto(projeto)].acao ?? "passo registrado"}`, detalhe: registroHub[para](hojeIso()) });
+    alterar(
+      (p) => {
+        const inicio = p.etapas[0]?.dataInicio;
+        mudarHub(p, para, hojeIso());
+        if (para === "execucao" && p.etapas[0]?.dataInicio !== inicio)
+          registrarEvento(p, "Sistema", textoPlanoAjustado(p));
+      },
+      { acao: `HUB: ${passosHub[passoHubDoProjeto(projeto)].acao ?? "passo registrado"}`, detalhe: registroHub[para](hojeIso()) },
+    );
     if (para === "concluido") void guardarProjetoNaBiblioteca(projeto, cliente).then((erro) => erro && alert(erro));
   };
   const irPara = (a: Aba) => {
@@ -120,12 +146,20 @@ export default function PaginaProjeto() {
   const situacaoEtapa = et ? (et.status === "devolvida" ? "Devolvida" : etapaAtrasada(et) ? "Atrasada" : statusEtapa[et.status].rotulo) : null;
   const tomAvanco = previsto === null ? undefined : avanco >= previsto ? "ok" : previsto - avanco >= 10 ? "atencao" : undefined;
   const diasEntrega = entrega ? diferencaDias(hoje, entrega) : null;
-  const proximoPasso = passo && (
-    <ProximoPasso
-      passo={passo}
-      aoAgir={passo.hub ? () => registrarHub(passo.hub!) : passo.href.endsWith("#plano") ? abrirPlano : passo.href.endsWith("#desenvolvimento") ? desenvolver : undefined}
-    />
-  );
+  const abrirEntrega = (ordem: number) => {
+    setAba("Entregas");
+    setTimeout(() => document.getElementById(`entrega-${ordem}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+  };
+  const agir = (x: NonNullable<typeof passo>) => {
+    if (x.hub) return () => registrarHub(x.hub!);
+    if (x.acao && x.etapa) return () => mudarStatus(x.etapa!.ordem, x.acao!) || abrirEntrega(x.etapa!.ordem);
+    if (x.href.endsWith("#plano")) return abrirPlano;
+    if (x.href.endsWith("#desenvolvimento")) return desenvolver;
+    const etapa = /#etapa-(\d+)$/.exec(x.href)?.[1];
+    if (etapa) return () => abrirEntrega(Number(etapa));
+    return undefined;
+  };
+  const proximoPasso = passo && <ProximoPasso passo={passo} aoAgir={agir(passo)} />;
   const abaMais = (secundarias as readonly string[]).includes(aba) ? aba : "Mais";
 
   const situacao = situacaoProjeto(projeto);
@@ -149,6 +183,14 @@ export default function PaginaProjeto() {
             <span aria-hidden>·</span>
             <span>ficha {projeto.codigoFichaTecnica}</span>
             <Chip tom={situacao.tom}>{situacao.rotulo}</Chip>
+            <button
+              type="button"
+              onClick={() => setDados(!dados)}
+              aria-expanded={dados}
+              className="text-[13px] font-semibold text-azul underline-offset-4 hover:underline"
+            >
+              Dados do projeto
+            </button>
           </p>
         }
         abas={
@@ -223,6 +265,11 @@ export default function PaginaProjeto() {
                 <p className="mt-0.5 break-words font-semibold leading-snug text-tinta">{consultor?.nome ?? "A definir"}</p>
               </div>
             </Cartao>
+            {dados && (
+              <div className="mt-4">
+                <DadosProjeto projeto={projeto} aoFechar={() => setDados(false)} />
+              </div>
+            )}
             <div className="relative mt-5" data-faixa-abas>
               <Abas
                 abas={[...principais, abaMais]}
@@ -237,7 +284,6 @@ export default function PaginaProjeto() {
                   <div aria-hidden className="fixed inset-0 z-30" onClick={() => setMenuMais(null)} />
                   <ul
                     style={menuMais}
-                    onKeyDown={(e) => e.key === "Escape" && setMenuMais(null)}
                     className="absolute z-40 w-60 rounded-[var(--radius-bloco)] border border-linha bg-folha p-1.5 shadow-lg"
                   >
                     {secundarias.map((s) => (
@@ -287,12 +333,9 @@ export default function PaginaProjeto() {
       {aba === "Entregas" && (
         <div className="space-y-4">
           {proximoPasso}
-          <Relatorios projeto={projeto} />
+          <Relatorios projeto={projeto} aoDesenvolver={desenvolver} />
         </div>
       )}
-      {aba === "Ficha do projeto" && <DadosProjeto projeto={projeto} />}
-      {aba === "Tabelas do relatório" && <Registros projeto={projeto} />}
-      {aba === "Referências" && <Referencias projeto={projeto} />}
       {aba === "Horas e visitas" && (
         <div className="space-y-4">
           <p className="text-sm text-tinta-2">

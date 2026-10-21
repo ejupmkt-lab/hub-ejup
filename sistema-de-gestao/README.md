@@ -47,10 +47,12 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   com passos que dizem com quem está a bola (você, o gestor do SEBRAE, a FUNCERN ou o cliente) e há
   quantos dias. Cada passo é registrado com a data na linha do tempo do Desenvolvimento, pelo botão do
   próximo passo ou pela conversa com a IA (`avancar_hub`); dá para voltar um passo. O plano de trabalho é
-  montado na proposta e enviado à FUNCERN, que lança no HUB; as datas dele são as oficiais e não são
-  recalculadas quando o cliente paga. O sistema avisa quando o pagamento sai depois do início previsto e
-  pede confirmação para enviar uma etapa ou finalizar o projeto antes do fim previsto (o gestor recusa a
-  nota quando muitas horas são entregues em poucos dias). Projetos do formato antigo (`contratacao`) são
+  montado na proposta e enviado à FUNCERN, que lança no HUB; a consultoria começa quando o cliente paga, e
+  o plano passa a começar na data do pagamento, com a mesma duração e as mesmas horas
+  (`ajustarPlanoAoPagamento`). O sistema pede confirmação para enviar uma etapa ou finalizar o projeto
+  antes do fim previsto (o gestor recusa a nota quando muitas horas são entregues em poucos dias).
+  Embaixo da régua do HUB, a trilha dos relatórios do serviço (um por etapa da ficha: 5 na LGPD, 2 no
+  Planejamento Tecnológico). Projetos do formato antigo (`contratacao`) são
   lidos como o passo equivalente. Em Tarefas, "Aguardando outros" junta o que está com terceiros, com a
   mensagem pronta para cobrar (`src/lib/cobranca.ts`); o quadro de projetos tem uma coluna por etapa do HUB.
 - **Projeto novo**: escolhe o serviço, o cliente, o consultor e onde o projeto está no HUB (começa no
@@ -62,10 +64,13 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   mão na aba Plano de trabalho; alteração posterior exige justificativa.
 - **Clientes e projetos**: cada cliente tem a sua página com todos os projetos (até 3 em andamento ao
   mesmo tempo; um 4º só excepcionalmente), cada um com o seu serviço e as suas etapas.
-- **Dentro do projeto**: resumo fixo (avanço, etapa atual, período, horas, consultor) e três abas:
-  Desenvolvimento (abre por padrão), Plano de trabalho (linha do tempo das etapas e as datas, editáveis) e
-  Entregas (o relatório técnico de cada etapa). Ficha, tabelas do relatório, referências, horas e
-  visitas e histórico ficam no menu "Mais".
+- **Dentro do projeto**: resumo fixo (avanço, etapa atual, período, horas, consultor), "Dados do projeto"
+  no cabeçalho (consultor, código do pedido no HUB, gestor do SEBRAE, local do relatório, correção do
+  passo no HUB, exclusão) e três abas: Desenvolvimento (abre por padrão; o relatório é escrito aqui, pela
+  conversa ou pelo "Preencher com a biblioteca"), Plano de trabalho e Entregas (como o Plano de Entrega do
+  HUB: cada relatório com o Word, o PDF assinado, "Enviei no HUB" e a devolução do gestor). Horas e visitas
+  e histórico ficam no menu "Mais". O processo (ficha, textos, referências) fica no serviço; o endereço
+  antigo da etapa (`/etapas/N`) leva à entrega dela (`#etapa-N`).
 - **Desenvolvimento com a IA** (`src/components/projeto/conversa.tsx`, rota `/api/conversa`, tabela
   `mensagens_projeto`): o consultor escreve ou dita (reconhecimento de voz do navegador), manda fotos e
   PDFs; a IA define o plano de trabalho, identifica a etapa, marca o checklist, guarda as fotos como evidência,
@@ -74,13 +79,15 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   aparece como aviso com o motivo); cada resposta mostra o que mudou e pode ser desfeita
   (`src/lib/conversa.ts`). Sugestões de mensagem levam ao próximo passo até a entrega final. Precisa da
   `ANTHROPIC_API_KEY` na Vercel.
-- **Etapas no formato do HUB SEBRAE**, registros do programa, redação por seção, checagem de completude.
+- **Etapas no formato do HUB SEBRAE**, tabelas do relatório (preenchidas pela conversa, ação
+  `preencher_tabela`), redação por seção, checagem de completude.
 - **Relatório Técnico em Word (.docx)** no papel timbrado do modelo (`public/modelos/relatorio-base.docx`).
 - **Cadastro pelo CNPJ**: razão social, nome fantasia, endereço, CEP, porte, atividade e data de abertura
   vêm da Receita Federal (BrasilAPI, com cnpj.ws de reserva), pela rota `/api/cnpj/[cnpj]`.
 - **Textos-padrão do relatório** no estilo dos relatórios entregues (`src/lib/relatorio/padroes.ts`);
   o que só o consultor sabe fica como `[completar: …]` e a checagem de pendências acusa.
-- **Referências normativas e inventário de normas** já carregados em todo projeto novo.
+- **Referências normativas** cadastradas no serviço (aba Referências) e copiadas para o projeto ao nascer;
+  a LGPD sem lista própria usa as referências-padrão.
 - **Imagens de evidência** no Supabase Storage (bucket privado `evidencias`, separado por empresa),
   inseridas no Word como Figura 1, Figura 2…
 - **Status automático**: primeira atividade marcada leva a "Em levantamento"; as duas assinaturas com o
@@ -88,7 +95,7 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Salvamento automático** com controle de versão: se duas pessoas editam o mesmo projeto ao mesmo
   tempo, quem salvar por último é avisado e recebe a versão mais recente.
 - **PDF assinado** de cada entrega guardado com a etapa (mesmo bucket, `assinado-<id>.pdf`); ao anexar,
-  as datas de assinatura em branco recebem a data do dia. Botão "Marcar como enviada no HUB".
+  as datas de assinatura em branco recebem a data do dia. Nas Entregas, "Enviei no HUB".
 - **Exclusão** de projeto (leva junto imagens e PDF) e de cliente sem projeto, só para gestores (RLS).
 - **Verificação em duas etapas** opcional (aplicativo autenticador), em Minha conta. Com ela ativa, o
   banco só entrega dados à sessão confirmada com o código (`privado.sessao_verificada`, aal2).
@@ -98,13 +105,9 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   evidências cita as datas dos encontros.
 - **Biblioteca de textos aprovados** (tabela `biblioteca_textos`, aba "Biblioteca de textos" de cada serviço): quando
   uma etapa é marcada como aprovada, as seções e os entregáveis completos entram anonimizados (empresa,
-  responsável, CNPJ, participantes e datas viram marcadores). Nos próximos projetos, cada seção mostra
-  "Da biblioteca (N)" com os mais parecidos (mesmo ramo primeiro), e "Preencher" usa o melhor texto aprovado
-  antes do texto-padrão. Textos de relatórios antigos podem ser colados à mão.
-- **Redação com IA** (`/api/redigir`): redige as seções do relatório a partir das anotações da etapa, do
-  checklist e dos dados do cliente (Claude, modelo `claude-opus-5-5`, saída em JSON estruturado). Os dados
-  são lidos no banco com a sessão de quem pediu. O que faltar volta como `[completar: …]`. Requer a variável
-  `ANTHROPIC_API_KEY` na Vercel (Settings → Environment Variables); sem ela, a tela avisa e nada quebra.
+  responsável, CNPJ, participantes e datas viram marcadores). Nos próximos projetos, "Preencher o relatório
+  com a biblioteca", no Desenvolvimento, usa o texto aprovado mais parecido (mesmo ramo primeiro) antes do
+  texto-padrão. Textos de relatórios antigos podem ser colados à mão.
 - **Senhas vazadas recusadas** no cadastro e na troca de senha (consulta anônima ao Have I Been Pwned;
   só os 5 primeiros caracteres do hash saem do navegador).
 

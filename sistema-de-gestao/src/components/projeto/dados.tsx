@@ -11,16 +11,10 @@ import { Botao, Campo, Cartao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 import { EscolherGestorSebrae } from "./gestor-sebrae";
 
-const campos: { k: keyof Projeto; r: string; largo?: boolean }[] = [
-  { k: "prestadoraVinculada", r: "Prestadora vinculada" },
-  { k: "fichaTecnica", r: "Ficha técnica", largo: true },
-  { k: "codigoFichaTecnica", r: "Código da ficha técnica" },
-  { k: "segmento", r: "Segmento" },
-  { k: "areaAtuacao", r: "Área de atuação da consultoria", largo: true },
-  { k: "localAssinatura", r: "Local (fechamento do relatório)" },
-];
+// Só o que é deste projeto; a ficha técnica, os textos e as referências vêm do serviço
+const campos: { k: keyof Projeto; r: string; largo?: boolean }[] = [{ k: "localAssinatura", r: "Local (fechamento do relatório)" }];
 
-export function DadosProjeto({ projeto }: { projeto: Projeto }) {
+export function DadosProjeto({ projeto, aoFechar }: { projeto: Projeto; aoFechar: () => void }) {
   const { alterar, cliente } = useProjeto();
   const { estado, excluir } = useEstado();
   const { gerencia } = useAcesso();
@@ -48,10 +42,17 @@ export function DadosProjeto({ projeto }: { projeto: Projeto }) {
   return (
     <>
       <Cartao className="p-4 sm:p-8">
-        <h2 className="text-xl font-semibold">Ficha de identificação</h2>
-        <p className="mb-6 mt-1 text-[15px] text-tinta-2">
-          Estes dados e os do cliente ({cliente?.razaoSocial}) preenchem a ficha no topo de todos os relatórios.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-xl font-semibold">Dados do projeto</h2>
+            <p className="mb-6 mt-1 text-[15px] text-tinta-2">
+              Estes dados, os do cliente ({cliente?.razaoSocial}) e a ficha do serviço preenchem a identificação no topo dos relatórios.
+            </p>
+          </div>
+          <Botao variante="secundario" tamanho="pequeno" onClick={aoFechar}>
+            Fechar
+          </Botao>
+        </div>
         <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
           <Campo
             rotulo="Consultor responsável"

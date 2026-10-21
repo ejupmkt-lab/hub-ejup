@@ -84,7 +84,7 @@ export function Cronograma({ projetos }: { projetos: Projeto[] }) {
                     return (
                       <Link
                         key={e.ordem}
-                        href={`/${p.empresa}/projetos/${p.id}/etapas/${e.ordem}`}
+                        href={`/${p.empresa}/projetos/${p.id}#etapa-${e.ordem}`}
                         aria-label={`${nome(p)}, etapa ${doisDigitos(e.ordem)}: ${statusEtapa[e.status].rotulo}, ${periodoCurto(e.dataInicio, e.dataFim)}`}
                         {...props(
                           <>

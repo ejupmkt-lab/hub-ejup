@@ -196,8 +196,8 @@ export default function Tarefas() {
                       </BotaoLink>
                     )}
                     {e && itens.length > 0 && (
-                      <Link href={`/${p.empresa}/projetos/${p.id}/etapas/${e.ordem}#checklist`} className="text-[13px] font-semibold text-azul hover:underline">
-                        Checklist completo da etapa
+                      <Link href={`/${p.empresa}/projetos/${p.id}#etapa-${e.ordem}`} className="text-[13px] font-semibold text-azul hover:underline">
+                        Ver a entrega da etapa
                       </Link>
                     )}
                   </div>

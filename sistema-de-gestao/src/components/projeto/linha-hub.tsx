@@ -1,17 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import type { PassoHub, Projeto } from "@/lib/dados/tipos";
-import { useEstado } from "@/lib/dados/store";
+import type { Etapa, PassoHub, Projeto } from "@/lib/dados/tipos";
+import { registrarEvento, useEstado } from "@/lib/dados/store";
 import {
+  antesDaContratacao,
   avisoFinalizarAntecipado,
-  avisoPagamentoTardio,
   bloqueioHub,
   diasNoPasso,
   fases,
   hubDoProjeto,
   mudarHub,
-  ondeEsta,
   ordemFases,
   ordemPassos,
   passosDaFase,
@@ -20,18 +19,80 @@ import {
   registroHub,
   responsaveis,
   tempoNoPasso,
+  textoPlanoAjustado,
   type Fase,
 } from "@/lib/fase";
-import { entregaFinal } from "@/lib/projeto";
+import { entregaFinal, etapaAtrasada, etapaAtual, etapaConcluida, progressoAtividades } from "@/lib/projeto";
 import { formatarData, hojeIso } from "@/lib/datas";
+import { statusEtapa } from "@/lib/rotulos";
 import { Botao, Cartao, Chip } from "@/components/ui";
 import { IconeCheck } from "@/components/icones";
 import { useProjeto } from "./use-projeto";
-import { guardarProjetoNaBiblioteca } from "./sugestoes-biblioteca";
+import { PreencherComBiblioteca } from "./preencher-biblioteca";
+import { guardarProjetoNaBiblioteca } from "./acoes-etapa";
 
-// Linha do tempo do projeto no HUB SEBRAE: as 6 etapas do HUB, o passo em que
-// o projeto está, com quem está a bola e há quantos dias. Cada passo é
-// registrado com a data; dá para voltar um passo.
+type Estado = "feito" | "agora" | "pendente" | "alerta";
+type Item = { chave: string; numero: number; rotulo: string; detalhe?: string; estado: Estado };
+
+const corBarra: Record<Estado, string> = { feito: "bg-verde", agora: "bg-azul", alerta: "bg-laranja-vivo", pendente: "bg-linha" };
+const corBola: Record<Estado, string> = {
+  feito: "bg-verde text-folha",
+  agora: "bg-azul text-folha",
+  alerta: "bg-laranja-vivo text-folha",
+  pendente: "bg-linha text-tinta-2",
+};
+const corTexto: Record<Estado, string> = { feito: "font-semibold text-tinta", agora: "font-bold text-azul", alerta: "font-bold text-laranja", pendente: "text-tinta-2" };
+
+// Trilha de passos: em coluna no celular, em linha nas telas maiores
+function Trilha({ itens, rotulo, numerada = true }: { itens: Item[]; rotulo: string; numerada?: boolean }) {
+  return (
+    <ol
+      className="grid gap-2 sm:gap-1.5 sm:[grid-template-columns:repeat(var(--n),minmax(0,1fr))]"
+      style={{ "--n": itens.length } as React.CSSProperties}
+      aria-label={rotulo}
+    >
+      {itens.map((x) => (
+        <li key={x.chave} aria-current={x.estado === "agora" ? "step" : undefined} className="flex items-center gap-3 sm:flex-col sm:items-stretch sm:gap-1.5">
+          <span className={`h-1.5 rounded-full max-sm:hidden ${corBarra[x.estado]}`} aria-hidden />
+          <span className="flex items-center gap-2.5 sm:items-start">
+            <span className={`num grid h-7 w-7 shrink-0 place-items-center rounded-full text-[12px] font-bold sm:hidden ${corBola[x.estado]}`}>
+              {x.estado === "feito" ? <IconeCheck className="h-3.5 w-3.5" /> : x.numero}
+            </span>
+            <span className="min-w-0">
+              <span className={`block text-[14px] leading-snug ${corTexto[x.estado]}`}>
+                {numerada && <span className="num max-sm:hidden">{x.numero} </span>}
+                {x.rotulo}
+              </span>
+              {x.detalhe && <span className="num block text-[12px] leading-snug text-tinta-2">{x.detalhe}</span>}
+            </span>
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
+
+// Relatório de cada etapa do serviço: enviado, em curso (com o status) ou não começado
+function itemRelatorio(p: Projeto, e: Etapa, atual: Etapa | undefined): Item {
+  const base = { chave: String(e.ordem), numero: e.ordem, rotulo: `Relatório ${e.ordem}` };
+  const nome = capitalizar(e.nome);
+  if (antesDaContratacao(p)) return { ...base, detalhe: nome, estado: "pendente" };
+  if (etapaConcluida(e)) return { ...base, detalhe: `${nome} · enviado`, estado: "feito" };
+  if (e.status === "devolvida") return { ...base, detalhe: `${nome} · devolvido`, estado: "alerta" };
+  if (atual?.ordem === e.ordem)
+    return {
+      ...base,
+      detalhe: `${nome} · ${etapaAtrasada(e) ? "atrasado" : statusEtapa[e.status].rotulo.toLowerCase()}`,
+      estado: etapaAtrasada(e) ? "alerta" : "agora",
+    };
+  return { ...base, detalhe: nome, estado: "pendente" };
+}
+
+// O projeto no HUB SEBRAE (as 6 etapas do HUB) e, embaixo, os relatórios do
+// serviço (tantos quantas as etapas da ficha). O passo atual diz com quem está
+// a bola e há quantos dias; cada passo é registrado com a data.
 export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbrirPlano: () => void }) {
   const { alterar, cliente } = useProjeto();
   const { estado } = useEstado();
@@ -45,10 +106,10 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
   const proximo = proximoPassoHub(projeto);
   const bloqueio = bloqueioHub(projeto);
   const dias = diasNoPasso(projeto);
+  const atual = projeto.etapas.find((e) => e.status === "devolvida") ?? etapaAtual(projeto);
+  const enviados = projeto.etapas.filter(etapaConcluida).length;
   const preDiagnostico = estado.servicos.find((s) => s.id === projeto.modeloId)?.preDiagnostico ?? [];
-  const avisos = [passo === "execucao" ? avisoPagamentoTardio(projeto) : null, passo === "execucao" && !bloqueio ? avisoFinalizarAntecipado(projeto, data) : null].filter(
-    (a): a is string => !!a,
-  );
+  const aviso = passo === "execucao" && !bloqueio ? avisoFinalizarAntecipado(projeto, data) : null;
   // Durante as etapas, o botão só aparece quando todas foram enviadas
   const mostrarAcao = !!proximo && !!info.acao && !(passo === "execucao" && bloqueio);
 
@@ -57,7 +118,15 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
       const cedo = avisoFinalizarAntecipado(projeto, data);
       if (cedo && !confirm(`${cedo}\n\nRegistrar a finalização mesmo assim?`)) return;
     }
-    alterar((p) => mudarHub(p, para, data), { acao: `HUB: ${acao}`, detalhe: registroHub[para](data) });
+    alterar(
+      (p) => {
+        const inicio = p.etapas[0]?.dataInicio;
+        mudarHub(p, para, data);
+        if (para === "execucao" && p.etapas[0]?.dataInicio !== inicio)
+          registrarEvento(p, "Sistema", textoPlanoAjustado(p));
+      },
+      { acao: `HUB: ${acao}`, detalhe: registroHub[para](data) },
+    );
     if (para === "concluido" && cliente) void guardarProjetoNaBiblioteca(projeto, cliente).then((erro) => erro && alert(erro));
   };
   const voltar = () => {
@@ -71,6 +140,25 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
       .map((s) => hub.datas[s])
       .find(Boolean);
 
+  const itensHub: Item[] = ordemFases.map((f, i) => {
+    const feita = i < iFase || passo === "concluido";
+    const agora = i === iFase && passo !== "concluido";
+    return {
+      chave: f,
+      numero: fases[f].numero,
+      rotulo: fases[f].rotulo,
+      detalhe: (feita || agora) && chegada(f) ? `desde ${formatarData(chegada(f))}` : undefined,
+      estado: feita ? "feito" : agora ? "agora" : "pendente",
+    };
+  });
+  const itensRelatorios = projeto.etapas.map((e) => itemRelatorio(projeto, e, atual));
+  const tituloPasso =
+    passo === "execucao" || atual?.status === "devolvida"
+      ? atual
+        ? `Relatório ${atual.ordem} de ${projeto.etapas.length} · ${capitalizar(atual.nome)}`
+        : "Todos os relatórios enviados"
+      : info.rotulo;
+
   return (
     <Cartao className="mb-4 p-4 sm:p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
@@ -79,51 +167,43 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
           Etapa {fases[faseAtual].numero} de 6 · {fases[faseAtual].rotulo}
         </span>
       </div>
+      <div className="mt-4">
+        <Trilha itens={itensHub} rotulo="Etapas no HUB" />
+      </div>
 
-      {/* As 6 etapas do HUB: em coluna no celular, em linha nas telas maiores */}
-      <ol className="mt-4 grid gap-2 sm:grid-cols-6 sm:gap-1.5" aria-label="Etapas no HUB">
-        {ordemFases.map((f, i) => {
-          const feita = i < iFase || passo === "concluido";
-          const agora = i === iFase && passo !== "concluido";
-          return (
-            <li key={f} aria-current={agora ? "step" : undefined} className="flex items-center gap-3 sm:flex-col sm:items-stretch sm:gap-1.5">
-              <span
-                className={`h-1.5 rounded-full max-sm:hidden ${feita ? "bg-verde" : agora ? "bg-azul" : "bg-linha"}`}
-                aria-hidden
-              />
-              <span className="flex items-center gap-2.5 sm:items-start">
-                <span
-                  className={`num grid h-7 w-7 shrink-0 place-items-center rounded-full text-[12px] font-bold sm:hidden ${
-                    feita ? "bg-verde text-folha" : agora ? "bg-azul text-folha" : "bg-linha text-tinta-2"
-                  }`}
-                >
-                  {feita ? <IconeCheck className="h-3.5 w-3.5" /> : fases[f].numero}
-                </span>
-                <span className="min-w-0">
-                  <span className={`block text-[14px] leading-snug ${agora ? "font-bold text-azul" : feita ? "font-semibold text-tinta" : "text-tinta-2"}`}>
-                    <span className="num max-sm:hidden">{fases[f].numero} </span>
-                    {fases[f].rotulo}
-                  </span>
-                  {(feita || agora) && chegada(f) && <span className="num block text-[12px] text-tinta-2">desde {formatarData(chegada(f))}</span>}
-                </span>
-              </span>
-            </li>
-          );
-        })}
-      </ol>
+      {/* Os relatórios do serviço: um por etapa da ficha */}
+      <div className="mt-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 className="text-lg font-bold">Relatórios do serviço</h2>
+        <span className="text-sm text-tinta-2">
+          {antesDaContratacao(projeto)
+            ? `${projeto.etapas.length} ${projeto.etapas.length === 1 ? "relatório" : "relatórios"} · começam depois do pagamento`
+            : `${enviados} de ${projeto.etapas.length} ${enviados === 1 ? "enviado" : "enviados"}`}
+        </span>
+      </div>
+      <div className="mt-4">
+        <Trilha itens={itensRelatorios} rotulo="Relatórios do serviço" numerada={false} />
+      </div>
 
       {/* O passo em que o projeto está */}
       {passo !== "concluido" && (
-        <div className="mt-4 rounded-[var(--radius-campo)] border border-azul/25 bg-azul-claro/50 p-3 sm:p-4">
+        <div className="mt-5 rounded-[var(--radius-campo)] border border-azul/25 bg-azul-claro/50 p-3 sm:p-4">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <p className="text-[15px] font-semibold text-tinta">{passo === "execucao" ? ondeEsta(projeto) : info.rotulo}</p>
+            <p className="text-[15px] font-semibold text-tinta">{tituloPasso}</p>
             {info.com && <Chip tom={info.com === "consultor" ? "andamento" : "neutro"}>{responsaveis[info.com]}</Chip>}
-            {dias !== null && (
-              <span className={`num text-[13px] ${dias >= 10 && info.com !== "consultor" ? "font-semibold text-laranja" : "text-tinta-2"}`}>
-                {tempoNoPasso(dias)}
-              </span>
+            {dias !== null && passo !== "execucao" && (
+              <span className={`num text-[13px] ${dias >= 10 && info.com !== "consultor" ? "font-semibold text-laranja" : "text-tinta-2"}`}>{tempoNoPasso(dias)}</span>
             )}
           </div>
+
+          {passo === "execucao" && atual && (
+            <>
+              <p className="num mt-1.5 text-[13px] text-tinta-2">
+                {statusEtapa[atual.status].rotulo} · checklist {progressoAtividades(atual).feitas}/{progressoAtividades(atual).total}
+                {atual.dataFim && ` · prazo ${formatarData(atual.dataFim)}`}
+              </p>
+              <PreencherComBiblioteca projeto={projeto} etapa={atual} />
+            </>
+          )}
 
           {/* Passos da etapa do HUB em que o projeto está */}
           {passosDaFase(faseAtual).length > 1 && (
@@ -143,16 +223,15 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
 
           {passo === "execucao" && entregaFinal(projeto) && (
             <p className="num mt-2 text-[13px] text-tinta-2">
-              Fim previsto no plano de trabalho: <span className="font-semibold text-tinta">{formatarData(entregaFinal(projeto))}</span>. As datas do plano são as
-              oficiais: não envie a última etapa antes disso.
+              Fim previsto no plano de trabalho: <span className="font-semibold text-tinta">{formatarData(entregaFinal(projeto))}</span>. Não envie o último
+              relatório antes disso: muitas horas em poucos dias levam o gestor a recusar a nota.
             </p>
           )}
+          {passo === "proposta_cliente" && projeto.planoFechadoEm && (
+            <p className="mt-2 text-[13px] text-tinta-2">Quando o cliente pagar, o plano de trabalho passa a começar na data do pagamento, com a mesma duração.</p>
+          )}
 
-          {avisos.map((a) => (
-            <p key={a} className="mt-2 rounded-[var(--radius-campo)] bg-laranja-claro px-3 py-2 text-[13px] text-laranja">
-              {a}
-            </p>
-          ))}
+          {aviso && <p className="mt-2 rounded-[var(--radius-campo)] bg-laranja-claro px-3 py-2 text-[13px] text-laranja">{aviso}</p>}
 
           {mostrarAcao && (
             <div className="mt-3 flex flex-wrap items-end gap-2">

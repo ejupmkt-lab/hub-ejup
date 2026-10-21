@@ -84,7 +84,12 @@ function Conteudo() {
         etapas: etapasDoModelo(modelo).map((e) => ({ ...e, horasPrevistas: Number(horaDaEtapa(e.ordem, e.horasPrevistas).replace(",", ".")) || 0 })),
         hub: hubInicial(f.situacao, hojeIso()),
         registros: lgpd ? normasPadrao().map((r) => ({ ...r, id: novoId("reg") })) : [],
-        referencias: lgpd ? referenciasPadrao().map((r) => ({ ...r, id: novoId("ref") })) : [],
+        // Referências do serviço (a LGPD sem lista própria usa as padrão)
+        referencias: modelo.referencias?.length
+          ? modelo.referencias.map((r) => ({ ...r, id: novoId("ref"), consultadoEm: r.url ? hojeIso() : "" }))
+          : lgpd
+            ? referenciasPadrao().map((r) => ({ ...r, id: novoId("ref") }))
+            : [],
         historico: [],
       };
       registrarEvento(p, usuario.nome, "Projeto criado");

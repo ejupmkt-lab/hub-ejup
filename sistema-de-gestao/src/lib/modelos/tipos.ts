@@ -32,4 +32,5 @@ export type Servico = ModeloFluxo & {
   credenciado: boolean; // credenciado no Sebraetec para prestar este serviço
   areaAtuacao: string; // "área de atuação da consultoria", usada nos relatórios
   preDiagnostico?: string[]; // perguntas do pré-diagnóstico da ficha técnica
+  referencias?: { texto: string; url: string }[]; // referências normativas dos relatórios (copiadas para o projeto ao nascer)
 };
