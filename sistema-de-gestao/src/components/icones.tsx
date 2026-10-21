@@ -33,6 +33,14 @@ export const IconeTarefas = (p: P) => (
   </Svg>
 );
 
+export const IconeFinanceiro = (p: P) => (
+  <Svg {...p}>
+    <rect x="3.5" y="6" width="17" height="12.5" rx="2.5" />
+    <path d="M3.5 10h17" />
+    <path d="M7.5 14.5h3" />
+  </Svg>
+);
+
 export const IconeMais = (p: P) => (
   <Svg {...p}>
     <circle cx="5.5" cy="12" r="1.2" fill="currentColor" />

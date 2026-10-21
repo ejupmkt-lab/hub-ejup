@@ -63,8 +63,9 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   etapas pela complexidade. No projeto ("Dados do projeto"): valor, FUNCERN, o que fica para o consultor e
   as parcelas: o SEBRAE paga até o dia 5 o que ficou pronto até o dia 20 do mês anterior; 30% quando o
   Relatório 1 foi enviado e o projeto ainda não foi finalizado, o restante (70%, ou 100% no mesmo mês)
-  quando o projeto é finalizado no HUB (último relatório e avaliação do cliente). O Painel mostra o que cai
-  em cada dia 5 e o que ainda dá para garantir até o próximo dia 20.
+  quando o projeto é finalizado no HUB (último relatório e avaliação do cliente). A área **Financeiro** (menu
+  lateral, abaixo de Tarefas, só para o gestor master; marcada como em desenvolvimento) mostra o que cai em
+  cada dia 5 e o que ainda dá para garantir até o próximo dia 20.
 - **Projeto novo**: escolhe o serviço, o cliente, o consultor e onde o projeto está no HUB (começa no
   diagnóstico); as horas de cada etapa vêm da ficha ou da proposta (editáveis também no plano de trabalho); o código do pedido no HUB é um campo só (o
   mesmo número do projeto no HUB); o número de visitas é o de etapas do serviço (uma por etapa); o gestor

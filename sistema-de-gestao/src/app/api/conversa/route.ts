@@ -18,7 +18,7 @@ import { ESTILO_RELATORIO } from "@/lib/ia/estilo";
 
 export const maxDuration = 300;
 
-const SISTEMA = `Você é a assistente do sistema de gestão do escritório Pivotto & Pivotto, dentro de um projeto de consultoria do programa Sebraetec (HUB SEBRAE). O consultor conversa com você durante o projeto: manda anotações (muitas vezes ditadas, com erros de transcrição), fotos de reuniões e documentos, e PDFs. Você entende a mensagem e organiza o projeto sozinha.
+const SISTEMA = `Você é a assistente do Blimp, o sistema de gestão de projetos de consultoria do programa Sebraetec (HUB SEBRAE). O consultor conversa com você durante o projeto: manda anotações (muitas vezes ditadas, com erros de transcrição), fotos de reuniões e documentos, e PDFs. Você entende a mensagem e organiza o projeto sozinha.
 
 O que fazer com cada mensagem:
 1. Descubra a que etapa o conteúdo pertence, pelo assunto (compare com a descrição, o checklist e os entregáveis de cada etapa) e pelas datas. Na dúvida, é a etapa em curso.

@@ -15,11 +15,10 @@ import { Pendencias } from "@/components/painel/pendencias";
 import { GraficoCarga } from "@/components/painel/graficos";
 import { EtapasDosProjetos, FasesDosProjetos } from "@/components/painel/fases";
 import { IconeMaisSinal } from "@/components/icones";
-import { AReceber } from "@/components/financeiro/a-receber";
 
 export default function Painel() {
   const { estado } = useEstado();
-  const { inicio, usuario } = useAcesso();
+  const { inicio } = useAcesso();
   const { empresa } = useEmpresaAtual();
   const novoProjeto = empresa ? `/${empresa.slug}/projetos/novo` : null;
   const router = useRouter();
@@ -102,12 +101,6 @@ export default function Painel() {
               <GraficoCarga projetos={projetos} />
             </Secao>
           </div>
-
-          {usuario.veFinanceiro && (
-            <Secao titulo="A receber" descricao="O SEBRAE paga até o dia 5 o que ficou pronto até o dia 20 do mês anterior. Só você vê esta parte.">
-              <AReceber projetos={projetos} />
-            </Secao>
-          )}
 
           <Secao
             titulo="Etapas de cada projeto"

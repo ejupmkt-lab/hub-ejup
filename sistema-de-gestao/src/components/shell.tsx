@@ -20,6 +20,7 @@ import {
   IconeSair,
   IconeSeta,
   IconeTarefas,
+  IconeFinanceiro,
 } from "@/components/icones";
 import { LogoBlimp } from "@/components/logo";
 import { useEmpresaAtual } from "@/lib/dados/empresa-atual";
@@ -52,13 +53,19 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const em = (p: string) => caminho === p || caminho.startsWith(`${p}/`);
   const emProjetos = !!base && em(base) && !em(`${base}/clientes`) && !em(`${base}/servicos`) && !em(`${base}/equipe`);
 
+  // Financeiro: só para o gestor master
+  const financeiro = usuario.veFinanceiro
+    ? [{ href: "/financeiro", rotulo: "Financeiro", icone: IconeFinanceiro, ativo: em("/financeiro") }]
+    : [];
   const principais = [
     { href: "/", rotulo: "Painel", icone: IconePainel, ativo: caminho === "/" },
     ...(base ? [{ href: base, rotulo: "Projetos", icone: IconeProjetos, ativo: emProjetos }] : []),
     { href: "/tarefas", rotulo: "Tarefas", icone: IconeTarefas, ativo: em("/tarefas") },
+    ...financeiro,
   ];
-  // No menu inferior: Painel e Projetos à esquerda do botão central, Tarefas à direita
-  const esquerda = principais.filter((i) => i.href !== "/tarefas");
+  // No menu inferior: Painel e Projetos à esquerda do botão central, Tarefas à
+  // direita; o Financeiro fica no "Mais"
+  const esquerda = principais.filter((i) => i.href !== "/tarefas" && i.href !== "/financeiro");
   const direita = principais.filter((i) => i.href === "/tarefas");
   const secundarios = [
     ...(base
@@ -190,7 +197,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                       }`}
                     >
                       <IconeEmpresa className="h-5 w-5 shrink-0" />
-                      <span className="min-w-0 flex-1 truncate">{e.nome}</span>
+                      <span className="min-w-0 flex-1 break-words">{e.nome}</span>
                       {e.status !== "ativo" && <span className="shrink-0 text-xs font-normal text-tinta-2">{statusEmpresa[e.status].toLowerCase()}</span>}
                     </button>
                   </li>
@@ -199,7 +206,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             </div>
           )}
           <ul className="space-y-1">
-            {secundarios.map((i) => (
+            {[...financeiro, ...secundarios].map((i) => (
               <li key={i.href}>
                 <LinkFolha href={i.href} icone={<i.icone className="h-5 w-5" />}>
                   {i.rotulo}
@@ -388,7 +395,7 @@ function SeletorEmpresa({
         <IconeEmpresa className="h-5 w-5 shrink-0 text-azul" />
         <span className="min-w-0 flex-1">
           <span className="block text-[11px] font-semibold uppercase tracking-wide text-tinta-2">Empresa</span>
-          <span className="block truncate text-[15px] font-semibold text-tinta">{empresa.nome}</span>
+          <span className="block break-words text-[15px] font-semibold leading-snug text-tinta">{empresa.nome}</span>
         </span>
         {empresas.length > 1 && <span aria-hidden className="text-tinta-2">▾</span>}
       </button>
@@ -409,7 +416,7 @@ function SeletorEmpresa({
                     e.slug === empresa.slug ? "bg-azul-claro font-semibold text-azul" : "text-tinta hover:bg-pedra"
                   }`}
                 >
-                  <span className="min-w-0 truncate">{e.nome}</span>
+                  <span className="min-w-0 break-words">{e.nome}</span>
                   {e.status !== "ativo" && <span className="shrink-0 text-xs font-normal text-tinta-2">{statusEmpresa[e.status].toLowerCase()}</span>}
                 </button>
               </li>
