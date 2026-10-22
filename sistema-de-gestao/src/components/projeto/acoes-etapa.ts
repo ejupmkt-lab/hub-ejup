@@ -9,6 +9,7 @@ import { traduzirErro } from "@/lib/erros";
 import { avisoEnvioAntecipado } from "@/lib/fase";
 import { automatizarEtapa, bloqueioStatus } from "@/lib/regras-etapa";
 import { gerarDocx } from "@/lib/relatorio/docx";
+import { relatorioFeitoFora } from "@/lib/relatorio/secoes";
 import { doisDigitos, statusEtapa, type StatusEtapa } from "@/lib/rotulos";
 import { etapaConcluida } from "@/lib/projeto";
 import { baixarImagens } from "./evidencias";
@@ -66,6 +67,11 @@ export function useAcoesEtapa() {
         const e = p.etapas.find((x) => x.ordem === ordem)!;
         e.status = s;
         if (s === "enviada") e.enviadaEm = hojeIso();
+        // Relatório feito fora do sistema e enviado: o checklist da etapa foi cumprido nele
+        if (s === "enviada" && relatorioFeitoFora(e)) {
+          e.relatorioExterno = true;
+          e.atividades.forEach((a) => a.status === "pendente" && (a.status = "feito"));
+        }
         if (retomando) {
           e.assinaturaConsultor = null;
           e.assinaturaCliente = null;

@@ -28,7 +28,9 @@ export function ImportarRelatorio({
   const [pdf, setPdf] = useState<File | null>(null);
   const [fotos, setFotos] = useState<File[]>([]);
   const [legenda, setLegenda] = useState("Registro fotográfico de atendimento e levantamento");
-  const [assinadoEm, setAssinadoEm] = useState(hojeIso());
+  // Em branco de propósito: a data vem do PDF, não de hoje
+  const [assinadoEm, setAssinadoEm] = useState("");
+  const [clienteAssinouEm, setClienteAssinouEm] = useState("");
   const [enviadoEm, setEnviadoEm] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -39,8 +41,9 @@ export function ImportarRelatorio({
     if (!pdf) return setErro("Escolha o PDF assinado.");
     if (pdf.type !== "application/pdf") return setErro("O relatório precisa estar em PDF.");
     if (pdf.size > 20 * 1024 * 1024) return setErro("O PDF passa de 20 MB.");
-    if (!assinadoEm) return setErro("Informe a data das assinaturas.");
-    if (enviadoEm && enviadoEm < assinadoEm) return setErro("O envio no HUB não pode ser antes das assinaturas.");
+    if (!assinadoEm || !clienteAssinouEm) return setErro("Informe as datas das duas assinaturas, como estão no PDF.");
+    const ultimaAssinatura = assinadoEm > clienteAssinouEm ? assinadoEm : clienteAssinouEm;
+    if (enviadoEm && enviadoEm < ultimaAssinatura) return setErro("O envio no HUB não pode ser antes das assinaturas.");
     setEnviando(true);
     try {
       const sb = supabaseNavegador();
@@ -58,7 +61,7 @@ export function ImportarRelatorio({
           e.relatorioAssinado = { caminho, nome: pdf.name, enviadoEm: new Date().toISOString(), por: usuario.nome };
           e.evidencias = [...(e.evidencias ?? []), ...novas];
           e.assinaturaConsultor = assinadoEm;
-          e.assinaturaCliente = assinadoEm;
+          e.assinaturaCliente = clienteAssinouEm;
           e.dataRelatorio = assinadoEm;
           e.atividades.forEach((a) => a.status === "pendente" && (a.status = "feito"));
           e.status = enviadoEm ? "enviada" : "a_enviar";
@@ -66,7 +69,7 @@ export function ImportarRelatorio({
         },
         {
           acao: `${rotulo}: relatório pronto importado`,
-          detalhe: `${pdf.name}, assinado em ${formatarData(assinadoEm)}${enviadoEm ? `, enviado no HUB em ${formatarData(enviadoEm)}` : ""}${novas.length ? `, ${novas.length} foto(s)` : ""}`,
+          detalhe: `${pdf.name}, assinado em ${formatarData(assinadoEm)} (consultor) e ${formatarData(clienteAssinouEm)} (cliente)${enviadoEm ? `, enviado no HUB em ${formatarData(enviadoEm)}` : ""}${novas.length ? `, ${novas.length} foto(s)` : ""}`,
         },
       );
       if (anterior) void sb.storage.from("evidencias").remove([anterior]);
@@ -105,8 +108,12 @@ export function ImportarRelatorio({
       )}
       <div className="flex flex-wrap gap-3">
         <label className="text-[13px] font-semibold">
-          Assinado em
+          Consultor assinou em
           <input type="date" className="campo num mt-1 !w-auto" value={assinadoEm} max={hojeIso()} onChange={(ev) => setAssinadoEm(ev.target.value)} />
+        </label>
+        <label className="text-[13px] font-semibold">
+          Cliente assinou em
+          <input type="date" className="campo num mt-1 !w-auto" value={clienteAssinouEm} max={hojeIso()} onChange={(ev) => setClienteAssinouEm(ev.target.value)} />
         </label>
         <label className="text-[13px] font-semibold">
           Enviado no HUB em <span className="font-normal text-tinta-2">(em branco se ainda não foi)</span>

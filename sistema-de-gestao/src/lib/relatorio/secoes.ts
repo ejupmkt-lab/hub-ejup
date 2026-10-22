@@ -87,11 +87,16 @@ export const todasSecoes = [...secoesAntes, ...secoesDepois];
 
 export type Pendencia = { onde: string; texto: string };
 
+// Relatório feito fora do sistema: importado como pronto, ou com o PDF assinado
+// anexado sem nada escrito nas seções. O PDF assinado é o relatório da etapa.
+export function relatorioFeitoFora(etapa: Etapa) {
+  return !!etapa.relatorioExterno || (!!etapa.relatorioAssinado && !Object.values(etapa.secoes ?? {}).some((t) => t.trim()));
+}
+
 // Checagem que impede marcar a etapa como "A enviar" com algo faltando.
 export function verificarCompletude(projeto: Projeto, etapa: Etapa): Pendencia[] {
   const p: Pendencia[] = [];
-  // Relatório feito fora do sistema: o PDF assinado é o relatório
-  if (etapa.relatorioExterno) {
+  if (relatorioFeitoFora(etapa)) {
     if (!etapa.relatorioAssinado) p.push({ onde: "Relatório", texto: "PDF assinado do relatório importado não anexado" });
     return p;
   }

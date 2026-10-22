@@ -8,7 +8,7 @@ import { formatarData, hojeIso, periodoCurto } from "@/lib/datas";
 import { antesDaContratacao } from "@/lib/fase";
 import { etapaAtrasada, etapaConcluida, progressoAtividades } from "@/lib/projeto";
 import { bloqueioStatus } from "@/lib/regras-etapa";
-import { verificarCompletude } from "@/lib/relatorio/secoes";
+import { relatorioFeitoFora, verificarCompletude } from "@/lib/relatorio/secoes";
 import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Cartao } from "@/components/ui";
 import { RelatorioAssinado } from "./assinado";
@@ -61,6 +61,7 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
   const concluida = etapaConcluida(e);
   const prog = progressoAtividades(e);
   const pendencias = verificarCompletude(projeto, e);
+  const feitoFora = relatorioFeitoFora(e);
   const bloqueioEnvio = bloqueioStatus(projeto, e, "enviada");
   const refsServico = estado.servicos.find((s) => s.id === projeto.modeloId)?.referencias ?? [];
   const semReferencias = pendencias.some((x) => x.onde === "Referências") && projeto.referencias.length === 0 && refsServico.length > 0;
@@ -110,6 +111,11 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
               <button type="button" onClick={aoDesenvolver} className="font-semibold text-azul hover:underline">
                 Resolver no Desenvolvimento
               </button>
+              {!concluida && (
+                <button type="button" onClick={() => (setVerPendencias(false), setImportando(true))} className="font-semibold text-azul hover:underline">
+                  Fiz o relatório fora do sistema
+                </button>
+              )}
               {semReferencias && (
                 <button type="button" onClick={usarReferenciasDoServico} className="font-semibold text-azul hover:underline">
                   Usar as referências do serviço
@@ -127,7 +133,7 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
 
         {!antes && (
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            {!e.relatorioExterno && (
+            {!feitoFora && (
               <Botao variante="secundario" tamanho="pequeno" onClick={() => void baixar(e.ordem)} disabled={gerando === e.ordem}>
                 {gerando === e.ordem ? "Gerando…" : "Baixar relatório em Word"}
               </Botao>
@@ -169,7 +175,7 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
         {importando && !concluida && (
           <ImportarRelatorio projeto={projeto} etapa={e} alterarEtapa={alterarEtapa(e.ordem)} aoFechar={() => setImportando(false)} />
         )}
-        {e.relatorioExterno && <p className="mt-2 text-[13px] text-tinta-2">Relatório feito fora do sistema: o PDF assinado é o relatório desta etapa.</p>}
+        {feitoFora && <p className="mt-2 text-[13px] text-tinta-2">Relatório feito fora do sistema: o PDF assinado é o relatório desta etapa.</p>}
       </div>
       <span aria-hidden className={`w-2 shrink-0 ${sit.faixa}`} />
     </li>
