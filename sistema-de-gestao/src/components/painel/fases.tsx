@@ -5,7 +5,7 @@ import type { Projeto } from "@/lib/dados/tipos";
 import { useEstado } from "@/lib/dados/store";
 import { aguardandoOutros, antesDaContratacao, comQuem, fases, faseDoProjeto, ondeEsta, ordemFases, comQuemTexto, type Fase } from "@/lib/fase";
 import { grupoDaEtapa, grupos, ordemGrupos, type Grupo } from "@/lib/painel";
-import { etapaAtrasada, etapaAtual, servicoDoProjeto } from "@/lib/projeto";
+import { etapaAtrasada, etapaAtual, servicoDoProjeto, statusDaEtapa } from "@/lib/projeto";
 import { statusEtapa } from "@/lib/rotulos";
 import { nomeDoCliente } from "@/lib/campos-cliente";
 
@@ -72,7 +72,7 @@ export function EtapasDosProjetos({ projetos }: { projetos: Projeto[] }) {
                 ? "devolvida pelo SEBRAE"
                 : etapaAtrasada(et)
                   ? "atrasada"
-                  : statusEtapa[et.status].rotulo.toLowerCase()
+                  : statusEtapa[statusDaEtapa(et)].rotulo.toLowerCase()
               : "finalize no HUB";
           return (
             <li key={p.id} className="grid gap-x-6 gap-y-2 py-3 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,15rem)_1fr_minmax(0,12rem)] md:items-center">

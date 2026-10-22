@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { Projeto } from "@/lib/dados/tipos";
 import { diferencaDias, hojeIso, somarDias } from "@/lib/datas";
 import { grupoDaEtapa, grupos } from "@/lib/painel";
-import { avancoEtapa } from "@/lib/projeto";
+import { avancoEtapa, statusDaEtapa } from "@/lib/projeto";
 import { doisDigitos, statusEtapa } from "@/lib/rotulos";
 import { Botao, Cartao } from "@/components/ui";
 
@@ -13,8 +13,10 @@ const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 const mesMaiusculo = (m: string) => m.charAt(0).toUpperCase() + m.slice(1);
 const diaMes = (iso: string) => `${iso.slice(8)}/${iso.slice(5, 7)}`;
 
-// Gantt de um projeto: uma linha por etapa, a barra no período do plano de
-// trabalho, preenchida conforme o andamento, e a linha vermelha de hoje.
+// Gantt de um projeto: uma linha por etapa, a barra no período da execução,
+// preenchida conforme o andamento, o contorno tracejado onde a etapa estava no
+// plano do HUB (quando a execução começou depois, no pagamento) e a linha
+// vermelha de hoje.
 export function CronogramaProjeto({ projeto, aoEditar }: { projeto: Projeto; aoEditar: () => void }) {
   const etapas = projeto.etapas;
   const comDatas = !!projeto.planoFechadoEm && etapas.every((e) => e.dataInicio && e.dataFim);
@@ -31,8 +33,14 @@ export function CronogramaProjeto({ projeto, aoEditar }: { projeto: Projeto; aoE
     );
 
   const hoje = hojeIso();
-  const inicio = somarDias(etapas[0].dataInicio!, -2);
-  const fim = somarDias(etapas[etapas.length - 1].dataFim!, 2);
+  const noPlano = (e: (typeof etapas)[number]) =>
+    e.dataInicioPlano && e.dataFimPlano && (e.dataInicioPlano !== e.dataInicio || e.dataFimPlano !== e.dataFim)
+      ? { inicio: e.dataInicioPlano, fim: e.dataFimPlano }
+      : null;
+  const comPlano = etapas.some(noPlano);
+  const extremos = etapas.flatMap((e) => [e.dataInicio!, e.dataFim!, ...(noPlano(e) ? [noPlano(e)!.inicio, noPlano(e)!.fim] : [])]).sort();
+  const inicio = somarDias(extremos[0], -2);
+  const fim = somarDias(extremos[extremos.length - 1], 2);
   const dias = diferencaDias(inicio, fim) + 1;
   const pos = (d: string) => (diferencaDias(inicio, d) / dias) * 100;
   const meses: string[] = [];
@@ -71,6 +79,7 @@ export function CronogramaProjeto({ projeto, aoEditar }: { projeto: Projeto; aoE
             const pct = Math.round(avancoEtapa(e) * 100);
             const esquerda = pos(e.dataInicio!);
             const largura = ((diferencaDias(e.dataInicio!, e.dataFim!) + 1) / dias) * 100;
+            const plano = noPlano(e);
             const href = `/${projeto.empresa}/projetos/${projeto.id}#etapa-${e.ordem}`;
             return (
               <li key={e.ordem} className={`${colunas} items-center border-b border-linha/70 py-2.5 last:border-0`}>
@@ -83,10 +92,18 @@ export function CronogramaProjeto({ projeto, aoEditar }: { projeto: Projeto; aoE
                   </span>
                 </Link>
                 <div className="relative h-7 rounded-md bg-pedra">
+                  {plano && (
+                    <span
+                      aria-hidden
+                      title={`No plano do HUB: ${diaMes(plano.inicio)} – ${diaMes(plano.fim)}`}
+                      className="absolute inset-y-0.5 rounded-[5px] border border-dashed border-tinta-2/60"
+                      style={{ left: `${pos(plano.inicio)}%`, width: `max(${((diferencaDias(plano.inicio, plano.fim) + 1) / dias) * 100}%, 6px)` }}
+                    />
+                  )}
                   <Link
                     href={href}
-                    aria-label={`Etapa ${doisDigitos(e.ordem)}: ${statusEtapa[e.status].rotulo}, ${pct}%`}
-                    title={`${statusEtapa[e.status].rotulo} · ${pct}%`}
+                    aria-label={`Etapa ${doisDigitos(e.ordem)}: ${statusEtapa[statusDaEtapa(e)].rotulo}, ${pct}%`}
+                    title={`${statusEtapa[statusDaEtapa(e)].rotulo} · ${pct}%`}
                     className="absolute inset-y-1 overflow-hidden rounded-[5px] hover:brightness-110"
                     style={{
                       left: `${esquerda}%`,
@@ -115,6 +132,12 @@ export function CronogramaProjeto({ projeto, aoEditar }: { projeto: Projeto; aoE
             {grupos[k].rotulo}
           </li>
         ))}
+        {comPlano && (
+          <li className="flex items-center gap-1.5">
+            <span aria-hidden className="h-2.5 w-3.5 rounded-[3px] border border-dashed border-tinta-2/70" />
+            Plano do HUB
+          </li>
+        )}
         {posHoje !== null && (
           <li className="flex items-center gap-1.5">
             <span aria-hidden className="h-3 w-[2px] bg-vermelho-vivo" />

@@ -3,6 +3,7 @@ import type { Etapa, Projeto } from "./dados/tipos";
 import type { Tom } from "./rotulos";
 import { modeloPorId } from "./modelos";
 import { comQuem, faseDoProjeto, fases, ondeEsta } from "./fase";
+import { relatorioFeitoFora } from "./relatorio/secoes";
 
 const concluidas = new Set(["enviada", "aprovada"]);
 
@@ -74,9 +75,18 @@ const pesoStatus: Record<Etapa["status"], number> = {
   devolvida: 0.8,
 };
 
+// Relatório feito fora do sistema, com o PDF assinado pelas duas partes: pronto
+// para enviar, mesmo que o status ainda não tenha sido atualizado
+export const prontaForaDoSistema = (e: Etapa) =>
+  !concluidas.has(e.status) && e.status !== "devolvida" && relatorioFeitoFora(e) && !!e.assinaturaConsultor && !!e.assinaturaCliente;
+
+// Status para mostrar: a etapa pronta fora do sistema aparece como pronta para enviar
+export const statusDaEtapa = (e: Etapa) => (prontaForaDoSistema(e) ? "a_enviar" : e.status);
+
 // Andamento de uma etapa (0 a 1): 40% pelo checklist e 60% pelo status do relatório
 export function avancoEtapa(e: Etapa) {
   if (concluidas.has(e.status)) return 1;
+  if (prontaForaDoSistema(e)) return 0.4 + 0.6 * pesoStatus.a_enviar;
   const { feitas, total } = progressoAtividades(e);
   return 0.4 * (total ? feitas / total : 0) + 0.6 * pesoStatus[e.status];
 }

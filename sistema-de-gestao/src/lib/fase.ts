@@ -5,8 +5,10 @@ import { diferencaDias, formatarData, hojeIso, somarDias } from "./datas";
 
 // A régua do projeto é a do HUB SEBRAE: 6 etapas, as mesmas que aparecem no
 // HUB. Cada uma tem passos que dizem com quem está a bola, para nenhum projeto
-// ficar parado sem que se saiba quem cobrar. As datas do plano de trabalho são
-// montadas na proposta e, quando o cliente paga, passam a começar no pagamento.
+// ficar parado sem que se saiba quem cobrar. Dois calendários: o plano do HUB
+// (dataInicioPlano/dataFimPlano), montado na proposta para o orçamento e que não
+// muda; e a execução (dataInicio/dataFim), que começa no pagamento com a mesma
+// duração de cada etapa. Prazos, atrasos e avisos seguem a execução.
 
 export type Fase = "solicitacao" | "diagnostico" | "proposta" | "execucao" | "finalizado" | "concluido";
 export type Responsavel = "consultor" | "gestor" | "funcern" | "cliente";
@@ -179,15 +181,32 @@ export function ajustarPlanoAoPagamento(p: Projeto, pagamento: string): number {
   if (!p.planoFechadoEm || !inicio) return 0;
   const delta = diferencaDias(inicio, pagamento);
   if (!delta) return 0;
+  // Só a execução anda: o plano do HUB fica como foi orçado
   const mover = (d: string | null) => (d ? somarDias(d, delta) : d);
   for (const e of p.etapas) {
+    e.dataInicioPlano ??= e.dataInicio;
+    e.dataFimPlano ??= e.dataFim;
     e.dataInicio = mover(e.dataInicio);
     e.dataFim = mover(e.dataFim);
-    e.dataInicioPlano = mover(e.dataInicioPlano);
-    e.dataFimPlano = mover(e.dataFimPlano);
-    e.dataRelatorio = mover(e.dataRelatorio);
+    // A data do relatório já assinado é a da assinatura e não muda
+    if (!etapaConcluida(e) && !e.relatorioAssinado) e.dataRelatorio = mover(e.dataRelatorio);
   }
   return delta;
+}
+
+// Dia em que o cliente pagou no HUB (nulo antes do pagamento)
+export function dataDoPagamento(p: Projeto): string | null {
+  const h = hubDoProjeto(p);
+  if (ordemPassos.indexOf(h.passo) < ordemPassos.indexOf("execucao")) return null;
+  return h.datas.execucao ?? null;
+}
+
+// Execução fora do pagamento: quando o plano foi fechado depois do pagamento,
+// a execução ainda está nas datas do orçamento
+export function execucaoForaDoPagamento(p: Projeto): string | null {
+  const pago = dataDoPagamento(p);
+  const inicio = p.etapas[0]?.dataInicio;
+  return p.planoFechadoEm && pago && inicio && inicio !== pago ? pago : null;
 }
 
 // "Plano de trabalho ajustado ao pagamento: 21/10/2026 a 08/01/2027"

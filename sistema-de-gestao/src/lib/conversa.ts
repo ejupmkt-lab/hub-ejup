@@ -1,5 +1,5 @@
 import type { Atividade, Contratacao, Etapa, Hub, PassoHub, Projeto, Registro, RelatorioAssinado, TipoAtividade } from "./dados/tipos";
-import { avisoEnvioAntecipado, avisoFinalizarAntecipado, bloqueioAte, textoPlanoAjustado, mudarHub, ordemPassos, passoHubDoProjeto, registroHub } from "./fase";
+import { ajustarPlanoAoPagamento, avisoEnvioAntecipado, avisoFinalizarAntecipado, bloqueioAte, dataDoPagamento, textoPlanoAjustado, mudarHub, ordemPassos, passoHubDoProjeto, registroHub } from "./fase";
 import { todasSecoes, verificarCompletude } from "./relatorio/secoes";
 import { assinada, automatizarEtapa, bloqueioStatus, marcarAtividade } from "./regras-etapa";
 import { doisDigitos, statusEtapa, type StatusEtapa as StatusEtapaTipo } from "./rotulos";
@@ -153,6 +153,8 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
       desfazer.push({ tipo: "plano", planoFechadoEm: p.planoFechadoEm, status: p.status });
       p.planoFechadoEm = new Date().toISOString().slice(0, 19);
       p.status = "em_andamento";
+      const pago = dataDoPagamento(p);
+      if (pago && ajustarPlanoAoPagamento(p, pago)) feito(textoPlanoAjustado(p));
       const fim = linhas[linhas.length - 1].fim;
       feito(
         `Plano de trabalho definido: ${formatarData(a.inicio)} a ${formatarData(fim)}, ${p.etapas.length} etapas divididas ${a.fim ? "pela carga horária" : "pela duração de referência"}`,

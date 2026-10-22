@@ -22,7 +22,7 @@ export function textoPlano(p: Projeto, cliente: Cliente | undefined) {
     `Código da ficha técnica: ${p.codigoFichaTecnica}`,
     `Número de Visitas: ${visitasDoPlano(p)}`,
     ...p.etapas.map(
-      (e) => `Etapa ${e.ordem} – ${tituloEtapa(e.nome)}: ${formatarData(e.dataInicio)} a ${formatarData(e.dataFim)} - carga horária - ${e.horasPrevistas ? `${e.horasPrevistas}h` : "a definir"}`,
+      (e) => `Etapa ${e.ordem} – ${tituloEtapa(e.nome)}: ${formatarData(e.dataInicioPlano ?? e.dataInicio)} a ${formatarData(e.dataFimPlano ?? e.dataFim)} - carga horária - ${e.horasPrevistas ? `${e.horasPrevistas}h` : "a definir"}`,
     ),
     `Carga horária total: ${total ? `${total}h` : "a definir"}.`,
   ];

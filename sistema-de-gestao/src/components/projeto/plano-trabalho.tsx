@@ -8,6 +8,7 @@ import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Campo, Status } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 import { automatizarEtapa } from "@/lib/regras-etapa";
+import { ajustarPlanoAoPagamento, dataDoPagamento, execucaoForaDoPagamento } from "@/lib/fase";
 
 type Linha = { inicio: string; fim: string; horas: string };
 
@@ -65,6 +66,9 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
         });
         p.planoFechadoEm = new Date().toISOString().slice(0, 19);
         p.status = "em_andamento";
+        // Plano fechado depois do pagamento: a execução já começa nele
+        const pago = dataDoPagamento(p);
+        if (pago) ajustarPlanoAoPagamento(p, pago);
         // Checklist já marcado antes do plano: aplica os avanços automáticos
         p.etapas.forEach((e) => automatizarEtapa(p, e));
       },
@@ -72,6 +76,14 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
     );
     setEditando(false);
   };
+
+  const pago = dataDoPagamento(projeto);
+  const foraDoPagamento = execucaoForaDoPagamento(projeto);
+  const alinharAoPagamento = () =>
+    alterar((p) => void ajustarPlanoAoPagamento(p, foraDoPagamento!), {
+      acao: "Execução alinhada ao pagamento",
+      detalhe: `A execução passa a começar em ${formatarData(foraDoPagamento)}, dia do pagamento, com a mesma duração de cada etapa; o plano do HUB fica como foi orçado`,
+    });
 
   const salvarAlteracao = () => {
     const mudancas = projeto.etapas
@@ -90,6 +102,11 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
           if (e.dataRelatorio === e.dataFim) e.dataRelatorio = linhas[i].fim; // acompanha o novo fim, se não foi mudada à mão
           e.dataInicio = linhas[i].inicio;
           e.dataFim = linhas[i].fim;
+          // Antes do pagamento ainda é a proposta: o plano do HUB muda junto
+          if (!pago) {
+            e.dataInicioPlano = linhas[i].inicio;
+            e.dataFimPlano = linhas[i].fim;
+          }
         }),
       { acao: "Datas do plano alteradas", detalhe: `${mudancas}. Justificativa: ${justificativa}` },
     );
@@ -104,11 +121,28 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
           <h2 className="text-xl font-semibold">Datas do plano de trabalho</h2>
           <p className="mt-2 max-w-2xl text-[15px] text-tinta-2">
             Defina o início e o fim aqui, ou conte à IA no Desenvolvimento; as etapas dividem o período na proporção da carga horária ({horasTotal} h no
-            total). Essas datas são a base do acompanhamento, dos prazos e dos avisos, e a mensagem abaixo sai pronta para enviar.
+            total). Essas são as datas do orçamento, que vão para o HUB na mensagem abaixo. A consultoria, de fato, começa quando o cliente paga: a
+            execução segue a mesma duração de cada etapa a partir do pagamento, e é ela que conta para os prazos e os avisos.
           </p>
         </div>
         {fechado ? <Status tom="ok">Fechado em {formatarData(projeto.planoFechadoEm!.slice(0, 10))}</Status> : <Status tom="atencao">Ainda não fechado</Status>}
       </div>
+
+      {foraDoPagamento && !editando && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-bloco)] border border-laranja/30 bg-laranja-claro px-4 py-3.5">
+          <p className="max-w-2xl text-[15px] text-tinta">
+            O cliente pagou em <span className="num font-semibold">{formatarData(foraDoPagamento)}</span>, mas a execução ainda está nas datas do orçamento. Com
+            ela começando no pagamento, os prazos e os atrasos passam a valer a partir de quando a consultoria começou de fato.
+          </p>
+          <Botao onClick={alinharAoPagamento}>Começar a execução no pagamento</Botao>
+        </div>
+      )}
+      {pago && !foraDoPagamento && fechado && (
+        <p className="mb-6 rounded-[var(--radius-campo)] bg-azul-claro px-4 py-3 text-[15px] text-tinta">
+          Execução a partir do pagamento, em <span className="num font-semibold">{formatarData(pago)}</span>. As datas do plano do HUB ficam na última coluna e na
+          mensagem.
+        </p>
+      )}
 
       {editando && !fechado && (
         <div className="mb-6 rounded-[var(--radius-bloco)] bg-pedra/60 p-5">
@@ -140,9 +174,9 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
               <th className="py-2.5 pr-4 font-normal">Etapa</th>
               <th className="py-2.5 pr-4 font-normal">Horas</th>
               <th className="py-2.5 pr-4 font-normal">Dias</th>
-              <th className="py-2.5 pr-4 font-normal">Início</th>
-              <th className="py-2.5 pr-4 font-normal">Fim</th>
-              {fechado && <th className="py-2.5 font-normal">No plano original</th>}
+              <th className="py-2.5 pr-4 font-normal">{pago ? "Início da execução" : "Início"}</th>
+              <th className="py-2.5 pr-4 font-normal">{pago ? "Fim da execução" : "Fim"}</th>
+              {fechado && <th className="py-2.5 font-normal">No plano do HUB</th>}
             </tr>
           </thead>
           <tbody>
@@ -181,8 +215,8 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
                     {editando ? <input type="date" className="campo" value={linhas[i].fim} onChange={(ev) => setLinha(i, "fim", ev.target.value)} /> : formatarData(e.dataFim)}
                   </td>
                   {fechado && (
-                    <td className={`py-2 text-[13px] ${mudou ? "text-vermelho" : "text-tinta-2"}`}>
-                      {mudou ? `${formatarData(e.dataInicioPlano)} a ${formatarData(e.dataFimPlano)}` : "sem alteração"}
+                    <td className="num py-2 text-[13px] text-tinta-2">
+                      {mudou ? `${formatarData(e.dataInicioPlano)} a ${formatarData(e.dataFimPlano)}` : "as mesmas"}
                     </td>
                   )}
                 </tr>

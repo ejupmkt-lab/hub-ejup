@@ -9,6 +9,7 @@ import { doisDigitos, statusEtapa } from "@/lib/rotulos";
 import { useDica } from "./dica";
 import { Legenda } from "./legenda";
 import { nomeDoCliente } from "@/lib/campos-cliente";
+import { statusDaEtapa } from "@/lib/projeto";
 
 const mesesCurtos = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
 
@@ -86,7 +87,7 @@ export function Cronograma({ projetos }: { projetos: Projeto[] }) {
                       <Link
                         key={e.ordem}
                         href={`/${p.empresa}/projetos/${p.id}#etapa-${e.ordem}`}
-                        aria-label={`${nome(p)}, etapa ${doisDigitos(e.ordem)}: ${statusEtapa[e.status].rotulo}, ${periodoCurto(e.dataInicio, e.dataFim)}`}
+                        aria-label={`${nome(p)}, etapa ${doisDigitos(e.ordem)}: ${statusEtapa[statusDaEtapa(e)].rotulo}, ${periodoCurto(e.dataInicio, e.dataFim)}`}
                         {...props(
                           <>
                             <span className="block font-medium">
@@ -95,7 +96,7 @@ export function Cronograma({ projetos }: { projetos: Projeto[] }) {
                             <span className="block text-folha/80">
                               {e.nome.charAt(0) + e.nome.slice(1).toLowerCase()}, {periodoCurto(e.dataInicio, e.dataFim)}
                             </span>
-                            <span className="block text-folha/80">{statusEtapa[e.status].rotulo}</span>
+                            <span className="block text-folha/80">{statusEtapa[statusDaEtapa(e)].rotulo}</span>
                           </>,
                         )}
                         className="absolute top-2.5 flex h-6 items-center overflow-hidden rounded-[4px] px-1.5 text-[11px] font-medium outline-offset-1 hover:brightness-110"

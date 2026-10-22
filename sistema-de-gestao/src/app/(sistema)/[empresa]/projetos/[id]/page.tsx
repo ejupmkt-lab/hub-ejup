@@ -27,6 +27,7 @@ import {
   previstoProjeto,
   servicoDoProjeto,
   situacaoProjeto,
+  statusDaEtapa,
 } from "@/lib/projeto";
 import { doisDigitos, statusEtapa } from "@/lib/rotulos";
 import { ancoraAbaProjeto, passoDoProjeto } from "@/lib/proximo-passo";
@@ -141,7 +142,7 @@ export default function PaginaProjeto() {
 
   const fase = faseDoProjeto(projeto);
   const preContrato = antesDaContratacao(projeto);
-  const situacaoEtapa = et ? (et.status === "devolvida" ? "Devolvida" : etapaAtrasada(et) ? "Atrasada" : statusEtapa[et.status].rotulo) : null;
+  const situacaoEtapa = et ? (et.status === "devolvida" ? "Devolvida" : etapaAtrasada(et) ? "Atrasada" : statusEtapa[statusDaEtapa(et)].rotulo) : null;
   const tomAvanco = previsto === null ? undefined : avanco >= previsto ? "ok" : previsto - avanco >= 10 ? "atencao" : undefined;
   const diasEntrega = entrega ? diferencaDias(hoje, entrega) : null;
   const abrirEntrega = (ordem: number) => {

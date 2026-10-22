@@ -47,9 +47,12 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   com passos que dizem com quem está a bola (você, o gestor do SEBRAE, a FUNCERN ou o cliente) e há
   quantos dias. Cada passo é registrado com a data na linha do tempo do Desenvolvimento, pelo botão do
   próximo passo ou pela conversa com a IA (`avancar_hub`); dá para voltar um passo. O plano de trabalho é
-  montado na proposta e enviado à FUNCERN, que lança no HUB; a consultoria começa quando o cliente paga, e
-  o plano passa a começar na data do pagamento, com a mesma duração e as mesmas horas
-  (`ajustarPlanoAoPagamento`). O sistema pede confirmação para enviar uma etapa ou finalizar o projeto
+  montado na proposta e enviado à FUNCERN, que lança no HUB. São dois calendários: o **plano do HUB**
+  (as datas do orçamento, que não mudam e saem na mensagem do plano) e a **execução**, que começa quando o
+  cliente paga, com a mesma duração e as mesmas horas de cada etapa (`ajustarPlanoAoPagamento`). Prazos,
+  atrasos, gráfico e avisos seguem a execução. Plano fechado depois do pagamento já nasce alinhado; nos
+  projetos antigos, a aba Plano de trabalho oferece "Começar a execução no pagamento". O gráfico mostra o
+  plano do HUB em tracejado. O sistema pede confirmação para enviar uma etapa ou finalizar o projeto
   antes do fim previsto (o gestor recusa a nota quando muitas horas são entregues em poucos dias).
   Embaixo da régua do HUB, a trilha dos relatórios do serviço (um por etapa da ficha: 5 na LGPD, 2 no
   Planejamento Tecnológico). Projetos do formato antigo (`contratacao`) são

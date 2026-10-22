@@ -15,6 +15,7 @@ import {
   previstoProjeto,
   servicoDoProjeto,
   situacaoProjeto,
+  statusDaEtapa,
 } from "@/lib/projeto";
 import { passoDoProjeto } from "@/lib/proximo-passo";
 import { doisDigitos, statusEtapa, type Tom } from "@/lib/rotulos";
@@ -63,7 +64,7 @@ export function CartaoProjeto({
       ? { texto: "Devolvida", tom: "critico" }
       : etapaAtrasada(et)
         ? { texto: "Atrasada", tom: "atencao" }
-        : { texto: statusEtapa[et.status].rotulo, tom: "neutro" };
+        : { texto: statusEtapa[statusDaEtapa(et)].rotulo, tom: "neutro" };
 
   return (
     <article

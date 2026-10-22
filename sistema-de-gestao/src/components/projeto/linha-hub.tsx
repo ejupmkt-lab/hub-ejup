@@ -22,7 +22,7 @@ import {
   textoPlanoAjustado,
   type Fase,
 } from "@/lib/fase";
-import { entregaFinal, etapaAtrasada, etapaAtual, etapaConcluida } from "@/lib/projeto";
+import { entregaFinal, etapaAtrasada, etapaAtual, etapaConcluida, statusDaEtapa } from "@/lib/projeto";
 import { formatarData, hojeIso } from "@/lib/datas";
 import { statusEtapa } from "@/lib/rotulos";
 import { Botao, Cartao, Chip } from "@/components/ui";
@@ -85,7 +85,7 @@ function itemRelatorio(p: Projeto, e: Etapa, atual: Etapa | undefined): Item {
   if (atual?.ordem === e.ordem)
     return {
       ...base,
-      detalhe: `${nome} · ${etapaAtrasada(e) ? "atrasado" : statusEtapa[e.status].rotulo.toLowerCase()}`,
+      detalhe: `${nome} · ${etapaAtrasada(e) ? "atrasado" : statusEtapa[statusDaEtapa(e)].rotulo.toLowerCase()}`,
       estado: etapaAtrasada(e) ? "alerta" : "agora",
     };
   return { ...base, detalhe: nome, estado: "pendente" };

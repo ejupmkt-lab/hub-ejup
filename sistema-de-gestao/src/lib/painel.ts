@@ -1,6 +1,6 @@
 import type { Etapa, Projeto } from "./dados/tipos";
 import { diferencaDias, hojeIso, somarDias } from "./datas";
-import { etapaConcluida } from "./projeto";
+import { etapaConcluida, prontaForaDoSistema } from "./projeto";
 import { antesDaContratacao, comQuem, etapasTodasEnviadas, faseDoProjeto, ondeEsta, comQuemTexto } from "./fase";
 
 // Números, cronograma, calendário e gráficos do painel, calculados a partir
@@ -25,7 +25,7 @@ export function grupoDaEtapa(e: Etapa, hoje = hojeIso()): Grupo {
   if (e.status === "devolvida") return "devolvida";
   if (etapaConcluida(e)) return "concluida";
   if (e.dataFim && e.dataFim < hoje) return "atrasada"; // mesmo se já pronta
-  if (e.status === "a_enviar") return "a_enviar";
+  if (e.status === "a_enviar" || prontaForaDoSistema(e)) return "a_enviar";
   if (e.status === "nao_iniciada" && (!e.dataInicio || e.dataInicio > hoje)) return "nao_iniciada";
   return "andamento";
 }
