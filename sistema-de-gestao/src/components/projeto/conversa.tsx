@@ -317,10 +317,14 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
             value={texto}
             onChange={(e) => setTexto(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) void enviar();
+              // Enter envia; Shift+Enter quebra a linha. Não envia no meio de uma composição (acentos, ditado do teclado)
+              if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+                e.preventDefault();
+                if (ocupado === null) void enviar();
+              }
             }}
             rows={Math.min(8, Math.max(2, texto.split("\n").length + Math.floor(texto.length / 70)))}
-            placeholder={ditado.ouvindo ? "Pode falar…" : "Conte o que aconteceu, peça um texto ou pergunte o que falta"}
+            placeholder={ditado.ouvindo ? "Pode falar…" : "Conte o que aconteceu, peça um texto ou pergunte o que falta (Enter envia, Shift+Enter pula linha)"}
             className="block w-full resize-none bg-transparent px-2 py-1.5 text-[15px] leading-relaxed text-tinta outline-none placeholder:text-tinta-2/70 focus-visible:outline-none"
             disabled={ocupado === "enviando"}
           />

@@ -1,6 +1,6 @@
 import { diferencaDias, hojeIso } from "./datas";
 import type { Etapa, Projeto } from "./dados/tipos";
-import type { Tom } from "./rotulos";
+import { statusEtapa, type Tom } from "./rotulos";
 import { modeloPorId } from "./modelos";
 import { comQuem, dataDoPagamento, faseDoProjeto, fases, ondeEsta } from "./fase";
 import { relatorioFeitoFora } from "./relatorio/secoes";
@@ -80,19 +80,35 @@ const pesoStatus: Record<Etapa["status"], number> = {
 export const prontaForaDoSistema = (e: Etapa) =>
   !concluidas.has(e.status) && e.status !== "devolvida" && relatorioFeitoFora(e) && !!e.assinaturaConsultor && !!e.assinaturaCliente;
 
-// Quando a etapa foi feita de fato. As etapas são em sequência, sem sobreposição:
-// a primeira começa no pagamento e cada uma seguinte no dia em que a anterior foi
-// enviada no HUB; termina no envio do relatório dela. Nulo se ainda não começou.
-export function periodoEfetivo(p: Projeto, e: Etapa): { inicio: string; fim: string | null } | null {
+// Quando a etapa foi feita de fato. Só há data de início se a etapa começou
+// (iniciadaEm, registrada quando sai de "não iniciada"). Uma etapa enviada, sem
+// esse registro, começou no dia em que a anterior foi enviada (as etapas são em
+// sequência) ou, a primeira, no pagamento; termina no envio do relatório.
+export function periodoEfetivo(p: Projeto, e: Etapa): { inicio: string | null; fim: string | null } | null {
   const i = p.etapas.findIndex((x) => x.ordem === e.ordem);
   const anterior = i > 0 ? p.etapas[i - 1] : null;
   const fim = concluidas.has(e.status) ? (e.enviadaEm ?? null) : null;
-  let inicio: string | null;
-  if (!anterior) inicio = dataDoPagamento(p) ?? e.dataInicio;
-  else inicio = concluidas.has(anterior.status) ? (anterior.enviadaEm ?? null) : null;
-  if (!inicio) return null;
-  if (fim && fim < inicio) inicio = fim;
+  if (!fim && !etapaIniciada(e)) return null;
+  let inicio: string | null = e.iniciadaEm ?? null;
+  if (!inicio && fim) inicio = !anterior ? (dataDoPagamento(p) ?? e.dataInicio) : concluidas.has(anterior.status) ? (anterior.enviadaEm ?? null) : null;
+  if (inicio && fim && fim < inicio) inicio = fim;
   return { inicio, fim };
+}
+
+// A etapa começou: tem avanço registrado, ou o relatório já está pronto/enviado
+export const etapaIniciada = (e: Etapa) => e.status !== "nao_iniciada" || prontaForaDoSistema(e);
+
+export type SituacaoEtapa = { chave: "devolvida" | "concluida" | "atrasada" | "pronta" | "andamento" | "nao_iniciada"; rotulo: string };
+
+// Situação da etapa, a mesma em toda a tela (cabeçalho, trilha, gráfico, cartões):
+// devolvida > enviada > atrasada > pronta para enviar > em andamento > não iniciada
+export function situacaoDaEtapa(e: Etapa, hoje = hojeIso()): SituacaoEtapa {
+  if (e.status === "devolvida") return { chave: "devolvida", rotulo: "Devolvida" };
+  if (concluidas.has(e.status)) return { chave: "concluida", rotulo: statusEtapa[e.status].rotulo };
+  if (e.dataFim && e.dataFim < hoje) return { chave: "atrasada", rotulo: "Atrasada" };
+  if (prontaForaDoSistema(e) || e.status === "a_enviar") return { chave: "pronta", rotulo: statusEtapa.a_enviar.rotulo };
+  if (etapaIniciada(e)) return { chave: "andamento", rotulo: statusEtapa[e.status].rotulo };
+  return { chave: "nao_iniciada", rotulo: statusEtapa.nao_iniciada.rotulo };
 }
 
 // Status para mostrar: a etapa pronta fora do sistema aparece como pronta para enviar

@@ -20,16 +20,14 @@ import {
   avancoEtapa,
   avancoProjeto,
   entregaFinal,
-  etapaAtrasada,
   etapaAtual,
   previstoProjeto,
   servicoDoProjeto,
   horasDoProjeto,
   horasFmt,
   situacaoProjeto,
-  statusDaEtapa,
-} from "@/lib/projeto";
-import { doisDigitos, statusEtapa } from "@/lib/rotulos";
+  situacaoDaEtapa } from "@/lib/projeto";
+import { doisDigitos, } from "@/lib/rotulos";
 import { ancoraAbaProjeto, passoDoProjeto } from "@/lib/proximo-passo";
 import { Abas, Barra, Botao, BotaoLink, Cabecalho, Cartao, Chip, ProximoPasso, Vazio } from "@/components/ui";
 import { nomeDoCliente } from "@/lib/campos-cliente";
@@ -142,7 +140,7 @@ export default function PaginaProjeto() {
 
   const fase = faseDoProjeto(projeto);
   const preContrato = antesDaContratacao(projeto);
-  const situacaoEtapa = et ? (et.status === "devolvida" ? "Devolvida" : etapaAtrasada(et) ? "Atrasada" : statusEtapa[statusDaEtapa(et)].rotulo) : null;
+  const situacaoEtapa = et ? situacaoDaEtapa(et).rotulo : null;
   const tomAvanco = previsto === null ? undefined : avanco >= previsto ? "ok" : previsto - avanco >= 10 ? "atencao" : undefined;
   const diasEntrega = entrega ? diferencaDias(hoje, entrega) : null;
   const abrirEntrega = (ordem: number) => {
@@ -162,7 +160,8 @@ export default function PaginaProjeto() {
   const abaMais = (secundarias as readonly string[]).includes(aba) ? aba : "Mais";
 
   const situacao = situacaoProjeto(projeto);
-  const corEtapa = et?.status === "devolvida" ? "text-vermelho" : et && etapaAtrasada(et) ? "text-laranja" : "text-tinta-2";
+  const chaveEtapa = et ? situacaoDaEtapa(et).chave : null;
+  const corEtapa = chaveEtapa === "devolvida" ? "text-vermelho" : chaveEtapa === "atrasada" ? "text-laranja" : "text-tinta-2";
   const celula = "min-w-0 bg-folha px-4 py-3.5 sm:px-5";
 
   return (

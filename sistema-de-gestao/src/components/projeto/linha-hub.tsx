@@ -22,9 +22,8 @@ import {
   textoPlanoAjustado,
   type Fase,
 } from "@/lib/fase";
-import { entregaFinal, etapaAtrasada, etapaAtual, etapaConcluida, periodoEfetivo, statusDaEtapa } from "@/lib/projeto";
+import { entregaFinal, etapaAtual, etapaConcluida, periodoEfetivo, situacaoDaEtapa } from "@/lib/projeto";
 import { dataCurta, formatarData, hojeIso, periodoCurto } from "@/lib/datas";
-import { statusEtapa } from "@/lib/rotulos";
 import { Botao, Cartao, Chip } from "@/components/ui";
 import { IconeCheck } from "@/components/icones";
 import { useProjeto } from "./use-projeto";
@@ -88,7 +87,9 @@ function datasDoRelatorio(p: Projeto, e: Etapa): string[] {
   const fimPlano = e.dataFimPlano ?? e.dataFim;
   if (inicioPlano && fimPlano) datas.push(`Previsto ${periodoCurto(inicioPlano, fimPlano)}`);
   const feito = antesDaContratacao(p) ? null : periodoEfetivo(p, e);
-  if (feito) datas.push(feito.fim ? `Realizado ${periodoCurto(feito.inicio, feito.fim)}` : `Em execução desde ${dataCurta(feito.inicio)}`);
+  // Só entra data do que aconteceu: etapa enviada, ou em andamento com o início registrado
+  if (feito?.fim) datas.push(feito.inicio ? `Realizado ${periodoCurto(feito.inicio, feito.fim)}` : `Enviado em ${dataCurta(feito.fim)}`);
+  else if (feito?.inicio) datas.push(`Em andamento desde ${dataCurta(feito.inicio)}`);
   return datas;
 }
 
@@ -102,8 +103,8 @@ function itemRelatorio(p: Projeto, e: Etapa, atual: Etapa | undefined): Item {
   if (atual?.ordem === e.ordem)
     return {
       ...base,
-      detalhe: `${nome} · ${etapaAtrasada(e) ? "atrasado" : statusEtapa[statusDaEtapa(e)].rotulo.toLowerCase()}`,
-      estado: etapaAtrasada(e) ? "alerta" : "agora",
+      detalhe: `${nome} · ${situacaoDaEtapa(e).rotulo.toLowerCase()}`,
+      estado: situacaoDaEtapa(e).chave === "atrasada" ? "alerta" : "agora",
     };
   return { ...base, detalhe: nome, estado: "pendente" };
 }

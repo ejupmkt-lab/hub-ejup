@@ -88,6 +88,7 @@ export type Etapa = {
   assinaturaCliente: string | null;
   evidencias?: Evidencia[];
   relatorioAssinado?: RelatorioAssinado | null;
+  iniciadaEm?: string | null; // dia em que a etapa começou de fato (primeira atividade ou avanço registrado)
   enviadaEm?: string | null; // data em que o relatório foi enviado no Plano de Entrega do HUB
   assinaturaDigital?: AssinaturaDigital | null; // enviada para assinar na Autentique
   relatorioExterno?: boolean; // feito fora do sistema e importado: o PDF assinado é o relatório

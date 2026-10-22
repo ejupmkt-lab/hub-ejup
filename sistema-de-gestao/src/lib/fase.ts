@@ -127,6 +127,7 @@ export function mudarHub(p: Projeto, para: PassoHub, data: string) {
   const datas: Hub["datas"] = {};
   for (const s of ordemPassos.slice(0, i + 1)) if (h.datas[s]) datas[s] = h.datas[s];
   datas[para] ??= data;
+  if (para === "execucao") limitarDatasAnteriores(datas, datas.execucao ?? data);
   // Pagamento: a consultoria começa nele, e o plano de trabalho anda junto
   if (para === "execucao" && ordemPassos.indexOf(h.passo) < i) ajustarPlanoAoPagamento(p, data);
   p.hub = { passo: para, datas };
@@ -206,6 +207,12 @@ export function reencadearExecucao(p: Projeto) {
     if (e.dataInicioBase == null && e.dataInicio) e.dataInicioBase = e.dataInicio;
     if (e.dataFimBase == null && e.dataFim) e.dataFimBase = e.dataFim;
   }
+  // A etapa só "começou" quando há avanço de verdade: sai do "não iniciada" e a data fica registrada
+  for (const e of p.etapas) {
+    if (etapaConcluida(e) || e.status === "nao_iniciada") {
+      if (e.status === "nao_iniciada") e.iniciadaEm = null;
+    } else if (!e.iniciadaEm) e.iniciadaEm = hojeIso();
+  }
   let anterior: Etapa | undefined;
   for (const e of p.etapas) {
     const bi = e.dataInicioBase;
@@ -238,12 +245,19 @@ export function dataDoPagamento(p: Projeto): string | null {
   return h.datas.execucao ?? null;
 }
 
+// Os passos anteriores ao pagamento não podem ter data depois dele (proposta, diagnóstico…)
+function limitarDatasAnteriores(datas: Hub["datas"], pagamento: string) {
+  for (const s of ordemPassos.slice(0, ordemPassos.indexOf("execucao"))) if (datas[s] && datas[s]! > pagamento) datas[s] = pagamento;
+}
+
 // Corrige o dia do pagamento no HUB e leva a execução junto, com a mesma duração.
 // Devolve quantos dias a execução andou.
 export function corrigirPagamento(p: Projeto, data: string): number {
   const h = hubDoProjeto(p);
   if (ordemPassos.indexOf(h.passo) < ordemPassos.indexOf("execucao")) return 0;
-  p.hub = { passo: h.passo, datas: { ...h.datas, execucao: data } };
+  const datas = { ...h.datas, execucao: data };
+  limitarDatasAnteriores(datas, data);
+  p.hub = { passo: h.passo, datas };
   delete p.contratacao;
   return ajustarPlanoAoPagamento(p, data);
 }

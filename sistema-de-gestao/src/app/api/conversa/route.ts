@@ -9,6 +9,7 @@ import { todasSecoes } from "@/lib/relatorio/secoes";
 import { hojeIso } from "@/lib/datas";
 import { statusEtapa } from "@/lib/rotulos";
 import { ESTILO_RELATORIO } from "@/lib/ia/estilo";
+import { textoPlano } from "@/lib/plano-texto";
 
 // Conversa do projeto: lê a mensagem do consultor (texto, ditado, fotos e PDFs),
 // responde e devolve as ações para organizar o projeto. O navegador aplica as
@@ -34,7 +35,7 @@ O que fazer com cada mensagem:
    - 3 Proposta: o consultor monta o plano de trabalho (horas e datas de cada etapa) e envia à FUNCERN, não ao HUB: "proposta_funcern". A FUNCERN lança no HUB: "proposta_cliente". O cliente analisa e paga: "execucao".
    - 4 Em execução: as etapas do serviço, cada uma enviada no Plano de Entrega do HUB. Com todas enviadas, o consultor finaliza no HUB: "finalizado".
    - 5 Projeto finalizado: o cliente avalia a consultoria ("avaliado") e depois o gestor analisa as entregas e conclui ("concluido"). Se o gestor devolver uma entrega, use "mudar_situacao_etapa" com "devolvida".
-   A consultoria começa quando o cliente paga: ao registrar o pagamento, a execução passa a começar nessa data, mantendo a duração e as horas de cada etapa; as datas do plano do HUB (o orçamento) não mudam. Prazos e atrasos seguem a execução. O gestor confere se as entregas são compatíveis com o período e recusa a nota quando muitas horas são entregues em poucos dias: avise se uma entrega estiver saindo antes do fim previsto da etapa.
+   A consultoria começa quando o cliente paga: ao registrar o pagamento, a execução passa a começar nessa data, mantendo a duração e as horas de cada etapa; as datas do plano do HUB (o orçamento) não mudam. Prazos e atrasos seguem a execução. O gestor confere se as entregas são compatíveis com o período e recusa a nota quando muitas horas são entregues em poucos dias: avise se uma entrega estiver saindo antes do fim previsto da etapa. Se o consultor pedir a mensagem do plano de trabalho, devolva exatamente o texto pronto que está no contexto do projeto, sem alterar as datas.
    Antes da execução, ajude a escrever o diagnóstico (usando o que ele contar e as perguntas do pré-diagnóstico da ficha) e a montar o plano de trabalho; não marque checklist nem escreva relatórios de etapa. Quando algo depender do gestor, da FUNCERN ou do cliente, ofereça uma mensagem curta e cordial para cobrar.
 
 A resposta ao consultor ("resposta"): português claro e direto, em poucas linhas, sem Markdown. Diga o que você fez e qual é o próximo passo concreto para a etapa avançar (até a entrega final do projeto), e faça as perguntas necessárias. Se a mensagem for só uma pergunta, responda sem ações. Não repita a lista de ações em detalhe: o sistema já mostra cada alteração.
@@ -297,6 +298,7 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>, preDiagnostico: stri
     `Etapa do HUB: ${fases[faseDoProjeto(p)].numero} ${fases[faseDoProjeto(p)].rotulo}; passo atual: "${passoHubDoProjeto(p)}" (${passosHub[passoHubDoProjeto(p)].rotulo}${comQuem(p) ? `; com quem está: ${comQuem(p)}` : ""})${antesDaContratacao(p) ? ", antes da contratação" : ""}`,
     preDiagnostico.length ? `Perguntas do pré-diagnóstico da ficha:\n${preDiagnostico.map((q, i) => `${i + 1}. ${q}`).join("\n")}` : null,
     `Plano de trabalho: ${p.planoFechadoEm ? "definido" : "ainda não definido"}`,
+    p.planoFechadoEm ? `Mensagem do plano de trabalho (pronta para enviar à FUNCERN, no formato do WhatsApp, com as datas do plano do HUB):\n${textoPlano(p, c as Cliente)}` : null,
     `Etapa em curso: ${emCurso ? `${emCurso.ordem} (${emCurso.nome})` : "todas enviadas"}`,
   ];
   for (const e of p.etapas) {
@@ -305,7 +307,7 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>, preDiagnostico: stri
       "",
       `## Etapa ${e.ordem}: ${e.nome} (${statusEtapa[e.status].rotulo}${editavel ? "" : ", NÃO ALTERAR"})`,
       e.descricao,
-      `Período: ${e.dataInicio && e.dataFim ? `${e.dataInicio} a ${e.dataFim}` : "a definir"} (duração de referência: ${e.duracaoReferenciaDias} dias). Horas da etapa: ${e.horasPrevistas} h (cumpridas quando a etapa é enviada no HUB).`,
+      `Execução prevista: ${e.dataInicio && e.dataFim ? `${e.dataInicio} a ${e.dataFim}` : "a definir"}; plano do HUB: ${e.dataInicioPlano && e.dataFimPlano ? `${e.dataInicioPlano} a ${e.dataFimPlano}` : "a definir"}${e.enviadaEm ? `; enviada no HUB em ${e.enviadaEm}` : ""} (duração de referência: ${e.duracaoReferenciaDias} dias). Horas da etapa: ${e.horasPrevistas} h (cumpridas quando a etapa é enviada no HUB).`,
       `Assinaturas do relatório: consultor ${e.assinaturaConsultor ?? "pendente"}, cliente ${e.assinaturaCliente ?? "pendente"}${e.relatorioAssinado ? `; PDF assinado guardado (${e.relatorioAssinado.nome})` : ""}.`,
       "Checklist (código, texto, situação):",
       ...e.atividades.map(

@@ -4,8 +4,8 @@ import Link from "next/link";
 import type { Projeto } from "@/lib/dados/tipos";
 import { diferencaDias, formatarData, hojeIso, somarDias } from "@/lib/datas";
 import { grupoDaEtapa, grupos } from "@/lib/painel";
-import { avancoEtapa, periodoEfetivo, statusDaEtapa } from "@/lib/projeto";
-import { doisDigitos, statusEtapa } from "@/lib/rotulos";
+import { avancoEtapa, periodoEfetivo, situacaoDaEtapa } from "@/lib/projeto";
+import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Cartao } from "@/components/ui";
 
 const mesesCurtos = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
@@ -108,7 +108,7 @@ export function CronogramaProjeto({ projeto, aoEditar }: { projeto: Projeto; aoE
                   <div className="group absolute inset-y-1" style={{ left: `${esquerda}%`, width: `max(${largura}%, 6px)` }}>
                     <Link
                       href={href}
-                      aria-label={`Etapa ${doisDigitos(e.ordem)}: ${statusEtapa[statusDaEtapa(e)].rotulo}, ${pct}%`}
+                      aria-label={`Etapa ${doisDigitos(e.ordem)}: ${situacaoDaEtapa(e).rotulo}, ${pct}%`}
                       className="absolute inset-0 overflow-hidden rounded-[5px] hover:brightness-110"
                       style={{ background: grupoDaEtapa(e, hoje) === "nao_iniciada" ? g.cor : `${g.cor}55` }}
                     >
@@ -116,10 +116,11 @@ export function CronogramaProjeto({ projeto, aoEditar }: { projeto: Projeto; aoE
                     </Link>
                     <Dica alinhar={esquerda > 55 ? "direita" : "centro"}>
                       <b>
-                        Etapa {doisDigitos(e.ordem)} · {statusEtapa[statusDaEtapa(e)].rotulo} · {pct}%
+                        Etapa {doisDigitos(e.ordem)} · {situacaoDaEtapa(e).rotulo} · {pct}%
                       </b>
                       Execução prevista: {formatarData(e.dataInicio)} a {formatarData(e.dataFim)}
-                      {real && (real.fim ? <>Realizado: {formatarData(real.inicio)} a {formatarData(real.fim)}</> : <>Em execução desde {formatarData(real.inicio)}</>)}
+                      {real?.fim && (real.inicio ? <>Realizado: {formatarData(real.inicio)} a {formatarData(real.fim)}</> : <>Enviada em {formatarData(real.fim)}</>)}
+                      {real && !real.fim && real.inicio && <>Em andamento desde {formatarData(real.inicio)}</>}
                     </Dica>
                   </div>
                 </div>

@@ -14,10 +14,9 @@ import {
   previstoProjeto,
   servicoDoProjeto,
   situacaoProjeto,
-  statusDaEtapa,
-} from "@/lib/projeto";
+  situacaoDaEtapa } from "@/lib/projeto";
 import { passoDoProjeto } from "@/lib/proximo-passo";
-import { doisDigitos, statusEtapa, type Tom } from "@/lib/rotulos";
+import { doisDigitos, type Tom } from "@/lib/rotulos";
 import { Barra, Chip, corTom } from "@/components/ui";
 import { IconeSeta } from "@/components/icones";
 import { nomeDoCliente } from "@/lib/campos-cliente";
@@ -58,11 +57,7 @@ export function CartaoProjeto({
   // Situação da etapa em curso, ao lado do nome
   const situacaoEtapa: { texto: string; tom: Tom } | null = !et
     ? null
-    : et.status === "devolvida"
-      ? { texto: "Devolvida", tom: "critico" }
-      : etapaAtrasada(et)
-        ? { texto: "Atrasada", tom: "atencao" }
-        : { texto: statusEtapa[statusDaEtapa(et)].rotulo, tom: "neutro" };
+    : { texto: situacaoDaEtapa(et).rotulo, tom: situacaoDaEtapa(et).chave === "devolvida" ? "critico" : situacaoDaEtapa(et).chave === "atrasada" ? "atencao" : "neutro" };
 
   return (
     <article

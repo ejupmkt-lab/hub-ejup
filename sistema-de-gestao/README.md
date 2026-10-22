@@ -138,6 +138,14 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Exclusão** de projeto (leva junto imagens e PDF) e de cliente sem projeto, só para gestores (RLS).
 - **Verificação em duas etapas** opcional (aplicativo autenticador), em Minha conta. Com ela ativa, o
   banco só entrega dados à sessão confirmada com o código (`privado.sessao_verificada`, aal2).
+- **Situação das etapas, uma só em toda a tela** (`situacaoDaEtapa` em `src/lib/projeto.ts`): devolvida,
+  enviada, atrasada (fim da execução passou), pronta para enviar, em andamento ou não iniciada. O cabeçalho,
+  a trilha dos relatórios, o gráfico, os cartões e o painel usam a mesma função. Só há data de início
+  quando a etapa começou de fato (`iniciadaEm`, registrada quando ela sai de "não iniciada"); uma etapa
+  enviada sem esse registro começou no envio da anterior (ou, a primeira, no pagamento). Etapa que não
+  começou mostra só o previsto.
+- **Chat**: Enter envia a mensagem; Shift+Enter pula a linha. A mensagem do plano de trabalho para a FUNCERN
+  não fica mais na aba: a IA entrega pronta quando pedida (o texto vai no contexto do projeto).
 - **Horas**: não há registro de visitas nem de horas trabalhadas. As horas de cada etapa são as do plano
   de trabalho e contam como cumpridas quando o relatório da etapa é enviado no HUB (`horasDoProjeto`); o
   cabeçalho do projeto mostra "51 h de 333 h" e quantas etapas foram enviadas. O número de visitas do

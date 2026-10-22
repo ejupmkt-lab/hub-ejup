@@ -1,6 +1,6 @@
 import type { Etapa, Projeto } from "./dados/tipos";
 import { diferencaDias, hojeIso, somarDias } from "./datas";
-import { etapaConcluida, prontaForaDoSistema } from "./projeto";
+import { etapaConcluida, situacaoDaEtapa, type SituacaoEtapa } from "./projeto";
 import { antesDaContratacao, comQuem, etapasTodasEnviadas, faseDoProjeto, ondeEsta, comQuemTexto } from "./fase";
 
 // Números, cronograma, calendário e gráficos do painel, calculados a partir
@@ -21,14 +21,16 @@ export const grupos: Record<Grupo, { rotulo: string; cor: string; texto: string 
 export const ordemGrupos: Grupo[] = ["nao_iniciada", "andamento", "a_enviar", "concluida", "atrasada", "devolvida"];
 export const pedeAcao = (g: Grupo) => g === "atrasada" || g === "devolvida";
 
-export function grupoDaEtapa(e: Etapa, hoje = hojeIso()): Grupo {
-  if (e.status === "devolvida") return "devolvida";
-  if (etapaConcluida(e)) return "concluida";
-  if (e.dataFim && e.dataFim < hoje) return "atrasada"; // mesmo se já pronta
-  if (e.status === "a_enviar" || prontaForaDoSistema(e)) return "a_enviar";
-  if (e.status === "nao_iniciada" && (!e.dataInicio || e.dataInicio > hoje)) return "nao_iniciada";
-  return "andamento";
-}
+// O grupo vem da situação única da etapa (situacaoDaEtapa), a mesma de toda a tela
+const grupoDaSituacao: Record<SituacaoEtapa["chave"], Grupo> = {
+  devolvida: "devolvida",
+  concluida: "concluida",
+  atrasada: "atrasada",
+  pronta: "a_enviar",
+  andamento: "andamento",
+  nao_iniciada: "nao_iniciada",
+};
+export const grupoDaEtapa = (e: Etapa, hoje = hojeIso()): Grupo => grupoDaSituacao[situacaoDaEtapa(e, hoje).chave];
 
 export const ativos = (projetos: Projeto[]) => projetos.filter((p) => p.status !== "encerrado");
 

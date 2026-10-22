@@ -3,7 +3,6 @@
 import { useState } from "react";
 import type { Projeto } from "@/lib/dados/tipos";
 import { diferencaDias, distribuirPorHoras, formatarData, hojeIso, somarDias, sugerirDatas } from "@/lib/datas";
-import { faltandoNoPlano, textoPlano } from "@/lib/plano-texto";
 import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Campo, Status } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
@@ -24,12 +23,11 @@ function validar(linhas: Linha[]) {
 }
 
 export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
-  const { alterar, cliente } = useProjeto();
+  const { alterar } = useProjeto();
   const fechado = !!projeto.planoFechadoEm;
   const [editando, setEditando] = useState(!fechado);
   const [inicio, setInicio] = useState(projeto.etapas[0].dataInicio ?? hojeIso());
   const [fim, setFim] = useState(projeto.etapas[projeto.etapas.length - 1].dataFim ?? "");
-  const [copiado, setCopiado] = useState(false);
   const paraLinhas = () =>
     projeto.etapas.map((e) => ({
       inicio: e.dataInicio ?? "",
@@ -50,15 +48,6 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
     const porHoras = fim ? distribuirPorHoras(inicio, fim, linhas.map((l) => numero(l.horas))) : null;
     const datas = porHoras ?? sugerirDatas(inicio, projeto.etapas.map((e) => e.duracaoReferenciaDias));
     setLinhas(linhas.map((l, i) => ({ ...l, ...datas[i] })));
-  };
-  const copiar = async () => {
-    try {
-      await navigator.clipboard.writeText(textoPlano(projeto, cliente));
-      setCopiado(true);
-      setTimeout(() => setCopiado(false), 2500);
-    } catch {
-      alert("Não foi possível copiar automaticamente. Selecione o texto na tela e copie.");
-    }
   };
   const setLinha = (i: number, k: keyof Linha, v: string) => setLinhas(linhas.map((l, j) => (j === i ? { ...l, [k]: v } : l)));
 
@@ -334,23 +323,6 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
           </>
         )}
       </div>
-
-      {fechado && !editando && (
-        <div className="mt-10 border-t border-linha pt-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="text-lg font-semibold">Mensagem do plano de trabalho</h3>
-            <Botao onClick={copiar}>{copiado ? "Copiada" : "Copiar mensagem"}</Botao>
-          </div>
-          {faltandoNoPlano(projeto).length > 0 && (
-            <p className="mt-2 text-sm text-laranja">
-              Falta preencher na ficha de identificação: {faltandoNoPlano(projeto).join(" e ")}. Até lá, a mensagem sai com “a definir”.
-            </p>
-          )}
-          <pre className="mt-4 whitespace-pre-wrap rounded-[var(--radius-campo)] bg-pedra/60 p-4 font-sans text-sm leading-relaxed text-tinta">
-            {textoPlano(projeto, cliente)}
-          </pre>
-        </div>
-      )}
     </section>
   );
 }

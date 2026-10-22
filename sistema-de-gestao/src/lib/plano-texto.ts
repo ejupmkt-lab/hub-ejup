@@ -29,9 +29,3 @@ export function textoPlano(p: Projeto, cliente: Cliente | undefined) {
 }
 
 // O que falta para a mensagem sair completa
-export function faltandoNoPlano(p: Projeto) {
-  const f: string[] = [];
-  if (!p.codigoSolicitacaoHub && !p.numeroProjetoHub) f.push("código do pedido no HUB");
-  if (p.etapas.some((e) => !e.dataInicio || !e.dataFim)) f.push("datas das etapas");
-  return f;
-}
