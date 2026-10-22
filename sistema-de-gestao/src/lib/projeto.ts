@@ -139,11 +139,15 @@ export function etapaAtrasada(e: Etapa, hoje = hojeIso()) {
 // Fim previsto do projeto: o fim da última etapa
 export const entregaFinal = (p: Projeto) => p.etapas[p.etapas.length - 1]?.dataFim ?? null;
 
-// Dias desde o último registro de visita, reunião ou trabalho (nulo se nunca houve)
-export function diasSemRegistro(p: Projeto, hoje = hojeIso()) {
-  const ultima = (p.atividadesRegistradas ?? []).map((r) => r.data).sort().pop();
-  return ultima ? Math.max(0, diferencaDias(ultima, hoje)) : null;
+// Horas: as do plano de trabalho. Uma etapa finalizada, com o relatório enviado
+// no HUB, tem cumpridas as horas definidas para ela.
+export function horasDoProjeto(p: Projeto) {
+  const previstas = p.etapas.reduce((a, e) => a + (e.horasPrevistas || 0), 0);
+  const cumpridas = p.etapas.filter((e) => concluidas.has(e.status)).reduce((a, e) => a + (e.horasPrevistas || 0), 0);
+  return { previstas, cumpridas, etapasEnviadas: p.etapas.filter((e) => concluidas.has(e.status)).length, etapas: p.etapas.length };
 }
+
+export const horasFmt = (h: number) => `${Number.isInteger(h) ? h : h.toFixed(1).replace(".", ",")} h`;
 
 // Situação geral, nas três cores do painel: ponto crítico (devolução), atraso, em dia
 export type SituacaoProjeto = { tom: Tom; rotulo: string };

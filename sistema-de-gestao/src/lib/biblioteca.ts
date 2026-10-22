@@ -54,13 +54,6 @@ export function anonimizar(texto: string, cliente: Partial<Cliente>, participant
   return t;
 }
 
-export function nomesDosParticipantes(p: Projeto) {
-  return (p.atividadesRegistradas ?? [])
-    .flatMap((r) => r.participantes.split(/[,;]| e /))
-    .map((x) => x.replace(/\(.*?\)/g, "").trim())
-    .filter((x) => x.length > 2);
-}
-
 // Marcadores → dados do novo cliente (o que não existir vira [completar])
 export function preencherMarcadores(texto: string, cliente: Partial<Cliente>) {
   const valores: Record<string, string | undefined> = {
@@ -86,16 +79,15 @@ export function preencherMarcadores(texto: string, cliente: Partial<Cliente>) {
 export function textosParaBiblioteca(p: Projeto, e: Etapa, cliente: Partial<Cliente>) {
   // Relatório feito fora do sistema: o que está nas seções não é o texto entregue
   if (relatorioFeitoFora(e)) return [];
-  const participantes = nomesDosParticipantes(p);
   const linhas: Omit<TextoBiblioteca, "id" | "created_at">[] = [];
   const base = { empresa: p.empresa, etapa: e.ordem, ramo: cliente.ramo ?? "", porte: cliente.porte ?? "", origem: "aprovado" as const, projeto_origem: p.id, servico_id: p.modeloId };
   for (const d of todasSecoes) {
     const t = (e.secoes[d.chave] ?? "").trim();
-    if (t && !MARCA_COMPLETAR.test(t)) linhas.push({ ...base, chave: d.chave, titulo: d.titulo(e), texto: anonimizar(t, cliente, participantes) });
+    if (t && !MARCA_COMPLETAR.test(t)) linhas.push({ ...base, chave: d.chave, titulo: d.titulo(e), texto: anonimizar(t, cliente) });
   }
   for (const ent of e.entregaveis) {
     const t = ent.conteudo.trim();
-    if (t && !MARCA_COMPLETAR.test(t)) linhas.push({ ...base, chave: chaveEntregavel(ent.titulo), titulo: ent.titulo, texto: anonimizar(t, cliente, participantes) });
+    if (t && !MARCA_COMPLETAR.test(t)) linhas.push({ ...base, chave: chaveEntregavel(ent.titulo), titulo: ent.titulo, texto: anonimizar(t, cliente) });
   }
   return linhas;
 }

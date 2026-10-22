@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useProjeto } from "@/components/projeto/use-projeto";
 import { PlanoTrabalho } from "@/components/projeto/plano-trabalho";
-import { Visitas } from "@/components/projeto/visitas";
 import { DadosProjeto } from "@/components/projeto/dados";
 import { CronogramaProjeto } from "@/components/projeto/cronograma-projeto";
 import { Relatorios } from "@/components/projeto/relatorios";
@@ -16,7 +15,6 @@ import { antesDaContratacao, avisoFinalizarAntecipado, faseDoProjeto, fases, mud
 import type { PassoHub } from "@/lib/dados/tipos";
 import { registrarEvento } from "@/lib/dados/store";
 import { formatarData, diferencaDias, hojeIso } from "@/lib/datas";
-import { horasDoProjeto, horasFmt } from "@/lib/horas";
 import {
   codigoHub,
   avancoEtapa,
@@ -26,6 +24,8 @@ import {
   etapaAtual,
   previstoProjeto,
   servicoDoProjeto,
+  horasDoProjeto,
+  horasFmt,
   situacaoProjeto,
   statusDaEtapa,
 } from "@/lib/projeto";
@@ -37,7 +37,7 @@ import { nomeDoCliente } from "@/lib/campos-cliente";
 // Três abas para o dia a dia; o resto fica no "Mais". O processo (ficha,
 // textos, referências) fica no serviço; aqui, só o que é do projeto.
 const principais = ["Desenvolvimento", "Plano de trabalho", "Entregas"] as const;
-const secundarias = ["Dados do projeto", "Horas e visitas", "Histórico"] as const;
+const secundarias = ["Dados do projeto", "Histórico"] as const;
 type Aba = (typeof principais)[number] | (typeof secundarias)[number];
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
@@ -247,13 +247,11 @@ export default function PaginaProjeto() {
               <div className={celula}>
                 <p className="text-[12px] font-semibold text-tinta-2">Horas</p>
                 <p className="num mt-0.5 font-semibold leading-snug text-tinta">
-                  {horasFmt(horas.realizadas)} de {horas.previstas} h
+                  {horasFmt(horas.cumpridas)} de {horas.previstas} h
                 </p>
-                {horas.visitasPrevistas ? (
-                  <p className="num text-[13px] text-tinta-2">
-                    {horas.visitas} de {horas.visitasPrevistas} visitas
-                  </p>
-                ) : null}
+                <p className="num text-[13px] text-tinta-2">
+                  {horas.etapasEnviadas} de {horas.etapas} {horas.etapas === 1 ? "etapa enviada" : "etapas enviadas"}
+                </p>
               </div>
               <div className={celula}>
                 <p className="text-[12px] font-semibold text-tinta-2">Consultor</p>
@@ -327,18 +325,6 @@ export default function PaginaProjeto() {
         </div>
       )}
       {aba === "Dados do projeto" && <DadosProjeto projeto={projeto} aoFechar={() => setAba("Desenvolvimento")} />}
-      {aba === "Horas e visitas" && (
-        <div className="space-y-4">
-          <p className="text-sm text-tinta-2">
-            O SEBRAE confere as horas e as visitas contra a ficha técnica. Elas entram aqui sozinhas quando você conta a visita no{" "}
-            <button onClick={desenvolver} className="font-semibold text-azul hover:underline">
-              Desenvolvimento
-            </button>
-            ; nesta tela dá para conferir, corrigir ou lançar à mão.
-          </p>
-          <Visitas projeto={projeto} />
-        </div>
-      )}
       {aba === "Histórico" && (
         <Cartao className="px-4 py-1 sm:px-6">
           <ol className="max-w-3xl">

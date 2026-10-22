@@ -1,10 +1,9 @@
-import type { Atividade, Contratacao, Etapa, Hub, PassoHub, Projeto, Registro, RelatorioAssinado, TipoAtividade } from "./dados/tipos";
+import type { Atividade, Contratacao, Etapa, Hub, PassoHub, Projeto, Registro, RelatorioAssinado } from "./dados/tipos";
 import { ajustarPlanoAoPagamento, datasMudadasAMao, reencadearExecucao, avisoEnvioAntecipado, avisoFinalizarAntecipado, bloqueioAte, dataDoPagamento, textoPlanoAjustado, mudarHub, ordemPassos, passoHubDoProjeto, registroHub } from "./fase";
 import { todasSecoes, verificarCompletude } from "./relatorio/secoes";
 import { assinada, automatizarEtapa, bloqueioStatus, marcarAtividade } from "./regras-etapa";
 import { doisDigitos, statusEtapa, type StatusEtapa as StatusEtapaTipo } from "./rotulos";
 import { distribuirPorHoras, formatarData, hojeIso, sugerirDatas } from "./datas";
-import { horasFmt, tiposAtividade } from "./horas";
 import { etapaAtual } from "./projeto";
 import { tipoRegistro } from "./registros";
 
@@ -19,7 +18,6 @@ export type AcaoIA =
   | { tipo: "escrever_secao"; etapa: number; chave: string; texto: string }
   | { tipo: "escrever_entregavel"; etapa: number; titulo: string; texto: string }
   | { tipo: "guardar_anexo"; etapa: number; anexo: string; legenda: string }
-  | { tipo: "registrar_atividade"; etapa: number; data: string; modalidade: TipoAtividade; horas: number; participantes: string; anotacoes: string }
   | { tipo: "definir_cronograma"; inicio: string; fim: string }
   | { tipo: "alterar_datas_etapa"; etapa: number; inicio: string; fim: string; justificativa: string }
   | { tipo: "registrar_assinatura"; etapa: number; anexo: string; data_consultor: string; data_cliente: string }
@@ -36,7 +34,6 @@ export type Desfazer =
   | { tipo: "secao"; etapa: number; chave: string; texto: string | null }
   | { tipo: "entregavel"; etapa: number; titulo: string; conteudo: string }
   | { tipo: "evidencia"; etapa: number; id: string }
-  | { tipo: "registro"; id: string }
   | { tipo: "status"; etapa: number; status: StatusEtapaTipo }
   | {
       tipo: "datas";
@@ -261,22 +258,6 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
       });
       desfazer.push({ tipo: "evidencia", etapa: e.ordem, id });
       feito(`${et}: foto guardada como evidência (“${resumo(a.legenda.trim() || anexo.nome)}”)`);
-    } else if (a.tipo === "registrar_atividade") {
-      if (!(a.horas > 0 && a.horas <= 24) || !/^\d{4}-\d{2}-\d{2}$/.test(a.data) || !tiposAtividade[a.modalidade]) return;
-      const id = `atv-${mensagemId}-${i}`;
-      if ((p.atividadesRegistradas ?? []).some((x) => x.id === id)) return;
-      (p.atividadesRegistradas ??= []).push({
-        id,
-        data: a.data,
-        etapa: e.ordem,
-        tipo: a.modalidade,
-        horas: a.horas,
-        participantes: a.modalidade === "trabalho_interno" ? "" : a.participantes.trim(),
-        anotacoes: a.anotacoes.trim(),
-        registradoPor: autor,
-      });
-      desfazer.push({ tipo: "registro", id });
-      feito(`${et}: ${tiposAtividade[a.modalidade].rotulo.toLowerCase()} de ${formatarData(a.data)} registrada (${horasFmt(a.horas)})`);
     } else if (a.tipo === "registrar_assinatura") {
       // PDF assinado no gov.br, mandado na conversa, e/ou as datas das assinaturas
       const pdf = anexos.find((x) => x.id === a.anexo && x.tipo === "application/pdf");
@@ -351,10 +332,6 @@ export function desfazerAcoes(p: Projeto, passos: Desfazer[]) {
       p.status = d.status;
       continue;
     }
-    if (d.tipo === "registro") {
-      p.atividadesRegistradas = (p.atividadesRegistradas ?? []).filter((r) => r.id !== d.id);
-      continue;
-    }
     const e = p.etapas.find((x) => x.ordem === d.etapa);
     if (!e) continue;
     if (d.tipo === "atividade") {
@@ -417,12 +394,12 @@ export function sugestoesConversa(p: Projeto): string[] {
   if (passo === "finalizado" && etapaAtual(p)?.status !== "devolvida")
     return [`O cliente avaliou a consultoria hoje (${hoje}).`, "Escreva uma mensagem pedindo ao cliente que avalie a consultoria no HUB."];
   if (passo === "avaliado" && etapaAtual(p)?.status !== "devolvida")
-    return [`O gestor concluiu o projeto hoje (${hoje}).`, `O gestor devolveu a Etapa __ pedindo: __.`, "Faça um resumo final do projeto: o que foi feito em cada etapa e as horas."];
+    return [`O gestor concluiu o projeto hoje (${hoje}).`, `O gestor devolveu a Etapa __ pedindo: __.`, "Faça um resumo final do projeto: o que foi feito em cada etapa."];
   if (!p.planoFechadoEm)
     return [
       `O projeto começa em ${formatarData(hojeIso())} e termina em __/__/____. Monte o plano de trabalho.`,
       "Ainda não sei a data de fim. Monte o plano de trabalho a partir de hoje, com a duração de referência das etapas.",
-      "O que preciso preparar para a primeira visita?",
+      "O que preciso preparar para começar a primeira etapa?",
     ];
 
   const devolvida = p.etapas.find((e) => e.status === "devolvida");
@@ -433,7 +410,7 @@ export function sugestoesConversa(p: Projeto): string[] {
     ];
 
   const e = etapaAtual(p);
-  if (!e) return [`Finalizei o projeto no HUB hoje (${hoje}).`, "Faça um resumo final do projeto: o que foi feito em cada etapa e as horas."];
+  if (!e) return [`Finalizei o projeto no HUB hoje (${hoje}).`, "Faça um resumo final do projeto: o que foi feito em cada etapa."];
 
   const n = doisDigitos(e.ordem);
   const extra: string[] = [];
@@ -442,7 +419,7 @@ export function sugestoesConversa(p: Projeto): string[] {
   const pendente = e.atividades.find((a) => a.status === "pendente" && !a.codigo.includes(".")) ?? e.atividades.find((a) => a.status === "pendente");
   if (pendente)
     return [
-      `Hoje fiz uma visita de __ horas. Trabalhamos em: ${pendente.texto.charAt(0).toLowerCase()}${pendente.texto.slice(1)}.`,
+      `Hoje trabalhei em: ${pendente.texto.charAt(0).toLowerCase()}${pendente.texto.slice(1)}.`,
       `O que falta para concluir a ${nomeEtapa(e)}?`,
       ...extra,
       `Escreva o que já dá para escrever do relatório da Etapa ${n}.`,

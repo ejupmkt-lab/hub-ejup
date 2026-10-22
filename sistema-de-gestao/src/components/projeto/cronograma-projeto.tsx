@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import type { Projeto } from "@/lib/dados/tipos";
-import { diferencaDias, hojeIso, somarDias } from "@/lib/datas";
+import { diferencaDias, formatarData, hojeIso, somarDias } from "@/lib/datas";
 import { grupoDaEtapa, grupos } from "@/lib/painel";
-import { avancoEtapa, statusDaEtapa } from "@/lib/projeto";
+import { avancoEtapa, periodoEfetivo, statusDaEtapa } from "@/lib/projeto";
 import { doisDigitos, statusEtapa } from "@/lib/rotulos";
 import { Botao, Cartao } from "@/components/ui";
 
@@ -80,6 +80,7 @@ export function CronogramaProjeto({ projeto, aoEditar }: { projeto: Projeto; aoE
             const esquerda = pos(e.dataInicio!);
             const largura = ((diferencaDias(e.dataInicio!, e.dataFim!) + 1) / dias) * 100;
             const plano = noPlano(e);
+            const real = periodoEfetivo(projeto, e);
             const href = `/${projeto.empresa}/projetos/${projeto.id}#etapa-${e.ordem}`;
             return (
               <li key={e.ordem} className={`${colunas} items-center border-b border-linha/70 py-2.5 last:border-0`}>
@@ -93,26 +94,34 @@ export function CronogramaProjeto({ projeto, aoEditar }: { projeto: Projeto; aoE
                 </Link>
                 <div className="relative h-7 rounded-md bg-pedra">
                   {plano && (
-                    <span
-                      aria-hidden
-                      title={`No plano do HUB: ${diaMes(plano.inicio)} – ${diaMes(plano.fim)}`}
-                      className="absolute inset-y-0.5 rounded-[5px] border border-dashed border-tinta-2/60"
+                    <div
+                      className="group absolute inset-y-0.5"
                       style={{ left: `${pos(plano.inicio)}%`, width: `max(${((diferencaDias(plano.inicio, plano.fim) + 1) / dias) * 100}%, 6px)` }}
-                    />
+                    >
+                      <span aria-hidden className="absolute inset-0 rounded-[5px] border border-dashed border-tinta-2/60" />
+                      <Dica alinhar={pos(plano.inicio) > 55 ? "direita" : "centro"}>
+                        <b>Plano do HUB</b>
+                        {formatarData(plano.inicio)} a {formatarData(plano.fim)}
+                      </Dica>
+                    </div>
                   )}
-                  <Link
-                    href={href}
-                    aria-label={`Etapa ${doisDigitos(e.ordem)}: ${statusEtapa[statusDaEtapa(e)].rotulo}, ${pct}%`}
-                    title={`${statusEtapa[statusDaEtapa(e)].rotulo} · ${pct}%`}
-                    className="absolute inset-y-1 overflow-hidden rounded-[5px] hover:brightness-110"
-                    style={{
-                      left: `${esquerda}%`,
-                      width: `max(${largura}%, 6px)`,
-                      background: grupoDaEtapa(e, hoje) === "nao_iniciada" ? g.cor : `${g.cor}55`,
-                    }}
-                  >
-                    <span className="absolute inset-y-0 left-0" style={{ width: `${pct}%`, background: g.cor }} />
-                  </Link>
+                  <div className="group absolute inset-y-1" style={{ left: `${esquerda}%`, width: `max(${largura}%, 6px)` }}>
+                    <Link
+                      href={href}
+                      aria-label={`Etapa ${doisDigitos(e.ordem)}: ${statusEtapa[statusDaEtapa(e)].rotulo}, ${pct}%`}
+                      className="absolute inset-0 overflow-hidden rounded-[5px] hover:brightness-110"
+                      style={{ background: grupoDaEtapa(e, hoje) === "nao_iniciada" ? g.cor : `${g.cor}55` }}
+                    >
+                      <span className="absolute inset-y-0 left-0" style={{ width: `${pct}%`, background: g.cor }} />
+                    </Link>
+                    <Dica alinhar={esquerda > 55 ? "direita" : "centro"}>
+                      <b>
+                        Etapa {doisDigitos(e.ordem)} · {statusEtapa[statusDaEtapa(e)].rotulo} · {pct}%
+                      </b>
+                      Execução prevista: {formatarData(e.dataInicio)} a {formatarData(e.dataFim)}
+                      {real && (real.fim ? <>Realizado: {formatarData(real.inicio)} a {formatarData(real.fim)}</> : <>Em execução desde {formatarData(real.inicio)}</>)}
+                    </Dica>
+                  </div>
                 </div>
               </li>
             );
@@ -146,5 +155,17 @@ export function CronogramaProjeto({ projeto, aoEditar }: { projeto: Projeto; aoE
         )}
       </ul>
     </Cartao>
+  );
+}
+
+// Balãozinho que aparece ao passar o mouse (ou focar) sobre a barra
+function Dica({ children, alinhar }: { children: React.ReactNode; alinhar: "centro" | "direita" }) {
+  return (
+    <span
+      role="tooltip"
+      className={`num pointer-events-none absolute bottom-full z-20 mb-1.5 hidden w-max max-w-[16rem] flex-col gap-0.5 rounded-md bg-tinta px-2.5 py-1.5 text-[12px] leading-snug text-folha shadow-lg group-focus-within:flex group-hover:flex [&_b]:font-semibold ${alinhar === "direita" ? "right-0" : "left-1/2 -translate-x-1/2"}`}
+    >
+      {children}
+    </span>
   );
 }

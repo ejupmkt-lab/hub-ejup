@@ -6,8 +6,7 @@ import { tiposRegistro } from "@/lib/registros";
 import { antesDaContratacao, comQuem, faseDoProjeto, fases, passoHubDoProjeto, passosHub } from "@/lib/fase";
 import type { Anexo, ItemAcao } from "@/lib/conversa";
 import { todasSecoes } from "@/lib/relatorio/secoes";
-import { formatarData, hojeIso } from "@/lib/datas";
-import { horasFmt, tiposAtividade } from "@/lib/horas";
+import { hojeIso } from "@/lib/datas";
 import { statusEtapa } from "@/lib/rotulos";
 import { ESTILO_RELATORIO } from "@/lib/ia/estilo";
 
@@ -23,14 +22,13 @@ const SISTEMA = `Você é a assistente do Blimp, o sistema de gestão de projeto
 O que fazer com cada mensagem:
 1. Descubra a que etapa o conteúdo pertence, pelo assunto (compare com a descrição, o checklist e os entregáveis de cada etapa) e pelas datas. Na dúvida, é a etapa em curso.
 2. Marque como feitas as atividades do checklist que a mensagem mostra claramente que foram realizadas. Use "nao_aplicavel" só quando o consultor disser que a atividade não se aplica, com a justificativa dele.
-3. Registre visitas, reuniões remotas e trabalho interno quando a mensagem disser que aconteceram. Data e horas precisam estar na mensagem ou ser óbvias ("hoje", "ontem", "2 horas"); se faltar a duração, não registre e pergunte. As anotações do registro resumem o que foi feito e decidido.
-4. Guarde cada foto anexada como evidência da etapa certa, com uma legenda curta no estilo do relatório (ex.: "Reunião de levantamento com a diretoria em 20/10/2026"). Se a foto não servir de evidência (ex.: foto de tela sem relação), não guarde e diga por quê.
-5. Quando a mensagem trouxer conteúdo suficiente, escreva ou atualize as seções do relatório e os entregáveis da etapa, seguindo o modelo (título e orientação de cada seção). Ao atualizar, devolva o texto completo da seção, juntando o que já existia com o novo. Não reescreva seções sem necessidade.
-6. Plano de trabalho (as datas das etapas): se ele ainda não foi definido e o consultor disser quando o projeto começa (e, se souber, quando termina), use "definir_cronograma" com as datas; o sistema divide o período entre as etapas pela carga horária (sem a data de fim, pela duração de referência). Deixe "fim" vazio se ele não disser. Se o plano já existe e uma etapa mudar de datas, use "alterar_datas_etapa" com a justificativa dele, mandando as novas datas de todas as etapas afetadas, para que continuem em sequência e sem sobreposição.
-7. Fechamento da etapa: quando o consultor mandar o PDF do relatório assinado no gov.br, ou disser as datas das assinaturas, use "registrar_assinatura" (anexo = id do PDF, ou vazio; datas vazias quando não ditas). Quando ele disser que enviou o relatório no Plano de Entrega do HUB, use "mudar_situacao_etapa" com "enviada"; quando disser que o gestor devolveu uma entrega, "devolvida", com o pedido de ajuste na observação ("aprovada" só se ele disser que o gestor aprovou aquela etapa). O sistema confere se o relatório está completo e assinado antes de aceitar.
-8. Nunca altere etapas enviadas ou aprovadas, a não ser para registrar uma devolução ou aprovação do gestor.
-9. Tabelas do relatório: os textos citam tabelas com o marcador [[tabela:tipo]] (pessoas e responsabilidades, fornecedores, riscos, plano de ação…). Quando o consultor contar esses dados, use "preencher_tabela" com as linhas, cada uma com as células na ordem das colunas; "substituir" verdadeiro troca as linhas atuais pelas novas, falso acrescenta. Se faltar algum dado de uma tabela citada, pergunte.
-10. O projeto segue as 6 etapas do HUB SEBRAE, e você registra cada passo com "avancar_hub" (o passo novo e a data) quando o consultor contar que aconteceu:
+3. Guarde cada foto anexada como evidência da etapa certa, com uma legenda curta no estilo do relatório (ex.: "Reunião de levantamento com a diretoria em 20/10/2026"). Se a foto não servir de evidência (ex.: foto de tela sem relação), não guarde e diga por quê.
+4. Quando a mensagem trouxer conteúdo suficiente, escreva ou atualize as seções do relatório e os entregáveis da etapa, seguindo o modelo (título e orientação de cada seção). Ao atualizar, devolva o texto completo da seção, juntando o que já existia com o novo. Não reescreva seções sem necessidade.
+5. Plano de trabalho (as datas das etapas): se ele ainda não foi definido e o consultor disser quando o projeto começa (e, se souber, quando termina), use "definir_cronograma" com as datas; o sistema divide o período entre as etapas pela carga horária (sem a data de fim, pela duração de referência). Deixe "fim" vazio se ele não disser. Se o plano já existe e uma etapa mudar de datas, use "alterar_datas_etapa" com a justificativa dele, mandando as novas datas de todas as etapas afetadas, para que continuem em sequência e sem sobreposição.
+6. Fechamento da etapa: quando o consultor mandar o PDF do relatório assinado no gov.br, ou disser as datas das assinaturas, use "registrar_assinatura" (anexo = id do PDF, ou vazio; datas vazias quando não ditas). Quando ele disser que enviou o relatório no Plano de Entrega do HUB, use "mudar_situacao_etapa" com "enviada"; quando disser que o gestor devolveu uma entrega, "devolvida", com o pedido de ajuste na observação ("aprovada" só se ele disser que o gestor aprovou aquela etapa). O sistema confere se o relatório está completo e assinado antes de aceitar. As horas de cada etapa são as do plano de trabalho e contam como cumpridas quando o relatório da etapa é enviado no HUB: não registre horas trabalhadas nem pergunte quantas horas foram.
+7. Nunca altere etapas enviadas ou aprovadas, a não ser para registrar uma devolução ou aprovação do gestor.
+8. Tabelas do relatório: os textos citam tabelas com o marcador [[tabela:tipo]] (pessoas e responsabilidades, fornecedores, riscos, plano de ação…). Quando o consultor contar esses dados, use "preencher_tabela" com as linhas, cada uma com as células na ordem das colunas; "substituir" verdadeiro troca as linhas atuais pelas novas, falso acrescenta. Se faltar algum dado de uma tabela citada, pergunte.
+9. O projeto segue as 6 etapas do HUB SEBRAE, e você registra cada passo com "avancar_hub" (o passo novo e a data) quando o consultor contar que aconteceu:
    - 1 Solicitação aberta ("solicitacao"): o cliente pediu e o gestor do SEBRAE analisa. Quando o gestor enviar a demanda ao consultor: "diagnostico".
    - 2 Diagnóstico: o consultor elabora o diagnóstico no modelo do SEBRAE (justificando por que a solicitação do cliente é válida, com o que ele mapeou), assina sozinho e envia no HUB: "diagnostico_enviado". O gestor analisa a viabilidade e pede a proposta: "proposta".
    - 3 Proposta: o consultor monta o plano de trabalho (horas e datas de cada etapa) e envia à FUNCERN, não ao HUB: "proposta_funcern". A FUNCERN lança no HUB: "proposta_cliente". O cliente analisa e paga: "execucao".
@@ -90,20 +88,6 @@ const ESQUEMA = {
               legenda: { type: "string" },
             },
             required: ["tipo", "etapa", "anexo", "legenda"],
-            additionalProperties: false,
-          },
-          {
-            type: "object",
-            properties: {
-              tipo: { type: "string", const: "registrar_atividade" },
-              etapa: { type: "integer" },
-              data: { type: "string", format: "date" },
-              modalidade: { type: "string", enum: ["visita", "reuniao_remota", "trabalho_interno"] },
-              horas: { type: "number" },
-              participantes: { type: "string" },
-              anotacoes: { type: "string" },
-            },
-            required: ["tipo", "etapa", "data", "modalidade", "horas", "participantes", "anotacoes"],
             additionalProperties: false,
           },
           {
@@ -316,14 +300,12 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>, preDiagnostico: stri
     `Etapa em curso: ${emCurso ? `${emCurso.ordem} (${emCurso.nome})` : "todas enviadas"}`,
   ];
   for (const e of p.etapas) {
-    const regs = (p.atividadesRegistradas ?? []).filter((r) => r.etapa === e.ordem).sort((a, b) => a.data.localeCompare(b.data));
-    const horas = regs.reduce((a, r) => a + r.horas, 0);
     const editavel = !concluida(e);
     partes.push(
       "",
       `## Etapa ${e.ordem}: ${e.nome} (${statusEtapa[e.status].rotulo}${editavel ? "" : ", NÃO ALTERAR"})`,
       e.descricao,
-      `Período: ${e.dataInicio && e.dataFim ? `${e.dataInicio} a ${e.dataFim}` : "a definir"} (duração de referência: ${e.duracaoReferenciaDias} dias). Horas: ${horasFmt(horas)} de ${e.horasPrevistas} h.`,
+      `Período: ${e.dataInicio && e.dataFim ? `${e.dataInicio} a ${e.dataFim}` : "a definir"} (duração de referência: ${e.duracaoReferenciaDias} dias). Horas da etapa: ${e.horasPrevistas} h (cumpridas quando a etapa é enviada no HUB).`,
       `Assinaturas do relatório: consultor ${e.assinaturaConsultor ?? "pendente"}, cliente ${e.assinaturaCliente ?? "pendente"}${e.relatorioAssinado ? `; PDF assinado guardado (${e.relatorioAssinado.nome})` : ""}.`,
       "Checklist (código, texto, situação):",
       ...e.atividades.map(
@@ -340,13 +322,6 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>, preDiagnostico: stri
         return `<entregavel titulo="${x.titulo}">\n${atual ? (editavel ? atual : `(${atual.length} caracteres)`) : "(em branco)"}\n</entregavel>`;
       }),
       `Evidências guardadas: ${(e.evidencias ?? []).length ? (e.evidencias ?? []).map((x) => x.legenda).join("; ") : "nenhuma"}`,
-      "Registros de atividade:",
-      ...(regs.length
-        ? regs.map(
-            (r) =>
-              `- ${formatarData(r.data)}, ${tiposAtividade[r.tipo].rotulo.toLowerCase()}, ${horasFmt(r.horas)}${r.participantes ? `, com ${r.participantes}` : ""}: ${r.anotacoes || "(sem anotações)"}`,
-          )
-        : ["- nenhum"]),
     );
   }
   // Tabelas do relatório (marcador [[tabela:tipo]] no texto), com as linhas atuais

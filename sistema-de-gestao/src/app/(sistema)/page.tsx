@@ -3,9 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAcesso, useEstado } from "@/lib/dados/store";
-import { alertasDoProjeto } from "@/lib/projeto";
+import { alertasDoProjeto, horasDoProjeto, horasFmt } from "@/lib/projeto";
 import { dataPorExtenso, hojeIso } from "@/lib/datas";
-import { horasDoProjeto, horasFmt } from "@/lib/horas";
 import { contarTarefas } from "@/lib/tarefas";
 import { useEmpresaAtual } from "@/lib/dados/empresa-atual";
 import { indicadores } from "@/lib/painel";
@@ -38,7 +37,7 @@ export default function Painel() {
   const conta = contarTarefas(projetos);
   const horas = ativos
     .map(horasDoProjeto)
-    .reduce((a, h) => ({ previstas: a.previstas + h.previstas, realizadas: a.realizadas + h.realizadas }), { previstas: 0, realizadas: 0 });
+    .reduce((a, h) => ({ previstas: a.previstas + h.previstas, cumpridas: a.cumpridas + h.cumpridas }), { previstas: 0, cumpridas: 0 });
   const hoje = dataPorExtenso(hojeIso()).replace(/^0/, "");
 
   return (
@@ -81,7 +80,7 @@ export default function Painel() {
               tom={conta.atrasadas ? "atencao" : undefined}
               href="/tarefas"
             />
-            <Indicador rotulo="Horas registradas" valor={horasFmt(horas.realizadas)} detalhe={`de ${horas.previstas.toLocaleString("pt-BR")} h previstas`} />
+            <Indicador rotulo="Horas cumpridas" valor={horasFmt(horas.cumpridas)} detalhe={`de ${horas.previstas.toLocaleString("pt-BR")} h previstas`} />
             <Indicador
               rotulo="Etapas atrasadas"
               valor={ind.atrasadas}

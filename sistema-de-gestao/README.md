@@ -25,7 +25,7 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   etapa em curso ou o próximo passo (diagnóstico, plano de trabalho, relatório, envio), com "Continuar no
   Desenvolvimento"; o que depende do gestor, da FUNCERN ou do cliente fica em "Aguardando outros", com "Cobrar". Marcar uma atividade-mãe marca as filhas pendentes; a filha não marca a mãe.
 - **Painel** (página inicial de todos): projetos em andamento, tarefas pendentes do plano de trabalho,
-  horas registradas e etapas atrasadas; depois, pendências, situação das etapas e carga por semana; por
+  horas cumpridas e etapas atrasadas; depois, pendências, situação das etapas e carga por semana; por
   fim, um cartão por projeto com o avanço contra o previsto,
   a etapa, a entrega, os alertas (vermelho = devolução, laranja = atraso, verde = em dia) e o próximo
   passo. O avanço pesa cada etapa pelas horas: 40% pelo checklist e 60% pelo status do relatório
@@ -56,7 +56,9 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   realizado de cada relatório segue a mesma regra (`periodoEfetivo`). Prazos,
   atrasos, gráfico e avisos seguem a execução. Plano fechado depois do pagamento já nasce alinhado; nos
   projetos antigos, a aba Plano de trabalho oferece "Começar a execução no pagamento". O gráfico mostra o
-  plano do HUB em tracejado. O sistema pede confirmação para enviar uma etapa ou finalizar o projeto
+  plano do HUB em tracejado e, ao passar o mouse sobre cada barra, um balão com as datas (plano do HUB, execução
+  prevista e realizado). Depois do pagamento, "Alterar datas" também corrige as datas do plano do HUB, e a
+  execução é recalculada a partir delas. O sistema pede confirmação para enviar uma etapa ou finalizar o projeto
   antes do fim previsto (o gestor recusa a nota quando muitas horas são entregues em poucos dias).
   Embaixo da régua do HUB, a trilha dos relatórios do serviço (um por etapa da ficha: 5 na LGPD, 2 no
   Planejamento Tecnológico), com o período previsto (plano do HUB) embaixo de cada relatório e, conforme a
@@ -94,13 +96,13 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   anexar o PDF assinado, sem nada escrito nas seções, também vale como relatório feito fora: as seções
   não são cobradas, as datas das assinaturas podem ser corrigidas na entrega, o checklist é dado por
   feito no envio e esses textos não vão para a biblioteca. O número de visitas do plano é editável nos
-  Dados do projeto (em branco, uma por etapa). Dados do projeto,
-  horas e visitas e histórico ficam no menu "Mais". O processo (ficha, textos, referências) fica no serviço; o endereço
+  Dados do projeto (em branco, uma por etapa). Dados do projeto
+  e histórico ficam no menu "Mais". O processo (ficha, textos, referências) fica no serviço; o endereço
   antigo da etapa (`/etapas/N`) leva à entrega dela (`#etapa-N`).
 - **Desenvolvimento com a IA** (`src/components/projeto/conversa.tsx`, rota `/api/conversa`, tabela
   `mensagens_projeto`): o consultor escreve ou dita (reconhecimento de voz do navegador), manda fotos e
   PDFs; a IA define o plano de trabalho, identifica a etapa, marca o checklist, guarda as fotos como evidência,
-  registra visitas e horas, escreve seções e entregáveis no modelo, guarda o PDF assinado e registra o
+  escreve seções e entregáveis no modelo, guarda o PDF assinado e registra o
   envio no HUB e a aprovação ou devolução do SEBRAE. O sistema confere cada ação (o que não pode,
   aparece como aviso com o motivo); cada resposta mostra o que mudou e pode ser desfeita
   (`src/lib/conversa.ts`). Sugestões de mensagem levam ao próximo passo até a entrega final. Precisa da
@@ -136,10 +138,11 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Exclusão** de projeto (leva junto imagens e PDF) e de cliente sem projeto, só para gestores (RLS).
 - **Verificação em duas etapas** opcional (aplicativo autenticador), em Minha conta. Com ela ativa, o
   banco só entrega dados à sessão confirmada com o código (`privado.sessao_verificada`, aal2).
-- **Visitas e horas**: cada visita presencial, reunião remota ou trabalho interno é registrado com data,
-  horas, participantes e anotações (aba "Visitas e horas" no projeto e em cada etapa). As horas somam contra
-  as 333 h previstas, por etapa; fotos da visita entram como evidências do relatório; o texto-padrão das
-  evidências cita as datas dos encontros.
+- **Horas**: não há registro de visitas nem de horas trabalhadas. As horas de cada etapa são as do plano
+  de trabalho e contam como cumpridas quando o relatório da etapa é enviado no HUB (`horasDoProjeto`); o
+  cabeçalho do projeto mostra "51 h de 333 h" e quantas etapas foram enviadas. O número de visitas do
+  plano é só informativo (sai na mensagem do plano). Fotos entram como evidência pela conversa ou pela
+  importação de relatório pronto.
 - **Biblioteca de textos aprovados** (tabela `biblioteca_textos`, aba "Biblioteca de textos" de cada serviço): quando
   uma etapa é marcada como aprovada, as seções e os entregáveis completos entram anonimizados (empresa,
   responsável, CNPJ, participantes e datas viram marcadores). Nos próximos projetos, "Preencher o relatório

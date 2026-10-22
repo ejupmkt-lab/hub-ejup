@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Projeto } from "@/lib/dados/tipos";
-import { diferencaDias, distribuirPorHoras, formatarData, hojeIso, sugerirDatas } from "@/lib/datas";
+import { diferencaDias, distribuirPorHoras, formatarData, hojeIso, somarDias, sugerirDatas } from "@/lib/datas";
 import { faltandoNoPlano, textoPlano } from "@/lib/plano-texto";
 import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Campo, Status } from "@/components/ui";
@@ -10,7 +10,7 @@ import { useProjeto } from "./use-projeto";
 import { automatizarEtapa } from "@/lib/regras-etapa";
 import { ajustarPlanoAoPagamento, corrigirPagamento, datasMudadasAMao, dataDoPagamento, execucaoForaDoPagamento } from "@/lib/fase";
 
-type Linha = { inicio: string; fim: string; horas: string };
+type Linha = { inicio: string; fim: string; horas: string; planoInicio: string; planoFim: string };
 
 function validar(linhas: Linha[]) {
   const erros: string[] = [];
@@ -30,7 +30,14 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
   const [inicio, setInicio] = useState(projeto.etapas[0].dataInicio ?? hojeIso());
   const [fim, setFim] = useState(projeto.etapas[projeto.etapas.length - 1].dataFim ?? "");
   const [copiado, setCopiado] = useState(false);
-  const paraLinhas = () => projeto.etapas.map((e) => ({ inicio: e.dataInicio ?? "", fim: e.dataFim ?? "", horas: e.horasPrevistas ? String(e.horasPrevistas) : "" }));
+  const paraLinhas = () =>
+    projeto.etapas.map((e) => ({
+      inicio: e.dataInicio ?? "",
+      fim: e.dataFim ?? "",
+      horas: e.horasPrevistas ? String(e.horasPrevistas) : "",
+      planoInicio: e.dataInicioPlano ?? e.dataInicio ?? "",
+      planoFim: e.dataFimPlano ?? e.dataFim ?? "",
+    }));
   const [linhas, setLinhas] = useState<Linha[]>(paraLinhas);
   const numero = (h: string) => Number(h.replace(",", ".")) || 0;
   const horasTotal = editando ? linhas.reduce((a, l) => a + numero(l.horas), 0) : projeto.etapas.reduce((a, e) => a + e.horasPrevistas, 0);
@@ -102,9 +109,19 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
     />
   );
 
+  // Depois do pagamento o plano do HUB (orçamento) tem as próprias datas
+  const planoMudou = (i: number) =>
+    !!pago && ((projeto.etapas[i].dataInicioPlano ?? projeto.etapas[i].dataInicio ?? "") !== linhas[i].planoInicio ||
+        (projeto.etapas[i].dataFimPlano ?? projeto.etapas[i].dataFim ?? "") !== linhas[i].planoFim);
+  const planoInvalido = !!pago && linhas.some((l) => !l.planoInicio || !l.planoFim || l.planoFim < l.planoInicio);
+  const algumPlanoMudou = !!pago && projeto.etapas.some((_, i) => planoMudou(i));
+
   const salvarAlteracao = () => {
     const mudancas = projeto.etapas
       .flatMap((e, i) => [
+        pago && planoMudou(i)
+          ? `Etapa ${doisDigitos(e.ordem)} no plano do HUB: ${formatarData(e.dataInicioPlano)}–${formatarData(e.dataFimPlano)} → ${formatarData(linhas[i].planoInicio)}–${formatarData(linhas[i].planoFim)}`
+          : null,
         e.dataInicio !== linhas[i].inicio || e.dataFim !== linhas[i].fim
           ? `Etapa ${doisDigitos(e.ordem)}: ${formatarData(e.dataInicio)}–${formatarData(e.dataFim)} → ${formatarData(linhas[i].inicio)}–${formatarData(linhas[i].fim)}`
           : null,
@@ -113,7 +130,23 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
       .filter(Boolean)
       .join("; ");
     alterar(
-      (p) =>
+      (p) => {
+        if (algumPlanoMudou) {
+          // Plano do HUB corrigido: a execução é recalculada dele, a partir do pagamento
+          const delta = diferencaDias(linhas[0].planoInicio, pago!);
+          p.etapas.forEach((e, i) => {
+            e.horasPrevistas = numero(linhas[i].horas);
+            e.dataInicioPlano = linhas[i].planoInicio;
+            e.dataFimPlano = linhas[i].planoFim;
+            const novoInicio = somarDias(linhas[i].planoInicio, delta);
+            const novoFim = somarDias(linhas[i].planoFim, delta);
+            if (e.dataRelatorio === e.dataFim) e.dataRelatorio = novoFim;
+            e.dataInicio = novoInicio;
+            e.dataFim = novoFim;
+            datasMudadasAMao(e);
+          });
+          return;
+        }
         p.etapas.forEach((e, i) => {
           e.horasPrevistas = numero(linhas[i].horas);
           if (e.dataRelatorio === e.dataFim) e.dataRelatorio = linhas[i].fim; // acompanha o novo fim, se não foi mudada à mão
@@ -125,7 +158,8 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
             e.dataInicioPlano = linhas[i].inicio;
             e.dataFimPlano = linhas[i].fim;
           }
-        }),
+        });
+      },
       { acao: "Datas do plano alteradas", detalhe: `${mudancas}. Justificativa: ${justificativa}` },
     );
     setJustificativa("");
@@ -137,11 +171,6 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold">Datas do plano de trabalho</h2>
-          <p className="mt-2 max-w-2xl text-[15px] text-tinta-2">
-            Defina o início e o fim aqui, ou conte à IA no Desenvolvimento; as etapas dividem o período na proporção da carga horária ({horasTotal} h no
-            total). Essas são as datas do orçamento, que vão para o HUB na mensagem abaixo. A consultoria, de fato, começa quando o cliente paga: a
-            execução segue a mesma duração de cada etapa a partir do pagamento, e é ela que conta para os prazos e os avisos.
-          </p>
         </div>
         {fechado ? <Status tom="ok">Fechado em {formatarData(projeto.planoFechadoEm!.slice(0, 10))}</Status> : <Status tom="atencao">Ainda não fechado</Status>}
       </div>
@@ -254,7 +283,16 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
                   </td>
                   {fechado && (
                     <td className="num py-2 text-[13px] text-tinta-2">
-                      {mudou ? `${formatarData(e.dataInicioPlano)} a ${formatarData(e.dataFimPlano)}` : "as mesmas"}
+                      {editando && pago ? (
+                        <span className="flex flex-wrap items-center gap-1.5">
+                          <input type="date" aria-label={`Início da etapa ${e.ordem} no plano do HUB`} className="campo !w-auto !py-1 !text-[13px]" value={linhas[i].planoInicio} onChange={(ev) => setLinha(i, "planoInicio", ev.target.value)} />
+                          <input type="date" aria-label={`Fim da etapa ${e.ordem} no plano do HUB`} className="campo !w-auto !py-1 !text-[13px]" value={linhas[i].planoFim} onChange={(ev) => setLinha(i, "planoFim", ev.target.value)} />
+                        </span>
+                      ) : mudou ? (
+                        `${formatarData(e.dataInicioPlano)} a ${formatarData(e.dataFimPlano)}`
+                      ) : (
+                        "as mesmas"
+                      )}
                     </td>
                   )}
                 </tr>
@@ -274,6 +312,11 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
         </table>
       </div>
 
+      {editando && pago && (
+        <p className="mt-3 text-[13px] text-tinta-2">
+          Mudando as datas do plano do HUB, a execução é recalculada a partir do pagamento ({formatarData(pago)}). Mudando só as da execução, o plano do HUB fica como está.
+        </p>
+      )}
       {editando && erros.length > 0 && (
         <ul className="mt-3 list-disc pl-5 text-[13px] text-vermelho">{erros.map((e) => <li key={e}>{e}</li>)}</ul>
       )}
@@ -286,7 +329,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
             <Campo rotulo="Justificativa da alteração (obrigatória)" className="min-w-72 flex-1">
               <input className="campo" value={justificativa} onChange={(e) => setJustificativa(e.target.value)} />
             </Campo>
-            <Botao onClick={salvarAlteracao} disabled={erros.length > 0 || !justificativa.trim()}>Salvar alteração</Botao>
+            <Botao onClick={salvarAlteracao} disabled={erros.length > 0 || planoInvalido || !justificativa.trim()}>Salvar alteração</Botao>
             <Botao variante="secundario" onClick={() => { setLinhas(paraLinhas()); setEditando(false); }}>Cancelar</Botao>
           </>
         )}

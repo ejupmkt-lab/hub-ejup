@@ -21,7 +21,6 @@ export const ancoraAbaProjeto = {
   plano: "Plano de trabalho",
   entregas: "Entregas",
   relatorios: "Entregas",
-  visitas: "Horas e visitas",
   historico: "Histórico",
 } as const;
 

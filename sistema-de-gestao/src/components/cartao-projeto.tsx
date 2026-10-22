@@ -8,7 +8,6 @@ import { formatarData } from "@/lib/datas";
 import {
   codigoHub,
   avancoProjeto,
-  diasSemRegistro,
   entregaFinal,
   etapaAtrasada,
   etapaAtual,
@@ -20,7 +19,7 @@ import {
 import { passoDoProjeto } from "@/lib/proximo-passo";
 import { doisDigitos, statusEtapa, type Tom } from "@/lib/rotulos";
 import { Barra, Chip, corTom } from "@/components/ui";
-import { IconeCalendarioPequeno, IconeSeta } from "@/components/icones";
+import { IconeSeta } from "@/components/icones";
 import { nomeDoCliente } from "@/lib/campos-cliente";
 
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
@@ -47,7 +46,6 @@ export function CartaoProjeto({
   const et = etapaAtual(p);
   const atrasadas = p.etapas.filter((e) => etapaAtrasada(e) && e.status !== "devolvida").length;
   const devolvidas = p.etapas.filter((e) => e.status === "devolvida").length;
-  const semRegistro = diasSemRegistro(p);
   const entrega = entregaFinal(p);
   const passo = passoDoProjeto(p);
   const href = `/${p.empresa}/projetos/${p.id}`;
@@ -125,17 +123,6 @@ export function CartaoProjeto({
         {devolvidas > 0 && <Chip tom="critico">{devolvidas === 1 ? "1 etapa devolvida" : `${devolvidas} etapas devolvidas`}</Chip>}
         {atrasadas > 0 && <Chip tom="atencao">{atrasadas === 1 ? "1 etapa atrasada" : `${atrasadas} etapas atrasadas`}</Chip>}
         {!p.planoFechadoEm && fase === "execucao" && <Chip tom="atencao">Sem plano de trabalho</Chip>}
-        {p.status !== "encerrado" && (
-          <Chip tom={semRegistro === null || semRegistro > 7 ? "atencao" : "neutro"} icone={<IconeCalendarioPequeno className="h-3.5 w-3.5" />}>
-            {semRegistro === null
-              ? "sem registros"
-              : semRegistro === 0
-                ? "registro hoje"
-                : semRegistro === 1
-                  ? "1 dia sem registro"
-                  : `${semRegistro} dias sem registro`}
-          </Chip>
-        )}
         {sit.tom === "ok" && <Chip tom="ok">{sit.rotulo}</Chip>}
       </div>
 
