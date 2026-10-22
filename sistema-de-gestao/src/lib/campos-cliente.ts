@@ -39,3 +39,22 @@ export const gruposCliente: { titulo: string; campos: CampoCliente[] }[] = [
 ];
 
 export const camposCliente = gruposCliente.flatMap((g) => g.campos);
+
+// Nome do cliente para a tela. Nome todo em maiúsculas (como vem da Receita)
+// aparece com só as iniciais maiúsculas; siglas com números (NOV4) e "LTDA" ficam
+const MINUSCULAS = new Set(["de", "da", "do", "das", "dos", "e", "em", "a", "o", "para", "com"]);
+const SIGLAS = new Set(["ltda", "me", "epp", "eireli", "s/a", "sa"]);
+export function nomeDoCliente(c: Partial<Pick<Cliente, "nomeFantasia" | "razaoSocial">> | null | undefined, padrao = "Cliente") {
+  const nome = (c?.nomeFantasia || c?.razaoSocial || "").trim();
+  if (!nome) return padrao;
+  if (nome !== nome.toUpperCase() || !/\p{Lu}{3}/u.test(nome)) return nome;
+  return nome
+    .toLowerCase()
+    .split(/(\s+)/)
+    .map((p, i) => {
+      if (/\d/.test(p) || SIGLAS.has(p)) return p.toUpperCase();
+      if (i > 0 && MINUSCULAS.has(p)) return p;
+      return p.charAt(0).toUpperCase() + p.slice(1);
+    })
+    .join("");
+}

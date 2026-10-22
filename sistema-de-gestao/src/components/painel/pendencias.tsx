@@ -6,6 +6,7 @@ import { useEstado } from "@/lib/dados/store";
 import { dataCurta } from "@/lib/datas";
 import { grupos, pendenciasDoGrupo } from "@/lib/painel";
 import { doisDigitos } from "@/lib/rotulos";
+import { nomeDoCliente } from "@/lib/campos-cliente";
 
 // O que pede ação em todos os projetos: atrasos e devoluções primeiro,
 // depois o que está pronto para enviar e os prazos da semana.
@@ -14,7 +15,7 @@ export function Pendencias({ projetos }: { projetos: Projeto[] }) {
   const lista = pendenciasDoGrupo(projetos);
   const nome = (p: Projeto) => {
     const c = estado.clientes.find((x) => x.id === p.clienteId);
-    return c?.nomeFantasia || c?.razaoSocial || "Cliente";
+    return nomeDoCliente(c);
   };
   if (!lista.length)
     return <p className="text-sm text-tinta-2">Nada atrasado, nada esperando envio e nenhum prazo nos próximos 7 dias.</p>;

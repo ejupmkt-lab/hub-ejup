@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { novoId, useAcesso, useEstado } from "@/lib/dados/store";
 import type { Cliente, EmpresaSlug } from "@/lib/dados/tipos";
-import { camposCliente, gruposCliente } from "@/lib/campos-cliente";
+import { camposCliente, gruposCliente, nomeDoCliente } from "@/lib/campos-cliente";
 import { formatarCnpj, tempoDeAtividade, type DadosCnpj } from "@/lib/cnpj";
 import Link from "next/link";
 import { servicoDoProjeto } from "@/lib/projeto";
@@ -270,7 +270,7 @@ function Conteudo() {
                 <li key={c.id} className="relative flex flex-wrap items-center justify-between gap-x-8 gap-y-2 px-4 py-4 hover:bg-pedra/50 sm:px-6">
                   <div className="min-w-0">
                     <Link href={`/${slug}/clientes/${c.id}`} className="break-words text-[17px] font-semibold text-tinta after:absolute after:inset-0 after:content-[''] hover:text-azul">
-                      {c.nomeFantasia || c.razaoSocial}
+                      {nomeDoCliente(c)}
                     </Link>
                     <p className="num mt-0.5 break-words text-sm text-tinta-2">{[c.nomeFantasia && c.razaoSocial, c.cnpj, c.responsavel].filter(Boolean).join(", ")}</p>
                     {ativos.length > 0 && (

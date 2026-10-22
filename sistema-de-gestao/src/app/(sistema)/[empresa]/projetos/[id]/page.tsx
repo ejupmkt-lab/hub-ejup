@@ -31,6 +31,7 @@ import {
 import { doisDigitos, statusEtapa } from "@/lib/rotulos";
 import { ancoraAbaProjeto, passoDoProjeto } from "@/lib/proximo-passo";
 import { Abas, Barra, Botao, BotaoLink, Cabecalho, Cartao, Chip, ProximoPasso, Vazio } from "@/components/ui";
+import { nomeDoCliente } from "@/lib/campos-cliente";
 
 // Três abas para o dia a dia; o resto fica no "Mais". O processo (ficha,
 // textos, referências) fica no serviço; aqui, só o que é do projeto.
@@ -99,7 +100,7 @@ export default function PaginaProjeto() {
   const entrega = entregaFinal(projeto);
   const hoje = hojeIso();
   const servico = servicoDoProjeto(projeto);
-  const nomeCliente = cliente.nomeFantasia || cliente.razaoSocial;
+  const nomeCliente = nomeDoCliente(cliente);
 
   // Próximo passo do HUB registrado direto pelo botão do próximo passo, com a data de hoje
   const registrarHub = (para: PassoHub) => {
@@ -172,15 +173,19 @@ export default function PaginaProjeto() {
           { rotulo: servico },
         ]}
         titulo={nomeCliente}
+        selo={
+          <Chip tom={situacao.tom} icone={<span aria-hidden className="size-1.5 rounded-full bg-current" />}>
+            {situacao.rotulo}
+          </Chip>
+        }
         subtitulo={
-          <p className="num flex flex-wrap items-center gap-x-2 gap-y-1.5 break-words">
-            <span className="font-semibold text-tinta">{servico}</span>
-            <span aria-hidden>·</span>
-            <span>HUB {codigoHub(projeto) || "sem número"}</span>
-            <span aria-hidden>·</span>
-            <span>ficha {projeto.codigoFichaTecnica}</span>
-            <Chip tom={situacao.tom}>{situacao.rotulo}</Chip>
-          </p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span className="font-medium text-tinta">{servico}</span>
+            <span className="flex flex-wrap gap-1.5">
+              <CodigoHub codigo={codigoHub(projeto)} />
+              <Etiqueta rotulo="Ficha" valor={projeto.codigoFichaTecnica} />
+            </span>
+          </div>
         }
         abas={
           <>
@@ -364,5 +369,45 @@ export default function PaginaProjeto() {
         </p>
       )}
     </>
+  );
+}
+
+const etiqueta = "inline-flex items-center gap-1.5 rounded-md border border-linha bg-folha px-2 py-1 text-[13px] leading-none";
+
+function Etiqueta({ rotulo, valor }: { rotulo: string; valor: string }) {
+  return (
+    <span className={etiqueta}>
+      <span className="text-tinta-2">{rotulo}</span>
+      <span className="num font-semibold text-tinta">{valor || "—"}</span>
+    </span>
+  );
+}
+
+// Código do pedido no HUB, que o consultor cola no HUB: um clique copia
+function CodigoHub({ codigo }: { codigo: string }) {
+  const [copiado, setCopiado] = useState(false);
+  if (!codigo) return <Etiqueta rotulo="HUB" valor="sem número" />;
+  const copiar = async () => {
+    try {
+      await navigator.clipboard.writeText(codigo);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 1800);
+    } catch {
+      // sem permissão para copiar: o código continua visível
+    }
+  };
+  return (
+    <button type="button" onClick={() => void copiar()} title="Copiar o código do HUB" className={`${etiqueta} transition-colors hover:border-linha-forte hover:bg-pedra`}>
+      <span className="text-tinta-2">HUB</span>
+      <span className="num font-semibold text-tinta">{codigo}</span>
+      <span aria-live="polite" className={`text-[12px] ${copiado ? "text-verde" : "text-tinta-2"}`}>
+        {copiado ? "copiado" : (
+          <svg aria-hidden viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="5" y="5" width="8.5" height="8.5" rx="1.5" />
+            <path d="M10.5 5V3.5A1.5 1.5 0 0 0 9 2H3.5A1.5 1.5 0 0 0 2 3.5V9a1.5 1.5 0 0 0 1.5 1.5H5" />
+          </svg>
+        )}
+      </span>
+    </button>
   );
 }

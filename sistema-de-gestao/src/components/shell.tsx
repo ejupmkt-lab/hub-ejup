@@ -25,6 +25,7 @@ import {
 import { LogoBlimp } from "@/components/logo";
 import { useEmpresaAtual } from "@/lib/dados/empresa-atual";
 import type { Empresa } from "@/lib/dados/tipos";
+import { nomeDoCliente } from "@/lib/campos-cliente";
 
 type Folha = "mais" | "registrar" | null;
 
@@ -303,7 +304,7 @@ function EscolherProjeto({ aoFechar }: { aoFechar: () => void }) {
   const projetos = estado.projetos.filter((p) => p.status !== "encerrado" && p.empresa === empresa?.slug);
   const nome = (id: string) => {
     const c = estado.clientes.find((x) => x.id === id);
-    return c?.nomeFantasia || c?.razaoSocial || "Cliente";
+    return nomeDoCliente(c);
   };
   return (
     <FolhaSobreposta titulo="Desenvolver projeto" aoFechar={aoFechar}>

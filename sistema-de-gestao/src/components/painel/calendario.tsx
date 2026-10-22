@@ -8,6 +8,7 @@ import { dataPorExtenso, hojeIso } from "@/lib/datas";
 import { diasDoMes, eventos, grupos, type Evento } from "@/lib/painel";
 import { doisDigitos } from "@/lib/rotulos";
 import { Botao } from "@/components/ui";
+import { nomeDoCliente } from "@/lib/campos-cliente";
 
 const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 const diasSemana = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
@@ -29,7 +30,7 @@ export function Calendario({ projetos }: { projetos: Projeto[] }) {
   for (const ev of todos) porDia.set(ev.data, [...(porDia.get(ev.data) ?? []), ev]);
   const nome = (p: Projeto) => {
     const c = estado.clientes.find((x) => x.id === p.clienteId);
-    return c?.nomeFantasia || c?.razaoSocial || "Cliente";
+    return nomeDoCliente(c);
   };
   const doDia = porDia.get(dia) ?? [];
 

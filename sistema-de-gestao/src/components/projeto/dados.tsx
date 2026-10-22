@@ -11,6 +11,7 @@ import { Botao, Campo, Cartao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 import { EscolherGestorSebrae } from "./gestor-sebrae";
 import { ValoresProjeto } from "@/components/financeiro/valores-projeto";
+import { nomeDoCliente } from "@/lib/campos-cliente";
 
 // Só o que é deste projeto; a ficha técnica, os textos e as referências vêm do serviço
 const campos: { k: keyof Projeto; r: string; largo?: boolean }[] = [{ k: "localAssinatura", r: "Local (fechamento do relatório)" }];
@@ -25,7 +26,7 @@ export function DadosProjeto({ projeto, aoFechar }: { projeto: Projeto; aoFechar
   const consultorAtual = consultores.find((u) => u.id === projeto.consultorId);
 
   const excluirProjeto = async () => {
-    const nome = cliente?.nomeFantasia || cliente?.razaoSocial || "este cliente";
+    const nome = nomeDoCliente(cliente, "este cliente");
     const resposta = prompt(
       `Excluir o projeto de ${nome}? Etapas, relatórios, imagens e o PDF assinado serão apagados e não há como desfazer.\n\nPara confirmar, digite EXCLUIR.`,
     );

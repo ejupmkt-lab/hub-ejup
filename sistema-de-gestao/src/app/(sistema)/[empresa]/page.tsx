@@ -24,6 +24,7 @@ import { Cronograma } from "@/components/painel/cronograma";
 import { CartaoProjeto } from "@/components/cartao-projeto";
 import { Calendario } from "@/components/painel/calendario";
 import { IconeBusca, IconeCalendario, IconeCronograma, IconeLista, IconeMaisSinal, IconeQuadro } from "@/components/icones";
+import { nomeDoCliente } from "@/lib/campos-cliente";
 
 const situacoes = {
   andamento: "Ativos",
@@ -52,7 +53,7 @@ export default function Projetos() {
 
   const daEmpresa = estado.projetos.filter((p) => p.empresa === slug);
   const cliente = (p: Projeto) => estado.clientes.find((c) => c.id === p.clienteId);
-  const nome = (p: Projeto) => cliente(p)?.nomeFantasia || cliente(p)?.razaoSocial || "Cliente";
+  const nome = (p: Projeto) => nomeDoCliente(cliente(p));
   const passa = (p: Projeto, s: Situacao) =>
     s === "todos" ||
     (s === "andamento" && p.status !== "encerrado") ||

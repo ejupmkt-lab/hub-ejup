@@ -8,6 +8,7 @@ import { ativos, grupoDaEtapa, grupos, janelaCronograma } from "@/lib/painel";
 import { doisDigitos, statusEtapa } from "@/lib/rotulos";
 import { useDica } from "./dica";
 import { Legenda } from "./legenda";
+import { nomeDoCliente } from "@/lib/campos-cliente";
 
 const mesesCurtos = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
 
@@ -22,7 +23,7 @@ export function Cronograma({ projetos }: { projetos: Projeto[] }) {
   const pos = (d: string) => (diferencaDias(inicio, d) / dias) * 100;
   const nome = (p: Projeto) => {
     const c = estado.clientes.find((x) => x.id === p.clienteId);
-    return c?.nomeFantasia || c?.razaoSocial || "Cliente";
+    return nomeDoCliente(c);
   };
 
   // Marcas: início de cada semana (linha fina) e de cada mês (rótulo)

@@ -106,12 +106,14 @@ export type Migalha = { rotulo: string; href?: string };
 export function Cabecalho({
   migalhas,
   titulo,
+  selo,
   subtitulo,
   children,
   abas,
 }: {
   migalhas?: Migalha[];
   titulo: string;
+  selo?: React.ReactNode; // situação, ao lado do título
   subtitulo?: React.ReactNode;
   children?: React.ReactNode;
   abas?: React.ReactNode;
@@ -140,8 +142,11 @@ export function Cabecalho({
       )}
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div className="min-w-0">
-          <h1 className="text-balance break-words text-[1.65rem] font-bold leading-tight tracking-tight text-tinta sm:text-[1.9rem]">{titulo}</h1>
-          {subtitulo && <div className="mt-1 text-[15px] text-tinta-2">{subtitulo}</div>}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <h1 className="text-balance break-words text-[1.65rem] font-bold leading-tight tracking-tight text-tinta sm:text-[1.9rem]">{titulo}</h1>
+            {selo}
+          </div>
+          {subtitulo && <div className="mt-2 text-[15px] text-tinta-2">{subtitulo}</div>}
         </div>
         {children && <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">{children}</div>}
       </div>

@@ -16,6 +16,7 @@ import { useEmpresaAtual } from "@/lib/dados/empresa-atual";
 import { Botao, BotaoLink, Cabecalho, Cartao, Chip, Indicador, Segmentos, Vazio } from "@/components/ui";
 import { Pendencias } from "@/components/painel/pendencias";
 import { IconeSeta } from "@/components/icones";
+import { nomeDoCliente } from "@/lib/campos-cliente";
 
 type Filtro = "comigo" | "atrasadas" | "aguardando";
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
@@ -50,7 +51,7 @@ export default function Tarefas() {
   // Quem faz o relatório da etapa (sem escolha, o consultor do projeto)
   const responsavel = (p: Projeto, e: Etapa) => estado.usuarios.find((u) => u.id === (e.responsavelId || p.consultorId))?.nome;
   const clienteDe = (p: Projeto) => estado.clientes.find((x) => x.id === p.clienteId);
-  const nome = (p: Projeto) => clienteDe(p)?.nomeFantasia || clienteDe(p)?.razaoSocial || "Cliente";
+  const nome = (p: Projeto) => nomeDoCliente(clienteDe(p));
 
   // Cobrar quem está com a bola: a mensagem vai para a área de transferência
   const cobrar = async (p: Projeto) => {

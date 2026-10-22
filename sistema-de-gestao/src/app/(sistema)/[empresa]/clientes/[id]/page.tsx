@@ -8,6 +8,7 @@ import { formatarData } from "@/lib/datas";
 import { BotaoLink, Cabecalho, Cartao, Chip, Vazio } from "@/components/ui";
 import { CartaoProjeto } from "@/components/cartao-projeto";
 import { IconeMaisSinal } from "@/components/icones";
+import { nomeDoCliente } from "@/lib/campos-cliente";
 
 // Um cliente e todos os projetos dele: cada contratação no HUB é um projeto
 // independente, com o seu serviço (LGPD, planejamento…) e as suas etapas.
@@ -43,8 +44,8 @@ export default function PaginaCliente() {
   return (
     <>
       <Cabecalho
-        migalhas={[{ rotulo: "Clientes", href: `/${slug}/clientes` }, { rotulo: c.nomeFantasia || c.razaoSocial }]}
-        titulo={c.nomeFantasia || c.razaoSocial}
+        migalhas={[{ rotulo: "Clientes", href: `/${slug}/clientes` }, { rotulo: nomeDoCliente(c) }]}
+        titulo={nomeDoCliente(c)}
         subtitulo={c.nomeFantasia ? c.razaoSocial : undefined}
       >
         <BotaoLink href={`/${slug}/clientes?editar=${c.id}`} variante="secundario" className="flex-1 sm:flex-none">

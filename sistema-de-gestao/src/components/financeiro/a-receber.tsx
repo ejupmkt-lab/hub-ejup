@@ -7,6 +7,7 @@ import { useFinanceiro } from "@/lib/dados/financeiro";
 import { dataDeEnvio, dataFinalizacao, diaDoPagamento, moeda, proximoCorte, recebimento } from "@/lib/financeiro";
 import { etapasTodasEnviadas, faseDoProjeto } from "@/lib/fase";
 import { diferencaDias, formatarData, hojeIso } from "@/lib/datas";
+import { nomeDoCliente } from "@/lib/campos-cliente";
 
 // Painel (só para quem vê o financeiro): o que cai em cada dia 5 e o que dá
 // para garantir até o próximo dia 20
@@ -19,7 +20,7 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
   const pagamentoDoCorte = diaDoPagamento(corte);
   const nome = (p: Projeto) => {
     const c = estado.clientes.find((x) => x.id === p.clienteId);
-    return c?.nomeFantasia || c?.razaoSocial || "Cliente";
+    return nomeDoCliente(c);
   };
 
   const parcelas = projetos.flatMap((p) =>

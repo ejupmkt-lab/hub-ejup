@@ -20,6 +20,7 @@ import { passoDoProjeto } from "@/lib/proximo-passo";
 import { doisDigitos, statusEtapa, type Tom } from "@/lib/rotulos";
 import { Barra, Chip, corTom } from "@/components/ui";
 import { IconeCalendarioPequeno, IconeSeta } from "@/components/icones";
+import { nomeDoCliente } from "@/lib/campos-cliente";
 
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
@@ -50,7 +51,7 @@ export function CartaoProjeto({
   const passo = passoDoProjeto(p);
   const href = `/${p.empresa}/projetos/${p.id}`;
   const servico = servicoDoProjeto(p);
-  const nomeCliente = c?.nomeFantasia || c?.razaoSocial || "Cliente";
+  const nomeCliente = nomeDoCliente(c);
   const subtitulo = [mostrarEmpresa && empresa?.nome, titulo === "cliente" ? servico : null, `Projeto HUB ${codigoHub(p) || "sem número"}`]
     .filter(Boolean)
     .join(" · ");

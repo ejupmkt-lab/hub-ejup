@@ -7,6 +7,7 @@ import { aguardandoOutros, antesDaContratacao, comQuem, fases, faseDoProjeto, on
 import { grupoDaEtapa, grupos, ordemGrupos, type Grupo } from "@/lib/painel";
 import { etapaAtrasada, etapaAtual, servicoDoProjeto } from "@/lib/projeto";
 import { statusEtapa } from "@/lib/rotulos";
+import { nomeDoCliente } from "@/lib/campos-cliente";
 
 // Quantos projetos em cada etapa do HUB, e quantos dependem de você ou de
 // outros (gestor, FUNCERN, cliente). Cada serviço tem as suas etapas; a régua do HUB vale para todos.
@@ -165,5 +166,5 @@ export function EtapasDosProjetos({ projetos }: { projetos: Projeto[] }) {
 const ordemFase = (p: Projeto) => ordemFases.indexOf(faseDoProjeto(p));
 function nome(estado: ReturnType<typeof useEstado>["estado"], p: Projeto) {
   const c = estado.clientes.find((x) => x.id === p.clienteId);
-  return c?.nomeFantasia || c?.razaoSocial || "Cliente";
+  return nomeDoCliente(c);
 }

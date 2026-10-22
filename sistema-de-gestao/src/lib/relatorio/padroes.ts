@@ -14,7 +14,7 @@ const minuscula = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 const semPonto = (s: string) => s.replace(/[.;\s]+$/, "");
 const nomeEtapa = (e: Etapa) => `ETAPA ${doisDigitos(e.ordem)} | ${e.nome}`;
 
-function nomeCliente(c: Cliente) {
+function nomeDoCliente(c: Cliente) {
   return c.nomeFantasia ? `${c.razaoSocial} - ${c.nomeFantasia}` : c.razaoSocial;
 }
 
@@ -43,7 +43,7 @@ export function textoPadraoSecao(chave: string, projeto: Projeto, etapa: Etapa, 
   const entregaveis = etapa.entregaveis.filter((e) => e.tipo === "entregavel").map((e) => minuscula(e.titulo));
   switch (chave) {
     case "objeto":
-      return `O presente Relatório Técnico registra a ${ord} entrega da consultoria de ${projeto.fichaTecnica} da ${nomeCliente(cliente)}, correspondente à ${nomeEtapa(etapa)} da ficha técnica Sebraetec nº ${projeto.codigoFichaTecnica}. A etapa tem por finalidade ${minuscula(semPonto(etapa.descricao))}.`;
+      return `O presente Relatório Técnico registra a ${ord} entrega da consultoria de ${projeto.fichaTecnica} da ${nomeDoCliente(cliente)}, correspondente à ${nomeEtapa(etapa)} da ficha técnica Sebraetec nº ${projeto.codigoFichaTecnica}. A etapa tem por finalidade ${minuscula(semPonto(etapa.descricao))}.`;
     case "natureza":
       return projeto.modeloId === ID_SERVICO_LGPD ? (natureza[etapa.ordem] ?? "") : "[completar: o que esta entrega cobre e o que fica para as próximas etapas.]";
     case "escopo": {
