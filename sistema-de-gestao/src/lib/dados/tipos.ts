@@ -87,6 +87,7 @@ export type Etapa = {
   evidencias?: Evidencia[];
   relatorioAssinado?: RelatorioAssinado | null;
   enviadaEm?: string | null; // data em que o relatório foi enviado no Plano de Entrega do HUB
+  responsavelId?: string | null; // quem da equipe faz o relatório (sem ele, o consultor do projeto)
 };
 
 // PDF final, já assinado no gov.br, guardado junto da etapa

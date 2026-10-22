@@ -47,6 +47,8 @@ export default function Tarefas() {
         (a.etapa?.dataFim ?? "9").localeCompare(b.etapa?.dataFim ?? "9"),
     );
 
+  // Quem faz o relatório da etapa (sem escolha, o consultor do projeto)
+  const responsavel = (p: Projeto, e: Etapa) => estado.usuarios.find((u) => u.id === (e.responsavelId || p.consultorId))?.nome;
   const clienteDe = (p: Projeto) => estado.clientes.find((x) => x.id === p.clienteId);
   const nome = (p: Projeto) => clienteDe(p)?.nomeFantasia || clienteDe(p)?.razaoSocial || "Cliente";
 
@@ -136,7 +138,7 @@ export default function Tarefas() {
                   : !p.planoFechadoEm
                     ? "Contratado · sem plano de trabalho"
                     : e
-                      ? `Etapa ${doisDigitos(e.ordem)} de ${doisDigitos(p.etapas.length)} · ${capitalizar(e.nome)} · ${feitas} de ${e.atividades.length} feitas${e.dataFim ? ` · prazo ${formatarData(e.dataFim)}` : ""}`
+                      ? `Etapa ${doisDigitos(e.ordem)} de ${doisDigitos(p.etapas.length)} · ${capitalizar(e.nome)} · ${feitas} de ${e.atividades.length} feitas${e.dataFim ? ` · prazo ${formatarData(e.dataFim)}` : ""}${responsavel(p, e) ? ` · com ${responsavel(p, e)}` : ""}`
                       : "Todas as etapas enviadas";
               return (
                 <Cartao

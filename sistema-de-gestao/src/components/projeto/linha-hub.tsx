@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Etapa, PassoHub, Projeto } from "@/lib/dados/tipos";
-import { registrarEvento, useEstado } from "@/lib/dados/store";
+import { registrarEvento, useAcesso, useEstado } from "@/lib/dados/store";
 import {
   antesDaContratacao,
   avisoFinalizarAntecipado,
@@ -22,7 +22,7 @@ import {
   textoPlanoAjustado,
   type Fase,
 } from "@/lib/fase";
-import { entregaFinal, etapaAtrasada, etapaAtual, etapaConcluida, progressoAtividades } from "@/lib/projeto";
+import { entregaFinal, etapaAtrasada, etapaAtual, etapaConcluida } from "@/lib/projeto";
 import { formatarData, hojeIso } from "@/lib/datas";
 import { statusEtapa } from "@/lib/rotulos";
 import { Botao, Cartao, Chip } from "@/components/ui";
@@ -32,7 +32,7 @@ import { PreencherComBiblioteca } from "./preencher-biblioteca";
 import { guardarProjetoNaBiblioteca } from "./acoes-etapa";
 
 type Estado = "feito" | "agora" | "pendente" | "alerta";
-type Item = { chave: string; numero: number; rotulo: string; detalhe?: string; estado: Estado };
+type Item = { chave: string; numero: number; rotulo: string; detalhe?: string; extra?: React.ReactNode; estado: Estado };
 
 const corBarra: Record<Estado, string> = { feito: "bg-verde", agora: "bg-azul", alerta: "bg-laranja-vivo", pendente: "bg-linha" };
 const corBola: Record<Estado, string> = {
@@ -64,6 +64,7 @@ function Trilha({ itens, rotulo, numerada = true }: { itens: Item[]; rotulo: str
                 {x.rotulo}
               </span>
               {x.detalhe && <span className="num block text-[12px] leading-snug text-tinta-2">{x.detalhe}</span>}
+              {x.extra}
             </span>
           </span>
         </li>
@@ -95,6 +96,7 @@ function itemRelatorio(p: Projeto, e: Etapa, atual: Etapa | undefined): Item {
 // a bola e há quantos dias; cada passo é registrado com a data.
 export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbrirPlano: () => void }) {
   const { alterar, cliente } = useProjeto();
+  const { usuario, gerencia } = useAcesso();
   const { estado } = useEstado();
   const [data, setData] = useState(hojeIso());
   const [perguntas, setPerguntas] = useState(false);
@@ -151,7 +153,41 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
       estado: feita ? "feito" : agora ? "agora" : "pendente",
     };
   });
-  const itensRelatorios = projeto.etapas.map((e) => itemRelatorio(projeto, e, atual));
+  // Quem faz cada relatório: a pessoa escolhida, ou o consultor do projeto
+  const equipe = estado.usuarios.filter((u) => u.acessos[projeto.empresa] || u.adminGrupo || u.id === projeto.consultorId);
+  const responsavelDe = (e: Etapa) => equipe.find((u) => u.id === (e.responsavelId || projeto.consultorId));
+  const podeAtribuir = gerencia(projeto.empresa) && !antesDaContratacao(projeto);
+  const atribuir = (e: Etapa, id: string) =>
+    alterar(
+      (p) => void (p.etapas.find((x) => x.ordem === e.ordem)!.responsavelId = id === projeto.consultorId ? null : id),
+      { acao: `Relatório ${e.ordem}: responsável`, detalhe: equipe.find((u) => u.id === id)?.nome },
+    );
+  const itensRelatorios = projeto.etapas.map((e) => {
+    const r = responsavelDe(e);
+    const nome = r ? (r.id === usuario.id ? `${r.nome} (você)` : r.nome) : "Sem responsável";
+    return {
+      ...itemRelatorio(projeto, e, atual),
+      extra: podeAtribuir && !etapaConcluida(e) ? (
+        <label className="mt-1 block">
+          <span className="sr-only">Responsável pelo Relatório {e.ordem}</span>
+          <select
+            className="campo !w-auto max-w-full !py-0.5 !pl-2 !text-[12px] !font-semibold !text-azul"
+            value={r?.id ?? ""}
+            onChange={(ev) => atribuir(e, ev.target.value)}
+          >
+            {!r && <option value="">Sem responsável</option>}
+            {equipe.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.id === usuario.id ? `${u.nome} (você)` : u.nome}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : (
+        <span className="mt-0.5 block text-[12px] font-semibold text-tinta">{nome}</span>
+      ),
+    };
+  });
   const tituloPasso =
     passo === "execucao" || atual?.status === "devolvida"
       ? atual
@@ -177,15 +213,18 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
         <span className="text-sm text-tinta-2">
           {antesDaContratacao(projeto)
             ? `${projeto.etapas.length} ${projeto.etapas.length === 1 ? "relatório" : "relatórios"} · começam depois do pagamento`
-            : `${enviados} de ${projeto.etapas.length} ${enviados === 1 ? "enviado" : "enviados"}`}
+            : `${enviados} de ${projeto.etapas.length} ${enviados === 1 ? "enviado" : "enviados"}${entregaFinal(projeto) ? ` · fim previsto ${formatarData(entregaFinal(projeto))}` : ""}`}
         </span>
       </div>
       <div className="mt-4">
         <Trilha itens={itensRelatorios} rotulo="Relatórios do serviço" numerada={false} />
       </div>
+      {passo === "execucao" && atual && <PreencherComBiblioteca projeto={projeto} etapa={atual} />}
 
       {/* O passo em que o projeto está */}
-      {passo !== "concluido" && (
+      {/* O passo do HUB em que o projeto está. Durante os relatórios, só aparece
+          quando todos foram enviados (para registrar a finalização) */}
+      {passo !== "concluido" && (passo !== "execucao" || mostrarAcao) && (
         <div className="mt-5 rounded-[var(--radius-campo)] border border-azul/25 bg-azul-claro/50 p-3 sm:p-4">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <p className="text-[15px] font-semibold text-tinta">{tituloPasso}</p>
@@ -195,15 +234,6 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
             )}
           </div>
 
-          {passo === "execucao" && atual && (
-            <>
-              <p className="num mt-1.5 text-[13px] text-tinta-2">
-                {statusEtapa[atual.status].rotulo} · checklist {progressoAtividades(atual).feitas}/{progressoAtividades(atual).total}
-                {atual.dataFim && ` · prazo ${formatarData(atual.dataFim)}`}
-              </p>
-              <PreencherComBiblioteca projeto={projeto} etapa={atual} />
-            </>
-          )}
 
           {/* Passos da etapa do HUB em que o projeto está */}
           {passosDaFase(faseAtual).length > 1 && (
@@ -221,12 +251,6 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
             </ol>
           )}
 
-          {passo === "execucao" && entregaFinal(projeto) && (
-            <p className="num mt-2 text-[13px] text-tinta-2">
-              Fim previsto no plano de trabalho: <span className="font-semibold text-tinta">{formatarData(entregaFinal(projeto))}</span>. Não envie o último
-              relatório antes disso: muitas horas em poucos dias levam o gestor a recusar a nota.
-            </p>
-          )}
           {passo === "proposta_cliente" && projeto.planoFechadoEm && (
             <p className="mt-2 text-[13px] text-tinta-2">Quando o cliente pagar, o plano de trabalho passa a começar na data do pagamento, com a mesma duração.</p>
           )}
