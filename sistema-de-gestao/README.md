@@ -76,11 +76,11 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Clientes e projetos**: cada cliente tem a sua página com todos os projetos (até 3 em andamento ao
   mesmo tempo; um 4º só excepcionalmente), cada um com o seu serviço e as suas etapas.
 - **Dentro do projeto**: resumo fixo (avanço, etapa atual, período, horas, consultor), "Dados do projeto"
-  no cabeçalho (consultor, código do pedido no HUB, gestor do SEBRAE, local do relatório, correção do
+  no menu "Mais" (consultor, código do pedido no HUB, gestor do SEBRAE, local do relatório, correção do
   passo no HUB, exclusão) e três abas: Desenvolvimento (abre por padrão; o relatório é escrito aqui, pela
   conversa ou pelo "Preencher com a biblioteca"), Plano de trabalho e Entregas (como o Plano de Entrega do
-  HUB: cada relatório com o Word, o PDF assinado, "Enviei no HUB" e a devolução do gestor). Horas e visitas
-  e histórico ficam no menu "Mais". O processo (ficha, textos, referências) fica no serviço; o endereço
+  HUB: cada relatório com o Word, o PDF assinado, "Enviei no HUB" e a devolução do gestor). Dados do projeto,
+  horas e visitas e histórico ficam no menu "Mais". O processo (ficha, textos, referências) fica no serviço; o endereço
   antigo da etapa (`/etapas/N`) leva à entrega dela (`#etapa-N`).
 - **Desenvolvimento com a IA** (`src/components/projeto/conversa.tsx`, rota `/api/conversa`, tabela
   `mensagens_projeto`): o consultor escreve ou dita (reconhecimento de voz do navegador), manda fotos e

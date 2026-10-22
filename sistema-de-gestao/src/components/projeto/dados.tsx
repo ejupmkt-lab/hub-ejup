@@ -51,7 +51,7 @@ export function DadosProjeto({ projeto, aoFechar }: { projeto: Projeto; aoFechar
             </p>
           </div>
           <Botao variante="secundario" tamanho="pequeno" onClick={aoFechar}>
-            Fechar
+            Voltar ao Desenvolvimento
           </Botao>
         </div>
         <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2">

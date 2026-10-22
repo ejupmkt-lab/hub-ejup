@@ -35,7 +35,7 @@ import { Abas, Barra, Botao, BotaoLink, Cabecalho, Cartao, Chip, ProximoPasso, V
 // Três abas para o dia a dia; o resto fica no "Mais". O processo (ficha,
 // textos, referências) fica no serviço; aqui, só o que é do projeto.
 const principais = ["Desenvolvimento", "Plano de trabalho", "Entregas"] as const;
-const secundarias = ["Horas e visitas", "Histórico"] as const;
+const secundarias = ["Dados do projeto", "Horas e visitas", "Histórico"] as const;
 type Aba = (typeof principais)[number] | (typeof secundarias)[number];
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
@@ -49,8 +49,6 @@ export default function PaginaProjeto() {
   const [menuMais, setMenuMais] = useState<{ left: number; top: number } | null>(null);
   // Atalho "Registrar" do menu (#registrar) traz a caixa de mensagem à vista
   const [focar, setFocar] = useState(0);
-  // Dados próprios do projeto (código no HUB, gestor, consultor…), abertos pelo cabeçalho
-  const [dados, setDados] = useState(false);
 
   // #plano, #desenvolvimento, #ficha… no endereço abrem a aba certa. Lido
   // depois da navegação, porque o Next atualiza o hash depois de montar.
@@ -59,7 +57,6 @@ export default function PaginaProjeto() {
       const ancora = window.location.hash.slice(1) as keyof typeof ancoraAbaProjeto;
       const a = ancoraAbaProjeto[ancora];
       if (a) setAba(a);
-      if (ancora === "ficha") setDados(true);
       // #etapa-2: a entrega da etapa 2, nas Entregas
       const etapa = /^etapa-(\d+)$/.exec(ancora)?.[1];
       if (etapa) {
@@ -183,14 +180,6 @@ export default function PaginaProjeto() {
             <span aria-hidden>·</span>
             <span>ficha {projeto.codigoFichaTecnica}</span>
             <Chip tom={situacao.tom}>{situacao.rotulo}</Chip>
-            <button
-              type="button"
-              onClick={() => setDados(!dados)}
-              aria-expanded={dados}
-              className="text-[13px] font-semibold text-azul underline-offset-4 hover:underline"
-            >
-              Dados do projeto
-            </button>
           </p>
         }
         abas={
@@ -265,11 +254,6 @@ export default function PaginaProjeto() {
                 <p className="mt-0.5 break-words font-semibold leading-snug text-tinta">{consultor?.nome ?? "A definir"}</p>
               </div>
             </Cartao>
-            {dados && (
-              <div className="mt-4">
-                <DadosProjeto projeto={projeto} aoFechar={() => setDados(false)} />
-              </div>
-            )}
             <div className="relative mt-5" data-faixa-abas>
               <Abas
                 abas={[...principais, abaMais]}
@@ -336,6 +320,7 @@ export default function PaginaProjeto() {
           <Relatorios projeto={projeto} aoDesenvolver={desenvolver} />
         </div>
       )}
+      {aba === "Dados do projeto" && <DadosProjeto projeto={projeto} aoFechar={() => setAba("Desenvolvimento")} />}
       {aba === "Horas e visitas" && (
         <div className="space-y-4">
           <p className="text-sm text-tinta-2">
