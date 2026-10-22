@@ -93,6 +93,10 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Etapas no formato do HUB SEBRAE**, tabelas do relatório (preenchidas pela conversa, ação
   `preencher_tabela`), redação por seção, checagem de completude.
 - **Relatório Técnico em Word (.docx)** no papel timbrado do modelo (`public/modelos/relatorio-base.docx`).
+  No texto: `## ` subtítulo, `a) ` alínea, `!QUADRO`/`!ALERTA` quadro, `[[tabela:x]]` tabela de registro e
+  linhas `| A | B |` para tabelas avulsas (resumo, fluxo, metas). As colunas se ajustam ao conteúdo, e
+  coluna vazia em todas as linhas não entra. O estilo que a IA segue (`src/lib/ia/estilo.ts`) inclui o
+  padrão do Relatório 01 assinado da NOV4.
 - **Cadastro pelo CNPJ**: razão social, nome fantasia, endereço, CEP, porte, atividade e data de abertura
   vêm da Receita Federal (BrasilAPI, com cnpj.ws de reserva), pela rota `/api/cnpj/[cnpj]`.
 - **Textos-padrão do relatório** no estilo dos relatórios entregues (`src/lib/relatorio/padroes.ts`);

@@ -5,7 +5,7 @@ export type TipoRegistro = {
   tipo: string;
   nome: string;
   prefixo: string;
-  colunas: { chave: string; titulo: string; largura?: number }[];
+  colunas: { chave: string; titulo: string }[];
 };
 
 export const tiposRegistro: TipoRegistro[] = [
@@ -16,7 +16,7 @@ export const tiposRegistro: TipoRegistro[] = [
     colunas: [
       { chave: "pessoa", titulo: "Pessoa/entidade" },
       { chave: "funcao", titulo: "Função" },
-      { chave: "responsabilidade", titulo: "Responsabilidade em PD&P", largura: 2 },
+      { chave: "responsabilidade", titulo: "Responsabilidade em PD&P" },
     ],
   },
   {
@@ -25,7 +25,7 @@ export const tiposRegistro: TipoRegistro[] = [
     prefixo: "M",
     colunas: [
       { chave: "objetivo", titulo: "Objetivo" },
-      { chave: "criterio", titulo: "Critério de conclusão", largura: 2 },
+      { chave: "criterio", titulo: "Critério de conclusão" },
       { chave: "fase", titulo: "Fase" },
       { chave: "responsavel", titulo: "Responsável" },
     ],
@@ -59,7 +59,7 @@ export const tiposRegistro: TipoRegistro[] = [
     colunas: [
       { chave: "data", titulo: "Data proposta" },
       { chave: "horario", titulo: "Horário" },
-      { chave: "pauta", titulo: "Pauta temática", largura: 2 },
+      { chave: "pauta", titulo: "Pauta temática" },
       { chave: "evidencia", titulo: "Evidência" },
     ],
   },
@@ -69,7 +69,7 @@ export const tiposRegistro: TipoRegistro[] = [
     prefixo: "T",
     colunas: [
       { chave: "tema", titulo: "Tema" },
-      { chave: "conteudo", titulo: "Conteúdo", largura: 2 },
+      { chave: "conteudo", titulo: "Conteúdo" },
       { chave: "carga", titulo: "Carga" },
       { chave: "previsao", titulo: "Previsão" },
     ],
@@ -92,7 +92,7 @@ export const tiposRegistro: TipoRegistro[] = [
       { chave: "tema", titulo: "Tema" },
       { chave: "achado", titulo: "Achado" },
       { chave: "nivel", titulo: "Nível" },
-      { chave: "medida", titulo: "Medida", largura: 2 },
+      { chave: "medida", titulo: "Medida" },
       { chave: "prazo", titulo: "Prazo" },
       { chave: "responsavel", titulo: "Responsável" },
     ],
@@ -102,7 +102,7 @@ export const tiposRegistro: TipoRegistro[] = [
     nome: "Plano de ação",
     prefixo: "A",
     colunas: [
-      { chave: "acao", titulo: "Ação", largura: 2 },
+      { chave: "acao", titulo: "Ação" },
       { chave: "responsavel", titulo: "Responsável" },
       { chave: "evidencia", titulo: "Evidência esperada" },
       { chave: "prazo", titulo: "Prazo" },
@@ -129,7 +129,7 @@ export const tiposRegistro: TipoRegistro[] = [
     prefixo: "I",
     colunas: [
       { chave: "data", titulo: "Data" },
-      { chave: "descricao", titulo: "Descrição", largura: 2 },
+      { chave: "descricao", titulo: "Descrição" },
       { chave: "dados", titulo: "Dados afetados" },
       { chave: "contencao", titulo: "Contenção" },
     ],

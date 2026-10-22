@@ -119,18 +119,21 @@ function tabelaRegistro(projeto: Projeto, tipo: string) {
   const t = tipoRegistro(tipo);
   if (!t) return "";
   const regs = projeto.registros.filter((r) => r.tipo === tipo);
-  const pesos = [0.6, ...t.colunas.map((c) => c.largura ?? 1)];
-  const total = pesos.reduce((a, c) => a + c, 0);
-  const larguras = pesos.map((p) => Math.floor((LARGURA * p) / total));
+  // Coluna vazia em todas as linhas (ex.: prazo ainda não definido) não entra
+  const colunas = t.colunas.filter((c) => regs.some((r) => (r.dados[c.chave] ?? "").trim()));
+  const larguras = largurasPeloConteudo([
+    ["ID", ...colunas.map((c) => c.titulo)],
+    ...regs.map((r) => [r.codigo, ...colunas.map((c) => r.dados[c.chave] ?? "")]),
+  ]);
   const cab = linhaTabela(
-    ["ID", ...t.colunas.map((c) => c.titulo)].map((h, i) =>
+    ["ID", ...colunas.map((c) => c.titulo)].map((h, i) =>
       celula(textoCelula(h, { b: true, cor: "FFFFFF", alinhar: "center" }), larguras[i], { fundo: AZUL_FAIXA }),
     ),
     true,
   );
   const linhas = regs.map((r, li) =>
     linhaTabela(
-      [r.codigo, ...t.colunas.map((c) => r.dados[c.chave] ?? "")].map((v, i) =>
+      [r.codigo, ...colunas.map((c) => r.dados[c.chave] ?? "")].map((v, i) =>
         celula(textoCelula(v, { alinhar: i === 0 ? "center" : "left" }), larguras[i], { fundo: li % 2 ? ZEBRA : undefined }),
       ),
     ),
@@ -138,10 +141,55 @@ function tabelaRegistro(projeto: Projeto, tipo: string) {
   return tabela([cab, ...linhas], larguras);
 }
 
+// Colunas mais largas conforme o texto, sem quebrar palavra no meio: cada uma
+// tem ao menos a largura da palavra mais longa dela (cerca de 130 twips por
+// letra no corpo 11), e o espaço que falta sai das colunas mais largas
+function largurasPeloConteudo(celulas: string[][]) {
+  const n = Math.max(...celulas.map((c) => c.length));
+  const col = (i: number) => celulas.map((c) => c[i] ?? "");
+  const minimos = Array.from({ length: n }, (_, i) => Math.min(Math.max(...col(i).flatMap((t) => t.split(/\s+/).map((w) => w.length))), 22) * 130 + 320);
+  const pesos = Array.from({ length: n }, (_, i) => Math.min(Math.max(col(i).reduce((a, t) => a + t.length, 0) / celulas.length, 4), 70));
+  let larguras = pesos.map((p) => (LARGURA * p) / pesos.reduce((a, c) => a + c, 0));
+  for (let volta = 0; volta < n; volta++) {
+    const presas = larguras.map((l, i) => l <= minimos[i]);
+    const fixo = larguras.reduce((a, l, i) => a + (presas[i] ? minimos[i] : 0), 0);
+    const livre = pesos.reduce((a, p, i) => a + (presas[i] ? 0 : p), 0);
+    // Palavras longas demais para caber todas: divide pelos mínimos
+    if (!livre || fixo >= LARGURA) {
+      const soma = minimos.reduce((a, c) => a + c, 0);
+      return minimos.map((m) => Math.floor((LARGURA * m) / soma));
+    }
+    const novas = larguras.map((_, i) => (presas[i] ? minimos[i] : ((LARGURA - fixo) * pesos[i]) / livre));
+    if (novas.every((l, i) => l === larguras[i])) break;
+    larguras = novas;
+  }
+  return larguras.map(Math.floor);
+}
+
+// Tabela escrita no próprio texto, uma linha por linha da tabela: "| A | B |".
+// A primeira linha é o cabeçalho; as colunas ficam mais largas conforme o texto.
+function tabelaTexto(linhas: string[]) {
+  const celulas = linhas.map((l) => l.replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim()));
+  const larguras = largurasPeloConteudo(celulas);
+  const [cab, ...corpo] = celulas;
+  return tabela(
+    [
+      linhaTabela(
+        larguras.map((l, i) => celula(textoCelula(cab[i] ?? "", { b: true, cor: "FFFFFF", alinhar: "center" }), l, { fundo: AZUL_FAIXA })),
+        true,
+      ),
+      ...corpo.map((c, li) =>
+        linhaTabela(larguras.map((l, i) => celula(textoCelula(c[i] ?? ""), l, { fundo: li % 2 ? ZEBRA : undefined }))),
+      ),
+    ],
+    larguras,
+  );
+}
+
 // Converte o texto redigido no sistema em parágrafos no padrão dos relatórios:
 // parágrafo justificado com recuo; alíneas "a) " com recuo largo; "## " subtítulo;
 // "!QUADRO Título" / "!ALERTA Título" quadro; [[tabela:x]] tabela de registro;
-// "Figura: legenda" legenda de figura numerada.
+// "Figura: legenda" legenda de figura numerada; "| A | B |" tabela.
 function blocos(texto: string, projeto: Projeto, numeroSecao: string, contador: { sub: number; figura: { n: number } }) {
   const saida: string[] = [];
   for (const bloco of texto.replace(/\r/g, "").split(/\n\s*\n/)) {
@@ -158,8 +206,19 @@ function blocos(texto: string, projeto: Projeto, numeroSecao: string, contador: 
       if (corrido.length) saida.push(par(corrido.join(" "), { recuoPrimeira: 709 }));
       corrido = [];
     };
+    let tabelaAberta: string[] = [];
+    const fecharTabela = () => {
+      if (tabelaAberta.length) saida.push(tabelaTexto(tabelaAberta));
+      tabelaAberta = [];
+    };
     for (const linha of linhas) {
       const l = linha.trim();
+      if (l.startsWith("|")) {
+        fechar();
+        tabelaAberta.push(l);
+        continue;
+      }
+      fecharTabela();
       const tab = l.match(/^\[\[tabela:([a-z_]+)\]\]$/);
       if (tab) {
         fechar();
@@ -179,6 +238,7 @@ function blocos(texto: string, projeto: Projeto, numeroSecao: string, contador: 
         corrido.push(l);
       }
     }
+    fecharTabela();
     fechar();
   }
   return saida.join("");
