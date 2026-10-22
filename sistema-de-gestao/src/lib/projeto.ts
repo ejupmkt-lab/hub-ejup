@@ -95,6 +95,17 @@ export function periodoEfetivo(p: Projeto, e: Etapa): { inicio: string | null; f
   return { inicio, fim };
 }
 
+// Dias além do plano do HUB (o orçamento): etapa ainda não enviada que passou do fim do plano,
+// ou enviada depois dele. Não muda o "atrasada", que segue a execução a partir do pagamento;
+// serve para o consultor ver o desvio que o gestor do SEBRAE também enxerga.
+export function diasAlemDoPlano(e: Etapa, hoje = hojeIso()): number {
+  if (!e.dataFimPlano) return 0;
+  const referencia = concluidas.has(e.status) ? e.enviadaEm : hoje;
+  return referencia ? Math.max(0, diferencaDias(e.dataFimPlano, referencia)) : 0;
+}
+
+export const textoDiasAlemDoPlano = (n: number) => `${n} ${n === 1 ? "dia" : "dias"} além do plano do HUB`;
+
 // A etapa começou: tem avanço registrado, ou o relatório já está pronto/enviado
 export const etapaIniciada = (e: Etapa) => e.status !== "nao_iniciada" || prontaForaDoSistema(e);
 

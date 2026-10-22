@@ -26,7 +26,11 @@ import {
   horasDoProjeto,
   horasFmt,
   situacaoProjeto,
-  situacaoDaEtapa } from "@/lib/projeto";
+  situacaoDaEtapa,
+  diasAlemDoPlano,
+  etapaConcluida,
+  textoDiasAlemDoPlano,
+} from "@/lib/projeto";
 import { doisDigitos, } from "@/lib/rotulos";
 import { ancoraAbaProjeto, passoDoProjeto } from "@/lib/proximo-passo";
 import { Abas, Barra, Botao, BotaoLink, Cabecalho, Cartao, Chip, ProximoPasso, Vazio } from "@/components/ui";
@@ -160,6 +164,8 @@ export default function PaginaProjeto() {
   const abaMais = (secundarias as readonly string[]).includes(aba) ? aba : "Mais";
 
   const situacao = situacaoProjeto(projeto);
+  // Maior desvio, entre as etapas ainda não enviadas, em relação ao plano do HUB
+  const alemDoPlano = projeto.status === "encerrado" || preContrato ? 0 : Math.max(0, ...projeto.etapas.filter((e) => !etapaConcluida(e)).map((e) => diasAlemDoPlano(e)));
   const chaveEtapa = et ? situacaoDaEtapa(et).chave : null;
   const corEtapa = chaveEtapa === "devolvida" ? "text-vermelho" : chaveEtapa === "atrasada" ? "text-laranja" : "text-tinta-2";
   const celula = "min-w-0 bg-folha px-4 py-3.5 sm:px-5";
@@ -174,9 +180,16 @@ export default function PaginaProjeto() {
         ]}
         titulo={nomeCliente}
         selo={
-          <Chip tom={situacao.tom} icone={<span aria-hidden className="size-1.5 rounded-full bg-current" />}>
-            {situacao.rotulo}
-          </Chip>
+          <span className="flex flex-wrap items-center gap-2">
+            <Chip tom={situacao.tom} icone={<span aria-hidden className="size-1.5 rounded-full bg-current" />}>
+              {situacao.rotulo}
+            </Chip>
+            {alemDoPlano > 0 && (
+              <span title="Passou do fim previsto no plano do HUB (o orçamento). O atraso da execução conta a partir do pagamento.">
+                <Chip tom="atencao">{textoDiasAlemDoPlano(alemDoPlano)}</Chip>
+              </span>
+            )}
+          </span>
         }
         subtitulo={
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">

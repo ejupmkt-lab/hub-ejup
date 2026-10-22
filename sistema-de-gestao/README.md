@@ -144,6 +144,11 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   quando a etapa começou de fato (`iniciadaEm`, registrada quando ela sai de "não iniciada"); uma etapa
   enviada sem esse registro começou no envio da anterior (ou, a primeira, no pagamento). Etapa que não
   começou mostra só o previsto.
+- **Desvio do plano do HUB**: o atraso (`Atrasada`) conta pela execução, a partir do pagamento; separado
+  disso, o sistema mostra "N dias além do plano do HUB" (cabeçalho, cartão, trilha, Entregas e balão do
+  gráfico) quando uma etapa ainda não enviada passou do fim previsto no orçamento, ou foi enviada depois
+  dele (`diasAlemDoPlano`). A IA corrige as datas do plano com a ação `alterar_plano_hub` (todas as etapas
+  citadas de uma vez, em sequência, com desfazer); `alterar_datas_etapa` mexe só na execução.
 - **Chat**: Enter envia a mensagem; Shift+Enter pula a linha. A mensagem do plano de trabalho para a FUNCERN
   não fica mais na aba: a IA entrega pronta quando pedida (o texto vai no contexto do projeto).
 - **Horas**: não há registro de visitas nem de horas trabalhadas. As horas de cada etapa são as do plano

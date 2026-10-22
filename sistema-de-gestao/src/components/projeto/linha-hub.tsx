@@ -22,7 +22,7 @@ import {
   textoPlanoAjustado,
   type Fase,
 } from "@/lib/fase";
-import { entregaFinal, etapaAtual, etapaConcluida, periodoEfetivo, situacaoDaEtapa } from "@/lib/projeto";
+import { diasAlemDoPlano, entregaFinal, etapaAtual, etapaConcluida, periodoEfetivo, situacaoDaEtapa, textoDiasAlemDoPlano } from "@/lib/projeto";
 import { dataCurta, formatarData, hojeIso, periodoCurto } from "@/lib/datas";
 import { Botao, Cartao, Chip } from "@/components/ui";
 import { IconeCheck } from "@/components/icones";
@@ -31,7 +31,7 @@ import { PreencherComBiblioteca } from "./preencher-biblioteca";
 import { guardarProjetoNaBiblioteca } from "./acoes-etapa";
 
 type Estado = "feito" | "agora" | "pendente" | "alerta";
-type Item = { chave: string; numero: number; rotulo: string; detalhe?: string; datas?: string[]; extra?: React.ReactNode; estado: Estado };
+type Item = { chave: string; numero: number; rotulo: string; detalhe?: string; datas?: string[]; desvio?: string; extra?: React.ReactNode; estado: Estado };
 
 const corBarra: Record<Estado, string> = { feito: "bg-verde", agora: "bg-azul", alerta: "bg-laranja-vivo", pendente: "bg-linha" };
 const corBola: Record<Estado, string> = {
@@ -63,6 +63,7 @@ function Trilha({ itens, rotulo, numerada = true }: { itens: Item[]; rotulo: str
                 {x.rotulo}
               </span>
               {x.detalhe && <span className="num block text-[12px] leading-snug text-tinta-2">{x.detalhe}</span>}
+              {x.desvio && <span className="num block text-[12px] font-semibold leading-snug text-laranja">{x.desvio}</span>}
               {x.datas?.map((d) => (
                 <span key={d} className="num block text-[12px] leading-snug text-tinta-2">
                   {d}
@@ -95,7 +96,8 @@ function datasDoRelatorio(p: Projeto, e: Etapa): string[] {
 
 // Relatório de cada etapa do serviço: enviado, em curso (com o status) ou não começado
 function itemRelatorio(p: Projeto, e: Etapa, atual: Etapa | undefined): Item {
-  const base = { chave: String(e.ordem), numero: e.ordem, rotulo: `Relatório ${e.ordem}`, datas: datasDoRelatorio(p, e) };
+  const alem = antesDaContratacao(p) ? 0 : diasAlemDoPlano(e);
+  const base = { chave: String(e.ordem), numero: e.ordem, rotulo: `Relatório ${e.ordem}`, datas: datasDoRelatorio(p, e), desvio: alem ? textoDiasAlemDoPlano(alem) : undefined };
   const nome = capitalizar(e.nome);
   if (antesDaContratacao(p)) return { ...base, detalhe: nome, estado: "pendente" };
   if (etapaConcluida(e)) return { ...base, detalhe: `${nome} · enviado`, estado: "feito" };

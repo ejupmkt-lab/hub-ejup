@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import type { Projeto } from "@/lib/dados/tipos";
-import { diferencaDias, distribuirPorHoras, formatarData, hojeIso, somarDias, sugerirDatas } from "@/lib/datas";
+import { diferencaDias, distribuirPorHoras, formatarData, hojeIso, sugerirDatas } from "@/lib/datas";
 import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Campo, Status } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 import { automatizarEtapa } from "@/lib/regras-etapa";
-import { etapaConcluida } from "@/lib/projeto";
-import { ajustarPlanoAoPagamento, corrigirPagamento, datasMudadasAMao, dataDoPagamento, execucaoForaDoPagamento } from "@/lib/fase";
+import { ajustarPlanoAoPagamento, aplicarPlanoHub, corrigirPagamento, datasMudadasAMao, dataDoPagamento, execucaoForaDoPagamento } from "@/lib/fase";
 
 type Linha = { inicio: string; fim: string; horas: string; planoInicio: string; planoFim: string };
 
@@ -125,20 +124,11 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
       (p) => {
         if (algumPlanoMudou) {
           // Plano do HUB corrigido: a execução é recalculada dele, a partir do pagamento
-          const delta = diferencaDias(linhas[0].planoInicio, pago!);
-          p.etapas.forEach((e, i) => {
-            e.horasPrevistas = numero(linhas[i].horas);
-            e.dataInicioPlano = linhas[i].planoInicio;
-            e.dataFimPlano = linhas[i].planoFim;
-            // A execução de etapa já enviada fica como foi; as demais são recalculadas do plano, a partir do pagamento
-            if (etapaConcluida(e)) return;
-            const novoInicio = somarDias(linhas[i].planoInicio, delta);
-            const novoFim = somarDias(linhas[i].planoFim, delta);
-            if (e.dataRelatorio === e.dataFim) e.dataRelatorio = novoFim;
-            e.dataInicio = novoInicio;
-            e.dataFim = novoFim;
-            datasMudadasAMao(e);
-          });
+          p.etapas.forEach((e, i) => void (e.horasPrevistas = numero(linhas[i].horas)));
+          aplicarPlanoHub(
+            p,
+            p.etapas.map((e, i) => ({ ordem: e.ordem, inicio: linhas[i].planoInicio, fim: linhas[i].planoFim })),
+          );
           return;
         }
         p.etapas.forEach((e, i) => {

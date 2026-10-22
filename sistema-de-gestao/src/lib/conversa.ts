@@ -1,5 +1,5 @@
 import type { Atividade, Contratacao, Etapa, Hub, PassoHub, Projeto, Registro, RelatorioAssinado } from "./dados/tipos";
-import { ajustarPlanoAoPagamento, carimbarInicios, datasMudadasAMao, reencadearExecucao, avisoEnvioAntecipado, avisoFinalizarAntecipado, bloqueioAte, dataDoPagamento, textoPlanoAjustado, mudarHub, ordemPassos, passoHubDoProjeto, registroHub } from "./fase";
+import { ajustarPlanoAoPagamento, aplicarPlanoHub, carimbarInicios, datasMudadasAMao, reencadearExecucao, avisoEnvioAntecipado, avisoFinalizarAntecipado, bloqueioAte, dataDoPagamento, textoPlanoAjustado, mudarHub, ordemPassos, passoHubDoProjeto, registroHub } from "./fase";
 import { todasSecoes, verificarCompletude } from "./relatorio/secoes";
 import { assinada, automatizarEtapa, bloqueioStatus, marcarAtividade } from "./regras-etapa";
 import { doisDigitos, statusEtapa, type StatusEtapa as StatusEtapaTipo } from "./rotulos";
@@ -20,6 +20,7 @@ export type AcaoIA =
   | { tipo: "guardar_anexo"; etapa: number; anexo: string; legenda: string }
   | { tipo: "definir_cronograma"; inicio: string; fim: string }
   | { tipo: "alterar_datas_etapa"; etapa: number; inicio: string; fim: string; justificativa: string }
+  | { tipo: "alterar_plano_hub"; etapa: number; inicio: string; fim: string; justificativa: string }
   | { tipo: "registrar_assinatura"; etapa: number; anexo: string; data_consultor: string; data_cliente: string }
   | { tipo: "mudar_situacao_etapa"; etapa: number; situacao: "a_enviar" | "enviada" | "aprovada" | "devolvida"; observacao: string }
   | { tipo: "avancar_hub"; passo: PassoHub; data: string }
@@ -42,6 +43,8 @@ export type Desfazer =
       dataFim: string | null;
       dataInicioPlano: string | null;
       dataFimPlano: string | null;
+      dataInicioBase?: string | null; // desfazeres antigos não têm
+      dataFimBase?: string | null;
       dataRelatorio: string | null;
     }
   | { tipo: "plano"; planoFechadoEm: string | null; status: Projeto["status"] }
@@ -59,6 +62,8 @@ const passoDatas = (e: Etapa): Desfazer => ({
   dataFim: e.dataFim,
   dataInicioPlano: e.dataInicioPlano,
   dataFimPlano: e.dataFimPlano,
+  dataInicioBase: e.dataInicioBase ?? null,
+  dataFimBase: e.dataFimBase ?? null,
   dataRelatorio: e.dataRelatorio,
 });
 
@@ -81,6 +86,7 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
   const datasAlteradas: { item: number; passo: number }[] = [];
   if (p.status === "encerrado") return { itens, desfazer };
 
+  let planoHubFeito = false;
   acoes.forEach((a, i) => {
     // Tabelas do relatório ([[tabela:tipo]]): linhas com as células na ordem das colunas
     if (a.tipo === "preencher_tabela") {
@@ -103,6 +109,29 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
         });
       });
       feito(`Tabela “${t.nome}”: ${linhas.length} ${linhas.length === 1 ? "linha" : "linhas"} ${a.substituir ? "(substituindo as anteriores)" : "acrescentadas"}`);
+      return;
+    }
+
+    // Plano do HUB (o orçamento enviado à FUNCERN): todas as etapas citadas mudam juntas, para ficarem em sequência
+    if (a.tipo === "alterar_plano_hub") {
+      if (planoHubFeito) return;
+      planoHubFeito = true;
+      if (!p.planoFechadoEm) return avisar("O plano de trabalho ainda não foi definido; não alterei as datas do plano do HUB");
+      const pedidas = acoes.filter((x): x is Extract<AcaoIA, { tipo: "alterar_plano_hub" }> => x.tipo === "alterar_plano_hub");
+      const validas = pedidas.filter((x) => p.etapas.some((e) => e.ordem === x.etapa) && dataValida(x.inicio) && dataValida(x.fim));
+      if (!validas.length) return avisar("Não alterei o plano do HUB: as datas informadas não são válidas");
+      const antes = p.etapas.map(passoDatas);
+      const motivo = aplicarPlanoHub(
+        p,
+        validas.map((x) => ({ ordem: x.etapa, inicio: x.inicio, fim: x.fim })),
+      );
+      if (motivo) return avisar(`Não alterei o plano do HUB: ${motivo.charAt(0).toLowerCase()}${motivo.slice(1)}`);
+      antes.forEach((d) => desfazer.push(d));
+      for (const x of validas) tocadas.add(x.etapa);
+      const just = validas.find((x) => x.justificativa.trim())?.justificativa.trim();
+      feito(
+        `Plano do HUB alterado: ${validas.map((x) => `etapa ${doisDigitos(x.etapa)} de ${formatarData(x.inicio)} a ${formatarData(x.fim)}`).join("; ")}${just ? ` (${resumo(just, 120)})` : ""}. A execução foi recalculada a partir do pagamento.`,
+      );
       return;
     }
 
@@ -354,7 +383,10 @@ export function desfazerAcoes(p: Projeto, passos: Desfazer[]) {
     } else if (d.tipo === "datas") {
       e.dataInicio = d.dataInicio;
       e.dataFim = d.dataFim;
-      datasMudadasAMao(e);
+      if (d.dataInicioBase !== undefined) {
+        e.dataInicioBase = d.dataInicioBase;
+        e.dataFimBase = d.dataFimBase ?? null;
+      } else datasMudadasAMao(e);
       e.dataInicioPlano = d.dataInicioPlano;
       e.dataFimPlano = d.dataFimPlano;
       e.dataRelatorio = d.dataRelatorio;

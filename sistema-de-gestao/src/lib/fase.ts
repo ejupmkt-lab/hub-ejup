@@ -238,6 +238,40 @@ export function carimbarInicios(p: Projeto, statusAntes: Map<number, Etapa["stat
   }
 }
 
+export type DatasPlano = { ordem: number; inicio: string; fim: string };
+
+// Corrige as datas do plano do HUB (o orçamento) de uma ou mais etapas. O plano resultante tem de
+// estar em sequência, sem sobreposição. Antes do pagamento a execução é o próprio plano; depois dele
+// a execução das etapas ainda não enviadas é recalculada do plano a partir do pagamento, e a das
+// já enviadas fica como foi. Devolve o motivo se não aplicou (nada muda nesse caso).
+export function aplicarPlanoHub(p: Projeto, novas: DatasPlano[]): string | null {
+  const mapa = new Map(novas.map((n) => [n.ordem, n]));
+  const plano = p.etapas.map((e) => ({
+    ordem: e.ordem,
+    inicio: mapa.get(e.ordem)?.inicio ?? e.dataInicioPlano ?? e.dataInicio ?? "",
+    fim: mapa.get(e.ordem)?.fim ?? e.dataFimPlano ?? e.dataFim ?? "",
+  }));
+  for (const [i, l] of plano.entries()) {
+    const n = `Etapa ${String(l.ordem).padStart(2, "0")}`;
+    if (!l.inicio || !l.fim || l.fim < l.inicio) return `${n}: o fim não pode ser antes do início`;
+    if (i > 0 && l.inicio <= plano[i - 1].fim) return `${n}: começa antes do fim da etapa anterior`;
+  }
+  const pagamento = dataDoPagamento(p);
+  const delta = pagamento ? diferencaDias(plano[0].inicio, pagamento) : 0;
+  p.etapas.forEach((e, i) => {
+    e.dataInicioPlano = plano[i].inicio;
+    e.dataFimPlano = plano[i].fim;
+    if (pagamento && etapaConcluida(e)) return;
+    const inicio = pagamento ? somarDias(plano[i].inicio, delta) : plano[i].inicio;
+    const fim = pagamento ? somarDias(plano[i].fim, delta) : plano[i].fim;
+    if (!etapaConcluida(e) && !e.relatorioAssinado && e.dataRelatorio === e.dataFim) e.dataRelatorio = fim;
+    e.dataInicio = e.dataInicioBase = inicio;
+    e.dataFim = e.dataFimBase = fim;
+  });
+  reencadearExecucao(p);
+  return null;
+}
+
 // Zera a data-base da execução quando as datas são mudadas à mão
 export function datasMudadasAMao(e: Etapa) {
   e.dataInicioBase = null;

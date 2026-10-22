@@ -9,6 +9,7 @@ import { todasSecoes } from "@/lib/relatorio/secoes";
 import { hojeIso } from "@/lib/datas";
 import { statusEtapa } from "@/lib/rotulos";
 import { ESTILO_RELATORIO } from "@/lib/ia/estilo";
+import { diasAlemDoPlano, textoDiasAlemDoPlano } from "@/lib/projeto";
 import { textoPlano } from "@/lib/plano-texto";
 
 // Conversa do projeto: lê a mensagem do consultor (texto, ditado, fotos e PDFs),
@@ -25,7 +26,7 @@ O que fazer com cada mensagem:
 2. Marque como feitas as atividades do checklist que a mensagem mostra claramente que foram realizadas. Use "nao_aplicavel" só quando o consultor disser que a atividade não se aplica, com a justificativa dele.
 3. Guarde cada foto anexada como evidência da etapa certa, com uma legenda curta no estilo do relatório (ex.: "Reunião de levantamento com a diretoria em 20/10/2026"). Se a foto não servir de evidência (ex.: foto de tela sem relação), não guarde e diga por quê.
 4. Quando a mensagem trouxer conteúdo suficiente, escreva ou atualize as seções do relatório e os entregáveis da etapa, seguindo o modelo (título e orientação de cada seção). Ao atualizar, devolva o texto completo da seção, juntando o que já existia com o novo. Não reescreva seções sem necessidade.
-5. Plano de trabalho (as datas das etapas): se ele ainda não foi definido e o consultor disser quando o projeto começa (e, se souber, quando termina), use "definir_cronograma" com as datas; o sistema divide o período entre as etapas pela carga horária (sem a data de fim, pela duração de referência). Deixe "fim" vazio se ele não disser. Se o plano já existe e uma etapa mudar de datas, use "alterar_datas_etapa" com a justificativa dele, mandando as novas datas de todas as etapas afetadas, para que continuem em sequência e sem sobreposição.
+5. Plano de trabalho (as datas das etapas): se ele ainda não foi definido e o consultor disser quando o projeto começa (e, se souber, quando termina), use "definir_cronograma" com as datas; o sistema divide o período entre as etapas pela carga horária (sem a data de fim, pela duração de referência). Deixe "fim" vazio se ele não disser. Existem dois calendários, e é importante não confundir: (a) o plano do HUB, as datas do orçamento que foram enviadas à FUNCERN e aparecem como "Previsto" nos Relatórios do serviço; (b) a execução, que começa no pagamento e anda conforme os relatórios são enviados. Quando o consultor pedir para mudar as datas do plano de trabalho / do HUB / "previstas", use "alterar_plano_hub" (uma ação por etapa, mandando as novas datas de todas as etapas afetadas, para que continuem em sequência e sem sobreposição; a execução das etapas não enviadas é recalculada sozinha). Use "alterar_datas_etapa" só para mudar o prazo de execução de uma etapa, com a justificativa dele. As datas de "Previsto" e "Realizado" dos Relatórios do serviço são calculadas pelo sistema a partir desses dados: nunca as reescreva nos textos dos relatórios. Se pedirem algo que você não consegue fazer com as ações disponíveis, diga isso com clareza e não altere outra coisa no lugar; só mexa no texto de um relatório quando o consultor pedir esse texto.
 6. Fechamento da etapa: quando o consultor mandar o PDF do relatório assinado no gov.br, ou disser as datas das assinaturas, use "registrar_assinatura" (anexo = id do PDF, ou vazio; datas vazias quando não ditas). Quando ele disser que enviou o relatório no Plano de Entrega do HUB, use "mudar_situacao_etapa" com "enviada"; quando disser que o gestor devolveu uma entrega, "devolvida", com o pedido de ajuste na observação ("aprovada" só se ele disser que o gestor aprovou aquela etapa). O sistema confere se o relatório está completo e assinado antes de aceitar. As horas de cada etapa são as do plano de trabalho e contam como cumpridas quando o relatório da etapa é enviado no HUB: não registre horas trabalhadas nem pergunte quantas horas foram.
 7. Nunca altere etapas enviadas ou aprovadas, a não ser para registrar uma devolução ou aprovação do gestor.
 8. Tabelas do relatório: os textos citam tabelas com o marcador [[tabela:tipo]] (pessoas e responsabilidades, fornecedores, riscos, plano de ação…). Quando o consultor contar esses dados, use "preencher_tabela" com as linhas, cada uma com as células na ordem das colunas; "substituir" verdadeiro troca as linhas atuais pelas novas, falso acrescenta. Se faltar algum dado de uma tabela citada, pergunte.
@@ -106,6 +107,18 @@ const ESQUEMA = {
             type: "object",
             properties: { tipo: { type: "string", const: "definir_cronograma" }, inicio: { type: "string" }, fim: { type: "string" } },
             required: ["tipo", "inicio", "fim"],
+            additionalProperties: false,
+          },
+          {
+            type: "object",
+            properties: {
+              tipo: { type: "string", const: "alterar_plano_hub" },
+              etapa: { type: "integer" },
+              inicio: { type: "string", format: "date" },
+              fim: { type: "string", format: "date" },
+              justificativa: { type: "string" },
+            },
+            required: ["tipo", "etapa", "inicio", "fim", "justificativa"],
             additionalProperties: false,
           },
           {
@@ -307,7 +320,7 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>, preDiagnostico: stri
       "",
       `## Etapa ${e.ordem}: ${e.nome} (${statusEtapa[e.status].rotulo}${editavel ? "" : ", NÃO ALTERAR"})`,
       e.descricao,
-      `Execução prevista: ${e.dataInicio && e.dataFim ? `${e.dataInicio} a ${e.dataFim}` : "a definir"}; plano do HUB: ${e.dataInicioPlano && e.dataFimPlano ? `${e.dataInicioPlano} a ${e.dataFimPlano}` : "a definir"}${e.enviadaEm ? `; enviada no HUB em ${e.enviadaEm}` : ""} (duração de referência: ${e.duracaoReferenciaDias} dias). Horas da etapa: ${e.horasPrevistas} h (cumpridas quando a etapa é enviada no HUB).`,
+      `Execução prevista: ${e.dataInicio && e.dataFim ? `${e.dataInicio} a ${e.dataFim}` : "a definir"}; plano do HUB: ${e.dataInicioPlano && e.dataFimPlano ? `${e.dataInicioPlano} a ${e.dataFimPlano}` : "a definir"}${e.enviadaEm ? `; enviada no HUB em ${e.enviadaEm}` : ""}${diasAlemDoPlano(e) ? `; ${textoDiasAlemDoPlano(diasAlemDoPlano(e))}` : ""} (duração de referência: ${e.duracaoReferenciaDias} dias). Horas da etapa: ${e.horasPrevistas} h (cumpridas quando a etapa é enviada no HUB).`,
       `Assinaturas do relatório: consultor ${e.assinaturaConsultor ?? "pendente"}, cliente ${e.assinaturaCliente ?? "pendente"}${e.relatorioAssinado ? `; PDF assinado guardado (${e.relatorioAssinado.nome})` : ""}.`,
       "Checklist (código, texto, situação):",
       ...e.atividades.map(

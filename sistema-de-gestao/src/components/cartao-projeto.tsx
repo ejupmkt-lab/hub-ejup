@@ -14,7 +14,11 @@ import {
   previstoProjeto,
   servicoDoProjeto,
   situacaoProjeto,
-  situacaoDaEtapa } from "@/lib/projeto";
+  situacaoDaEtapa,
+  diasAlemDoPlano,
+  etapaConcluida,
+  textoDiasAlemDoPlano,
+} from "@/lib/projeto";
 import { passoDoProjeto } from "@/lib/proximo-passo";
 import { doisDigitos, type Tom } from "@/lib/rotulos";
 import { Barra, Chip, corTom } from "@/components/ui";
@@ -45,6 +49,7 @@ export function CartaoProjeto({
   const et = etapaAtual(p);
   const atrasadas = p.etapas.filter((e) => etapaAtrasada(e) && e.status !== "devolvida").length;
   const devolvidas = p.etapas.filter((e) => e.status === "devolvida").length;
+  const alemDoPlano = Math.max(0, ...p.etapas.filter((e) => !etapaConcluida(e)).map((e) => diasAlemDoPlano(e)));
   const entrega = entregaFinal(p);
   const passo = passoDoProjeto(p);
   const href = `/${p.empresa}/projetos/${p.id}`;
@@ -121,6 +126,7 @@ export function CartaoProjeto({
         {devolvidas > 0 && <Chip tom="critico">{devolvidas === 1 ? "1 etapa devolvida" : `${devolvidas} etapas devolvidas`}</Chip>}
         {atrasadas > 0 && <Chip tom="atencao">{atrasadas === 1 ? "1 etapa atrasada" : `${atrasadas} etapas atrasadas`}</Chip>}
         {!p.planoFechadoEm && fase === "execucao" && <Chip tom="atencao">Sem plano de trabalho</Chip>}
+        {alemDoPlano > 0 && <Chip tom="atencao">{textoDiasAlemDoPlano(alemDoPlano)}</Chip>}
         {sit.tom === "ok" && <Chip tom="ok">{sit.rotulo}</Chip>}
       </div>
 
