@@ -11,12 +11,15 @@ export const registros = (p: Projeto) => p.atividadesRegistradas ?? [];
 export const registrosDaEtapa = (p: Projeto, ordem: number) => registros(p).filter((r) => r.etapa === ordem);
 const somar = (l: RegistroAtividade[]) => l.reduce((a, r) => a + (Number(r.horas) || 0), 0);
 
+// Visitas do plano de trabalho: as informadas no projeto ou, sem elas, uma por etapa
+export const visitasDoPlano = (p: Projeto) => Number(p.numeroVisitas) || p.etapas.length;
+
 export function horasDoProjeto(p: Projeto) {
   const previstas = p.etapas.reduce((a, e) => a + e.horasPrevistas, 0);
   const realizadas = somar(registros(p));
   const porEtapa = p.etapas.map((e) => ({ ordem: e.ordem, previstas: e.horasPrevistas, realizadas: somar(registrosDaEtapa(p, e.ordem)) }));
   const visitas = registros(p).filter((r) => r.tipo === "visita").length;
-  const visitasPrevistas = p.etapas.length || null; // uma visita por etapa
+  const visitasPrevistas = visitasDoPlano(p) || null;
   return { previstas, realizadas, porEtapa, visitas, visitasPrevistas };
 }
 

@@ -1,5 +1,6 @@
 import type { Cliente, Projeto } from "./dados/tipos";
 import { formatarData } from "./datas";
+import { visitasDoPlano } from "./horas";
 
 // "ANÁLISE E MELHORIA" → "Análise e Melhoria"
 function tituloEtapa(nome: string) {
@@ -19,7 +20,7 @@ export function textoPlano(p: Projeto, cliente: Cliente | undefined) {
     `Código do pedido no Hub: ${p.codigoSolicitacaoHub || p.numeroProjetoHub || "a definir"}`,
     `Ficha: ${p.fichaTecnica}`,
     `Código da ficha técnica: ${p.codigoFichaTecnica}`,
-    `Número de Visitas: ${p.etapas.length}`,
+    `Número de Visitas: ${visitasDoPlano(p)}`,
     ...p.etapas.map(
       (e) => `Etapa ${e.ordem} – ${tituloEtapa(e.nome)}: ${formatarData(e.dataInicio)} a ${formatarData(e.dataFim)} - carga horária - ${e.horasPrevistas ? `${e.horasPrevistas}h` : "a definir"}`,
     ),

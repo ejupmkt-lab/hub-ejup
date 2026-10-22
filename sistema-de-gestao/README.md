@@ -81,7 +81,11 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   conversa ou pelo "Preencher com a biblioteca"), Plano de trabalho e Entregas (como o Plano de Entrega do
   HUB: cada relatório com o Word, o PDF assinado, "Enviei no HUB" e a devolução do gestor; "Importar
   relatório pronto" traz um relatório feito fora do sistema: PDF assinado, fotos de evidência, data das
-  assinaturas e do envio no HUB; o checklist fica feito e o PDF passa a ser o relatório da etapa). Dados do projeto,
+  assinaturas e do envio no HUB; o checklist fica feito e o PDF passa a ser o relatório da etapa). Só
+  anexar o PDF assinado, sem nada escrito nas seções, também vale como relatório feito fora: as seções
+  não são cobradas, as datas das assinaturas podem ser corrigidas na entrega, o checklist é dado por
+  feito no envio e esses textos não vão para a biblioteca. O número de visitas do plano é editável nos
+  Dados do projeto (em branco, uma por etapa). Dados do projeto,
   horas e visitas e histórico ficam no menu "Mais". O processo (ficha, textos, referências) fica no serviço; o endereço
   antigo da etapa (`/etapas/N`) leva à entrega dela (`#etapa-N`).
 - **Desenvolvimento com a IA** (`src/components/projeto/conversa.tsx`, rota `/api/conversa`, tabela

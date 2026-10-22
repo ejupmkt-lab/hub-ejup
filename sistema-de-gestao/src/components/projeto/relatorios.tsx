@@ -128,6 +128,37 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
         {!antes && (
           <div className="mt-3">
             <RelatorioAssinado projeto={projeto} etapa={e} alterarEtapa={alterarEtapa(e.ordem)} compacto />
+            {e.relatorioAssinado && (
+              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-tinta-2">
+                <span>Assinaturas, como estão no PDF:</span>
+                {(
+                  [
+                    ["assinaturaConsultor", "consultor"],
+                    ["assinaturaCliente", "cliente"],
+                  ] as const
+                ).map(([campo, quem]) => (
+                  <label key={campo} className="flex items-center gap-2">
+                    {quem}
+                    <input
+                      type="date"
+                      className="campo num !w-auto !py-1 !text-[13px]"
+                      value={e[campo] ?? ""}
+                      max={hojeIso()}
+                      onChange={(ev) =>
+                        alterarEtapa(e.ordem)(
+                          (x) => {
+                            x[campo] = ev.target.value || null;
+                            // No relatório feito fora, a data do relatório é a da assinatura do consultor
+                            if (campo === "assinaturaConsultor" && feitoFora && ev.target.value) x.dataRelatorio = ev.target.value;
+                          },
+                          { acao: `Etapa ${doisDigitos(e.ordem)}: data da assinatura do ${quem}` },
+                        )
+                      }
+                    />
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

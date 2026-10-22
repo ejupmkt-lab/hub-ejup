@@ -5,7 +5,7 @@ import { etapaAtual, progressoAtividades } from "./projeto";
 import { assinada } from "./regras-etapa";
 import { avisoFinalizarAntecipado, passoHubDoProjeto } from "./fase";
 import type { PassoHub } from "./dados/tipos";
-import { verificarCompletude } from "./relatorio/secoes";
+import { relatorioFeitoFora, verificarCompletude } from "./relatorio/secoes";
 
 // O que fazer agora, em uma frase e um botão. Usado no painel, na lista de
 // projetos, no projeto e na etapa, para ninguém precisar adivinhar o caminho.
@@ -79,8 +79,9 @@ export function passoDaEtapa(p: Projeto, e: Etapa): Passo | null {
       href: `${base}#etapa-${atual.ordem}`,
     };
 
+  // Relatório feito fora do sistema: o checklist foi cumprido nele e é dado por feito no envio
   const prog = progressoAtividades(e);
-  if (prog.feitas < prog.total)
+  if (prog.feitas < prog.total && !relatorioFeitoFora(e))
     return {
       texto: "Marque as atividades do checklist",
       detalhe: `${prog.feitas} de ${prog.total} já marcadas. Conte no Desenvolvimento o que foi feito, ou marque em Tarefas.`,

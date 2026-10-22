@@ -113,12 +113,20 @@ export function DadosProjeto({ projeto, aoFechar }: { projeto: Projeto; aoFechar
             />
           </Campo>
           <div>
-            <span className="mb-1.5 block text-[13px] font-semibold text-tinta">Número de visitas</span>
-            <p className="flex min-h-10 items-center rounded-[var(--radius-campo)] bg-pedra px-3 text-[15px] text-tinta">
-              <span>
-                <span className="num font-semibold">{projeto.etapas.length}</span>, uma por etapa do serviço
-              </span>
-            </p>
+            <label htmlFor="numero-visitas" className="mb-1.5 block text-[13px] font-semibold text-tinta">
+              Número de visitas
+            </label>
+            <input
+              id="numero-visitas"
+              type="number"
+              min={0}
+              inputMode="numeric"
+              className="campo num"
+              placeholder={`${projeto.etapas.length}, uma por etapa`}
+              value={projeto.numeroVisitas ?? ""}
+              onChange={(e) => alterar((p) => void (p.numeroVisitas = e.target.value))}
+            />
+            <p className="mt-1 text-[13px] text-tinta-2">Como está no plano de trabalho do HUB. Em branco, uma por etapa.</p>
           </div>
           <div className="sm:col-span-2">
             <label htmlFor="gestor-sebrae" className="mb-1.5 block text-[13px] font-semibold text-tinta">

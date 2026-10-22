@@ -1,5 +1,5 @@
 import type { Cliente, Etapa, Projeto } from "./dados/tipos";
-import { todasSecoes } from "./relatorio/secoes";
+import { todasSecoes, relatorioFeitoFora } from "./relatorio/secoes";
 import { MARCA_COMPLETAR } from "./relatorio/padroes";
 
 // Biblioteca de textos aprovados: o que entra é anonimizado (dados do cliente
@@ -84,6 +84,8 @@ export function preencherMarcadores(texto: string, cliente: Partial<Cliente>) {
 // O que de uma etapa aprovada vai para a biblioteca: seções e entregáveis
 // preenchidos e sem marcas de [completar]
 export function textosParaBiblioteca(p: Projeto, e: Etapa, cliente: Partial<Cliente>) {
+  // Relatório feito fora do sistema: o que está nas seções não é o texto entregue
+  if (relatorioFeitoFora(e)) return [];
   const participantes = nomesDosParticipantes(p);
   const linhas: Omit<TextoBiblioteca, "id" | "created_at">[] = [];
   const base = { empresa: p.empresa, etapa: e.ordem, ramo: cliente.ramo ?? "", porte: cliente.porte ?? "", origem: "aprovado" as const, projeto_origem: p.id, servico_id: p.modeloId };
