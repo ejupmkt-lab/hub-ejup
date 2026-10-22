@@ -8,7 +8,7 @@ import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Campo, Status } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 import { automatizarEtapa } from "@/lib/regras-etapa";
-import { ajustarPlanoAoPagamento, corrigirPagamento, dataDoPagamento, execucaoForaDoPagamento } from "@/lib/fase";
+import { ajustarPlanoAoPagamento, corrigirPagamento, datasMudadasAMao, dataDoPagamento, execucaoForaDoPagamento } from "@/lib/fase";
 
 type Linha = { inicio: string; fim: string; horas: string };
 
@@ -62,6 +62,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
           e.horasPrevistas = numero(linhas[i].horas);
           e.dataInicio = e.dataInicioPlano = linhas[i].inicio;
           e.dataFim = e.dataFimPlano = linhas[i].fim;
+          datasMudadasAMao(e);
           e.dataRelatorio ??= linhas[i].fim; // local e data do relatório: o fim da etapa, ajustável
         });
         p.planoFechadoEm = new Date().toISOString().slice(0, 19);
@@ -118,6 +119,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
           if (e.dataRelatorio === e.dataFim) e.dataRelatorio = linhas[i].fim; // acompanha o novo fim, se não foi mudada à mão
           e.dataInicio = linhas[i].inicio;
           e.dataFim = linhas[i].fim;
+          datasMudadasAMao(e);
           // Antes do pagamento ainda é a proposta: o plano do HUB muda junto
           if (!pago) {
             e.dataInicioPlano = linhas[i].inicio;

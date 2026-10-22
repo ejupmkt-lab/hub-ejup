@@ -1,5 +1,5 @@
 import type { Atividade, Contratacao, Etapa, Hub, PassoHub, Projeto, Registro, RelatorioAssinado, TipoAtividade } from "./dados/tipos";
-import { ajustarPlanoAoPagamento, avisoEnvioAntecipado, avisoFinalizarAntecipado, bloqueioAte, dataDoPagamento, textoPlanoAjustado, mudarHub, ordemPassos, passoHubDoProjeto, registroHub } from "./fase";
+import { ajustarPlanoAoPagamento, datasMudadasAMao, reencadearExecucao, avisoEnvioAntecipado, avisoFinalizarAntecipado, bloqueioAte, dataDoPagamento, textoPlanoAjustado, mudarHub, ordemPassos, passoHubDoProjeto, registroHub } from "./fase";
 import { todasSecoes, verificarCompletude } from "./relatorio/secoes";
 import { assinada, automatizarEtapa, bloqueioStatus, marcarAtividade } from "./regras-etapa";
 import { doisDigitos, statusEtapa, type StatusEtapa as StatusEtapaTipo } from "./rotulos";
@@ -147,6 +147,7 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
         desfazer.push(passoDatas(e));
         e.dataInicio = e.dataInicioPlano = linhas[j].inicio;
         e.dataFim = e.dataFimPlano = linhas[j].fim;
+        datasMudadasAMao(e);
         e.dataRelatorio ??= linhas[j].fim;
         tocadas.add(e.ordem);
       });
@@ -209,6 +210,7 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
       if (e.dataRelatorio === e.dataFim) e.dataRelatorio = a.fim; // acompanha o novo fim, se não foi mudada à mão
       e.dataInicio = a.inicio;
       e.dataFim = a.fim;
+      datasMudadasAMao(e);
       feito(
         `${et}: datas de ${antes} para ${formatarData(a.inicio)} a ${formatarData(a.fim)}${a.justificativa.trim() ? ` (${resumo(a.justificativa.trim(), 120)})` : ""}`,
       );
@@ -325,6 +327,7 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
       feito(`Etapa ${doisDigitos(ordem)} passou para “${statusEtapa[e.status].rotulo}”`);
     }
   }
+  reencadearExecucao(p);
   return { itens, desfazer };
 }
 
@@ -373,6 +376,7 @@ export function desfazerAcoes(p: Projeto, passos: Desfazer[]) {
     } else if (d.tipo === "datas") {
       e.dataInicio = d.dataInicio;
       e.dataFim = d.dataFim;
+      datasMudadasAMao(e);
       e.dataInicioPlano = d.dataInicioPlano;
       e.dataFimPlano = d.dataFimPlano;
       e.dataRelatorio = d.dataRelatorio;
@@ -382,6 +386,7 @@ export function desfazerAcoes(p: Projeto, passos: Desfazer[]) {
       e.relatorioAssinado = d.relatorioAssinado;
     }
   }
+  reencadearExecucao(p);
 }
 
 // Sugestões de mensagem para levar o projeto à próxima etapa, até o fim.

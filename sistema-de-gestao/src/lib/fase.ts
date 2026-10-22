@@ -177,21 +177,58 @@ export function avisoFinalizarAntecipado(p: Projeto, hoje = hojeIso()): string |
 // movido para começar nessa data, mantendo a duração e as horas de cada etapa.
 // Devolve quantos dias o plano andou (0 se não mudou).
 export function ajustarPlanoAoPagamento(p: Projeto, pagamento: string): number {
-  const inicio = p.etapas[0]?.dataInicio;
+  const inicio = p.etapas[0]?.dataInicioBase ?? p.etapas[0]?.dataInicio;
   if (!p.planoFechadoEm || !inicio) return 0;
   const delta = diferencaDias(inicio, pagamento);
   if (!delta) return 0;
   // Só a execução anda: o plano do HUB fica como foi orçado
-  const mover = (d: string | null) => (d ? somarDias(d, delta) : d);
+  const mover = (d: string | null | undefined) => (d ? somarDias(d, delta) : (d ?? null));
   for (const e of p.etapas) {
     e.dataInicioPlano ??= e.dataInicio;
     e.dataFimPlano ??= e.dataFim;
-    e.dataInicio = mover(e.dataInicio);
-    e.dataFim = mover(e.dataFim);
+    e.dataInicioBase = mover(e.dataInicioBase ?? e.dataInicio);
+    e.dataFimBase = mover(e.dataFimBase ?? e.dataFim);
     // A data do relatório já assinado é a da assinatura e não muda
     if (!etapaConcluida(e) && !e.relatorioAssinado) e.dataRelatorio = mover(e.dataRelatorio);
   }
+  reencadearExecucao(p);
   return delta;
+}
+
+// Uma etapa só começa quando a anterior termina, e ela termina quando o
+// relatório é enviado no HUB. A execução de cada etapa parte da data-base (o
+// plano a partir do pagamento) e, se a anterior terminou depois do previsto,
+// começa no dia do envio, com a mesma duração. Reversível: recalcula sempre
+// da data-base. Roda a cada alteração do projeto.
+export function reencadearExecucao(p: Projeto) {
+  if (!p.planoFechadoEm) return;
+  for (const e of p.etapas) {
+    if (e.dataInicioBase == null && e.dataInicio) e.dataInicioBase = e.dataInicio;
+    if (e.dataFimBase == null && e.dataFim) e.dataFimBase = e.dataFim;
+  }
+  let anterior: Etapa | undefined;
+  for (const e of p.etapas) {
+    const bi = e.dataInicioBase;
+    const bf = e.dataFimBase;
+    if (!bi || !bf) {
+      anterior = e;
+      continue;
+    }
+    // Começa no envio da anterior; se ela ainda não foi enviada, depois do fim previsto dela
+    const apos = !anterior ? null : etapaConcluida(anterior) ? (anterior.enviadaEm ?? null) : anterior.dataFim ? somarDias(anterior.dataFim, 1) : null;
+    const inicio = apos && apos > bi ? apos : bi;
+    const fim = somarDias(inicio, diferencaDias(bi, bf));
+    if (!etapaConcluida(e) && !e.relatorioAssinado && e.dataRelatorio === e.dataFim) e.dataRelatorio = fim;
+    e.dataInicio = inicio;
+    e.dataFim = fim;
+    anterior = e;
+  }
+}
+
+// Zera a data-base da execução quando as datas são mudadas à mão
+export function datasMudadasAMao(e: Etapa) {
+  e.dataInicioBase = null;
+  e.dataFimBase = null;
 }
 
 // Dia em que o cliente pagou no HUB (nulo antes do pagamento)

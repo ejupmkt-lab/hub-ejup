@@ -75,6 +75,8 @@ export type Etapa = {
   duracaoReferenciaDias: number;
   dataInicio: string | null;
   dataFim: string | null;
+  dataInicioBase?: string | null; // execução prevista a partir do pagamento, antes de encadear (uma etapa só começa quando a anterior é enviada)
+  dataFimBase?: string | null;
   dataInicioPlano: string | null;
   dataFimPlano: string | null;
   status: StatusEtapa;

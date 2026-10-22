@@ -49,7 +49,11 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   próximo passo ou pela conversa com a IA (`avancar_hub`); dá para voltar um passo. O plano de trabalho é
   montado na proposta e enviado à FUNCERN, que lança no HUB. São dois calendários: o **plano do HUB**
   (as datas do orçamento, que não mudam e saem na mensagem do plano) e a **execução**, que começa quando o
-  cliente paga, com a mesma duração e as mesmas horas de cada etapa (`ajustarPlanoAoPagamento`). Prazos,
+  cliente paga, com a mesma duração e as mesmas horas de cada etapa (`ajustarPlanoAoPagamento`). As
+  etapas são em sequência, sem sobreposição: a primeira começa no pagamento e cada seguinte no dia em que a
+  anterior foi enviada no HUB (`reencadearExecucao`, recalculada a cada alteração a partir da data-base
+  `dataInicioBase`/`dataFimBase`, então corrigir uma data de envio desfaz o deslocamento). O período
+  realizado de cada relatório segue a mesma regra (`periodoEfetivo`). Prazos,
   atrasos, gráfico e avisos seguem a execução. Plano fechado depois do pagamento já nasce alinhado; nos
   projetos antigos, a aba Plano de trabalho oferece "Começar a execução no pagamento". O gráfico mostra o
   plano do HUB em tracejado. O sistema pede confirmação para enviar uma etapa ou finalizar o projeto

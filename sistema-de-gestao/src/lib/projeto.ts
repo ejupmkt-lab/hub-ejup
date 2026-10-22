@@ -2,7 +2,7 @@ import { diferencaDias, hojeIso } from "./datas";
 import type { Etapa, Projeto } from "./dados/tipos";
 import type { Tom } from "./rotulos";
 import { modeloPorId } from "./modelos";
-import { comQuem, faseDoProjeto, fases, ondeEsta } from "./fase";
+import { comQuem, dataDoPagamento, faseDoProjeto, fases, ondeEsta } from "./fase";
 import { relatorioFeitoFora } from "./relatorio/secoes";
 
 const concluidas = new Set(["enviada", "aprovada"]);
@@ -80,18 +80,17 @@ const pesoStatus: Record<Etapa["status"], number> = {
 export const prontaForaDoSistema = (e: Etapa) =>
   !concluidas.has(e.status) && e.status !== "devolvida" && relatorioFeitoFora(e) && !!e.assinaturaConsultor && !!e.assinaturaCliente;
 
-// Quando a etapa foi feita de fato: do primeiro registro de visita, reunião ou
-// trabalho (ou, sem registro, do início da execução, se já chegou) até o envio
-// no HUB. Nulo enquanto a etapa não começou.
-export function periodoEfetivo(p: Projeto, e: Etapa, hoje = hojeIso()): { inicio: string; fim: string | null } | null {
+// Quando a etapa foi feita de fato. As etapas são em sequência, sem sobreposição:
+// a primeira começa no pagamento e cada uma seguinte no dia em que a anterior foi
+// enviada no HUB; termina no envio do relatório dela. Nulo se ainda não começou.
+export function periodoEfetivo(p: Projeto, e: Etapa): { inicio: string; fim: string | null } | null {
+  const i = p.etapas.findIndex((x) => x.ordem === e.ordem);
+  const anterior = i > 0 ? p.etapas[i - 1] : null;
   const fim = concluidas.has(e.status) ? (e.enviadaEm ?? null) : null;
-  const registro = (p.atividadesRegistradas ?? [])
-    .filter((r) => r.etapa === e.ordem)
-    .map((r) => r.data)
-    .sort()[0];
-  const comecou = concluidas.has(e.status) || e.status !== "nao_iniciada" || etapaAtual(p)?.ordem === e.ordem;
-  let inicio = registro ?? (comecou && e.dataInicio && e.dataInicio <= hoje ? e.dataInicio : null);
-  if (!inicio) return fim ? { inicio: fim, fim } : null;
+  let inicio: string | null;
+  if (!anterior) inicio = dataDoPagamento(p) ?? e.dataInicio;
+  else inicio = concluidas.has(anterior.status) ? (anterior.enviadaEm ?? null) : null;
+  if (!inicio) return null;
   if (fim && fim < inicio) inicio = fim;
   return { inicio, fim };
 }
