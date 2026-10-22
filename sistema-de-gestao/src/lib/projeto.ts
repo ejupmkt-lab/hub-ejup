@@ -80,6 +80,22 @@ const pesoStatus: Record<Etapa["status"], number> = {
 export const prontaForaDoSistema = (e: Etapa) =>
   !concluidas.has(e.status) && e.status !== "devolvida" && relatorioFeitoFora(e) && !!e.assinaturaConsultor && !!e.assinaturaCliente;
 
+// Quando a etapa foi feita de fato: do primeiro registro de visita, reunião ou
+// trabalho (ou, sem registro, do início da execução, se já chegou) até o envio
+// no HUB. Nulo enquanto a etapa não começou.
+export function periodoEfetivo(p: Projeto, e: Etapa, hoje = hojeIso()): { inicio: string; fim: string | null } | null {
+  const fim = concluidas.has(e.status) ? (e.enviadaEm ?? null) : null;
+  const registro = (p.atividadesRegistradas ?? [])
+    .filter((r) => r.etapa === e.ordem)
+    .map((r) => r.data)
+    .sort()[0];
+  const comecou = concluidas.has(e.status) || e.status !== "nao_iniciada" || etapaAtual(p)?.ordem === e.ordem;
+  let inicio = registro ?? (comecou && e.dataInicio && e.dataInicio <= hoje ? e.dataInicio : null);
+  if (!inicio) return fim ? { inicio: fim, fim } : null;
+  if (fim && fim < inicio) inicio = fim;
+  return { inicio, fim };
+}
+
 // Status para mostrar: a etapa pronta fora do sistema aparece como pronta para enviar
 export const statusDaEtapa = (e: Etapa) => (prontaForaDoSistema(e) ? "a_enviar" : e.status);
 

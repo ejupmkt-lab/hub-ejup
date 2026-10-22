@@ -55,7 +55,9 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   plano do HUB em tracejado. O sistema pede confirmação para enviar uma etapa ou finalizar o projeto
   antes do fim previsto (o gestor recusa a nota quando muitas horas são entregues em poucos dias).
   Embaixo da régua do HUB, a trilha dos relatórios do serviço (um por etapa da ficha: 5 na LGPD, 2 no
-  Planejamento Tecnológico). Projetos do formato antigo (`contratacao`) são
+  Planejamento Tecnológico), com o período previsto (plano do HUB) embaixo de cada relatório e, conforme a
+  etapa anda, o período realizado (do início da execução ou do primeiro registro até o envio no HUB). O
+  responsável é sempre o consultor do projeto; não há responsável por etapa. Projetos do formato antigo (`contratacao`) são
   lidos como o passo equivalente. Em Tarefas, "Aguardando outros" junta o que está com terceiros, com a
   mensagem pronta para cobrar (`src/lib/cobranca.ts`); o quadro de projetos tem uma coluna por etapa do HUB.
 - **Valores e recebimento** (`src/lib/financeiro.ts`, tabelas `financeiro_servicos` e

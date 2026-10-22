@@ -49,7 +49,6 @@ export default function Tarefas() {
     );
 
   // Quem faz o relatório da etapa (sem escolha, o consultor do projeto)
-  const responsavel = (p: Projeto, e: Etapa) => estado.usuarios.find((u) => u.id === (e.responsavelId || p.consultorId))?.nome;
   const clienteDe = (p: Projeto) => estado.clientes.find((x) => x.id === p.clienteId);
   const nome = (p: Projeto) => nomeDoCliente(clienteDe(p));
 
@@ -139,7 +138,7 @@ export default function Tarefas() {
                   : !p.planoFechadoEm
                     ? "Contratado · sem plano de trabalho"
                     : e
-                      ? `Etapa ${doisDigitos(e.ordem)} de ${doisDigitos(p.etapas.length)} · ${capitalizar(e.nome)} · ${feitas} de ${e.atividades.length} feitas${e.dataFim ? ` · prazo ${formatarData(e.dataFim)}` : ""}${responsavel(p, e) ? ` · com ${responsavel(p, e)}` : ""}`
+                      ? `Etapa ${doisDigitos(e.ordem)} de ${doisDigitos(p.etapas.length)} · ${capitalizar(e.nome)} · ${feitas} de ${e.atividades.length} feitas${e.dataFim ? ` · prazo ${formatarData(e.dataFim)}` : ""}`
                       : "Todas as etapas enviadas";
               return (
                 <Cartao

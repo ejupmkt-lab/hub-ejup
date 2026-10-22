@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Etapa, PassoHub, Projeto } from "@/lib/dados/tipos";
-import { registrarEvento, useAcesso, useEstado } from "@/lib/dados/store";
+import { registrarEvento, useEstado } from "@/lib/dados/store";
 import {
   antesDaContratacao,
   avisoFinalizarAntecipado,
@@ -22,8 +22,8 @@ import {
   textoPlanoAjustado,
   type Fase,
 } from "@/lib/fase";
-import { entregaFinal, etapaAtrasada, etapaAtual, etapaConcluida, statusDaEtapa } from "@/lib/projeto";
-import { formatarData, hojeIso } from "@/lib/datas";
+import { entregaFinal, etapaAtrasada, etapaAtual, etapaConcluida, periodoEfetivo, statusDaEtapa } from "@/lib/projeto";
+import { dataCurta, formatarData, hojeIso, periodoCurto } from "@/lib/datas";
 import { statusEtapa } from "@/lib/rotulos";
 import { Botao, Cartao, Chip } from "@/components/ui";
 import { IconeCheck } from "@/components/icones";
@@ -32,7 +32,7 @@ import { PreencherComBiblioteca } from "./preencher-biblioteca";
 import { guardarProjetoNaBiblioteca } from "./acoes-etapa";
 
 type Estado = "feito" | "agora" | "pendente" | "alerta";
-type Item = { chave: string; numero: number; rotulo: string; detalhe?: string; extra?: React.ReactNode; estado: Estado };
+type Item = { chave: string; numero: number; rotulo: string; detalhe?: string; datas?: string[]; extra?: React.ReactNode; estado: Estado };
 
 const corBarra: Record<Estado, string> = { feito: "bg-verde", agora: "bg-azul", alerta: "bg-laranja-vivo", pendente: "bg-linha" };
 const corBola: Record<Estado, string> = {
@@ -64,6 +64,11 @@ function Trilha({ itens, rotulo, numerada = true }: { itens: Item[]; rotulo: str
                 {x.rotulo}
               </span>
               {x.detalhe && <span className="num block text-[12px] leading-snug text-tinta-2">{x.detalhe}</span>}
+              {x.datas?.map((d) => (
+                <span key={d} className="num block text-[12px] leading-snug text-tinta-2">
+                  {d}
+                </span>
+              ))}
               {x.extra}
             </span>
           </span>
@@ -75,9 +80,21 @@ function Trilha({ itens, rotulo, numerada = true }: { itens: Item[]; rotulo: str
 
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
+// Datas de cada relatório: o previsto no plano do HUB e, conforme a etapa anda,
+// quando ela foi feita de fato
+function datasDoRelatorio(p: Projeto, e: Etapa): string[] {
+  const datas: string[] = [];
+  const inicioPlano = e.dataInicioPlano ?? e.dataInicio;
+  const fimPlano = e.dataFimPlano ?? e.dataFim;
+  if (inicioPlano && fimPlano) datas.push(`Previsto ${periodoCurto(inicioPlano, fimPlano)}`);
+  const feito = antesDaContratacao(p) ? null : periodoEfetivo(p, e);
+  if (feito) datas.push(feito.fim ? `Realizado ${periodoCurto(feito.inicio, feito.fim)}` : `Em execução desde ${dataCurta(feito.inicio)}`);
+  return datas;
+}
+
 // Relatório de cada etapa do serviço: enviado, em curso (com o status) ou não começado
 function itemRelatorio(p: Projeto, e: Etapa, atual: Etapa | undefined): Item {
-  const base = { chave: String(e.ordem), numero: e.ordem, rotulo: `Relatório ${e.ordem}` };
+  const base = { chave: String(e.ordem), numero: e.ordem, rotulo: `Relatório ${e.ordem}`, datas: datasDoRelatorio(p, e) };
   const nome = capitalizar(e.nome);
   if (antesDaContratacao(p)) return { ...base, detalhe: nome, estado: "pendente" };
   if (etapaConcluida(e)) return { ...base, detalhe: `${nome} · enviado`, estado: "feito" };
@@ -96,7 +113,6 @@ function itemRelatorio(p: Projeto, e: Etapa, atual: Etapa | undefined): Item {
 // a bola e há quantos dias; cada passo é registrado com a data.
 export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbrirPlano: () => void }) {
   const { alterar, cliente } = useProjeto();
-  const { usuario, gerencia } = useAcesso();
   const { estado } = useEstado();
   const [data, setData] = useState(hojeIso());
   const [perguntas, setPerguntas] = useState(false);
@@ -153,41 +169,7 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
       estado: feita ? "feito" : agora ? "agora" : "pendente",
     };
   });
-  // Quem faz cada relatório: a pessoa escolhida, ou o consultor do projeto
-  const equipe = estado.usuarios.filter((u) => u.acessos[projeto.empresa] || u.adminGrupo || u.id === projeto.consultorId);
-  const responsavelDe = (e: Etapa) => equipe.find((u) => u.id === (e.responsavelId || projeto.consultorId));
-  const podeAtribuir = gerencia(projeto.empresa) && !antesDaContratacao(projeto);
-  const atribuir = (e: Etapa, id: string) =>
-    alterar(
-      (p) => void (p.etapas.find((x) => x.ordem === e.ordem)!.responsavelId = id === projeto.consultorId ? null : id),
-      { acao: `Relatório ${e.ordem}: responsável`, detalhe: equipe.find((u) => u.id === id)?.nome },
-    );
-  const itensRelatorios = projeto.etapas.map((e) => {
-    const r = responsavelDe(e);
-    const nome = r ? (r.id === usuario.id ? `${r.nome} (você)` : r.nome) : "Sem responsável";
-    return {
-      ...itemRelatorio(projeto, e, atual),
-      extra: podeAtribuir && !etapaConcluida(e) ? (
-        <label className="mt-1 block">
-          <span className="sr-only">Responsável pelo Relatório {e.ordem}</span>
-          <select
-            className="campo !w-auto max-w-full !py-0.5 !pl-2 !text-[12px] !font-semibold !text-azul"
-            value={r?.id ?? ""}
-            onChange={(ev) => atribuir(e, ev.target.value)}
-          >
-            {!r && <option value="">Sem responsável</option>}
-            {equipe.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.id === usuario.id ? `${u.nome} (você)` : u.nome}
-              </option>
-            ))}
-          </select>
-        </label>
-      ) : (
-        <span className="mt-0.5 block text-[12px] font-semibold text-tinta">{nome}</span>
-      ),
-    };
-  });
+  const itensRelatorios = projeto.etapas.map((e) => itemRelatorio(projeto, e, atual));
   const tituloPasso =
     passo === "execucao" || atual?.status === "devolvida"
       ? atual
@@ -252,7 +234,7 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
           )}
 
           {passo === "proposta_cliente" && projeto.planoFechadoEm && (
-            <p className="mt-2 text-[13px] text-tinta-2">Quando o cliente pagar, o plano de trabalho passa a começar na data do pagamento, com a mesma duração.</p>
+            <p className="mt-2 text-[13px] text-tinta-2">Quando o cliente pagar, a execução passa a começar na data do pagamento, com a mesma duração; o plano do HUB fica como foi orçado.</p>
           )}
 
           {aviso && <p className="mt-2 rounded-[var(--radius-campo)] bg-laranja-claro px-3 py-2 text-[13px] text-laranja">{aviso}</p>}

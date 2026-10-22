@@ -201,6 +201,16 @@ export function dataDoPagamento(p: Projeto): string | null {
   return h.datas.execucao ?? null;
 }
 
+// Corrige o dia do pagamento no HUB e leva a execução junto, com a mesma duração.
+// Devolve quantos dias a execução andou.
+export function corrigirPagamento(p: Projeto, data: string): number {
+  const h = hubDoProjeto(p);
+  if (ordemPassos.indexOf(h.passo) < ordemPassos.indexOf("execucao")) return 0;
+  p.hub = { passo: h.passo, datas: { ...h.datas, execucao: data } };
+  delete p.contratacao;
+  return ajustarPlanoAoPagamento(p, data);
+}
+
 // Execução fora do pagamento: quando o plano foi fechado depois do pagamento,
 // a execução ainda está nas datas do orçamento
 export function execucaoForaDoPagamento(p: Projeto): string | null {

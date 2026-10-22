@@ -8,7 +8,7 @@ import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Campo, Status } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 import { automatizarEtapa } from "@/lib/regras-etapa";
-import { ajustarPlanoAoPagamento, dataDoPagamento, execucaoForaDoPagamento } from "@/lib/fase";
+import { ajustarPlanoAoPagamento, corrigirPagamento, dataDoPagamento, execucaoForaDoPagamento } from "@/lib/fase";
 
 type Linha = { inicio: string; fim: string; horas: string };
 
@@ -79,11 +79,27 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
 
   const pago = dataDoPagamento(projeto);
   const foraDoPagamento = execucaoForaDoPagamento(projeto);
-  const alinharAoPagamento = () =>
-    alterar((p) => void ajustarPlanoAoPagamento(p, foraDoPagamento!), {
-      acao: "Execução alinhada ao pagamento",
-      detalhe: `A execução passa a começar em ${formatarData(foraDoPagamento)}, dia do pagamento, com a mesma duração de cada etapa; o plano do HUB fica como foi orçado`,
+  const [dataPagamento, setDataPagamento] = useState("");
+  const [corrigindo, setCorrigindo] = useState(false);
+  // Alinha a execução ao dia do pagamento; com outra data, corrige também o dia do pagamento no HUB
+  const alinharAoPagamento = (data: string) => {
+    if (!data) return;
+    alterar((p) => void corrigirPagamento(p, data), {
+      acao: data === pago ? "Execução alinhada ao pagamento" : "Data do pagamento corrigida",
+      detalhe: `Pagamento em ${formatarData(data)}: a execução começa nesse dia, com a mesma duração de cada etapa; o plano do HUB fica como foi orçado`,
     });
+    setCorrigindo(false);
+  };
+  const seletorPagamento = (
+    <input
+      type="date"
+      aria-label="Data do pagamento"
+      className="campo num !w-auto !py-1.5 !text-sm"
+      value={dataPagamento || pago || ""}
+      max={hojeIso()}
+      onChange={(e) => setDataPagamento(e.target.value)}
+    />
+  );
 
   const salvarAlteracao = () => {
     const mudancas = projeto.etapas
@@ -134,14 +150,34 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
             O cliente pagou em <span className="num font-semibold">{formatarData(foraDoPagamento)}</span>, mas a execução ainda está nas datas do orçamento. Com
             ela começando no pagamento, os prazos e os atrasos passam a valer a partir de quando a consultoria começou de fato.
           </p>
-          <Botao onClick={alinharAoPagamento}>Começar a execução no pagamento</Botao>
+          <div className="flex flex-wrap items-center gap-2">
+            {seletorPagamento}
+            <Botao onClick={() => alinharAoPagamento(dataPagamento || pago!)}>Começar a execução no pagamento</Botao>
+          </div>
         </div>
       )}
-      {pago && !foraDoPagamento && fechado && (
-        <p className="mb-6 rounded-[var(--radius-campo)] bg-azul-claro px-4 py-3 text-[15px] text-tinta">
-          Execução a partir do pagamento, em <span className="num font-semibold">{formatarData(pago)}</span>. As datas do plano do HUB ficam na última coluna e na
-          mensagem.
-        </p>
+      {pago && !foraDoPagamento && fechado && !editando && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-campo)] bg-azul-claro px-4 py-3 text-[15px] text-tinta">
+          <p>
+            Execução a partir do pagamento, em <span className="num font-semibold">{formatarData(pago)}</span>. As datas do plano do HUB ficam na última coluna e na
+            mensagem.
+          </p>
+          {corrigindo ? (
+            <span className="flex flex-wrap items-center gap-2">
+              {seletorPagamento}
+              <Botao tamanho="pequeno" onClick={() => alinharAoPagamento(dataPagamento || pago)} disabled={(dataPagamento || pago) === pago}>
+                Corrigir
+              </Botao>
+              <Botao variante="fantasma" tamanho="pequeno" onClick={() => setCorrigindo(false)}>
+                Cancelar
+              </Botao>
+            </span>
+          ) : (
+            <button type="button" onClick={() => setCorrigindo(true)} className="text-sm font-semibold text-azul hover:underline">
+              Corrigir a data do pagamento
+            </button>
+          )}
+        </div>
       )}
 
       {editando && !fechado && (
