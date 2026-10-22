@@ -1,5 +1,5 @@
 import type { Atividade, Contratacao, Etapa, Hub, PassoHub, Projeto, Registro, RelatorioAssinado } from "./dados/tipos";
-import { ajustarPlanoAoPagamento, datasMudadasAMao, reencadearExecucao, avisoEnvioAntecipado, avisoFinalizarAntecipado, bloqueioAte, dataDoPagamento, textoPlanoAjustado, mudarHub, ordemPassos, passoHubDoProjeto, registroHub } from "./fase";
+import { ajustarPlanoAoPagamento, carimbarInicios, datasMudadasAMao, reencadearExecucao, avisoEnvioAntecipado, avisoFinalizarAntecipado, bloqueioAte, dataDoPagamento, textoPlanoAjustado, mudarHub, ordemPassos, passoHubDoProjeto, registroHub } from "./fase";
 import { todasSecoes, verificarCompletude } from "./relatorio/secoes";
 import { assinada, automatizarEtapa, bloqueioStatus, marcarAtividade } from "./regras-etapa";
 import { doisDigitos, statusEtapa, type StatusEtapa as StatusEtapaTipo } from "./rotulos";
@@ -308,6 +308,7 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
       feito(`Etapa ${doisDigitos(ordem)} passou para “${statusEtapa[e.status].rotulo}”`);
     }
   }
+  carimbarInicios(p, statusAntes);
   reencadearExecucao(p);
   return { itens, desfazer };
 }

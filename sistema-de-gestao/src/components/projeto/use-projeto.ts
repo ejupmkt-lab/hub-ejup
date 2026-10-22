@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import { registrarEvento, useEstado, useUsuario } from "@/lib/dados/store";
 import type { Projeto } from "@/lib/dados/tipos";
-import { reencadearExecucao } from "@/lib/fase";
+import { carimbarInicios, reencadearExecucao } from "@/lib/fase";
 
 // Projeto da rota + função para alterá-lo registrando no histórico
 export function useProjeto() {
@@ -19,7 +19,9 @@ export function useProjeto() {
     atualizar((r) => {
       const p = r.projetos.find((x) => x.id === id);
       if (!p) return;
+      const statusAntes = new Map(p.etapas.map((e) => [e.ordem, e.status]));
       fn(p);
+      carimbarInicios(p, statusAntes);
       reencadearExecucao(p);
       if (evento) registrarEvento(p, usuario.nome, evento.acao, evento.detalhe);
     });

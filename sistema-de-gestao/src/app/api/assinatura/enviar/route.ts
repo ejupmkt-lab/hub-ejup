@@ -20,13 +20,19 @@ export async function POST(req: Request) {
   if (!(pdf instanceof Blob) || pdf.type !== "application/pdf") return NextResponse.json({ erro: "Envie o relatório em PDF." }, { status: 400 });
   if (pdf.size > LIMITE) return NextResponse.json({ erro: "O PDF passa de 4 MB. Reduza as imagens e tente de novo." }, { status: 400 });
 
-  let signatarios: { nome: string; email: string; papel: "consultor" | "cliente" }[] = [];
+  // Já enviado e ainda em andamento: um segundo pedido criaria outro documento (e gastaria outra cota)
+  if (etapa.assinaturaDigital && etapa.assinaturaDigital.estado !== "recusado")
+    return NextResponse.json({ erro: "Esta etapa já foi enviada para assinatura. Confira as assinaturas ou retire o pedido antes de enviar de novo." }, { status: 409 });
+
+  type Pessoa = { nome: string; email: string; papel: "consultor" | "cliente" };
+  let signatarios: Pessoa[] = [];
   try {
-    signatarios = JSON.parse(String(form?.get("signatarios") ?? "[]"));
+    const lido: unknown = JSON.parse(String(form?.get("signatarios") ?? "[]"));
+    if (Array.isArray(lido)) signatarios = lido.filter((s): s is Pessoa => !!s && typeof s === "object" && typeof (s as Pessoa).nome === "string" && typeof (s as Pessoa).email === "string");
   } catch {
     // cai na validação abaixo
   }
-  const validos = signatarios.length > 0 && signatarios.every((s) => s.nome?.trim() && email.test(s.email?.trim() ?? "") && (s.papel === "consultor" || s.papel === "cliente"));
+  const validos = signatarios.length > 0 && signatarios.length <= 5 && signatarios.every((s) => s.nome.trim() && email.test(s.email.trim()) && (s.papel === "consultor" || s.papel === "cliente"));
   const emails = signatarios.map((s) => s.email.trim().toLowerCase());
   if (!validos || new Set(emails).size !== emails.length)
     return NextResponse.json({ erro: "Informe nome e e-mail de cada signatário, sem repetir o e-mail." }, { status: 400 });

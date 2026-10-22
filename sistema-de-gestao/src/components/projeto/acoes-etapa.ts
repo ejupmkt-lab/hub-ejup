@@ -76,6 +76,7 @@ export function useAcoesEtapa() {
           e.assinaturaConsultor = null;
           e.assinaturaCliente = null;
           e.relatorioAssinado = null;
+          e.assinaturaDigital = null;
         }
       },
       { acao: `Etapa ${doisDigitos(ordem)}: ${statusEtapa[s].rotulo.toLowerCase()}` },

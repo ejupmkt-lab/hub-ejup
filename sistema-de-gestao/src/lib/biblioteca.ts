@@ -26,6 +26,15 @@ const escapar = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const meses = "janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro";
 
 // Troca por marcadores tudo o que identifica o cliente de origem
+// Nomes de pessoas citados no projeto (tabela de pessoas e responsabilidades), para não irem à biblioteca
+export function nomesDasPessoas(p: Projeto) {
+  return p.registros
+    .filter((r) => r.tipo === "pessoas" && !/consultor/i.test(r.dados.funcao ?? "")) // o consultor é o mesmo nos próximos projetos
+    .flatMap((r) => (r.dados.pessoa ?? "").split(/[,;()]| e (?=[A-ZÀ-Ú])/))
+    .map((x) => x.trim())
+    .filter((x) => /^[A-ZÀ-Ú][\p{L}'.-]+(\s+(d[aeo]s?|[A-ZÀ-Ú][\p{L}'.-]+))+$/u.test(x) && x.split(/\s+/).length >= 2);
+}
+
 export function anonimizar(texto: string, cliente: Partial<Cliente>, participantes: string[] = []) {
   const trocas: [string | undefined, string][] = [
     [cliente.razaoSocial, "{{empresa}}"],
@@ -80,14 +89,15 @@ export function textosParaBiblioteca(p: Projeto, e: Etapa, cliente: Partial<Clie
   // Relatório feito fora do sistema: o que está nas seções não é o texto entregue
   if (relatorioFeitoFora(e)) return [];
   const linhas: Omit<TextoBiblioteca, "id" | "created_at">[] = [];
+  const pessoas = nomesDasPessoas(p);
   const base = { empresa: p.empresa, etapa: e.ordem, ramo: cliente.ramo ?? "", porte: cliente.porte ?? "", origem: "aprovado" as const, projeto_origem: p.id, servico_id: p.modeloId };
   for (const d of todasSecoes) {
     const t = (e.secoes[d.chave] ?? "").trim();
-    if (t && !MARCA_COMPLETAR.test(t)) linhas.push({ ...base, chave: d.chave, titulo: d.titulo(e), texto: anonimizar(t, cliente) });
+    if (t && !MARCA_COMPLETAR.test(t)) linhas.push({ ...base, chave: d.chave, titulo: d.titulo(e), texto: anonimizar(t, cliente, pessoas) });
   }
   for (const ent of e.entregaveis) {
     const t = ent.conteudo.trim();
-    if (t && !MARCA_COMPLETAR.test(t)) linhas.push({ ...base, chave: chaveEntregavel(ent.titulo), titulo: ent.titulo, texto: anonimizar(t, cliente) });
+    if (t && !MARCA_COMPLETAR.test(t)) linhas.push({ ...base, chave: chaveEntregavel(ent.titulo), titulo: ent.titulo, texto: anonimizar(t, cliente, pessoas) });
   }
   return linhas;
 }

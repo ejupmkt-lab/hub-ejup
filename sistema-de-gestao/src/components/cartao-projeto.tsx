@@ -57,7 +57,10 @@ export function CartaoProjeto({
   // Situação da etapa em curso, ao lado do nome
   const situacaoEtapa: { texto: string; tom: Tom } | null = !et
     ? null
-    : { texto: situacaoDaEtapa(et).rotulo, tom: situacaoDaEtapa(et).chave === "devolvida" ? "critico" : situacaoDaEtapa(et).chave === "atrasada" ? "atencao" : "neutro" };
+    : (() => {
+        const s = situacaoDaEtapa(et);
+        return { texto: s.rotulo, tom: s.chave === "devolvida" ? "critico" : s.chave === "atrasada" ? "atencao" : "neutro" };
+      })();
 
   return (
     <article

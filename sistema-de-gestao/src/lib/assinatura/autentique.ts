@@ -102,11 +102,21 @@ export async function reenviar(publicIds: string[]) {
 }
 
 // O PDF assinado fica numa URL da própria Autentique
+const dominioDaAutentique = (host: string) => host === "autentique.com.br" || host.endsWith(".autentique.com.br");
+
 export async function baixarAssinado(url: string): Promise<ArrayBuffer> {
-  const host = new globalThis.URL(url).hostname;
-  const confiavel = host.endsWith("autentique.com.br") || host === "127.0.0.1" || host === "localhost";
-  let r = await fetch(url);
-  if ((r.status === 401 || r.status === 403) && confiavel) r = await fetch(url, { headers: { Authorization: `Bearer ${process.env.AUTENTIQUE_TOKEN}` } });
+  let alvo: globalThis.URL;
+  try {
+    alvo = new globalThis.URL(url);
+  } catch {
+    throw new ErroAutentique("A Autentique devolveu um endereço de PDF inválido.");
+  }
+  // Só https (ou o endereço de teste configurado) e nunca rede interna; a chave só vai a domínios da Autentique
+  const teste = !!process.env.AUTENTIQUE_URL && alvo.host === new globalThis.URL(process.env.AUTENTIQUE_URL).host;
+  if (alvo.protocol !== "https:" && !teste) throw new ErroAutentique("Endereço do PDF assinado não é seguro.");
+  let r = await fetch(alvo);
+  if ((r.status === 401 || r.status === 403) && (dominioDaAutentique(alvo.hostname) || teste))
+    r = await fetch(alvo, { headers: { Authorization: `Bearer ${process.env.AUTENTIQUE_TOKEN}` } });
   if (!r.ok) throw new ErroAutentique("Não foi possível baixar o PDF assinado na Autentique.");
   return r.arrayBuffer();
 }

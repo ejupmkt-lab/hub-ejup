@@ -318,7 +318,8 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
             onChange={(e) => setTexto(e.target.value)}
             onKeyDown={(e) => {
               // Enter envia; Shift+Enter quebra a linha. Não envia no meio de uma composição (acentos, ditado do teclado)
-              if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+              // No celular (toque) o Enter pula a linha e o botão Enviar manda: o teclado não tem Shift+Enter
+              if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && !window.matchMedia("(pointer: coarse)").matches) {
                 e.preventDefault();
                 if (ocupado === null) void enviar();
               }

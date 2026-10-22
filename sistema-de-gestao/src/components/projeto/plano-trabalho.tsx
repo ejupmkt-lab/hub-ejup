@@ -7,6 +7,7 @@ import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Campo, Status } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 import { automatizarEtapa } from "@/lib/regras-etapa";
+import { etapaConcluida } from "@/lib/projeto";
 import { ajustarPlanoAoPagamento, corrigirPagamento, datasMudadasAMao, dataDoPagamento, execucaoForaDoPagamento } from "@/lib/fase";
 
 type Linha = { inicio: string; fim: string; horas: string; planoInicio: string; planoFim: string };
@@ -102,7 +103,9 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
   const planoMudou = (i: number) =>
     !!pago && ((projeto.etapas[i].dataInicioPlano ?? projeto.etapas[i].dataInicio ?? "") !== linhas[i].planoInicio ||
         (projeto.etapas[i].dataFimPlano ?? projeto.etapas[i].dataFim ?? "") !== linhas[i].planoFim);
-  const planoInvalido = !!pago && linhas.some((l) => !l.planoInicio || !l.planoFim || l.planoFim < l.planoInicio);
+  // O plano do HUB também tem de estar em sequência, sem sobreposição
+  const errosPlano = pago ? validar(linhas.map((l) => ({ ...l, inicio: l.planoInicio, fim: l.planoFim }))).map((m) => `${m} (plano do HUB)`) : [];
+  const planoInvalido = errosPlano.length > 0;
   const algumPlanoMudou = !!pago && projeto.etapas.some((_, i) => planoMudou(i));
 
   const salvarAlteracao = () => {
@@ -127,6 +130,8 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
             e.horasPrevistas = numero(linhas[i].horas);
             e.dataInicioPlano = linhas[i].planoInicio;
             e.dataFimPlano = linhas[i].planoFim;
+            // A execução de etapa já enviada fica como foi; as demais são recalculadas do plano, a partir do pagamento
+            if (etapaConcluida(e)) return;
             const novoInicio = somarDias(linhas[i].planoInicio, delta);
             const novoFim = somarDias(linhas[i].planoFim, delta);
             if (e.dataRelatorio === e.dataFim) e.dataRelatorio = novoFim;
@@ -306,8 +311,8 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
           Mudando as datas do plano do HUB, a execução é recalculada a partir do pagamento ({formatarData(pago)}). Mudando só as da execução, o plano do HUB fica como está.
         </p>
       )}
-      {editando && erros.length > 0 && (
-        <ul className="mt-3 list-disc pl-5 text-[13px] text-vermelho">{erros.map((e) => <li key={e}>{e}</li>)}</ul>
+      {editando && erros.length + errosPlano.length > 0 && (
+        <ul className="mt-3 list-disc pl-5 text-[13px] text-vermelho">{[...erros, ...errosPlano].map((e) => <li key={e}>{e}</li>)}</ul>
       )}
 
       <div className="mt-4 flex flex-wrap items-end gap-3">

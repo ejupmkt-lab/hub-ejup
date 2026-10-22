@@ -207,12 +207,6 @@ export function reencadearExecucao(p: Projeto) {
     if (e.dataInicioBase == null && e.dataInicio) e.dataInicioBase = e.dataInicio;
     if (e.dataFimBase == null && e.dataFim) e.dataFimBase = e.dataFim;
   }
-  // A etapa só "começou" quando há avanço de verdade: sai do "não iniciada" e a data fica registrada
-  for (const e of p.etapas) {
-    if (etapaConcluida(e) || e.status === "nao_iniciada") {
-      if (e.status === "nao_iniciada") e.iniciadaEm = null;
-    } else if (!e.iniciadaEm) e.iniciadaEm = hojeIso();
-  }
   let anterior: Etapa | undefined;
   for (const e of p.etapas) {
     const bi = e.dataInicioBase;
@@ -229,6 +223,18 @@ export function reencadearExecucao(p: Projeto) {
     e.dataInicio = inicio;
     e.dataFim = fim;
     anterior = e;
+  }
+}
+
+// Registra o dia em que cada etapa começou de fato: o dia em que sai de "não iniciada"
+// (e não foi direto para enviada). Compara com o status de antes da alteração, então
+// etapas que já estavam em andamento, sem data, não ganham a data de hoje. Se a etapa
+// volta a "não iniciada", o registro some.
+export function carimbarInicios(p: Projeto, statusAntes: Map<number, Etapa["status"]>) {
+  for (const e of p.etapas) {
+    const antes = statusAntes.get(e.ordem);
+    if (e.status === "nao_iniciada") e.iniciadaEm = null;
+    else if (antes === "nao_iniciada" && !etapaConcluida(e) && !e.iniciadaEm) e.iniciadaEm = hojeIso();
   }
 }
 

@@ -42,6 +42,12 @@ export function AssinaturaOnline({ projeto, etapa, alterarEtapa }: { projeto: Pr
   const [erro, setErro] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
   const jaVerificou = useRef(false);
+  const emConferencia = useRef(false);
+  // A etapa mais recente: uma conferência demorada não pode ressuscitar um pedido retirado nesse meio tempo
+  const etapaAtual = useRef(etapa);
+  useEffect(() => {
+    etapaAtual.current = etapa;
+  }, [etapa]);
 
   const enviar = async () => {
     setErro(null);
@@ -77,10 +83,12 @@ export function AssinaturaOnline({ projeto, etapa, alterarEtapa }: { projeto: Pr
 
   // Lê a situação na Autentique; se os dois assinaram, traz o PDF assinado para a etapa
   const verificar = async (silencioso = false) => {
-    if (!ad) return;
+    if (!ad || emConferencia.current) return;
+    emConferencia.current = true;
     setErro(null);
     setAviso(null);
     setOcupado("verificando");
+    let caminhoNovo: string | null = null;
     try {
       const r = await resposta<{ estado: AssinaturaDigital["estado"]; signatarios: (Sinal[number] extends infer S ? Omit<S & object, "papel"> : never)[]; arquivoPronto: boolean }>(
         await fetch("/api/assinatura/situacao", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ projetoId: projeto.id, ordem: etapa.ordem }) }),
@@ -97,6 +105,13 @@ export function AssinaturaOnline({ projeto, etapa, alterarEtapa }: { projeto: Pr
         const caminho = `${projeto.empresa}/${projeto.id}/${etapa.ordem}/assinado-${crypto.randomUUID()}.pdf`;
         const { error } = await supabaseNavegador().storage.from("evidencias").upload(caminho, bytes, { contentType: "application/pdf" });
         if (error) throw error;
+        caminhoNovo = caminho;
+        // O pedido foi retirado, ou o PDF já entrou por outro caminho, enquanto o arquivo vinha: descarta o que subiu
+        if (etapaAtual.current.assinaturaDigital?.documentoId !== ad.documentoId || etapaAtual.current.relatorioAssinado) {
+          await supabaseNavegador().storage.from("evidencias").remove([caminho]);
+          caminhoNovo = null;
+          return;
+        }
         const consultorAssinou = dia(novos.find((s) => s.papel === "consultor")?.assinouEm);
         const clienteAssinou = dia(novos.find((s) => s.papel === "cliente")?.assinouEm);
         alterarEtapa(
@@ -109,14 +124,20 @@ export function AssinaturaOnline({ projeto, etapa, alterarEtapa }: { projeto: Pr
           },
           { acao: `${rotulo}: assinado pelos dois na Autentique`, detalhe: `consultor ${formatarData(consultorAssinou)}, cliente ${formatarData(clienteAssinou)}` },
         );
-      } else if (mudou) {
-        alterarEtapa((e) => void (e.assinaturaDigital = { ...ad, estado: r.estado, signatarios: novos }), r.estado === "recusado" ? { acao: `${rotulo}: assinatura recusada na Autentique` } : undefined);
+      } else if (mudou || r.estado === "assinado") {
+        // Os dois assinaram mas o PDF assinado ainda não está pronto: continua "aguardando" até ele chegar
+        const estado = r.estado === "assinado" ? "aguardando" : r.estado;
+        if (JSON.stringify(novos) !== JSON.stringify(ad.signatarios) || estado !== ad.estado)
+          alterarEtapa((e) => void (e.assinaturaDigital = { ...ad, estado, signatarios: novos }), estado === "recusado" ? { acao: `${rotulo}: assinatura recusada na Autentique` } : undefined);
+        if (r.estado === "assinado") setAviso("Os dois já assinaram. O PDF assinado ainda está sendo gerado; confira de novo em instantes.");
       } else if (!silencioso) {
         setAviso("Nada mudou desde a última conferência.");
       }
     } catch (e) {
+      if (caminhoNovo) await supabaseNavegador().storage.from("evidencias").remove([caminhoNovo]);
       if (!silencioso) setErro(traduzirErro(e, e instanceof Error ? e.message : "Não foi possível conferir."));
     } finally {
+      emConferencia.current = false;
       setOcupado(null);
     }
   };
