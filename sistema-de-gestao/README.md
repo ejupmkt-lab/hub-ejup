@@ -112,6 +112,13 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   linhas `| A | B |` para tabelas avulsas (resumo, fluxo, metas). As colunas se ajustam ao conteúdo, e
   coluna vazia em todas as linhas não entra. O estilo que a IA segue (`src/lib/ia/estilo.ts`) inclui o
   padrão do Relatório 01 assinado da NOV4.
+- **Assinatura online (Autentique)** nas Entregas: "Ou enviar para assinatura online" manda o PDF do
+  relatório, o consultor e o responsável da empresa recebem o link por e-mail, e a tela mostra quem
+  assinou ("Conferir assinaturas", "Lembrar quem falta"). Quando os dois assinam, o PDF assinado e as
+  datas entram na etapa sozinhos. Rotas em `src/app/api/assinatura/*` (sempre com a sessão de quem pede)
+  e cliente da API em `src/lib/assinatura/autentique.ts`. A assinatura gov.br por fora continua valendo.
+  Na Vercel: `AUTENTIQUE_TOKEN` (chave da API, painel da Autentique › API keys) e, para testar sem gastar
+  a cota, `AUTENTIQUE_SANDBOX=1`. Sem a chave, o envio avisa que falta ativar. Os PDFs vão até 4 MB.
 - **Cadastro pelo CNPJ**: razão social, nome fantasia, endereço, CEP, porte, atividade e data de abertura
   vêm da Receita Federal (BrasilAPI, com cnpj.ws de reserva), pela rota `/api/cnpj/[cnpj]`.
 - **Textos-padrão do relatório** no estilo dos relatórios entregues (`src/lib/relatorio/padroes.ts`);

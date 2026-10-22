@@ -13,6 +13,7 @@ import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Cartao } from "@/components/ui";
 import { RelatorioAssinado } from "./assinado";
 import { ImportarRelatorio } from "./importar-relatorio";
+import { AssinaturaOnline } from "./assinatura-online";
 import { useAcoesEtapa } from "./acoes-etapa";
 import { useProjeto } from "./use-projeto";
 
@@ -128,6 +129,7 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
         {!antes && (
           <div className="mt-3">
             <RelatorioAssinado projeto={projeto} etapa={e} alterarEtapa={alterarEtapa(e.ordem)} compacto />
+            {!concluida && !feitoFora && <AssinaturaOnline projeto={projeto} etapa={e} alterarEtapa={alterarEtapa(e.ordem)} />}
             {e.relatorioAssinado && (
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-tinta-2">
                 <span>Assinaturas, como estão no PDF:</span>

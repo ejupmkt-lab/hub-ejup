@@ -89,7 +89,19 @@ export type Etapa = {
   evidencias?: Evidencia[];
   relatorioAssinado?: RelatorioAssinado | null;
   enviadaEm?: string | null; // data em que o relatório foi enviado no Plano de Entrega do HUB
+  assinaturaDigital?: AssinaturaDigital | null; // enviada para assinar na Autentique
   relatorioExterno?: boolean; // feito fora do sistema e importado: o PDF assinado é o relatório
+};
+
+// Relatório enviado para assinatura online (Autentique): cada signatário recebe o
+// link por e-mail; ao assinarem todos, o PDF assinado entra na etapa
+export type AssinaturaDigital = {
+  provedor: "autentique";
+  documentoId: string;
+  estado: "aguardando" | "assinado" | "recusado";
+  enviadoEm: string; // ISO data-hora
+  por: string;
+  signatarios: { publicId: string; nome: string; email: string; papel: "consultor" | "cliente"; link: string | null; viuEm: string | null; assinouEm: string | null; recusouEm: string | null }[];
 };
 
 // PDF final, já assinado no gov.br, guardado junto da etapa
