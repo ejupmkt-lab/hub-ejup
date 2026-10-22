@@ -180,31 +180,20 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
       {folha === "mais" && (
         <FolhaSobreposta titulo="Mais" aoFechar={() => setFolha(null)} soCelular>
-          {empresas.length > 1 && (
-            <div className="mb-3 border-b border-linha pb-3">
-              <p className="px-3 pb-1.5 text-[12px] font-semibold uppercase tracking-wide text-tinta-2">Empresa</p>
-              <ul className="space-y-1">
-                {empresas.map((e) => (
-                  <li key={e.slug}>
-                    <button
-                      onClick={() => {
-                        trocar(e.slug);
-                        setFolha(null);
-                      }}
-                      aria-current={e.slug === empresa?.slug ? "true" : undefined}
-                      className={`flex w-full items-center gap-3 rounded-[var(--radius-campo)] px-3 py-3 text-left text-[15px] font-medium ${
-                        e.slug === empresa?.slug ? "bg-azul-claro text-azul" : "text-tinta hover:bg-pedra"
-                      }`}
-                    >
-                      <IconeEmpresa className="h-5 w-5 shrink-0" />
-                      <span className="min-w-0 flex-1 break-words">{e.nome}</span>
-                      {e.status !== "ativo" && <span className="shrink-0 text-xs font-normal text-tinta-2">{statusEmpresa[e.status].toLowerCase()}</span>}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {/* O mesmo seletor do computador, à parte das opções do menu */}
+          <div className="-mx-3 mb-3 border-b border-linha pb-1">
+            <SeletorEmpresa
+              empresa={empresa}
+              empresas={empresas}
+              trocar={(slug) => {
+                trocar(slug);
+                setFolha(null);
+              }}
+              aberto={menuEmpresas}
+              setAberto={setMenuEmpresas}
+              emLinha
+            />
+          </div>
           <ul className="space-y-1">
             {[...financeiro, ...secundarios].map((i) => (
               <li key={i.href}>
@@ -374,12 +363,14 @@ function SeletorEmpresa({
   trocar,
   aberto,
   setAberto,
+  emLinha = false,
 }: {
   empresa: Empresa | null;
   empresas: Empresa[];
   trocar: (slug: string) => void;
   aberto: boolean;
   setAberto: (v: boolean) => void;
+  emLinha?: boolean; // no "Mais" do celular: a lista abre logo abaixo, sem sobrepor
 }) {
   if (!empresa) return null;
   return (
@@ -401,8 +392,12 @@ function SeletorEmpresa({
       </button>
       {aberto && (
         <>
-          <div aria-hidden className="fixed inset-0 z-30" onClick={() => setAberto(false)} />
-          <ul role="listbox" aria-label="Empresas" className="absolute inset-x-3 top-full z-40 -mt-2 rounded-[var(--radius-bloco)] border border-linha bg-folha p-1.5 shadow-lg">
+          {!emLinha && <div aria-hidden className="fixed inset-0 z-30" onClick={() => setAberto(false)} />}
+          <ul
+            role="listbox"
+            aria-label="Empresas"
+            className={`rounded-[var(--radius-bloco)] border border-linha bg-folha p-1.5 ${emLinha ? "mt-2" : "absolute inset-x-3 top-full z-40 -mt-2 shadow-lg"}`}
+          >
             {empresas.map((e) => (
               <li key={e.slug}>
                 <button
