@@ -12,6 +12,7 @@ import { verificarCompletude } from "@/lib/relatorio/secoes";
 import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Cartao } from "@/components/ui";
 import { RelatorioAssinado } from "./assinado";
+import { ImportarRelatorio } from "./importar-relatorio";
 import { useAcoesEtapa } from "./acoes-etapa";
 import { useProjeto } from "./use-projeto";
 
@@ -54,6 +55,7 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
   const { alterar } = useProjeto();
   const { estado } = useEstado();
   const [verPendencias, setVerPendencias] = useState(false);
+  const [importando, setImportando] = useState(false);
   const sit = situacao(projeto, e);
   const antes = antesDaContratacao(projeto);
   const concluida = etapaConcluida(e);
@@ -125,9 +127,11 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
 
         {!antes && (
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <Botao variante="secundario" tamanho="pequeno" onClick={() => void baixar(e.ordem)} disabled={gerando === e.ordem}>
-              {gerando === e.ordem ? "Gerando…" : "Baixar relatório em Word"}
-            </Botao>
+            {!e.relatorioExterno && (
+              <Botao variante="secundario" tamanho="pequeno" onClick={() => void baixar(e.ordem)} disabled={gerando === e.ordem}>
+                {gerando === e.ordem ? "Gerando…" : "Baixar relatório em Word"}
+              </Botao>
+            )}
             {e.status === "devolvida" ? (
               <Botao tamanho="pequeno" onClick={() => mudarStatus(e.ordem, "em_redacao")}>
                 Voltar a ajustar
@@ -155,8 +159,17 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
               </label>
             )}
             {concluida && e.dataFim && <span className="num text-[13px] text-tinta-2">fim previsto {formatarData(e.dataFim)}</span>}
+            {!concluida && !importando && (
+              <button type="button" onClick={() => setImportando(true)} className="text-[13px] font-semibold text-azul hover:underline">
+                Importar relatório pronto
+              </button>
+            )}
           </div>
         )}
+        {importando && !concluida && (
+          <ImportarRelatorio projeto={projeto} etapa={e} alterarEtapa={alterarEtapa(e.ordem)} aoFechar={() => setImportando(false)} />
+        )}
+        {e.relatorioExterno && <p className="mt-2 text-[13px] text-tinta-2">Relatório feito fora do sistema: o PDF assinado é o relatório desta etapa.</p>}
       </div>
       <span aria-hidden className={`w-2 shrink-0 ${sit.faixa}`} />
     </li>

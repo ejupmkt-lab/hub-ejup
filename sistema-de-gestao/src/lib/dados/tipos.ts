@@ -88,6 +88,7 @@ export type Etapa = {
   relatorioAssinado?: RelatorioAssinado | null;
   enviadaEm?: string | null; // data em que o relatório foi enviado no Plano de Entrega do HUB
   responsavelId?: string | null; // quem da equipe faz o relatório (sem ele, o consultor do projeto)
+  relatorioExterno?: boolean; // feito fora do sistema e importado: o PDF assinado é o relatório
 };
 
 // PDF final, já assinado no gov.br, guardado junto da etapa

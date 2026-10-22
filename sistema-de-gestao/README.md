@@ -79,7 +79,9 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   no menu "Mais" (consultor, código do pedido no HUB, gestor do SEBRAE, local do relatório, correção do
   passo no HUB, exclusão) e três abas: Desenvolvimento (abre por padrão; o relatório é escrito aqui, pela
   conversa ou pelo "Preencher com a biblioteca"), Plano de trabalho e Entregas (como o Plano de Entrega do
-  HUB: cada relatório com o Word, o PDF assinado, "Enviei no HUB" e a devolução do gestor). Dados do projeto,
+  HUB: cada relatório com o Word, o PDF assinado, "Enviei no HUB" e a devolução do gestor; "Importar
+  relatório pronto" traz um relatório feito fora do sistema: PDF assinado, fotos de evidência, data das
+  assinaturas e do envio no HUB; o checklist fica feito e o PDF passa a ser o relatório da etapa). Dados do projeto,
   horas e visitas e histórico ficam no menu "Mais". O processo (ficha, textos, referências) fica no serviço; o endereço
   antigo da etapa (`/etapas/N`) leva à entrega dela (`#etapa-N`).
 - **Desenvolvimento com a IA** (`src/components/projeto/conversa.tsx`, rota `/api/conversa`, tabela

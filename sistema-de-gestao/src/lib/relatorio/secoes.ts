@@ -90,6 +90,11 @@ export type Pendencia = { onde: string; texto: string };
 // Checagem que impede marcar a etapa como "A enviar" com algo faltando.
 export function verificarCompletude(projeto: Projeto, etapa: Etapa): Pendencia[] {
   const p: Pendencia[] = [];
+  // Relatório feito fora do sistema: o PDF assinado é o relatório
+  if (etapa.relatorioExterno) {
+    if (!etapa.relatorioAssinado) p.push({ onde: "Relatório", texto: "PDF assinado do relatório importado não anexado" });
+    return p;
+  }
   for (const s of todasSecoes) {
     if (s.obrigatoria(etapa) && !(etapa.secoes[s.chave] ?? "").trim()) {
       p.push({ onde: "Relatório", texto: `Seção em branco: ${s.titulo(etapa)}` });
