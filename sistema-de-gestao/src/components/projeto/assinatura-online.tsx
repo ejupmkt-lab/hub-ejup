@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { AssinaturaDigital, Etapa, Projeto } from "@/lib/dados/tipos";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
-import { useUsuario } from "@/lib/dados/store";
+import { useEstado, useUsuario } from "@/lib/dados/store";
 import { formatarData } from "@/lib/datas";
 import { traduzirErro } from "@/lib/erros";
 import { doisDigitos } from "@/lib/rotulos";
@@ -30,6 +30,7 @@ const situacaoDe = (s: Sinal[number]) => (s.recusouEm ? "recusou" : s.assinouEm 
 export function AssinaturaOnline({ projeto, etapa, alterarEtapa }: { projeto: Projeto; etapa: Etapa; alterarEtapa: Alterar }) {
   const { cliente, consultor } = useProjeto();
   const usuario = useUsuario();
+  const { salvarAgora } = useEstado();
   const ad = etapa.assinaturaDigital ?? null;
   const rotulo = `Etapa ${doisDigitos(etapa.ordem)}`;
   const [aberto, setAberto] = useState(false);
@@ -90,6 +91,7 @@ export function AssinaturaOnline({ projeto, etapa, alterarEtapa }: { projeto: Pr
     setOcupado("verificando");
     let caminhoNovo: string | null = null;
     try {
+      await salvarAgora();
       const r = await resposta<{ estado: AssinaturaDigital["estado"]; signatarios: (Sinal[number] extends infer S ? Omit<S & object, "papel"> : never)[]; arquivoPronto: boolean }>(
         await fetch("/api/assinatura/situacao", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ projetoId: projeto.id, ordem: etapa.ordem }) }),
       );
@@ -147,6 +149,7 @@ export function AssinaturaOnline({ projeto, etapa, alterarEtapa }: { projeto: Pr
     setAviso(null);
     setOcupado("lembrando");
     try {
+      await salvarAgora();
       const r = await resposta<{ lembrados: string[] }>(
         await fetch("/api/assinatura/lembrar", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ projetoId: projeto.id, ordem: etapa.ordem }) }),
       );
