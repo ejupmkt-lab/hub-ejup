@@ -194,16 +194,18 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
 
   return (
     <Cartao className="mb-4 p-4 sm:p-6">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 className="text-lg font-bold">No HUB SEBRAE</h2>
-        <span className="flex items-baseline gap-3 text-sm text-tinta-2">
-          Etapa {fases[faseAtual].numero} de 6 · {fases[faseAtual].rotulo}
-          {projeto.status !== "encerrado" && !importando && (
-            <button type="button" className="font-semibold text-azul underline-offset-4 hover:underline" onClick={() => setImportando(true)}>
-              Importar do HUB
-            </button>
-          )}
-        </span>
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <div className="min-w-0">
+          <h2 className="text-lg font-bold">No HUB SEBRAE</h2>
+          <span className="text-sm text-tinta-2">
+            Etapa {fases[faseAtual].numero} de 6 · {fases[faseAtual].rotulo}
+          </span>
+        </div>
+        {projeto.status !== "encerrado" && !importando && (
+          <Botao variante="secundario" tamanho="pequeno" onClick={() => setImportando(true)}>
+            Importar do HUB
+          </Botao>
+        )}
       </div>
       {importando && <ImportarHub projeto={projeto} aoFechar={() => setImportando(false)} />}
       <div className="mt-4">
