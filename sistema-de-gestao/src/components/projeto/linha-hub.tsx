@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Etapa, PassoHub, Projeto } from "@/lib/dados/tipos";
 import { registrarEvento, useEstado } from "@/lib/dados/store";
 import {
@@ -30,6 +30,7 @@ import { useProjeto } from "./use-projeto";
 import { PreencherComBiblioteca } from "./preencher-biblioteca";
 import { guardarProjetoNaBiblioteca } from "./acoes-etapa";
 import { ImportarHub } from "./importar-hub";
+import { AVISO_DA_EXTENSAO } from "@/lib/hub-extensao";
 
 type Estado = "feito" | "agora" | "pendente" | "alerta";
 type Item = { chave: string; numero: number; rotulo: string; detalhe?: string; datas?: string[]; desvio?: string; extra?: React.ReactNode; estado: Estado };
@@ -121,6 +122,15 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
   const [data, setData] = useState(hojeIso());
   const [perguntas, setPerguntas] = useState(false);
   const [importando, setImportando] = useState(false);
+  // "Ler agora" na extensão: o painel de importar abre sozinho e recebe o que ela leu
+  useEffect(() => {
+    if (projeto.status === "encerrado") return;
+    const ouvir = (ev: MessageEvent) => {
+      if (ev.source === window && ev.origin === window.location.origin && ev.data?.tipo === AVISO_DA_EXTENSAO) setImportando(true);
+    };
+    window.addEventListener("message", ouvir);
+    return () => window.removeEventListener("message", ouvir);
+  }, [projeto.status]);
   const hub = hubDoProjeto(projeto);
   const passo = hub.passo;
   const info = passosHub[passo];

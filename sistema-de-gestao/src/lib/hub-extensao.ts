@@ -43,6 +43,37 @@ export async function lerAbaDoHub(codigo: string): Promise<LeituraDoHub> {
   return r ?? { ok: false, motivo: "sem-extensao" };
 }
 
+// O que a extensão leu quando a pessoa clicou em "Ler agora" no ícone dela
+export type PendenteDoHub = {
+  id: string;
+  criadoEm: string;
+  origem: { endereco: string; titulo: string; url: string };
+  texto: string;
+  textoCortado: boolean;
+  quadros: number;
+  arquivos: { nome: string; tipo: string; tamanho: number; base64: string; url: string }[];
+  falhas: { nome: string; url: string; motivo: string; origemBloqueada?: string }[];
+  naoGuardados: { nome: string; tipo: string }[];
+};
+
+// A extensão avisa a aba do Blimp com esta mensagem; os dados vêm quando o Blimp pede
+export const AVISO_DA_EXTENSAO = "blimp-hub-pendente";
+
+export async function pegarPendente() {
+  const r = await enviar<{ ok: boolean; pendente?: PendenteDoHub }>({ tipo: "pegar" });
+  return r?.ok && r.pendente ? r.pendente : null;
+}
+export async function consumirPendente(id: string) {
+  await enviar({ tipo: "consumir", id });
+}
+
+export function arquivoDoPendente(a: PendenteDoHub["arquivos"][number]) {
+  const bin = atob(a.base64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new File([bytes], a.nome, { type: a.tipo });
+}
+
 export const explicarFalhaDaLeitura: Record<Exclude<Extract<LeituraDoHub, { ok: false }>["motivo"], never>, string> = {
   configurar: "A extensão ainda não tem o endereço do HUB. Clique no ícone dela, informe o endereço do HUB e permita a leitura.",
   "sem-aba": "Não encontrei o HUB aberto neste navegador. Abra o pedido no HUB em outra aba e tente de novo.",

@@ -238,6 +238,8 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
           ...(e.evidencias ?? []).map((ev) => ev.caminho),
           ...(e.relatorioAssinado ? [e.relatorioAssinado.caminho] : []),
         ]);
+        // Arquivos baixados do HUB pela extensão
+        arquivos.push(...(p?.materiaisHub ?? []).map((m) => m.caminho));
         // Fotos e PDFs mandados na conversa do projeto
         if (p) {
           const pasta = `${p.empresa}/${id}/conversa`;

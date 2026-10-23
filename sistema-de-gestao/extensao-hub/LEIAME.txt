@@ -1,15 +1,20 @@
 Blimp: importar do HUB SEBRAE (extensão do Chrome e do Edge)
 
-O que faz: quando você clica em "Importar do HUB" no Blimp, a extensão lê a página do pedido que
-está aberta numa aba do HUB e entrega o texto ao Blimp, que mostra a prévia do que vai mudar.
+O que faz: na página do HUB que você quer ler, você clica no ícone da extensão e em "Ler agora".
+Ela lê a página (texto e quadros internos), baixa os arquivos anexados com a sua própria sessão do
+HUB e leva tudo para o projeto que está aberto numa aba do Blimp. No Blimp aparece a prévia do que
+vai mudar; só vale quando você confirma. Os PDFs e imagens baixados ficam guardados no projeto.
 
 Instalar:
 1. Descompacte esta pasta.
 2. No Chrome (ou Edge) abra chrome://extensions e ligue o "Modo do desenvolvedor".
 3. Clique em "Carregar sem compactação" e escolha a pasta descompactada.
-4. Clique no ícone da extensão, cole o endereço do HUB (começa com https://) e clique em "Permitir".
-5. Deixe o pedido aberto no HUB e, no Blimp, clique em "Importar do HUB".
+4. Deixe o projeto aberto numa aba do Blimp. Vá à página do HUB e clique no ícone da extensão em "Ler agora".
 
-Privacidade: a extensão só lê o site que você permitiu, só quando o Blimp pede, e só o Blimp
-consegue pedir. Ela não guarda senha, não envia nada por conta própria e não roda no HUB sozinha.
-Para parar de vez: retire a permissão no ícone da extensão ou remova a extensão.
+Se um anexo estiver em outro endereço (por exemplo, um armazenamento de arquivos), o navegador
+bloqueia o download. A extensão mostra um botão "Permitir baixar de ..." e lê de novo.
+
+Privacidade: a extensão lê a página só quando você clica nela, e só a aba que está na tela. Ela não
+guarda nem lê senha, não roda sozinha e não envia nada para fora do seu navegador; o que ela lê vai
+só para o Blimp. Os arquivos baixados só saem da extensão quando o Blimp pede, e ela apaga a cópia
+depois. Para parar de vez, remova a extensão.

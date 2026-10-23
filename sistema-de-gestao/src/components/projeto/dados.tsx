@@ -2,7 +2,7 @@
 
 import { traduzirErro } from "@/lib/erros";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { PassoHub, Projeto } from "@/lib/dados/tipos";
 import { mudarHub, ordemPassos, passoHubDoProjeto, rotuloPassoHub } from "@/lib/fase";
 import { hojeIso } from "@/lib/datas";
@@ -12,9 +12,71 @@ import { useProjeto } from "./use-projeto";
 import { EscolherGestorSebrae } from "./gestor-sebrae";
 import { ValoresProjeto } from "@/components/financeiro/valores-projeto";
 import { nomeDoCliente } from "@/lib/campos-cliente";
+import { supabaseNavegador } from "@/lib/supabase/navegador";
+import { formatarData } from "@/lib/datas";
 
 // Só o que é deste projeto; a ficha técnica, os textos e as referências vêm do serviço
 const campos: { k: keyof Projeto; r: string; largo?: boolean }[] = [{ k: "localAssinatura", r: "Local (fechamento do relatório)" }];
+
+// Arquivos anexados no HUB que a extensão baixou e a importação guardou no projeto
+function MateriaisDoHub({ projeto }: { projeto: Projeto }) {
+  const { alterar } = useProjeto();
+  const materiais = projeto.materiaisHub ?? [];
+  const [urls, setUrls] = useState<Record<string, string>>({});
+  const chave = materiais.map((m) => m.caminho).join("|");
+  useEffect(() => {
+    const faltam = materiais.map((m) => m.caminho).filter((c) => !urls[c]);
+    if (!faltam.length) return;
+    let ativo = true;
+    void supabaseNavegador()
+      .storage.from("evidencias")
+      .createSignedUrls(faltam, 3600)
+      .then(({ data }) => {
+        if (ativo && data) setUrls((u) => ({ ...u, ...Object.fromEntries(data.filter((d) => d.signedUrl).map((d) => [d.path!, d.signedUrl as string])) }));
+      });
+    return () => {
+      ativo = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chave]);
+  if (!materiais.length) return null;
+
+  const remover = async (id: string) => {
+    const m = materiais.find((x) => x.id === id);
+    if (!m || !confirm(`Remover “${m.nome}” do projeto?`)) return;
+    await supabaseNavegador().storage.from("evidencias").remove([m.caminho]);
+    alterar((p) => void (p.materiaisHub = (p.materiaisHub ?? []).filter((x) => x.id !== id)), { acao: "Material do HUB removido", detalhe: m.nome });
+  };
+  const tamanho = (b: number) => (b >= 1024 * 1024 ? `${(b / 1024 / 1024).toFixed(1).replace(".", ",")} MB` : `${Math.max(1, Math.round(b / 1024))} KB`);
+
+  return (
+    <div className="mt-8 border-t border-linha pt-6" aria-label="Materiais do HUB">
+      <h3 className="text-[15px] font-semibold">Materiais do HUB</h3>
+      <p className="mb-3 mt-1 text-[13px] text-tinta-2">Arquivos anexados no HUB que foram baixados pela extensão e guardados aqui.</p>
+      <ul className="divide-y divide-linha rounded-[var(--radius-campo)] ring-1 ring-linha">
+        {materiais.map((m) => (
+          <li key={m.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 text-[14px]">
+            <span className="min-w-0">
+              {urls[m.caminho] ? (
+                <a className="font-semibold text-azul underline-offset-4 hover:underline" href={urls[m.caminho]} target="_blank" rel="noreferrer">
+                  {m.nome}
+                </a>
+              ) : (
+                <span className="font-semibold">{m.nome}</span>
+              )}
+              <span className="block text-[13px] text-tinta-2">
+                {tamanho(m.tamanho)} · baixado em {formatarData(m.baixadoEm.slice(0, 10))} por {m.por}
+              </span>
+            </span>
+            <button type="button" className="text-[13px] text-tinta-2 hover:text-vermelho" onClick={() => void remover(m.id)}>
+              Remover
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export function DadosProjeto({ projeto, aoFechar }: { projeto: Projeto; aoFechar: () => void }) {
   const { alterar, cliente } = useProjeto();
@@ -146,6 +208,7 @@ export function DadosProjeto({ projeto, aoFechar }: { projeto: Projeto; aoFechar
           ))}
         </div>
         <ValoresProjeto projeto={projeto} />
+        <MateriaisDoHub projeto={projeto} />
       </Cartao>
       {gerencia(projeto.empresa) && (
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-linha pt-6">

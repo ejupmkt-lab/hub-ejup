@@ -190,7 +190,11 @@ export type Projeto = {
   registros: Registro[];
   referencias: Referencia[];
   historico: Evento[];
+  materiaisHub?: MaterialHub[]; // arquivos baixados da página do HUB pela extensão
 };
+
+// Arquivo anexado no HUB (proposta, comprovante…) guardado no projeto pela importação do HUB
+export type MaterialHub = { id: string; nome: string; tipo: string; tamanho: number; caminho: string; origem: string; baixadoEm: string; por: string };
 
 export type { Servico };
 
