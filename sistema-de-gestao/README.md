@@ -107,6 +107,14 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   aparece como aviso com o motivo); cada resposta mostra o que mudou e pode ser desfeita
   (`src/lib/conversa.ts`). Sugestões de mensagem levam ao próximo passo até a entrega final. Precisa da
   `ANTHROPIC_API_KEY` na Vercel.
+- **Importar do HUB** (botão em "No HUB SEBRAE", `src/components/projeto/importar-hub.tsx`, rota
+  `/api/hub/importar`, conferências em `src/lib/hub-importar.ts`): sem API do HUB, o consultor cola o texto
+  da página do pedido (Ctrl+A, Ctrl+C) ou anexa prints e PDF; a IA lê código do pedido, gestor, passos com
+  data (diagnóstico enviado, proposta, FUNCERN, pagamento…) e o plano de trabalho do HUB, e o sistema mostra
+  a prévia (calculada numa cópia, pelas mesmas regras da conversa). Só aplica quando o consultor confirma;
+  se o código do pedido ou o CNPJ lidos contradizem o projeto, bloqueia. O que foi aplicado vai para a
+  conversa e pode ser desfeito lá. Relatórios enviados no HUB não são marcados como enviados: o PDF
+  assinado precisa estar no projeto. Nada é gravado pela rota. Usa a mesma `ANTHROPIC_API_KEY`.
 - **Etapas no formato do HUB SEBRAE**, tabelas do relatório (preenchidas pela conversa, ação
   `preencher_tabela`), redação por seção, checagem de completude.
 - **Relatório Técnico em Word (.docx)** no papel timbrado do modelo (`public/modelos/relatorio-base.docx`).

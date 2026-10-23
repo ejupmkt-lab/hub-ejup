@@ -29,6 +29,7 @@ import { IconeCheck } from "@/components/icones";
 import { useProjeto } from "./use-projeto";
 import { PreencherComBiblioteca } from "./preencher-biblioteca";
 import { guardarProjetoNaBiblioteca } from "./acoes-etapa";
+import { ImportarHub } from "./importar-hub";
 
 type Estado = "feito" | "agora" | "pendente" | "alerta";
 type Item = { chave: string; numero: number; rotulo: string; detalhe?: string; datas?: string[]; desvio?: string; extra?: React.ReactNode; estado: Estado };
@@ -119,6 +120,7 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
   const { estado } = useEstado();
   const [data, setData] = useState(hojeIso());
   const [perguntas, setPerguntas] = useState(false);
+  const [importando, setImportando] = useState(false);
   const hub = hubDoProjeto(projeto);
   const passo = hub.passo;
   const info = passosHub[passo];
@@ -184,10 +186,16 @@ export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbri
     <Cartao className="mb-4 p-4 sm:p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2 className="text-lg font-bold">No HUB SEBRAE</h2>
-        <span className="text-sm text-tinta-2">
+        <span className="flex items-baseline gap-3 text-sm text-tinta-2">
           Etapa {fases[faseAtual].numero} de 6 · {fases[faseAtual].rotulo}
+          {projeto.status !== "encerrado" && !importando && (
+            <button type="button" className="font-semibold text-azul underline-offset-4 hover:underline" onClick={() => setImportando(true)}>
+              Importar do HUB
+            </button>
+          )}
         </span>
       </div>
+      {importando && <ImportarHub projeto={projeto} aoFechar={() => setImportando(false)} />}
       <div className="mt-4">
         <Trilha itens={itensHub} rotulo="Etapas no HUB" />
       </div>

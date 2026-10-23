@@ -57,6 +57,12 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
   useEffect(() => {
     void Promise.resolve().then(carregar);
   }, [carregar]);
+  // A importação do HUB registra o que fez na conversa
+  useEffect(() => {
+    const recarregar = () => void carregar();
+    window.addEventListener("mensagens-do-projeto", recarregar);
+    return () => window.removeEventListener("mensagens-do-projeto", recarregar);
+  }, [carregar]);
 
   // Endereços temporários das fotos já enviadas
   const caminhos = (mensagens ?? []).flatMap((m) => m.anexos.filter((a) => a.tipo.startsWith("image/")).map((a) => a.caminho));

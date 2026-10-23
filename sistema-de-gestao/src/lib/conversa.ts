@@ -24,7 +24,9 @@ export type AcaoIA =
   | { tipo: "registrar_assinatura"; etapa: number; anexo: string; data_consultor: string; data_cliente: string }
   | { tipo: "mudar_situacao_etapa"; etapa: number; situacao: "a_enviar" | "enviada" | "aprovada" | "devolvida"; observacao: string }
   | { tipo: "avancar_hub"; passo: PassoHub; data: string }
-  | { tipo: "preencher_tabela"; tabela: string; linhas: string[][]; substituir: boolean };
+  | { tipo: "preencher_tabela"; tabela: string; linhas: string[][]; substituir: boolean }
+  // Só vem da importação do HUB (a conversa não oferece): código do pedido e gestor lidos na página do HUB
+  | { tipo: "dados_hub"; codigo_hub: string; gestor: string };
 
 // O que a IA fez (ou tentou e o sistema não deixou, com o motivo)
 export type ItemAcao = { descricao: string; aviso?: boolean };
@@ -50,6 +52,7 @@ export type Desfazer =
   | { tipo: "plano"; planoFechadoEm: string | null; status: Projeto["status"] }
   | { tipo: "hub"; hub: Hub | null; contratacao: Contratacao | null; status: Projeto["status"] }
   | { tipo: "registros"; registros: Registro[] }
+  | { tipo: "dados"; numeroProjetoHub: string; codigoSolicitacaoHub: string; gestorSebrae: string }
   | { tipo: "assinatura"; etapa: number; assinaturaConsultor: string | null; assinaturaCliente: string | null; relatorioAssinado: RelatorioAssinado | null };
 
 const concluida = (s: StatusEtapaTipo) => s === "enviada" || s === "aprovada";
@@ -88,6 +91,19 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
 
   let planoHubFeito = false;
   acoes.forEach((a, i) => {
+    // Código do pedido e gestor, lidos na página do HUB
+    if (a.tipo === "dados_hub") {
+      const codigo = String(a.codigo_hub ?? "").trim();
+      const gestor = String(a.gestor ?? "").trim();
+      const mudaCodigo = !!codigo && codigo !== (p.codigoSolicitacaoHub || p.numeroProjetoHub);
+      const mudaGestor = !!gestor && gestor !== p.gestorSebrae;
+      if (!mudaCodigo && !mudaGestor) return;
+      desfazer.push({ tipo: "dados", numeroProjetoHub: p.numeroProjetoHub, codigoSolicitacaoHub: p.codigoSolicitacaoHub, gestorSebrae: p.gestorSebrae });
+      if (mudaCodigo) p.numeroProjetoHub = p.codigoSolicitacaoHub = codigo;
+      if (mudaGestor) p.gestorSebrae = gestor;
+      feito(`Dados do pedido: ${[mudaCodigo ? `código do HUB ${codigo}` : "", mudaGestor ? `gestor ${gestor}` : ""].filter(Boolean).join("; ")}`);
+      return;
+    }
     // Tabelas do relatório ([[tabela:tipo]]): linhas com as células na ordem das colunas
     if (a.tipo === "preencher_tabela") {
       const t = tipoRegistro(a.tabela);
@@ -355,6 +371,12 @@ export function desfazerAcoes(p: Projeto, passos: Desfazer[]) {
       if (d.contratacao) p.contratacao = d.contratacao;
       else delete p.contratacao;
       p.status = d.status;
+      continue;
+    }
+    if (d.tipo === "dados") {
+      p.numeroProjetoHub = d.numeroProjetoHub;
+      p.codigoSolicitacaoHub = d.codigoSolicitacaoHub;
+      p.gestorSebrae = d.gestorSebrae;
       continue;
     }
     if (d.tipo === "plano") {
