@@ -2,18 +2,18 @@
 
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { novoId, registrarEvento, useEstado, useUsuario } from "@/lib/dados/store";
-import type { EmpresaSlug, Projeto } from "@/lib/dados/tipos";
-import { etapasDoModelo } from "@/lib/modelos/instanciar";
+import type { EmpresaSlug } from "@/lib/dados/tipos";
+import { montarProjeto } from "@/lib/projeto-novo";
 import { LIMITE_PROJETOS_CLIENTE } from "@/lib/projeto";
 import { horasDoServico, ID_SERVICO_LGPD, servicosDaEmpresa } from "@/lib/servicos";
-import { fases, hubInicial, ordemPassos, passosHub, rotuloPassoHub } from "@/lib/fase";
-import { hojeIso } from "@/lib/datas";
+import { fases, ordemPassos, passosHub, rotuloPassoHub } from "@/lib/fase";
 import type { PassoHub } from "@/lib/dados/tipos";
-import { normasPadrao, referenciasPadrao } from "@/lib/relatorio/padroes";
 import { Botao, BotaoLink, Cabecalho, Campo, Vazio } from "@/components/ui";
 import { EscolherGestorSebrae } from "@/components/projeto/gestor-sebrae";
+import { ImportarHubNovo } from "@/components/projeto/importar-hub-novo";
+import { AVISO_DA_EXTENSAO } from "@/lib/hub-extensao";
 
 function Conteudo() {
   const { empresa: slug } = useParams<{ empresa: EmpresaSlug }>();
@@ -51,6 +51,15 @@ function Conteudo() {
   const lgpd = modelo?.id === ID_SERVICO_LGPD;
 
   const [criando, setCriando] = useState(false);
+  // Criar o projeto a partir da página do pedido no HUB; o painel abre sozinho quando a extensão entrega a leitura
+  const [importando, setImportando] = useState(false);
+  useEffect(() => {
+    const ouvir = (ev: MessageEvent) => {
+      if (ev.source === window && ev.origin === window.location.origin && ev.data?.tipo === AVISO_DA_EXTENSAO) setImportando(true);
+    };
+    window.addEventListener("message", ouvir);
+    return () => window.removeEventListener("message", ouvir);
+  }, []);
   // Até 3 projetos em andamento por cliente; um 4º só excepcionalmente, e nunca um 5º
   const emAndamento = estado.projetos.filter((p) => p.clienteId === clienteId && p.status !== "encerrado");
   const mesmoServico = emAndamento.some((p) => p.modeloId === f.modeloId);
@@ -61,37 +70,19 @@ function Conteudo() {
     setCriando(true);
     const id = novoId("prj");
     atualizar((r) => {
-      const p: Projeto = {
+      const p = montarProjeto({
+        slug,
         id,
-        empresa: slug,
         clienteId,
-        modeloId: modelo.id,
-        modeloVersao: modelo.versao,
-        servicoNome: modelo.nomeCurto,
+        modelo,
         consultorId: f.consultorId,
-        status: "aguardando_plano",
-        prestadoraVinculada: modelo.prestadoraVinculada,
-        numeroProjetoHub: f.codigoHub.trim(),
-        codigoSolicitacaoHub: f.codigoHub.trim(),
-        numeroVisitas: String(modelo.etapas.length), // uma visita por etapa
-        gestorSebrae: f.gestorSebrae.trim(),
-        fichaTecnica: modelo.fichaTecnica,
-        codigoFichaTecnica: modelo.codigoFichaTecnica,
+        codigoHub: f.codigoHub,
+        gestorSebrae: f.gestorSebrae,
         segmento: f.segmento.trim() || segmentoSugerido,
         areaAtuacao: f.areaAtuacao.trim() || areaSugerida,
-        localAssinatura: "Natal/RN",
-        planoFechadoEm: null,
-        etapas: etapasDoModelo(modelo).map((e) => ({ ...e, horasPrevistas: Number(horaDaEtapa(e.ordem, e.horasPrevistas).replace(",", ".")) || 0 })),
-        hub: hubInicial(f.situacao, hojeIso()),
-        registros: lgpd ? normasPadrao().map((r) => ({ ...r, id: novoId("reg") })) : [],
-        // Referências do serviço (a LGPD sem lista própria usa as padrão)
-        referencias: modelo.referencias?.length
-          ? modelo.referencias.map((r) => ({ ...r, id: novoId("ref"), consultadoEm: r.url ? hojeIso() : "" }))
-          : lgpd
-            ? referenciasPadrao().map((r) => ({ ...r, id: novoId("ref") }))
-            : [],
-        historico: [],
-      };
+        situacao: f.situacao,
+        horasDaEtapa: (ordem, padrao) => Number(horaDaEtapa(ordem, padrao).replace(",", ".")) || 0,
+      });
       registrarEvento(p, usuario.nome, "Projeto criado");
       r.projetos.unshift(p);
     });
@@ -102,9 +93,16 @@ function Conteudo() {
 
   return (
     <>
-      <Cabecalho migalhas={[{ rotulo: empresa.nome, href: `/${slug}` }, { rotulo: "Novo projeto" }]} titulo="Novo projeto" />
+      <Cabecalho migalhas={[{ rotulo: empresa.nome, href: `/${slug}` }, { rotulo: "Novo projeto" }]} titulo="Novo projeto">
+        {!importando && (
+          <Botao variante="secundario" onClick={() => setImportando(true)}>
+            Importar do HUB
+          </Botao>
+        )}
+      </Cabecalho>
+      {importando && <ImportarHubNovo slug={slug} aoFechar={() => setImportando(false)} />}
       {clientes.length === 0 ? (
-        <Vazio titulo="Cadastre o cliente primeiro" acao={<BotaoLink href={`/${slug}/clientes?novo=1&voltar=novo-projeto`}>Cadastrar cliente</BotaoLink>}>
+        importando ? null : <Vazio titulo="Cadastre o cliente primeiro" acao={<BotaoLink href={`/${slug}/clientes?novo=1&voltar=novo-projeto`}>Cadastrar cliente</BotaoLink>}>
           O projeto é criado para um cliente já cadastrado, porque os dados dele preenchem a ficha de todos os relatórios.
         </Vazio>
       ) : (

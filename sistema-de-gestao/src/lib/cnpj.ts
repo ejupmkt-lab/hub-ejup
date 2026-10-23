@@ -32,3 +32,24 @@ export function tempoDeAtividade(dataAbertura: string, hoje = new Date()) {
   const duracao = anos < 1 ? "menos de 1 ano" : anos === 1 ? "1 ano" : `${anos} anos`;
   return `${duracao}, desde ${meses[m - 1]} de ${a}`;
 }
+
+// Campos que vêm da Receita Federal (os de contato só entram se estiverem em branco)
+export function dadosParaFormulario(d: DadosCnpj): Record<string, string> {
+  const admin = d.socios.find((s) => /administrador/i.test(s.qualificacao)) ?? d.socios[0];
+  return {
+    razaoSocial: d.razaoSocial,
+    nomeFantasia: d.nomeFantasia,
+    endereco: d.endereco,
+    cep: d.cep,
+    cidadeUf: d.cidadeUf,
+    porte: d.porte,
+    ramo: d.ramo,
+    tempoAtividade: tempoDeAtividade(d.dataAbertura),
+    email: d.email,
+    telefone: d.telefone,
+    responsavel: admin?.nome ?? "",
+    cargoResponsavel: admin?.qualificacao ?? "",
+  };
+}
+export const soSeVazio = new Set(["email", "telefone", "responsavel", "cargoResponsavel"]);
+

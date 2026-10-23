@@ -5,7 +5,18 @@ import type { AcaoIA } from "./conversa";
 // pedido no HUB e a IA lê o que está lá. Aqui ficam as conferências que o
 // sistema faz antes de aceitar: o conteúdo é mesmo deste pedido e deste cliente?
 
-export type IdentificacaoHub = { codigo_hub: string; cnpj: string; empresa: string; gestor: string; servico: string };
+export type IdentificacaoHub = {
+  codigo_hub: string;
+  cnpj: string;
+  empresa: string;
+  gestor: string;
+  servico: string;
+  // Só na criação de um projeto novo: o serviço escolhido na lista e o contato da empresa
+  servico_id?: string;
+  contato_nome?: string;
+  contato_email?: string;
+  contato_telefone?: string;
+};
 
 // Só o que a importação pode fazer: dados do pedido, plano, passos do HUB e a resposta do gestor a uma entrega
 export type AcaoImportacao = Extract<AcaoIA, { tipo: "dados_hub" | "definir_cronograma" | "alterar_plano_hub" | "avancar_hub" | "mudar_situacao_etapa" }>;

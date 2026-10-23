@@ -6,32 +6,12 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { novoId, useAcesso, useEstado } from "@/lib/dados/store";
 import type { Cliente, EmpresaSlug } from "@/lib/dados/tipos";
 import { camposCliente, gruposCliente, nomeDoCliente } from "@/lib/campos-cliente";
-import { formatarCnpj, tempoDeAtividade, type DadosCnpj } from "@/lib/cnpj";
+import { dadosParaFormulario, formatarCnpj, soSeVazio, type DadosCnpj } from "@/lib/cnpj";
 import Link from "next/link";
 import { servicoDoProjeto } from "@/lib/projeto";
 import { Botao, Cabecalho, Campo, Cartao, Chip, Vazio } from "@/components/ui";
 
 const vazio = Object.fromEntries(camposCliente.map((c) => [c.chave, ""])) as Record<string, string>;
-
-// Campos que vêm da Receita Federal (os de contato só entram se estiverem em branco)
-function dadosParaFormulario(d: DadosCnpj): Record<string, string> {
-  const admin = d.socios.find((s) => /administrador/i.test(s.qualificacao)) ?? d.socios[0];
-  return {
-    razaoSocial: d.razaoSocial,
-    nomeFantasia: d.nomeFantasia,
-    endereco: d.endereco,
-    cep: d.cep,
-    cidadeUf: d.cidadeUf,
-    porte: d.porte,
-    ramo: d.ramo,
-    tempoAtividade: tempoDeAtividade(d.dataAbertura),
-    email: d.email,
-    telefone: d.telefone,
-    responsavel: admin?.nome ?? "",
-    cargoResponsavel: admin?.qualificacao ?? "",
-  };
-}
-const soSeVazio = new Set(["email", "telefone", "responsavel", "cargoResponsavel"]);
 
 function Conteudo() {
   const { empresa: slug } = useParams<{ empresa: EmpresaSlug }>();

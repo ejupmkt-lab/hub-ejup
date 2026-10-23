@@ -9,7 +9,7 @@ Instalar:
 1. Descompacte esta pasta.
 2. No Chrome (ou Edge) abra chrome://extensions e ligue o "Modo do desenvolvedor".
 3. Clique em "Carregar sem compactação" e escolha a pasta descompactada.
-4. Deixe o projeto aberto numa aba do Blimp. Vá à página do HUB e clique no ícone da extensão em "Ler agora".
+4. Deixe o projeto (ou a tela Novo projeto, para criar um do zero) aberto numa aba do Blimp. Vá à página do HUB e clique no ícone da extensão em "Ler agora".
 
 Se um anexo estiver em outro endereço (por exemplo, um armazenamento de arquivos), o navegador
 bloqueia o download. A extensão mostra um botão "Permitir baixar de ..." e lê de novo.

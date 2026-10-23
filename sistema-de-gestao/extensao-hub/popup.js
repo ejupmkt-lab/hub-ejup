@@ -13,7 +13,7 @@ const dizer = (texto, classe = "") => {
 
 async function preparar() {
   const [ativa] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-  const blimps = (await chrome.tabs.query({ url: `${ORIGEM_BLIMP}/*` })).filter((a) => /\/projetos\/prj-/.test(a.url ?? ""));
+  const blimps = (await chrome.tabs.query({ url: `${ORIGEM_BLIMP}/*` })).filter((a) => /\/projetos\/(prj-|novo)/.test(a.url ?? ""));
   blimps.sort((a, b) => (b.lastAccessed ?? 0) - (a.lastAccessed ?? 0));
   abaBlimp = blimps[0] ?? null;
   const url = ativa?.url ?? "";
@@ -27,10 +27,10 @@ async function preparar() {
   }
   abaHub = ativa;
   if (!abaBlimp) {
-    el("onde").textContent = "Falta abrir o projeto no Blimp. Abra o projeto numa aba do Blimp, volte a esta página do HUB e clique de novo.";
+    el("onde").textContent = "Falta abrir o Blimp. Abra o projeto (ou a tela Novo projeto, para criar um) numa aba do Blimp, volte a esta página do HUB e clique de novo.";
     return;
   }
-  el("onde").textContent = `Vai ler “${(ativa.title || new URL(url).host).slice(0, 60)}” e levar para o projeto aberto no Blimp.`;
+  el("onde").textContent = `Vai ler “${(ativa.title || new URL(url).host).slice(0, 60)}” e levar para o Blimp (projeto aberto ou tela Novo projeto).`;
   botao.disabled = false;
 }
 

@@ -124,7 +124,14 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   (limite de 4 MB do pedido); ao aplicar, todos os arquivos ficam em "Dados do projeto › Materiais do
   HUB" (bucket `evidencias`, pasta `hub/`). Só usa `activeTab` (acesso à aba só no clique); anexos em
   outro endereço pedem permissão no próprio botão da extensão. O botão "Puxar o texto da aba aberta do
-  HUB" do Blimp continua para quem permitir o site nas opções. Só o Blimp (`externally_connectable`)
+  HUB" do Blimp continua para quem permitir o site nas opções. **Novo projeto a partir do HUB**
+  (`src/components/projeto/importar-hub-novo.tsx`): o mesmo botão "Importar do HUB" na tela Novo projeto
+  (a extensão também entrega ali). A IA, no modo "novo" da rota (recebe a lista de serviços da empresa),
+  identifica cliente (CNPJ), serviço, código do pedido, gestor, contato e os passos/plano; o Blimp mostra a
+  prévia e, ao criar, cadastra o cliente se não existir (dados da Receita + contato do HUB), cria o projeto
+  (`src/lib/projeto-novo.ts`, a mesma montagem da tela manual) já nos passos do HUB e guarda os arquivos.
+  Bloqueia pedido repetido (mesmo código) e cliente acima do limite de projetos. Leitura e painel
+  compartilhados em `src/components/projeto/hub-leitura.tsx`. Só o Blimp (`externally_connectable`)
   pede os dados à extensão, que apaga a cópia depois. O identificador é fixo (chave pública no
   manifesto). Depois de mudar a extensão, rode `extensao-hub/empacotar.sh` e suba o novo zip. Se o
   endereço do Blimp mudar, ajuste `externally_connectable`, `host_permissions` e `ORIGEM_BLIMP`.
