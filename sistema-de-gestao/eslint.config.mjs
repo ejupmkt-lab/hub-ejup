@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Extensão do navegador (JavaScript puro, fora do app)
+    "extensao-hub/**",
   ]),
 ]);
 

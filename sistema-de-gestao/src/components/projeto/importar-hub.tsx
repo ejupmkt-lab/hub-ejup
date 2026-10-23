@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Projeto } from "@/lib/dados/tipos";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { useEstado } from "@/lib/dados/store";
 import { aplicarAcoes } from "@/lib/conversa";
 import { acoesDaImportacao, conferirIdentificacao, type RespostaImportacao } from "@/lib/hub-importar";
 import { traduzirErro } from "@/lib/erros";
+import { ARQUIVO_DA_EXTENSAO, explicarFalhaDaLeitura, extensaoInstalada, lerAbaDoHub } from "@/lib/hub-extensao";
 import { Botao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 
@@ -44,6 +45,10 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
   const [insistir, setInsistir] = useState(false);
   const [aplicado, setAplicado] = useState<string[] | null>(null);
   const [aplicando, setAplicando] = useState(false);
+  // A extensão do navegador puxa a aba do HUB que está aberta, em um clique
+  const [extensao, setExtensao] = useState<"verificando" | "sim" | "nao">("verificando");
+  const [puxando, setPuxando] = useState(false);
+  const tentouSozinho = useRef(false);
 
   const conferencia = useMemo(() => (lido ? conferirIdentificacao(projeto, cliente, lido.identificacao) : null), [lido, projeto, cliente]);
   const bloqueado = !!conferencia?.bloqueios.length && !insistir;
@@ -58,9 +63,9 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
     setArquivos((a) => [...a, ...Array.from(lista ?? [])].slice(0, MAX_ARQUIVOS));
   };
 
-  const ler = async () => {
+  const ler = async (colado: string = texto) => {
     setErro(null);
-    if (!texto.trim() && !arquivos.length) return setErro("Cole o texto da página do HUB ou anexe um print ou PDF.");
+    if (!colado.trim() && !arquivos.length) return setErro("Cole o texto da página do HUB ou anexe um print ou PDF.");
     setLendo(true);
     try {
       const prontos = await Promise.all(arquivos.map(reduzir));
@@ -69,7 +74,7 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
       await salvarAgora();
       const f = new FormData();
       f.append("projetoId", projeto.id);
-      f.append("texto", texto);
+      f.append("texto", colado);
       prontos.forEach((a) => f.append("arquivos", a));
       const r = await fetch("/api/hub/importar", { method: "POST", body: f });
       const d = await r.json().catch(() => ({}));
@@ -82,6 +87,37 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
       setLendo(false);
     }
   };
+
+  // Um clique: a extensão lê a aba do HUB e a IA já lê o que veio
+  const puxar = async () => {
+    setErro(null);
+    setPuxando(true);
+    try {
+      const r = await lerAbaDoHub(projeto.codigoSolicitacaoHub || projeto.numeroProjetoHub);
+      if (!r.ok) return setErro(explicarFalhaDaLeitura[r.motivo] ?? "Não foi possível ler a aba do HUB.");
+      setTexto(r.texto);
+      await ler(r.texto);
+    } finally {
+      setPuxando(false);
+    }
+  };
+
+  // Ao abrir, se a extensão está instalada, já puxa sozinho (é o "um clique")
+  useEffect(() => {
+    let ativo = true;
+    void extensaoInstalada().then((e) => {
+      if (!ativo) return;
+      setExtensao(e ? "sim" : "nao");
+      if (e && !tentouSozinho.current) {
+        tentouSozinho.current = true;
+        void puxar();
+      }
+    });
+    return () => {
+      ativo = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const aplicar = async () => {
     if (!lido || !feitos.length) return;
@@ -128,9 +164,37 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
         </div>
       ) : !lido ? (
         <>
+          {extensao === "sim" && (
+            <div className="space-y-2">
+              <p className="text-[13px] text-tinta-2">Com o pedido aberto numa aba do HUB, é só clicar. A IA lê, mostra o que vai mudar e só aplica quando você confirmar.</p>
+              <Botao tamanho="pequeno" onClick={() => void puxar()} disabled={puxando || lendo}>
+                {puxando || lendo ? "Puxando do HUB…" : "Puxar da aba aberta do HUB"}
+              </Botao>
+            </div>
+          )}
+          {extensao === "nao" && (
+            <details className="rounded-[var(--radius-campo)] bg-folha px-3 py-2 text-[13px] ring-1 ring-linha">
+              <summary className="cursor-pointer font-semibold text-azul">Importar com um clique: instalar a extensão do Chrome</summary>
+              <ol className="mt-2 list-decimal space-y-1 pl-5 text-tinta-2">
+                <li>
+                  <a className="font-semibold text-azul underline" href={ARQUIVO_DA_EXTENSAO} download>
+                    Baixe a extensão
+                  </a>{" "}
+                  e descompacte a pasta.
+                </li>
+                <li>
+                  No Chrome (ou Edge), abra <span className="font-mono">chrome://extensions</span> e ligue o &quot;Modo do desenvolvedor&quot;.
+                </li>
+                <li>Clique em &quot;Carregar sem compactação&quot; e escolha a pasta descompactada.</li>
+                <li>Clique no ícone da extensão, cole o endereço do HUB e clique em &quot;Permitir&quot;.</li>
+                <li>Deixe o pedido aberto no HUB e volte aqui. A extensão só lê o HUB quando o Blimp pede.</li>
+              </ol>
+            </details>
+          )}
           <p className="text-[13px] text-tinta-2">
-            Abra o pedido no HUB, selecione a página toda (Ctrl+A), copie (Ctrl+C) e cole aqui. Se preferir, anexe um print ou PDF. A IA lê, mostra o que vai mudar e só
-            aplica quando você confirmar.
+            {extensao === "sim" ? "Ou, " : ""}
+            {extensao === "sim" ? "se preferir, abra" : "Abra"} o pedido no HUB, selecione a página toda (Ctrl+A), copie (Ctrl+C) e cole aqui. Também dá para anexar um print ou PDF. A IA
+            lê, mostra o que vai mudar e só aplica quando você confirmar.
           </p>
           <label className="block text-[13px] font-semibold">
             Texto copiado do HUB
@@ -160,7 +224,7 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
           )}
           {erro && <p className="text-[13px] text-vermelho">{erro}</p>}
           <div className="flex gap-2">
-            <Botao tamanho="pequeno" onClick={() => void ler()} disabled={lendo}>
+            <Botao tamanho="pequeno" variante={extensao === "sim" ? "secundario" : "primario"} onClick={() => void ler()} disabled={lendo || puxando}>
               {lendo ? "A IA está lendo…" : "Ler com a IA"}
             </Botao>
             <Botao variante="fantasma" tamanho="pequeno" onClick={aoFechar} disabled={lendo}>

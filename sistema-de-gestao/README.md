@@ -115,6 +115,14 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   se o código do pedido ou o CNPJ lidos contradizem o projeto, bloqueia. O que foi aplicado vai para a
   conversa e pode ser desfeito lá. Relatórios enviados no HUB não são marcados como enviados: o PDF
   assinado precisa estar no projeto. Nada é gravado pela rota. Usa a mesma `ANTHROPIC_API_KEY`.
+  **Um clique com a extensão do Chrome/Edge** (`extensao-hub/`, arquivo para baixar em
+  `public/blimp-hub-extensao.zip`, ponte em `src/lib/hub-extensao.ts`): uma página não lê outro site, então
+  a extensão lê a aba do HUB que o consultor deixou aberta e logada e entrega o texto ao Blimp, que a IA
+  lê na hora (ao abrir "Importar do HUB" já puxa sozinho). O consultor informa o endereço do HUB nas
+  opções da extensão e permite a leitura só desse site; só o Blimp (`externally_connectable`) consegue
+  pedir, e sem senha guardada. O identificador é fixo (chave pública no manifesto). Depois de mudar a
+  extensão, rode `extensao-hub/empacotar.sh` e suba o novo zip. Se o endereço do Blimp mudar, ajuste o
+  `externally_connectable` do manifesto.
 - **Etapas no formato do HUB SEBRAE**, tabelas do relatório (preenchidas pela conversa, ação
   `preencher_tabela`), redação por seção, checagem de completude.
 - **Relatório Técnico em Word (.docx)** no papel timbrado do modelo (`public/modelos/relatorio-base.docx`).

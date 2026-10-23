@@ -1,0 +1,15 @@
+Blimp: importar do HUB SEBRAE (extensão do Chrome e do Edge)
+
+O que faz: quando você clica em "Importar do HUB" no Blimp, a extensão lê a página do pedido que
+está aberta numa aba do HUB e entrega o texto ao Blimp, que mostra a prévia do que vai mudar.
+
+Instalar:
+1. Descompacte esta pasta.
+2. No Chrome (ou Edge) abra chrome://extensions e ligue o "Modo do desenvolvedor".
+3. Clique em "Carregar sem compactação" e escolha a pasta descompactada.
+4. Clique no ícone da extensão, cole o endereço do HUB (começa com https://) e clique em "Permitir".
+5. Deixe o pedido aberto no HUB e, no Blimp, clique em "Importar do HUB".
+
+Privacidade: a extensão só lê o site que você permitiu, só quando o Blimp pede, e só o Blimp
+consegue pedir. Ela não guarda senha, não envia nada por conta própria e não roda no HUB sozinha.
+Para parar de vez: retire a permissão no ícone da extensão ou remova a extensão.
