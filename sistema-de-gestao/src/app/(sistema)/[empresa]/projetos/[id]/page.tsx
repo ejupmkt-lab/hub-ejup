@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useProjeto } from "@/components/projeto/use-projeto";
+import { useExcluirProjeto } from "@/components/projeto/excluir-projeto";
 import { PlanoTrabalho } from "@/components/projeto/plano-trabalho";
 import { DadosProjeto } from "@/components/projeto/dados";
 import { CronogramaProjeto } from "@/components/projeto/cronograma-projeto";
@@ -46,6 +47,7 @@ const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 export default function PaginaProjeto() {
   const { projeto, cliente, consultor, alterar } = useProjeto();
   const { mudarStatus } = useAcoesEtapa();
+  const { excluirProjeto, excluindo, podeExcluir } = useExcluirProjeto(projeto);
   const { empresa: slug } = useParams<{ empresa: string }>();
   // O projeto abre sempre no Desenvolvimento (a conversa com a IA)
   const [aba, setAba] = useState<Aba>("Desenvolvimento");
@@ -302,7 +304,13 @@ export default function PaginaProjeto() {
             </div>
           </>
         }
-      />
+      >
+        {podeExcluir && (
+          <Botao variante="perigo" tamanho="pequeno" onClick={() => void excluirProjeto()} disabled={excluindo}>
+            {excluindo ? "Excluindo…" : "Excluir projeto"}
+          </Botao>
+        )}
+      </Cabecalho>
 
       {aba === "Desenvolvimento" && (
         <>

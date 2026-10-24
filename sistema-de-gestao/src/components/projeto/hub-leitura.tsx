@@ -362,6 +362,7 @@ export function relatoriosDasEtapas(materiais: Material[]) {
 
 // O que a página do HUB não mostra: o consultor completa as datas que souber (em branco não é registrado)
 export function CompletarDados({ pend, c, setC, relatorios }: { pend: Pendencias; c: Completar; setC: (c: Completar) => void; relatorios: Record<number, File> }) {
+  const [mesma, setMesma] = useState("");
   if (!pend.passosSemData.length && !pend.pedePlano && !pend.etapasEnviadas.length) return null;
   const campo = (rotulo: string, valor: string, aoMudar: (v: string) => void, dica?: string) => (
     <Campo key={rotulo} rotulo={rotulo} dica={dica}>
@@ -382,6 +383,23 @@ export function CompletarDados({ pend, c, setC, relatorios }: { pend: Pendencias
           </>
         )}
         {pend.passosSemData.map((p) => campo(rotuloDoPasso[p], c.passos[p] ?? "", (v) => setC({ ...c, passos: { ...c.passos, [p]: v } })))}
+        {pend.etapasEnviadas.length > 1 && (
+          <Campo rotulo="Não sei a data de cada etapa: usar esta para as que estão em branco" dica="Por exemplo, a data em que o projeto foi finalizado no HUB.">
+            <input
+              type="date"
+              className="campo num"
+              value={mesma}
+              onChange={(e) => {
+                const v = e.target.value;
+                setMesma(v);
+                if (!v) return;
+                const envios = { ...c.envios };
+                for (const x of pend.etapasEnviadas) if (!(envios[x.etapa] ?? x.dataDaIA)) envios[x.etapa] = v;
+                setC({ ...c, envios });
+              }}
+            />
+          </Campo>
+        )}
         {pend.etapasEnviadas.map((e) =>
           campo(
             `Etapa ${String(e.etapa).padStart(2, "0")} enviada no HUB em`,

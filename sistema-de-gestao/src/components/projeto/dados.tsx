@@ -1,17 +1,15 @@
 "use client";
 
-import { traduzirErro } from "@/lib/erros";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { PassoHub, Projeto } from "@/lib/dados/tipos";
 import { mudarHub, ordemPassos, passoHubDoProjeto, rotuloPassoHub } from "@/lib/fase";
 import { hojeIso } from "@/lib/datas";
-import { useAcesso, useEstado } from "@/lib/dados/store";
+import { useEstado } from "@/lib/dados/store";
 import { Botao, Campo, Cartao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
+import { useExcluirProjeto } from "./excluir-projeto";
 import { EscolherGestorSebrae } from "./gestor-sebrae";
 import { ValoresProjeto } from "@/components/financeiro/valores-projeto";
-import { nomeDoCliente } from "@/lib/campos-cliente";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { formatarData } from "@/lib/datas";
 
@@ -80,28 +78,10 @@ function MateriaisDoHub({ projeto }: { projeto: Projeto }) {
 
 export function DadosProjeto({ projeto, aoFechar }: { projeto: Projeto; aoFechar: () => void }) {
   const { alterar, cliente } = useProjeto();
-  const { estado, excluir } = useEstado();
-  const { gerencia } = useAcesso();
-  const router = useRouter();
-  const [excluindo, setExcluindo] = useState(false);
+  const { estado } = useEstado();
+  const { excluirProjeto, excluindo, podeExcluir } = useExcluirProjeto(projeto);
   const consultores = estado.usuarios.filter((u) => u.acessos[projeto.empresa]);
   const consultorAtual = consultores.find((u) => u.id === projeto.consultorId);
-
-  const excluirProjeto = async () => {
-    const nome = nomeDoCliente(cliente, "este cliente");
-    const resposta = prompt(
-      `Excluir o projeto de ${nome}? Etapas, relatórios, imagens e o PDF assinado serão apagados e não há como desfazer.\n\nPara confirmar, digite EXCLUIR.`,
-    );
-    if (resposta?.trim().toUpperCase() !== "EXCLUIR") return;
-    setExcluindo(true);
-    try {
-      await excluir("projeto", projeto.id);
-      router.replace(`/${projeto.empresa}`);
-    } catch (e) {
-      alert(traduzirErro(e, "Não foi possível excluir."));
-      setExcluindo(false);
-    }
-  };
 
   return (
     <>
@@ -210,7 +190,7 @@ export function DadosProjeto({ projeto, aoFechar }: { projeto: Projeto; aoFechar
         <ValoresProjeto projeto={projeto} />
         <MateriaisDoHub projeto={projeto} />
       </Cartao>
-      {gerencia(projeto.empresa) && (
+      {podeExcluir && (
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-linha pt-6">
           <p className="text-[13px] text-tinta-2">Projeto criado por engano ou cancelado pelo SEBRAE? A exclusão é definitiva.</p>
           <Botao variante="perigo" onClick={excluirProjeto} disabled={excluindo}>
