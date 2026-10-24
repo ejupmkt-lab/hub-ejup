@@ -23,13 +23,13 @@ import {
   entregaFinal,
   etapaAtual,
   previstoProjeto,
+  desvioDoPlano,
+  entregueAlemDoPlano,
   servicoDoProjeto,
   horasDoProjeto,
   horasFmt,
   situacaoProjeto,
   situacaoDaEtapa,
-  diasAlemDoPlano,
-  etapaConcluida,
   textoDiasAlemDoPlano,
 } from "@/lib/projeto";
 import { doisDigitos, } from "@/lib/rotulos";
@@ -166,8 +166,9 @@ export default function PaginaProjeto() {
   const abaMais = (secundarias as readonly string[]).includes(aba) ? aba : "Mais";
 
   const situacao = situacaoProjeto(projeto);
-  // Maior desvio, entre as etapas ainda não enviadas, em relação ao plano do HUB
-  const alemDoPlano = projeto.status === "encerrado" || preContrato ? 0 : Math.max(0, ...projeto.etapas.filter((e) => !etapaConcluida(e)).map((e) => diasAlemDoPlano(e)));
+  // O mesmo desvio em relação ao plano do HUB que a situação já diz (e, nos concluídos, a entrega final)
+  const alemDoPlano = preContrato ? 0 : desvioDoPlano(projeto);
+  const entregueAlem = entregueAlemDoPlano(projeto);
   const chaveEtapa = et ? situacaoDaEtapa(et).chave : null;
   const corEtapa = chaveEtapa === "devolvida" ? "text-vermelho" : chaveEtapa === "atrasada" ? "text-laranja" : "text-tinta-2";
   const celula = "min-w-0 bg-folha px-4 py-3.5 sm:px-5";
@@ -186,9 +187,14 @@ export default function PaginaProjeto() {
             <Chip tom={situacao.tom} icone={<span aria-hidden className="size-1.5 rounded-full bg-current" />}>
               {situacao.rotulo}
             </Chip>
-            {alemDoPlano > 0 && (
+            {alemDoPlano > 0 && situacao.rotulo !== textoDiasAlemDoPlano(alemDoPlano) && (
               <span title="Passou do fim previsto no plano do HUB (o orçamento). O atraso da execução conta a partir do pagamento.">
                 <Chip tom="atencao">{textoDiasAlemDoPlano(alemDoPlano)}</Chip>
+              </span>
+            )}
+            {entregueAlem > 0 && (
+              <span title="A última etapa foi enviada no HUB depois do fim previsto no plano do HUB.">
+                <Chip tom="atencao">{`entregue ${textoDiasAlemDoPlano(entregueAlem)}`}</Chip>
               </span>
             )}
           </span>
@@ -211,7 +217,7 @@ export default function PaginaProjeto() {
                 <p className="num mt-0.5 flex flex-wrap items-baseline gap-x-2">
                   <span className="text-2xl font-bold text-tinta">{avanco}%</span>
                   <span className={`text-[13px] ${tomAvanco === "atencao" ? "text-laranja" : "text-tinta-2"}`}>
-                    {preContrato ? "antes da contratação" : previsto === null ? "sem plano de trabalho" : `previsto hoje ${previsto}%`}
+                    {preContrato ? "antes da contratação" : projeto.status === "encerrado" ? "projeto entregue" : previsto === null ? "sem plano de trabalho" : `previsto hoje ${previsto}%`}
                   </span>
                 </p>
                 <div className="mt-2">

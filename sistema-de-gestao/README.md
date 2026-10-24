@@ -178,6 +178,10 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   gráfico) quando uma etapa ainda não enviada passou do fim previsto no orçamento, ou foi enviada depois
   dele (`diasAlemDoPlano`). A IA corrige as datas do plano com a ação `alterar_plano_hub` (todas as etapas
   citadas de uma vez, em sequência, com desfazer); `alterar_datas_etapa` mexe só na execução.
+  A situação do projeto (`situacaoProjeto`) segue a mesma regra do desvio (`desvioDoPlano`): devolvida >
+  "Atrasado" (execução) > "N dias além do plano do HUB" > "Em dia", então nunca diz "Em dia" com o desvio à
+  vista. Projeto concluído mostra "projeto entregue" (previsto 100%) e, se a última etapa saiu depois do
+  plano, "entregue N dias além do plano do HUB" (`entregueAlemDoPlano`); o fim dele é o envio real da última etapa.
 - **Chat**: Enter envia a mensagem; Shift+Enter pula a linha. A mensagem do plano de trabalho para a FUNCERN
   não fica mais na aba: a IA entrega pronta quando pedida (o texto vai no contexto do projeto).
 - **Horas**: não há registro de visitas nem de horas trabalhadas. As horas de cada etapa são as do plano

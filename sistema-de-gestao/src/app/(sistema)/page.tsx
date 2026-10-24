@@ -117,7 +117,7 @@ export default function Painel() {
               </li>
               <li className="flex items-center gap-2">
                 <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-laranja-vivo" />
-                Atraso (etapa ou tarefa)
+                Atraso ou além do plano do HUB
               </li>
               <li className="flex items-center gap-2">
                 <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-verde-vivo" />

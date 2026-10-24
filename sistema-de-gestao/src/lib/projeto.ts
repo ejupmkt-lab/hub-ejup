@@ -148,6 +148,8 @@ export function avancoProjeto(p: Projeto) {
 
 // Quanto já deveria estar pronto hoje pelo plano de trabalho, em % (nulo sem plano)
 export function previstoProjeto(p: Projeto, hoje = hojeIso()) {
+  // Tudo enviado no HUB: o previsto é tudo
+  if (p.etapas.length && p.etapas.every((e) => concluidas.has(e.status))) return 100;
   if (!p.planoFechadoEm || !p.etapas.every((e) => e.dataInicio && e.dataFim)) return null;
   const peso = pesos(p);
   const horas = p.etapas.reduce((a, e) => a + peso(e), 0) || 1;
@@ -179,7 +181,21 @@ export function horasDoProjeto(p: Projeto) {
 
 export const horasFmt = (h: number) => `${Number.isInteger(h) ? h : h.toFixed(1).replace(".", ",")} h`;
 
-// Situação geral, nas três cores do painel: ponto crítico (devolução), atraso, em dia
+// Maior desvio, entre as etapas ainda não enviadas, em relação ao plano do HUB (o orçamento). Só vale com a execução em curso.
+export function desvioDoPlano(p: Projeto, hoje = hojeIso()) {
+  if (p.status === "encerrado") return 0;
+  const fase = faseDoProjeto(p);
+  if (fase !== "execucao" && fase !== "finalizado") return 0;
+  return Math.max(0, ...p.etapas.filter((e) => !concluidas.has(e.status)).map((e) => diasAlemDoPlano(e, hoje)));
+}
+
+// Projeto concluído: quantos dias depois do plano do HUB a última etapa foi de fato enviada
+export const entregueAlemDoPlano = (p: Projeto) => {
+  const ultima = p.etapas[p.etapas.length - 1];
+  return p.status === "encerrado" && ultima ? diasAlemDoPlano(ultima) : 0;
+};
+
+// Situação geral, nas três cores do painel: ponto crítico (devolução), atraso, além do plano do HUB, em dia
 export type SituacaoProjeto = { tom: Tom; rotulo: string };
 export function situacaoProjeto(p: Projeto, hoje = hojeIso()): SituacaoProjeto {
   if (p.status === "encerrado") return { tom: "ok", rotulo: "Concluído" };
@@ -189,6 +205,9 @@ export function situacaoProjeto(p: Projeto, hoje = hojeIso()): SituacaoProjeto {
   if (fase === "finalizado") return { tom: "neutro", rotulo: "Finalizado" };
   if (!p.planoFechadoEm) return { tom: "neutro", rotulo: "Sem plano de trabalho" };
   if (p.etapas.some((e) => etapaAtrasada(e, hoje))) return { tom: "atencao", rotulo: "Atrasado" };
+  // "Em dia" só quando também está dentro do plano do HUB: o mesmo desvio que o projeto mostra por dentro
+  const alem = desvioDoPlano(p, hoje);
+  if (alem > 0) return { tom: "atencao", rotulo: textoDiasAlemDoPlano(alem) };
   return { tom: "ok", rotulo: "Em dia" };
 }
 
