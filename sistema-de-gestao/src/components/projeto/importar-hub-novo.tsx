@@ -16,7 +16,8 @@ import { camposCliente, nomeDoCliente } from "@/lib/campos-cliente";
 import { dadosParaFormulario, formatarCnpj, type DadosCnpj } from "@/lib/cnpj";
 import { traduzirErro } from "@/lib/erros";
 import { Botao, Campo } from "@/components/ui";
-import { EntradaDoHub, LidoDaPagina, useLeituraHub } from "./hub-leitura";
+import { registrarDocumentosNoHistorico } from "@/lib/hub-documentos";
+import { DocumentosDoHub, EntradaDoHub, LidoDaPagina, useLeituraHub } from "./hub-leitura";
 
 const BUCKET = "evidencias";
 const digitos = (t: string) => (t ?? "").replace(/\D/g, "");
@@ -32,6 +33,8 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
   const [lido, setLido] = useState<RespostaImportacao | null>(null);
   const [servicoEscolhido, setServicoEscolhido] = useState<string | null>(null);
   const [clienteEscolhido, setClienteEscolhido] = useState("");
+  // Quando o CNPJ não aparece no que foi lido, o consultor digita
+  const [cnpjDigitado, setCnpjDigitado] = useState("");
   const [insistir, setInsistir] = useState(false);
   const [criando, setCriando] = useState(false);
   const h = useLeituraHub({
@@ -41,6 +44,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
       setLido(r);
       setServicoEscolhido(null);
       setClienteEscolhido("");
+      setCnpjDigitado("");
       setInsistir(false);
     },
     aoReceber: () => setLido(null),
@@ -61,7 +65,8 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
   const modelo = modelos.find((m) => m.id === modeloId);
 
   // Cliente: o do CNPJ lido; sem CNPJ válido, o consultor escolhe um já cadastrado
-  const cnpjLido = digitos(ident?.cnpj ?? "");
+  const cnpjDoHub = digitos(ident?.cnpj ?? "");
+  const cnpjLido = cnpjDoHub.length === 14 ? cnpjDoHub : digitos(cnpjDigitado);
   const cnpjValido = cnpjLido.length === 14;
   const clienteDoCnpj = cnpjValido ? clientes.find((c) => digitos(c.cnpj) === cnpjLido) : undefined;
   const clienteEscolhidoObj = clientes.find((c) => c.id === clienteEscolhido);
@@ -162,6 +167,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
 
       // 3. Tudo de uma vez, para o projeto nascer já completo
       const itens = montado.itens.filter((i) => !i.aviso).map((i) => i.descricao);
+      registrarDocumentosNoHistorico(montado.projeto, usuario.nome, lido.documentos, guardados.map((g) => g.nome));
       registrarEvento(montado.projeto, usuario.nome, "Projeto criado a partir do HUB", [...itens, ...avisosFinais, ...(naoSubiu.length ? [`não guardei: ${naoSubiu.join(", ")}`] : [])].join("; ") || undefined);
       atualizar((r) => {
         if (cliente) r.clientes.push(cliente);
@@ -203,20 +209,27 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
                   {ident?.empresa || "Empresa do pedido"} · {formatarCnpj(cnpjLido)} <span className="text-tinta-2">(será cadastrado com os dados da Receita Federal)</span>
                 </>
               ) : (
-                <span className="text-laranja">não encontrei o CNPJ no conteúdo. Escolha um cliente já cadastrado:</span>
+                <span className="text-laranja">não encontrei o CNPJ no conteúdo{ident?.empresa ? ` (empresa: ${ident.empresa})` : ""}. Digite o CNPJ para cadastrar{clientes.length ? " ou escolha um cliente já cadastrado" : ""}:</span>
               )}
             </p>
-            {semCliente && (
-              <Campo rotulo="Cliente">
-                <select className="campo" value={clienteEscolhido} onChange={(e) => setClienteEscolhido(e.target.value)}>
-                  <option value="">Escolha…</option>
-                  {clientes.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {nomeDoCliente(c)}
-                    </option>
-                  ))}
-                </select>
-              </Campo>
+            {cnpjDoHub.length !== 14 && !clienteDoCnpj && (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Campo rotulo="CNPJ do cliente" dica={cnpjDigitado && !cnpjValido ? "Digite os 14 números do CNPJ." : undefined}>
+                  <input className="campo num" inputMode="numeric" placeholder="00.000.000/0000-00" value={cnpjDigitado} onChange={(e) => setCnpjDigitado(formatarCnpj(e.target.value))} />
+                </Campo>
+                {clientes.length > 0 && !cnpjValido && (
+                  <Campo rotulo="Ou cliente já cadastrado">
+                    <select className="campo" value={clienteEscolhido} onChange={(e) => setClienteEscolhido(e.target.value)}>
+                      <option value="">Escolha…</option>
+                      {clientes.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {nomeDoCliente(c)}
+                        </option>
+                      ))}
+                    </select>
+                  </Campo>
+                )}
+              </div>
             )}
             <div className="grid gap-3 sm:grid-cols-2">
               <Campo rotulo="Serviço" dica={servicoDaIA ? "Reconhecido pelo nome do serviço no HUB." : ident?.servico ? `No HUB: ${ident.servico}. Confira e escolha.` : undefined}>
@@ -291,6 +304,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
             </div>
           )}
           {entrega && <LidoDaPagina h={h} destino="no projeto" />}
+          <DocumentosDoHub documentos={lido.documentos} nomesBaixados={materiais.map((m) => m.arquivo.name)} />
           {erro && <p className="text-[13px] text-vermelho">{erro}</p>}
           <div className="flex flex-wrap gap-2">
             <Botao tamanho="pequeno" onClick={() => void criar()} disabled={criando || bloqueado}>

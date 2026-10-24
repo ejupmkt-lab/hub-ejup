@@ -49,8 +49,10 @@ function mostrarResultado(r) {
     const motivo = { vazia: "A página está vazia ou ainda carregando. Espere carregar e tente de novo." }[r.motivo] ?? `Não consegui ler: ${r.detalhe ?? r.motivo}`;
     return dizer(motivo, "erro");
   }
-  const { arquivos, caracteres } = r.resumo;
+  const { arquivos, caracteres, balaos, diag } = r.resumo;
   dizer(`Pronto: li a página (${caracteres.toLocaleString("pt-BR")} caracteres) e baixei ${arquivos} ${arquivos === 1 ? "arquivo" : "arquivos"}. Confira a prévia no Blimp.`, "ok");
+  if (balaos) item(`Li ${balaos} ${balaos === 1 ? "balão" : "balões"} que só aparecem ao passar o mouse.`);
+  if (diag?.botoesSemEndereco) item(`${diag.botoesSemEndereco} ${diag.botoesSemEndereco === 1 ? "botão de download não tem" : "botões de download não têm"} endereço para eu baixar. O que está listado vai para o histórico do projeto.`);
   for (const f of r.falhas ?? []) item(`Não baixei “${f.nome}”: ${f.motivo}.`);
   for (const n of r.naoGuardados ?? []) item(`“${n.nome}” (${n.tipo}) não é PDF nem imagem, então não foi guardado.`);
   const origens = [...new Set((r.falhas ?? []).map((f) => f.origemBloqueada).filter(Boolean))];

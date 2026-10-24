@@ -19,9 +19,11 @@ const somenteDigitos = (t) => String(t ?? "").replace(/\D/g, "");
 
 // ─── Funções que rodam DENTRO da página do HUB ─────────────────────────────────
 
-// Texto + links de arquivos anexados da página
+// Texto, links de arquivos anexados e o que só aparece ao passar o mouse (balões sobre ícones e iniciais)
 // (roda dentro da página: precisa ser autossuficiente, sem chamar outras funções deste arquivo)
-function lerPagina() {
+async function lerPagina(passarMouse) {
+  const normalizar = (t) => String(t ?? "").replace(/\s+/g, " ").trim();
+  const linhasDaPagina = () => (document.body?.innerText ?? "").split("\n").map(normalizar).filter(Boolean);
   // Texto visível, sem as linhas em branco repetidas
   const texto = (document.body?.innerText ?? "")
     .split("\n")
@@ -29,10 +31,14 @@ function lerPagina() {
     .filter((l, i, a) => l || (a[i - 1] ?? "") !== "")
     .join("\n")
     .trim();
+
+  // ── Links de arquivos
   const ehArquivo = /\.(pdf|docx?|xlsx?|pptx?|odt|ods|csv|txt|png|jpe?g|webp|gif|zip)(?:[?#]|$)/i;
-  const palavras = /(anexo|download|baixar|arquivo|documento|comprovante|proposta|diagn[oó]stico|relat[oó]rio|contrato|plano)/i;
+  const palavras = /(anexo|download|baixar|arquivo|documento|comprovante|proposta|diagn[oó]stico|relat[oó]rio|contrato|plano|recibo|atesto|nota)/i;
+  const caminhoDeArquivo = /(download|baixar|arquivo|anexo|attachment|document|file|blob|storage|upload)/i;
   const vistos = new Set();
   const links = [];
+  let linksIgnorados = 0;
   for (const a of document.querySelectorAll("a[href]")) {
     let url;
     try {
@@ -41,13 +47,78 @@ function lerPagina() {
       continue;
     }
     if (!/^https?:$/.test(url.protocol) || url.href === location.href || vistos.has(url.href)) continue;
-    const rotulo = (a.innerText || a.getAttribute("title") || a.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim();
-    const baixavel = a.hasAttribute("download") || ehArquivo.test(url.pathname + url.search) || (palavras.test(rotulo) && /download|arquivo|anexo|file|document/i.test(url.pathname + url.search));
-    if (!baixavel) continue;
+    // O nome pode estar no texto do link ou na linha ao lado (ícone de download sem texto)
+    const linha = a.closest("li, tr, [class*=item], [class*=row], [class*=linha]");
+    const rotuloProprio = (a.innerText || a.getAttribute("title") || a.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim();
+    const rotuloDaLinha = (linha?.innerText ?? "").split("\n").map((l) => l.trim()).find(Boolean) ?? "";
+    const rotulo = rotuloProprio || rotuloDaLinha;
+    const caminho = url.pathname + url.search;
+    const baixavel =
+      a.hasAttribute("download") ||
+      ehArquivo.test(caminho) ||
+      (palavras.test(rotulo) && caminhoDeArquivo.test(caminho)) ||
+      (!rotuloProprio && !!linha && caminhoDeArquivo.test(caminho));
+    if (!baixavel) {
+      linksIgnorados++;
+      continue;
+    }
     vistos.add(url.href);
     links.push({ url: url.href, rotulo, nomeNoLink: a.getAttribute("download") || "" });
   }
-  return { texto, links };
+  // Botões de download que não têm endereço: o navegador só baixa clicando, e a extensão não clica
+  const botoesSemEndereco = [...document.querySelectorAll("button, [role=button]")].filter((b) =>
+    /download|baixar/i.test(`${b.getAttribute("title") ?? ""} ${b.getAttribute("aria-label") ?? ""} ${b.className ?? ""} ${b.innerText ?? ""}`),
+  ).length;
+
+  // ── Balões: o texto de title/tooltip e o que aparece ao passar o mouse sobre ícones e iniciais
+  const passeios = [];
+  const diag = { linksIgnorados, botoesSemEndereco, candidatosAoPassarMouse: 0 };
+  if (passarMouse) {
+    const atributos = ["title", "data-tooltip", "data-original-title", "data-bs-original-title", "mattooltip", "ngbtooltip", "data-tippy-content"];
+    for (const el of document.querySelectorAll(atributos.map((a) => `[${a}]`).join(","))) {
+      const valor = atributos.map((a) => normalizar(el.getAttribute(a))).find((v) => v.length > 2);
+      if (valor && passeios.length < 40) passeios.push({ rotulo: normalizar(el.innerText).slice(0, 30), linhas: [valor.slice(0, 200)] });
+    }
+    // Iniciais em círculo (MN, LN, TC) e gatilhos de tooltip: passa o mouse e vê o que apareceu
+    const candidatos = [];
+    const gatilhos = "[data-toggle=tooltip],[data-bs-toggle=tooltip],[data-bs-toggle=popover],[data-toggle=popover],[mattooltip],[ngbtooltip],[data-tippy-content],[aria-haspopup=true],[aria-describedby]";
+    for (const e of document.querySelectorAll(`*, ${gatilhos}`)) {
+      if (!(e instanceof HTMLElement) || candidatos.includes(e)) continue;
+      const curto = e.children.length <= 2 && (e.textContent ?? "").trim().length <= 4 && (e.textContent ?? "").trim().length > 0;
+      const gatilho = e.matches(gatilhos);
+      if (!curto && !gatilho) continue;
+      const r = e.getBoundingClientRect();
+      if (r.width < 14 || r.height < 14 || r.width > 120 || r.height > 120) continue;
+      if (curto && !gatilho) {
+        const raio = parseFloat(getComputedStyle(e).borderTopLeftRadius) || 0;
+        const t = normalizar(e.textContent);
+        if (!(raio >= Math.min(r.width, r.height) * 0.3) || !/^\p{L}{1,3}$/u.test(t)) continue;
+      }
+      candidatos.push(e);
+      if (candidatos.length >= 24) break;
+    }
+    diag.candidatosAoPassarMouse = candidatos.length;
+    const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+    const disparar = (el, tipos, x, y) => {
+      for (const t of tipos) {
+        const base = { bubbles: !/enter|leave/.test(t), cancelable: true, view: window, clientX: x, clientY: y };
+        el.dispatchEvent(t.startsWith("pointer") ? new PointerEvent(t, { ...base, pointerType: "mouse" }) : new MouseEvent(t, base));
+      }
+    };
+    for (const el of candidatos) {
+      const base = new Set(linhasDaPagina());
+      const r = el.getBoundingClientRect();
+      const x = r.left + r.width / 2;
+      const y = r.top + r.height / 2;
+      disparar(el, ["pointerover", "pointerenter", "mouseover", "mouseenter", "mousemove"], x, y);
+      await esperar(350);
+      const novas = linhasDaPagina().filter((l) => !base.has(l) && l.length < 300).slice(0, 14);
+      disparar(el, ["mousemove", "pointerout", "pointerleave", "mouseout", "mouseleave"], x + 400, y + 400);
+      await esperar(120);
+      if (novas.length) passeios.push({ rotulo: normalizar(el.innerText).slice(0, 30), linhas: novas });
+    }
+  }
+  return { texto, links, passeios, diag };
 }
 
 // Baixa um arquivo com a sessão da própria página (mesmo endereço, com cookies)
@@ -107,13 +178,27 @@ function nomeDoArquivo(link, disposicao, tipo) {
 const TIPOS_GUARDADOS = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
 const tipoPeloNome = (nome) => ({ pdf: "application/pdf", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp" })[(/\.([a-z0-9]+)$/i.exec(nome)?.[1] ?? "").toLowerCase()];
 
-async function textoDeTodosOsQuadros(tabId) {
-  const partes = await chrome.scripting.executeScript({ target: { tabId, allFrames: true }, func: lerPagina });
+async function textoDeTodosOsQuadros(tabId, passarMouse = false) {
+  const partes = await chrome.scripting.executeScript({ target: { tabId, allFrames: true }, func: lerPagina, args: [passarMouse] });
   const resultados = partes.map((p) => p.result).filter(Boolean);
-  const texto = resultados.map((r) => r.texto).filter(Boolean).join("\n\n").trim();
   const links = [];
   for (const r of resultados) for (const l of r.links) if (!links.some((x) => x.url === l.url)) links.push(l);
-  return { texto, links, quadros: partes.length };
+  // Balões: "LN: Cliente: … CNPJ: …" (sem repetir o que já está na página)
+  const balao = [];
+  const jaNaPagina = resultados.map((r) => r.texto).join("\n");
+  for (const r of resultados)
+    for (const p of r.passeios) {
+      const linhas = p.linhas.filter((l) => !jaNaPagina.includes(l) || p.linhas.length > 1);
+      const item = `${p.rotulo ? `[${p.rotulo}] ` : ""}${linhas.join(" | ")}`;
+      if (linhas.length && !balao.includes(item)) balao.push(item);
+    }
+  const secaoBalao = balao.length ? `\n\n[Informações que aparecem ao passar o mouse sobre ícones e iniciais da página]\n${balao.join("\n")}` : "";
+  const textoPagina = resultados.map((r) => r.texto).filter(Boolean).join("\n\n").trim();
+  const diag = resultados.reduce(
+    (d, r) => ({ linksIgnorados: d.linksIgnorados + r.diag.linksIgnorados, botoesSemEndereco: d.botoesSemEndereco + r.diag.botoesSemEndereco, candidatosAoPassarMouse: d.candidatosAoPassarMouse + r.diag.candidatosAoPassarMouse }),
+    { linksIgnorados: 0, botoesSemEndereco: 0, candidatosAoPassarMouse: 0 },
+  );
+  return { texto: textoPagina + secaoBalao, textoPagina, secaoBalao, balaos: balao.length, links, quadros: partes.length, diag };
 }
 
 // ─── Pedido do Blimp: lê a aba do HUB que a pessoa já permitiu ─────────────────
@@ -155,8 +240,8 @@ async function lerAgora({ tabId, blimpTabId }) {
   try {
     const aba = await chrome.tabs.get(tabId);
     const hub = new URL(aba.url);
-    await progresso({ etapa: "lendo", texto: "Lendo a página do HUB…" });
-    const { texto, links, quadros } = await textoDeTodosOsQuadros(tabId);
+    await progresso({ etapa: "lendo", texto: "Lendo a página do HUB e passando o mouse nos ícones…" });
+    const { texto, textoPagina, secaoBalao, balaos, links, quadros, diag } = await textoDeTodosOsQuadros(tabId, true);
     if (!texto && !links.length) return { ok: false, motivo: "vazia" };
 
     const arquivos = [];
@@ -218,9 +303,12 @@ async function lerAgora({ tabId, blimpTabId }) {
       id: crypto.randomUUID(),
       criadoEm: new Date().toISOString(),
       origem: { endereco: hub.origin, titulo: aba.title ?? "", url: `${hub.origin}${hub.pathname}` },
-      texto: texto.slice(0, LIMITE_TEXTO),
+      // Os balões vão inteiros; o corte, se houver, é no texto da página
+      texto: textoPagina.slice(0, Math.max(2000, LIMITE_TEXTO - secaoBalao.length)) + secaoBalao,
       textoCortado: texto.length > LIMITE_TEXTO,
       quadros,
+      balaos,
+      diag: { ...diag, linksAchados: links.length },
       arquivos,
       falhas,
       naoGuardados,
@@ -234,7 +322,7 @@ async function lerAgora({ tabId, blimpTabId }) {
     const jan = await chrome.tabs.get(blimpTabId);
     await chrome.windows.update(jan.windowId, { focused: true }).catch(() => {});
     await progresso({ etapa: "pronto", texto: "Pronto. A prévia está no Blimp." });
-    return { ok: true, resumo: { arquivos: arquivos.length, falhas: falhas.length, naoGuardados: naoGuardados.length, quadros, caracteres: texto.length } };
+    return { ok: true, resumo: { arquivos: arquivos.length, falhas: falhas.length, naoGuardados: naoGuardados.length, quadros, caracteres: texto.length, balaos, diag: { ...diag, linksAchados: links.length } } };
   } catch (e) {
     return { ok: false, motivo: "erro", detalhe: String(e?.message ?? e) };
   } finally {

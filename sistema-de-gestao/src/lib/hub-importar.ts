@@ -22,7 +22,8 @@ export type IdentificacaoHub = {
 export type AcaoImportacao = Extract<AcaoIA, { tipo: "dados_hub" | "definir_cronograma" | "alterar_plano_hub" | "avancar_hub" | "mudar_situacao_etapa" }>;
 export const tiposDaImportacao = ["definir_cronograma", "alterar_plano_hub", "avancar_hub", "mudar_situacao_etapa"] as const;
 
-export type RespostaImportacao = { resumo: string; identificacao: IdentificacaoHub; acoes: unknown[]; nao_importado: string[] };
+export type DocumentoDoHub = { nome: string; data: string; por: string };
+export type RespostaImportacao = { resumo: string; identificacao: IdentificacaoHub; acoes: unknown[]; nao_importado: string[]; documentos?: DocumentoDoHub[] };
 
 const digitos = (t: string) => (t ?? "").replace(/\D/g, "");
 

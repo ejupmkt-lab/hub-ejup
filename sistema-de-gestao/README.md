@@ -130,7 +130,7 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   identifica cliente (CNPJ), serviço, código do pedido, gestor, contato e os passos/plano; o Blimp mostra a
   prévia e, ao criar, cadastra o cliente se não existir (dados da Receita + contato do HUB), cria o projeto
   (`src/lib/projeto-novo.ts`, a mesma montagem da tela manual) já nos passos do HUB e guarda os arquivos.
-  Bloqueia pedido repetido (mesmo código) e cliente acima do limite de projetos. Leitura e painel
+  Bloqueia pedido repetido (mesmo código) e cliente acima do limite de projetos. Sem CNPJ no conteúdo, o painel pede para digitar. Os documentos que a página lista (contrato, recibo…) e não deu para baixar vão para o histórico do projeto (`src/lib/hub-documentos.ts`). Leitura e painel
   compartilhados em `src/components/projeto/hub-leitura.tsx`. Só o Blimp (`externally_connectable`)
   pede os dados à extensão, que apaga a cópia depois. O identificador é fixo (chave pública no
   manifesto). Depois de mudar a extensão, rode `extensao-hub/empacotar.sh` e suba o novo zip. Se o

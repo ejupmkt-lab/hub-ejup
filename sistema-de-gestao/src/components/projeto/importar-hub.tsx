@@ -9,7 +9,8 @@ import { acoesDaImportacao, conferirIdentificacao, type RespostaImportacao } fro
 import { traduzirErro } from "@/lib/erros";
 import { Botao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
-import { EntradaDoHub, LidoDaPagina, useLeituraHub } from "./hub-leitura";
+import { registrarDocumentosNoHistorico } from "@/lib/hub-documentos";
+import { DocumentosDoHub, EntradaDoHub, LidoDaPagina, useLeituraHub } from "./hub-leitura";
 
 const BUCKET = "evidencias";
 
@@ -49,7 +50,7 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
   const avisos = previa.filter((i) => i.aviso);
 
   const aplicar = async () => {
-    if (!lido || (!feitos.length && !materiais.length)) return;
+    if (!lido || (!feitos.length && !materiais.length && !lido.documentos?.length)) return;
     setAplicando(true);
     setErro(null);
     try {
@@ -72,6 +73,8 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
         (p) => {
           void aplicarAcoes(p, acoes, [], id, usuario.nome);
           if (guardados.length) p.materiaisHub = [...(p.materiaisHub ?? []), ...guardados];
+          // O que o HUB lista e não deu para baixar fica ao menos no histórico
+          registrarDocumentosNoHistorico(p, usuario.nome, lido.documentos, guardados.map((g) => g.nome));
         },
         { acao: "HUB: dados importados da página do pedido", detalhe: [...efetivos, ...dosMateriais].map((x) => x.descricao).join("; ") },
       );
@@ -174,9 +177,10 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
             </div>
           )}
           {!bloqueado && entrega && <LidoDaPagina h={h} destino="no projeto" />}
+          {!bloqueado && <DocumentosDoHub documentos={lido.documentos} nomesBaixados={materiais.map((m) => m.arquivo.name)} />}
           {erro && <p className="text-[13px] text-vermelho">{erro}</p>}
           <div className="flex flex-wrap gap-2">
-            <Botao tamanho="pequeno" onClick={() => void aplicar()} disabled={aplicando || bloqueado || (!feitos.length && !materiais.length)}>
+            <Botao tamanho="pequeno" onClick={() => void aplicar()} disabled={aplicando || bloqueado || (!feitos.length && !materiais.length && !lido.documentos?.length)}>
               {aplicando ? "Aplicando…" : "Aplicar no projeto"}
             </Botao>
             <Botao variante="secundario" tamanho="pequeno" onClick={() => setLido(null)} disabled={aplicando}>

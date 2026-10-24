@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { RespostaImportacao } from "@/lib/hub-importar";
+import type { DocumentoDoHub, RespostaImportacao } from "@/lib/hub-importar";
+import { itensDosDocumentos } from "@/lib/hub-documentos";
 import {
   ARQUIVO_DA_EXTENSAO,
   arquivoDoPendente,
@@ -321,6 +322,28 @@ export function LidoDaPagina({ h, destino }: { h: LeituraHub; destino: string })
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+// Documentos que a página lista: os baixados ficam guardados e os demais, só registrados no histórico
+export function DocumentosDoHub({ documentos, nomesBaixados }: { documentos: DocumentoDoHub[] | undefined; nomesBaixados: string[] }) {
+  const itens = itensDosDocumentos(documentos, nomesBaixados);
+  if (!itens.length) return null;
+  return (
+    <div>
+      <h3 className="mb-1.5 text-[13px] font-semibold">Documentos listados no HUB</h3>
+      <ul className="list-disc space-y-1 pl-5 text-[14px]">
+        {itens.map((i, k) => (
+          <li key={k}>
+            {i.doc.nome.trim()}
+            <span className="text-tinta-2">
+              {[i.doc.data?.trim(), i.doc.por?.trim() && `por ${i.doc.por.trim()}`].filter(Boolean).length ? ` (${[i.doc.data?.trim(), i.doc.por?.trim() && `por ${i.doc.por.trim()}`].filter(Boolean).join(" ")})` : ""}
+              {i.baixado ? " · baixado e guardado" : " · não baixei: fica registrado no histórico"}
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
