@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { rotuloDoPasso, type Completar, type DocumentoDoHub, type LeituraRelatorio, type LeiturasDosRelatorios, type Pendencias, type RespostaImportacao } from "@/lib/hub-importar";
+import { rotuloDoPasso, type Completar, type Efetivos, type DocumentoDoHub, type LeituraRelatorio, type LeiturasDosRelatorios, type Pendencias, type RespostaImportacao } from "@/lib/hub-importar";
 import { formatarData } from "@/lib/datas";
 import { itensDosDocumentos } from "@/lib/hub-documentos";
 import {
@@ -25,7 +25,7 @@ export const MAX_ARQUIVOS = 3;
 const MAX_BYTES = 4 * 1024 * 1024;
 
 export type Material = { arquivo: File; lidoPelaIA: boolean; etapa: number }; // etapa 0: anexo geral do pedido
-export type Entrega = { origem: string; titulo: string; falhas: PendenteDoHub["falhas"]; naoGuardados: PendenteDoHub["naoGuardados"]; textoCortado: boolean };
+export type Entrega = { origem: string; titulo: string; falhas: PendenteDoHub["falhas"]; naoGuardados: PendenteDoHub["naoGuardados"]; textoCortado: boolean; diag?: PendenteDoHub["diag"] };
 
 export const tamanhoFmt = (b: number) => (b >= 1024 * 1024 ? `${(b / 1024 / 1024).toFixed(1).replace(".", ",")} MB` : `${Math.max(1, Math.round(b / 1024))} KB`);
 
@@ -160,7 +160,7 @@ export function useLeituraHub(opcoes: Opcoes) {
       const todos = p.arquivos.map(arquivoDoPendente);
       const paraIA = escolherParaIA(todos);
       setMateriais(todos.map((arquivo, i) => ({ arquivo, lidoPelaIA: paraIA.includes(arquivo), etapa: p.arquivos[i].etapa ?? 0 })));
-      setEntrega({ origem: p.origem.endereco, titulo: p.origem.titulo, falhas: p.falhas, naoGuardados: p.naoGuardados, textoCortado: p.textoCortado });
+      setEntrega({ origem: p.origem.endereco, titulo: p.origem.titulo, falhas: p.falhas, naoGuardados: p.naoGuardados, textoCortado: p.textoCortado, diag: p.diag });
       setTexto(p.texto);
       setArquivos([]);
       pendenteId.current = p.id;
@@ -329,6 +329,21 @@ export function LidoDaPagina({ h, destino, emEntregas }: { h: LeituraHub; destin
     <div>
       <h3 className="mb-1.5 text-[13px] font-semibold">Lido da página do HUB{entrega.titulo ? ` (${entrega.titulo.slice(0, 60)})` : ""}</h3>
       {entrega.textoCortado && <p className="mb-1.5 text-[13px] text-laranja">A página era muito longa e só o começo foi lido.</p>}
+      {entrega.diag?.cliques && entrega.diag.cliques.length > 0 && (
+        <div className="mb-2">
+          <p className="mb-1 text-[13px] text-tinta-2">Botões de download em que a extensão clicou:</p>
+          <ul className="list-disc space-y-0.5 pl-5 text-[14px]">
+            {entrega.diag.cliques.map((c, i) => (
+              <li key={i} className={c.gerou ? "" : "text-laranja"}>
+                {c.etapa ? `Etapa ${String(c.etapa).padStart(2, "0")}` : c.rotulo || "Documento"}: {c.gerou ? `baixou ${c.gerou === 1 ? "1 arquivo" : `${c.gerou} arquivos`}` : `não gerou arquivo${c.erro ? ` (${c.erro})` : ""}`}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {entrega.diag?.cliques && entrega.diag.cliques.length === 0 && materiais.length === 0 && (
+        <p className="mb-1.5 text-[13px] text-laranja">A extensão não achou nenhum botão de download para clicar nesta página. Se ele existe, use “Copiar diagnóstico da leitura” na janelinha da extensão e mande para quem mantém o Blimp.</p>
+      )}
       {materiais.length > 0 ? (
         <>
           <p className="mb-1 text-[13px] text-tinta-2">Arquivos baixados, que serão guardados {destino} ao aplicar:</p>
@@ -395,8 +410,9 @@ export function relatoriosDasEtapas(materiais: Material[]) {
   return por;
 }
 
-// O que a página do HUB não mostra: o consultor completa as datas que souber (em branco não é registrado)
-export function CompletarDados({ pend, c, setC, relatorios }: { pend: Pendencias; c: Completar; setC: (c: Completar) => void; relatorios: Record<number, File> }) {
+// O que a página do HUB não mostra: o consultor completa as datas que souber. Onde falta, vai uma estimativa
+// (pagamento e conclusão provados pelos documentos), marcada, para o projeto não ficar parado.
+export function CompletarDados({ pend, ef, c, setC, relatorios }: { pend: Pendencias; ef: Efetivos; c: Completar; setC: (c: Completar) => void; relatorios: Record<number, File> }) {
   const [mesma, setMesma] = useState("");
   if (!pend.passosSemData.length && !pend.pedePlano && !pend.etapasEnviadas.length) return null;
   const campo = (rotulo: string, valor: string, aoMudar: (v: string) => void, dica?: string) => (
@@ -404,22 +420,33 @@ export function CompletarDados({ pend, c, setC, relatorios }: { pend: Pendencias
       <input type="date" className="campo num" value={valor} onChange={(e) => aoMudar(e.target.value)} />
     </Campo>
   );
+  const semData = pend.etapasEnviadas.filter((e) => !ef.envios[e.etapa] || ef.envios[e.etapa].origem === "estimativa" || ef.envios[e.etapa].origem === "");
   return (
     <div className="space-y-3 rounded-[var(--radius-campo)] border border-laranja/30 bg-laranja-claro p-3">
       <div>
         <h3 className="text-[13px] font-semibold text-laranja">O HUB não mostra estas datas</h3>
-        <p className="text-[13px] text-tinta-2">Preencha as que souber. O que ficar em branco não é registrado, e dá para completar depois.</p>
+        <p className="text-[13px] text-tinta-2">Onde não achei, usei uma estimativa (marcada). Corrija o que souber; o que ficar em branco não é registrado.</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         {pend.pedePlano && (
           <>
-            {campo("Início do projeto (plano de trabalho)", c.planoInicio, (v) => setC({ ...c, planoInicio: v }), "Sem o plano, o sistema não registra o pagamento.")}
-            {campo("Fim do projeto (plano de trabalho)", c.planoFim, (v) => setC({ ...c, planoFim: v }))}
+            {campo(
+              "Início do projeto (plano de trabalho)",
+              c.planoInicio || ef.planoInicio,
+              (v) => setC({ ...c, planoInicio: v }),
+              ef.planoEstimado && !c.planoInicio ? "Estimativa: a data do pagamento. O plano de trabalho não está no HUB; corrija se souber." : "Sem o plano, o sistema não registra o pagamento.",
+            )}
+            {campo(
+              "Fim do projeto (plano de trabalho)",
+              c.planoFim || (c.planoInicio ? "" : ef.planoFim),
+              (v) => setC({ ...c, planoFim: v }),
+              ef.planoEstimado && !c.planoInicio ? "Estimativa: a data da conclusão (atesto final)." : undefined,
+            )}
           </>
         )}
         {pend.passosSemData.map((p) => campo(rotuloDoPasso[p], c.passos[p] ?? "", (v) => setC({ ...c, passos: { ...c.passos, [p]: v } })))}
-        {pend.etapasEnviadas.length > 1 && (
-          <Campo rotulo="Não sei a data de cada etapa: usar esta para as que estão em branco" dica="Por exemplo, a data em que o projeto foi finalizado no HUB.">
+        {pend.etapasEnviadas.length > 1 && semData.length > 0 && (
+          <Campo rotulo="Usar a mesma data para as etapas sem data" dica="Preenche de uma vez as etapas que estão só com estimativa.">
             <input
               type="date"
               className="campo num"
@@ -429,24 +456,24 @@ export function CompletarDados({ pend, c, setC, relatorios }: { pend: Pendencias
                 setMesma(v);
                 if (!v) return;
                 const envios = { ...c.envios };
-                for (const x of pend.etapasEnviadas) if (!(envios[x.etapa] ?? x.dataDaIA)) envios[x.etapa] = v;
+                for (const x of semData) envios[x.etapa] = v;
                 setC({ ...c, envios });
               }}
             />
           </Campo>
         )}
-        {pend.etapasEnviadas.map((e) =>
-          campo(
-            `Etapa ${String(e.etapa).padStart(2, "0")} enviada no HUB em`,
-            c.envios[e.etapa] ?? e.dataDaIA,
-            (v) => setC({ ...c, envios: { ...c.envios, [e.etapa]: v } }),
-            e.dataDoRelatorio
+        {pend.etapasEnviadas.map((e) => {
+          const v = ef.envios[e.etapa];
+          const dica =
+            v?.origem === "relatorio"
               ? `Data tirada do relatório “${relatorios[e.etapa]?.name ?? ""}” (a mais recente entre o fechamento e as assinaturas). Confira.`
-              : relatorios[e.etapa]
-                ? `O relatório “${relatorios[e.etapa].name}” vai para Entregas.`
-                : "O HUB não tinha o relatório para baixar: anexe o PDF depois em Entregas.",
-          ),
-        )}
+              : v?.origem === "estimativa"
+                ? "Estimativa: a data da conclusão (atesto final). Corrija se souber."
+                : relatorios[e.etapa]
+                  ? `O relatório “${relatorios[e.etapa].name}” vai para Entregas.`
+                  : "O HUB não tinha o relatório para baixar: anexe o PDF depois em Entregas.";
+          return campo(`Etapa ${String(e.etapa).padStart(2, "0")} enviada no HUB em`, c.envios[e.etapa] ?? v?.data ?? "", (d) => setC({ ...c, envios: { ...c.envios, [e.etapa]: d } }), dica);
+        })}
       </div>
     </div>
   );

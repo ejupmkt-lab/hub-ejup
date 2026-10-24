@@ -7,7 +7,7 @@ import type { Cliente, EmpresaSlug } from "@/lib/dados/tipos";
 import { novoId, registrarEvento, useEstado, useUsuario } from "@/lib/dados/store";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { aplicarAcoes, type AcaoIA } from "@/lib/conversa";
-import { completarVazio, montarAcoes, pendenciasDoHub, type Completar, type RespostaImportacao } from "@/lib/hub-importar";
+import { completarVazio, efetivosDoHub, montarAcoes, pendenciasDoHub, type Completar, type RespostaImportacao } from "@/lib/hub-importar";
 import { carimbarInicios, reencadearExecucao } from "@/lib/fase";
 import { montarProjeto } from "@/lib/projeto-novo";
 import { servicosDaEmpresa } from "@/lib/servicos";
@@ -85,11 +85,13 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
   // Relatórios por etapa (o primeiro PDF do cartão de cada etapa no HUB) e o que o consultor completou
   const relFiles = useMemo(() => relatoriosDasEtapas(materiais), [materiais]);
   const relPrevia = useMemo(() => Object.fromEntries(Object.entries(relFiles).map(([e, f]) => [Number(e), { caminho: "previa", nome: f.name }])), [relFiles]);
-  const pend = useMemo(() => (lido ? pendenciasDoHub(lido, null, leituras) : null), [lido, leituras]);
+  const totalEtapas = modelo?.etapas.length ?? 0;
+  const pend = lido ? pendenciasDoHub(lido, null, leituras, totalEtapas) : null;
+  const ef = lido ? efetivosDoHub(lido, null, c, leituras, totalEtapas) : null;
   // Ações da importação: o diagnóstico define a data do começo do projeto; código e gestor entram na criação
-  const dataDiagnostico = useMemo(() => (lido?.acoes as { tipo?: string; passo?: string; data?: string }[] | undefined)?.find((a) => a?.tipo === "avancar_hub" && a.passo === "diagnostico")?.data, [lido]);
-  const acoes = useMemo(() => (lido ? montarAcoes(lido, false, c, null, relPrevia, false, leituras) : []), [lido, c, relPrevia, leituras]);
-  const etapasComRelatorio = useMemo(() => new Set(acoes.flatMap((a) => (a.tipo === "registrar_envio_etapa" && a.relatorio ? [a.etapa] : []))), [acoes]);
+  const dataDiagnostico = (lido?.acoes as { tipo?: string; passo?: string; data?: string }[] | undefined)?.find((a) => a?.tipo === "avancar_hub" && a.passo === "diagnostico")?.data;
+  const acoes = lido ? montarAcoes(lido, false, c, null, relPrevia, false, leituras, totalEtapas) : [];
+  const etapasComRelatorio = new Set(acoes.flatMap((a) => (a.tipo === "registrar_envio_etapa" && a.relatorio ? [a.etapa] : [])));
   const paraMateriais = materiais.filter((m) => !(m.etapa > 0 && relFiles[m.etapa] === m.arquivo && etapasComRelatorio.has(m.etapa)));
 
   // O projeto como ficaria, para a prévia (cópia): passos e plano aplicados pelas mesmas regras da conversa
@@ -166,7 +168,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
         if (error) naoSubiu.push(arquivo.name);
         else relatorios[etapa] = { caminho, nome: arquivo.name };
       }
-      const acoesFinais = montarAcoes(lido, false, c, null, relatorios, false, leituras);
+      const acoesFinais = montarAcoes(lido, false, c, null, relatorios, false, leituras, totalEtapas);
       const montado = montar(id, clienteId, cliente?.ramo ?? clienteExistente?.ramo ?? "", acoesFinais);
       if (!montado) throw new Error("Escolha o serviço.");
       const guardados = [];
@@ -286,7 +288,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
           )}
 
           <DatasDosRelatorios h={h} />
-          {pend && <CompletarDados pend={pend} c={c} setC={setC} relatorios={relFiles} />}
+          {pend && ef && <CompletarDados pend={pend} ef={ef} c={c} setC={setC} relatorios={relFiles} />}
 
           <div>
             <h3 className="mb-1.5 text-[13px] font-semibold">O projeto nasce com</h3>

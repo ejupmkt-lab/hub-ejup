@@ -54,6 +54,8 @@ export type PendenteDoHub = {
   arquivos: { nome: string; tipo: string; tamanho: number; base64: string; url: string; etapa?: number }[];
   falhas: { nome: string; url: string; motivo: string; origemBloqueada?: string }[];
   naoGuardados: { nome: string; tipo: string }[];
+  // O que a extensão fez na página: cliques nos botões de download (etapa, rótulo, quantos arquivos gerou, erro)
+  diag?: { linksAchados?: number; cliques?: { etapa: number; rotulo: string; motivo: string; gerou: number; erro: string }[] };
 };
 
 // A extensão avisa a aba do Blimp com esta mensagem; os dados vêm quando o Blimp pede

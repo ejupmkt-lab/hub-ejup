@@ -129,31 +129,102 @@ export const completarVazio: Completar = { passos: {}, planoInicio: "", planoFim
 const dataIso = (d: string) => /^\d{4}-\d{2}-\d{2}$/.test(d ?? "") && !Number.isNaN(Date.parse(d));
 const ePasso = (p: string): p is PassoHub => (ordemPassos as readonly string[]).includes(p);
 
+// "20/10/2026 15:02:34" → "2026-10-20"
+const dataDoTexto = (t: string) => {
+  const m = /(\d{2})\/(\d{2})\/(\d{4})/.exec(t ?? "");
+  return m ? `${m[3]}-${m[2]}-${m[1]}` : "";
+};
+
+// O que os documentos listados no HUB provam: o recibo é o pagamento (a data mais antiga) e o atesto final,
+// a conclusão do projeto pelo gestor (a mais recente). Vale quando a IA não achou essas datas por conta própria.
+export function inferirDosDocumentos(docs: DocumentoDoHub[] | undefined): { execucao?: string; concluido?: string } {
+  const datas = (re: RegExp) => (docs ?? []).filter((d) => re.test(d.nome ?? "")).map((d) => dataDoTexto(d.data)).filter(dataIso).sort();
+  const recibos = datas(/recibo/i);
+  const atestos = datas(/atesto/i);
+  return { execucao: recibos[0], concluido: atestos.at(-1) };
+}
+
+// Os passos com data que o HUB (ou os documentos) provam, por passo
+function passosComData(r: RespostaImportacao): Partial<Record<PassoHub, string>> {
+  const por: Partial<Record<PassoHub, string>> = {};
+  for (const a of r.acoes as { tipo?: string; passo?: string; data?: string }[]) if (a?.tipo === "avancar_hub" && a.passo && ePasso(a.passo) && dataIso(a.data ?? "")) por[a.passo] = a.data;
+  const doc = inferirDosDocumentos(r.documentos);
+  if (!por.execucao && doc.execucao) por.execucao = doc.execucao;
+  if (!por.concluido && doc.concluido) por.concluido = doc.concluido;
+  return por;
+}
+
 export type Pendencias = {
   passosSemData: PassoHub[];
   pedePlano: boolean;
-  // Etapas que o HUB mostra como enviadas e ainda não estão assim no projeto (com a data que a IA achou, se achou)
+  // Etapas que o HUB mostra como enviadas (ou que o atesto final prova) e ainda não estão assim no projeto
   etapasEnviadas: { etapa: number; dataDaIA: string; dataDoRelatorio: boolean }[];
 };
 
 // projeto: o projeto em que se importa; null quando o projeto será criado agora (começa no diagnóstico, sem plano)
-export function pendenciasDoHub(r: RespostaImportacao, projeto: Projeto | null, leituras?: LeiturasDosRelatorios): Pendencias {
+// totalEtapas: quantas etapas o serviço tem (só preciso quando o projeto ainda não existe)
+export function pendenciasDoHub(r: RespostaImportacao, projeto: Projeto | null, leituras?: LeiturasDosRelatorios, totalEtapas?: number): Pendencias {
   const atual = projeto ? ordemPassos.indexOf(passoHubDoProjeto(projeto)) : ordemPassos.indexOf("diagnostico");
-  const comData = new Set((r.acoes as { tipo?: string; passo?: string }[]).filter((a) => a?.tipo === "avancar_hub").map((a) => a.passo));
-  const passosSemData = (r.passos_sem_data ?? []).filter(ePasso).filter((p, i, l) => l.indexOf(p) === i && !comData.has(p) && ordemPassos.indexOf(p) > atual);
+  const comData = passosComData(r);
+  const passosSemData = (r.passos_sem_data ?? []).filter(ePasso).filter((p, i, l) => l.indexOf(p) === i && !comData[p] && ordemPassos.indexOf(p) > atual);
   const planoFechado = !!projeto?.planoFechadoEm;
-  const algumDepoisDaProposta = [...passosSemData, ...[...comData].filter((p): p is PassoHub => !!p && ePasso(p))].some((p) => ordemPassos.indexOf(p) > ordemPassos.indexOf("proposta"));
+  const algumDepoisDaProposta = [...passosSemData, ...(Object.keys(comData) as PassoHub[])].some((p) => ordemPassos.indexOf(p) > ordemPassos.indexOf("proposta"));
   const aiDefiniu = (r.acoes as { tipo?: string }[]).some((a) => a?.tipo === "definir_cronograma");
   const pedePlano = !planoFechado && !aiDefiniu && algumDepoisDaProposta && (!projeto || antesDaContratacao(projeto));
-  const etapasEnviadas = (r.etapas ?? [])
-    .filter((e) => (e.situacao === "enviada" || e.situacao === "aprovada") && (!projeto || !projeto.etapas.find((x) => x.ordem === e.etapa && (x.status === "enviada" || x.status === "aprovada" ) && x.relatorioAssinado)))
-    .filter((e) => !projeto || projeto.etapas.some((x) => x.ordem === e.etapa))
-    .map((e) => {
-      const doHub = dataIso(e.data) ? e.data : "";
-      const doRelatorio = envioPeloRelatorio(comLeitura(leituras, e.etapa));
-      return { etapa: e.etapa, dataDaIA: doHub || doRelatorio, dataDoRelatorio: !doHub && !!doRelatorio };
+
+  // Atesto final (conclusão provada) → todas as etapas já foram entregues, mesmo que a página não diga uma a uma
+  const todasProvadas = !!comData.concluido;
+  const ordens = projeto ? projeto.etapas.map((e) => e.ordem) : Array.from({ length: totalEtapas ?? 0 }, (_, i) => i + 1);
+  const enviadasNoHub = new Set((r.etapas ?? []).filter((e) => e.situacao === "enviada" || e.situacao === "aprovada").map((e) => e.etapa));
+  const etapasEnviadas = ordens
+    .filter((o) => enviadasNoHub.has(o) || todasProvadas)
+    .filter((o) => !projeto || !projeto.etapas.find((x) => x.ordem === o && (x.status === "enviada" || x.status === "aprovada") && x.relatorioAssinado))
+    .map((o) => {
+      const e = (r.etapas ?? []).find((x) => x.etapa === o);
+      const doHub = e && dataIso(e.data) ? e.data : "";
+      const doRelatorio = envioPeloRelatorio(comLeitura(leituras, o));
+      return { etapa: o, dataDaIA: doHub || doRelatorio, dataDoRelatorio: !doHub && !!doRelatorio };
     });
   return { passosSemData, pedePlano, etapasEnviadas };
+}
+
+// Os valores que valem para o plano e para o envio de cada etapa: o que o consultor digitou; senão o que o HUB ou
+// os relatórios mostram; senão uma estimativa (pagamento e conclusão, quando são conhecidos), sempre marcada.
+export type Efetivos = {
+  planoInicio: string;
+  planoFim: string;
+  planoEstimado: boolean;
+  envios: Record<number, { data: string; origem: "consultor" | "hub" | "relatorio" | "estimativa" | "" }>;
+  passos: Partial<Record<PassoHub, string>>;
+};
+export function efetivosDoHub(r: RespostaImportacao, projeto: Projeto | null, c: Completar, leituras?: LeiturasDosRelatorios, totalEtapas?: number): Efetivos {
+  const pend = pendenciasDoHub(r, projeto, leituras, totalEtapas);
+  const passos = { ...passosComData(r) };
+  for (const p of pend.passosSemData) if (dataIso(c.passos[p])) passos[p] = c.passos[p];
+  // Envio de cada etapa
+  const envios: Efetivos["envios"] = {};
+  const conhecidas = pend.etapasEnviadas.map((e) => (dataIso(c.envios[e.etapa]) ? c.envios[e.etapa] : e.dataDaIA)).filter(dataIso).sort();
+  const estimativa = passos.concluido ?? conhecidas.at(-1) ?? "";
+  for (const e of pend.etapasEnviadas) {
+    if (dataIso(c.envios[e.etapa])) envios[e.etapa] = { data: c.envios[e.etapa], origem: "consultor" };
+    else if (e.dataDaIA) envios[e.etapa] = { data: e.dataDaIA, origem: e.dataDoRelatorio ? "relatorio" : "hub" };
+    else envios[e.etapa] = { data: estimativa, origem: estimativa ? "estimativa" : "" };
+  }
+  // Plano de trabalho: do consultor, ou estimado do pagamento até a conclusão
+  let planoInicio = "";
+  let planoFim = "";
+  let planoEstimado = false;
+  if (pend.pedePlano) {
+    if (dataIso(c.planoInicio)) {
+      planoInicio = c.planoInicio;
+      planoFim = dataIso(c.planoFim) ? c.planoFim : "";
+    } else if (passos.execucao && (passos.concluido || conhecidas.at(-1))) {
+      planoInicio = passos.execucao;
+      planoFim = passos.concluido ?? conhecidas.at(-1) ?? "";
+      planoEstimado = true;
+    }
+  }
+  return { planoInicio, planoFim, planoEstimado, envios, passos };
 }
 
 // As datas escritas no relatório, para a ação de envio da etapa
@@ -172,33 +243,40 @@ export function montarAcoes(
   relatorios: Record<number, { caminho: string; nome: string }>,
   incluirDiagnostico = true,
   leituras?: LeiturasDosRelatorios,
+  totalEtapas?: number,
 ): AcaoIA[] {
   const base = acoesDaImportacao(r.acoes, r.identificacao, semBloqueio);
   const dados = base.filter((a) => a.tipo === "dados_hub");
   let definir = base.filter((a) => a.tipo === "definir_cronograma");
   const plano = base.filter((a) => a.tipo === "alterar_plano_hub");
   const situacao = base.filter((a) => a.tipo === "mudar_situacao_etapa");
-  const passos = base.filter((a): a is Extract<AcaoIA, { tipo: "avancar_hub" }> => a.tipo === "avancar_hub" && (incluirDiagnostico || a.passo !== "diagnostico"));
-  const pend = pendenciasDoHub(r, projeto, leituras);
+  const ef = efetivosDoHub(r, projeto, c, leituras, totalEtapas);
+  const atual = projeto ? ordemPassos.indexOf(passoHubDoProjeto(projeto)) : ordemPassos.indexOf("diagnostico");
 
-  // Datas informadas pelo consultor
-  for (const p of pend.passosSemData) if (dataIso(c.passos[p])) passos.push({ tipo: "avancar_hub", passo: p, data: c.passos[p] });
-  if (!definir.length && pend.pedePlano && dataIso(c.planoInicio)) definir = [{ tipo: "definir_cronograma", inicio: c.planoInicio, fim: dataIso(c.planoFim) ? c.planoFim : "" }];
+  // Passos: os da IA, os provados pelos documentos e os que o consultor datou (sem repetir passo)
+  const passos: Extract<AcaoIA, { tipo: "avancar_hub" }>[] = [];
+  const dosHub = base.filter((a): a is Extract<AcaoIA, { tipo: "avancar_hub" }> => a.tipo === "avancar_hub");
+  for (const a of dosHub) if (incluirDiagnostico || a.passo !== "diagnostico") passos.push(a);
+  for (const [passo, data] of Object.entries(ef.passos) as [PassoHub, string][])
+    if (!passos.some((x) => x.passo === passo) && ordemPassos.indexOf(passo) > atual && (incluirDiagnostico || passo !== "diagnostico")) passos.push({ tipo: "avancar_hub", passo, data });
   passos.sort((a, b) => ordemPassos.indexOf(a.passo) - ordemPassos.indexOf(b.passo));
+
+  if (!definir.length && dataIso(ef.planoInicio)) definir = [{ tipo: "definir_cronograma", inicio: ef.planoInicio, fim: dataIso(ef.planoFim) ? ef.planoFim : "" }];
 
   const execIdx = ordemPassos.indexOf("execucao");
   const antes = passos.filter((a) => ordemPassos.indexOf(a.passo) <= execIdx);
   const depois = passos.filter((a) => ordemPassos.indexOf(a.passo) > execIdx);
   const envios: AcaoIA[] = [];
-  for (const e of pend.etapasEnviadas) {
-    const data = dataIso(c.envios[e.etapa]) ? c.envios[e.etapa] : e.dataDaIA;
-    if (dataIso(data)) envios.push({ tipo: "registrar_envio_etapa", etapa: e.etapa, data, relatorio: relatorios[e.etapa], ...datasDoRelatorio(comLeitura(leituras, e.etapa)) });
+  for (const [ordem, v] of Object.entries(ef.envios)) {
+    if (!dataIso(v.data)) continue;
+    envios.push({ tipo: "registrar_envio_etapa", etapa: Number(ordem), data: v.data, relatorio: relatorios[Number(ordem)], ...datasDoRelatorio(comLeitura(leituras, Number(ordem))) });
   }
   // Etapa já enviada no projeto, sem o PDF: só anexa o relatório
   if (projeto)
     for (const [ordem, rel] of Object.entries(relatorios)) {
       const e = projeto.etapas.find((x) => x.ordem === Number(ordem));
-      if (e && (e.status === "enviada" || e.status === "aprovada") && !e.relatorioAssinado && e.enviadaEm) envios.push({ tipo: "registrar_envio_etapa", etapa: e.ordem, data: e.enviadaEm, relatorio: rel, ...datasDoRelatorio(comLeitura(leituras, e.ordem)) });
+      if (e && (e.status === "enviada" || e.status === "aprovada") && !e.relatorioAssinado && e.enviadaEm && !envios.some((x) => x.tipo === "registrar_envio_etapa" && x.etapa === e.ordem))
+        envios.push({ tipo: "registrar_envio_etapa", etapa: e.ordem, data: e.enviadaEm, relatorio: rel, ...datasDoRelatorio(comLeitura(leituras, e.ordem)) });
     }
-  return [...dados, ...definir, ...plano, ...antes, ...envios, ...depois, ...situacao];
+  return [...dados, ...definir, ...plano, ...antes, ...envios.sort((a, b) => (a.tipo === "registrar_envio_etapa" && b.tipo === "registrar_envio_etapa" ? a.etapa - b.etapa : 0)), ...depois, ...situacao];
 }

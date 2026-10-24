@@ -5,7 +5,7 @@ import type { MaterialHub, Projeto } from "@/lib/dados/tipos";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { useEstado } from "@/lib/dados/store";
 import { aplicarAcoes } from "@/lib/conversa";
-import { completarVazio, conferirIdentificacao, montarAcoes, pendenciasDoHub, type Completar, type RespostaImportacao } from "@/lib/hub-importar";
+import { completarVazio, conferirIdentificacao, efetivosDoHub, montarAcoes, pendenciasDoHub, type Completar, type RespostaImportacao } from "@/lib/hub-importar";
 import { traduzirErro } from "@/lib/erros";
 import { Botao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
@@ -50,6 +50,7 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
   const relFiles = useMemo(() => relatoriosDasEtapas(materiais), [materiais]);
   const relPrevia = useMemo(() => Object.fromEntries(Object.entries(relFiles).map(([e, f]) => [Number(e), { caminho: "previa", nome: f.name }])), [relFiles]);
   const pend = useMemo(() => (lido ? pendenciasDoHub(lido, projeto, leituras) : null), [lido, projeto, leituras]);
+  const ef = useMemo(() => (lido ? efetivosDoHub(lido, projeto, c, leituras) : null), [lido, projeto, c, leituras]);
   const acoes = useMemo(() => (lido ? montarAcoes(lido, !bloqueado, c, projeto, relPrevia, true, leituras) : []), [lido, bloqueado, c, projeto, relPrevia, leituras]);
   const etapasComRelatorio = useMemo(() => new Set(acoes.flatMap((a) => (a.tipo === "registrar_envio_etapa" && a.relatorio ? [a.etapa] : []))), [acoes]);
   // Os demais arquivos ficam em "Materiais do HUB"
@@ -166,7 +167,7 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
           )}
 
           {!bloqueado && <DatasDosRelatorios h={h} />}
-          {!bloqueado && pend && <CompletarDados pend={pend} c={c} setC={setC} relatorios={relFiles} />}
+          {!bloqueado && pend && ef && <CompletarDados pend={pend} ef={ef} c={c} setC={setC} relatorios={relFiles} />}
 
           {!bloqueado && (
             <div>
