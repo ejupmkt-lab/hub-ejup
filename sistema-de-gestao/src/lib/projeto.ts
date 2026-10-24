@@ -22,9 +22,10 @@ export function diasParaFim(e: Etapa) {
 
 export function situacaoPrazo(e: Etapa): { texto: string; tom: Tom } {
   if (concluidas.has(e.status)) return { texto: "Concluída", tom: "ok" };
+  const prazo = prazoDaEtapa(e);
+  if (prazo.atrasada) return { texto: prazo.texto!, tom: "critico" };
   const d = diasParaFim(e);
   if (d === null) return { texto: "Sem data", tom: "neutro" };
-  if (d < 0) return { texto: d === -1 ? "1 dia de atraso" : `${-d} dias de atraso`, tom: "critico" };
   if (d === 0) return { texto: "Vence hoje", tom: "atencao" };
   if (d <= 2) return { texto: d === 1 ? "Vence amanhã" : `Vence em ${d} dias`, tom: "atencao" };
   return { texto: `${d} dias restantes`, tom: "neutro" };
@@ -50,12 +51,11 @@ export function alertasDoProjeto(p: Projeto): Alerta[] {
     if (e.status === "devolvida") lista.push({ projeto: p, etapa: e, texto: "Devolvida pelo SEBRAE para ajuste", tom: "critico", ordem: 0 });
     else if (e.status === "a_enviar") lista.push({ projeto: p, etapa: e, texto: "Pronta para enviar no HUB", tom: "atencao", ordem: 2 });
   }
+  for (const e of etapasAtrasadas(p)) lista.push({ projeto: p, etapa: e, texto: situacaoPrazo(e).texto, tom: "critico", ordem: 1 });
   const atual = etapaAtual(p);
-  if (atual) {
+  if (atual && !prazoDaEtapa(atual).atrasada) {
     const d = diasParaFim(atual);
-    if (d !== null && d < 0) lista.push({ projeto: p, etapa: atual, texto: situacaoPrazo(atual).texto, tom: "critico", ordem: 1 });
-    else if (d !== null && d <= 2 && atual.status !== "a_enviar")
-      lista.push({ projeto: p, etapa: atual, texto: situacaoPrazo(atual).texto, tom: "atencao", ordem: 2 });
+    if (d !== null && d <= 2 && atual.status !== "a_enviar") lista.push({ projeto: p, etapa: atual, texto: situacaoPrazo(atual).texto, tom: "atencao", ordem: 2 });
   }
   return lista;
 }
@@ -96,8 +96,8 @@ export function periodoEfetivo(p: Projeto, e: Etapa): { inicio: string | null; f
 }
 
 // Dias além do plano do HUB (o orçamento): etapa ainda não enviada que passou do fim do plano,
-// ou enviada depois dele. Não muda o "atrasada", que segue a execução a partir do pagamento;
-// serve para o consultor ver o desvio que o gestor do SEBRAE também enxerga.
+// ou enviada depois dele. É o desvio que o gestor do SEBRAE também enxerga; conta como atraso
+// (ver prazoDaEtapa), junto com o fim da execução, que segue o pagamento.
 export function diasAlemDoPlano(e: Etapa, hoje = hojeIso()): number {
   if (!e.dataFimPlano) return 0;
   const referencia = concluidas.has(e.status) ? e.enviadaEm : hoje;
@@ -105,6 +105,45 @@ export function diasAlemDoPlano(e: Etapa, hoje = hojeIso()): number {
 }
 
 export const textoDiasAlemDoPlano = (n: number) => `${n} ${n === 1 ? "dia" : "dias"} além do plano do HUB`;
+
+// ─── Prazo da etapa: a única regra de atraso do sistema ───────────────────
+// Uma etapa ainda não enviada está atrasada quando passou do fim da execução
+// (que conta a partir do pagamento) OU do fim do plano do HUB (o orçamento).
+// Painel, pendências, cartões, listas, cronograma, tarefas e a IA leem daqui:
+// nenhuma outra tela compara datas por conta própria.
+export type PrazoDaEtapa = {
+  atraso: number; // dias depois do fim da execução
+  alemDoPlano: number; // dias depois do fim do plano do HUB (etapa enviada: quando foi enviada)
+  atrasada: boolean; // só etapa ainda não enviada
+  vencidoDesde: string | null; // a data mais antiga que já passou (para ordenar)
+  texto: string | null; // "3 dias de atraso · 7 dias além do plano do HUB"
+};
+
+const diasDeAtraso = (n: number) => (n === 1 ? "1 dia de atraso" : `${n} dias de atraso`);
+
+export function prazoDaEtapa(e: Etapa, hoje = hojeIso()): PrazoDaEtapa {
+  const alemDoPlano = diasAlemDoPlano(e, hoje);
+  if (concluidas.has(e.status)) return { atraso: 0, alemDoPlano, atrasada: false, vencidoDesde: null, texto: null };
+  const atraso = e.dataFim ? Math.max(0, diferencaDias(e.dataFim, hoje)) : 0;
+  const vencidos = [atraso > 0 ? e.dataFim! : null, alemDoPlano > 0 ? e.dataFimPlano! : null].filter((d): d is string => !!d).sort();
+  const partes = [atraso > 0 ? diasDeAtraso(atraso) : null, alemDoPlano > 0 ? textoDiasAlemDoPlano(alemDoPlano) : null].filter(Boolean);
+  return { atraso, alemDoPlano, atrasada: atraso > 0 || alemDoPlano > 0, vencidoDesde: vencidos[0] ?? null, texto: partes.length ? partes.join(" · ") : null };
+}
+
+// O que dizer do prazo da etapa em qualquer tela: o atraso de hoje ou, na etapa enviada, o quanto passou do plano do HUB
+export const textoDoPrazo = (e: Etapa, hoje = hojeIso()) => {
+  const prazo = prazoDaEtapa(e, hoje);
+  return prazo.texto ?? (prazo.alemDoPlano > 0 ? textoDiasAlemDoPlano(prazo.alemDoPlano) : null);
+};
+
+// Etapas atrasadas do projeto, com a execução em curso (antes do pagamento ou
+// depois de concluído não há atraso a cobrar). Devolvida é outro ponto crítico.
+export function etapasAtrasadas(p: Projeto, hoje = hojeIso()): Etapa[] {
+  if (p.status === "encerrado" || !p.planoFechadoEm) return [];
+  const fase = faseDoProjeto(p);
+  if (fase !== "execucao" && fase !== "finalizado") return [];
+  return p.etapas.filter((e) => e.status !== "devolvida" && prazoDaEtapa(e, hoje).atrasada);
+}
 
 // A etapa começou: tem avanço registrado, ou o relatório já está pronto/enviado
 export const etapaIniciada = (e: Etapa) => e.status !== "nao_iniciada" || prontaForaDoSistema(e);
@@ -116,7 +155,7 @@ export type SituacaoEtapa = { chave: "devolvida" | "concluida" | "atrasada" | "p
 export function situacaoDaEtapa(e: Etapa, hoje = hojeIso()): SituacaoEtapa {
   if (e.status === "devolvida") return { chave: "devolvida", rotulo: "Devolvida" };
   if (concluidas.has(e.status)) return { chave: "concluida", rotulo: statusEtapa[e.status].rotulo };
-  if (e.dataFim && e.dataFim < hoje) return { chave: "atrasada", rotulo: "Atrasada" };
+  if (prazoDaEtapa(e, hoje).atrasada) return { chave: "atrasada", rotulo: "Atrasada" };
   if (prontaForaDoSistema(e) || e.status === "a_enviar") return { chave: "pronta", rotulo: statusEtapa.a_enviar.rotulo };
   if (etapaIniciada(e)) return { chave: "andamento", rotulo: statusEtapa[e.status].rotulo };
   return { chave: "nao_iniciada", rotulo: statusEtapa.nao_iniciada.rotulo };
@@ -161,9 +200,7 @@ export function previstoProjeto(p: Projeto, hoje = hojeIso()) {
   return Math.round((soma / horas) * 100);
 }
 
-export function etapaAtrasada(e: Etapa, hoje = hojeIso()) {
-  return !concluidas.has(e.status) && !!e.dataFim && e.dataFim < hoje;
-}
+export const etapaAtrasada = (e: Etapa, hoje = hojeIso()) => prazoDaEtapa(e, hoje).atrasada;
 
 // Fim do projeto: o fim previsto da última etapa; com ela já enviada no HUB, o dia em que foi de fato enviada
 export const entregaFinal = (p: Projeto) => {
@@ -186,7 +223,7 @@ export function desvioDoPlano(p: Projeto, hoje = hojeIso()) {
   if (p.status === "encerrado") return 0;
   const fase = faseDoProjeto(p);
   if (fase !== "execucao" && fase !== "finalizado") return 0;
-  return Math.max(0, ...p.etapas.filter((e) => !concluidas.has(e.status)).map((e) => diasAlemDoPlano(e, hoje)));
+  return Math.max(0, ...p.etapas.filter((e) => !concluidas.has(e.status)).map((e) => prazoDaEtapa(e, hoje).alemDoPlano));
 }
 
 // Projeto concluído: quantos dias depois do plano do HUB a última etapa foi de fato enviada
@@ -204,7 +241,7 @@ export function situacaoProjeto(p: Projeto, hoje = hojeIso()): SituacaoProjeto {
   if (p.etapas.some((e) => e.status === "devolvida")) return { tom: "critico", rotulo: "Devolvida pelo SEBRAE" };
   if (fase === "finalizado") return { tom: "neutro", rotulo: "Finalizado" };
   if (!p.planoFechadoEm) return { tom: "neutro", rotulo: "Sem plano de trabalho" };
-  if (p.etapas.some((e) => etapaAtrasada(e, hoje))) return { tom: "atencao", rotulo: "Atrasado" };
+  if (etapasAtrasadas(p, hoje).some((e) => prazoDaEtapa(e, hoje).atraso > 0)) return { tom: "atencao", rotulo: "Atrasado" };
   // "Em dia" só quando também está dentro do plano do HUB: o mesmo desvio que o projeto mostra por dentro
   const alem = desvioDoPlano(p, hoje);
   if (alem > 0) return { tom: "atencao", rotulo: textoDiasAlemDoPlano(alem) };

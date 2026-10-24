@@ -9,7 +9,7 @@ import { todasSecoes } from "@/lib/relatorio/secoes";
 import { hojeIso } from "@/lib/datas";
 import { statusEtapa } from "@/lib/rotulos";
 import { ESTILO_RELATORIO } from "@/lib/ia/estilo";
-import { diasAlemDoPlano, textoDiasAlemDoPlano } from "@/lib/projeto";
+import { textoDoPrazo } from "@/lib/projeto";
 import { textoPlano } from "@/lib/plano-texto";
 
 // Conversa do projeto: lê a mensagem do consultor (texto, ditado, fotos e PDFs),
@@ -320,7 +320,7 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>, preDiagnostico: stri
       "",
       `## Etapa ${e.ordem}: ${e.nome} (${statusEtapa[e.status].rotulo}${editavel ? "" : ", NÃO ALTERAR"})`,
       e.descricao,
-      `Execução prevista: ${e.dataInicio && e.dataFim ? `${e.dataInicio} a ${e.dataFim}` : "a definir"}; plano do HUB: ${e.dataInicioPlano && e.dataFimPlano ? `${e.dataInicioPlano} a ${e.dataFimPlano}` : "a definir"}${e.enviadaEm ? `; enviada no HUB em ${e.enviadaEm}` : ""}${diasAlemDoPlano(e) ? `; ${textoDiasAlemDoPlano(diasAlemDoPlano(e))}` : ""} (duração de referência: ${e.duracaoReferenciaDias} dias). Horas da etapa: ${e.horasPrevistas} h (cumpridas quando a etapa é enviada no HUB).`,
+      `Execução prevista: ${e.dataInicio && e.dataFim ? `${e.dataInicio} a ${e.dataFim}` : "a definir"}; plano do HUB: ${e.dataInicioPlano && e.dataFimPlano ? `${e.dataInicioPlano} a ${e.dataFimPlano}` : "a definir"}${e.enviadaEm ? `; enviada no HUB em ${e.enviadaEm}` : ""}${textoDoPrazo(e) ? `; ${textoDoPrazo(e)}` : ""} (duração de referência: ${e.duracaoReferenciaDias} dias). Horas da etapa: ${e.horasPrevistas} h (cumpridas quando a etapa é enviada no HUB).`,
       `Assinaturas do relatório: consultor ${e.assinaturaConsultor ?? "pendente"}, cliente ${e.assinaturaCliente ?? "pendente"}${e.relatorioAssinado ? `; PDF assinado guardado (${e.relatorioAssinado.nome})` : ""}.`,
       "Checklist (código, texto, situação):",
       ...e.atividades.map(

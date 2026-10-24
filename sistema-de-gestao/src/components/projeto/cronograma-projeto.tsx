@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { Projeto } from "@/lib/dados/tipos";
 import { diferencaDias, formatarData, hojeIso, somarDias } from "@/lib/datas";
 import { grupoDaEtapa, grupos } from "@/lib/painel";
-import { avancoEtapa, diasAlemDoPlano, periodoEfetivo, situacaoDaEtapa, textoDiasAlemDoPlano } from "@/lib/projeto";
+import { avancoEtapa, periodoEfetivo, situacaoDaEtapa, textoDoPrazo } from "@/lib/projeto";
 import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Cartao } from "@/components/ui";
 
@@ -119,7 +119,7 @@ export function CronogramaProjeto({ projeto, aoEditar }: { projeto: Projeto; aoE
                         Etapa {doisDigitos(e.ordem)} · {situacaoDaEtapa(e).rotulo} · {pct}%
                       </b>
                       Execução prevista: {formatarData(e.dataInicio)} a {formatarData(e.dataFim)}
-                      {diasAlemDoPlano(e, hoje) > 0 && <>Fora do plano do HUB: {textoDiasAlemDoPlano(diasAlemDoPlano(e, hoje))}</>}
+                      {textoDoPrazo(e, hoje) && <>Prazo: {textoDoPrazo(e, hoje)}</>}
                       {real?.fim && (real.inicio ? <>Realizado: {formatarData(real.inicio)} a {formatarData(real.fim)}</> : <>Enviada em {formatarData(real.fim)}</>)}
                       {real && !real.fim && real.inicio && <>Em andamento desde {formatarData(real.inicio)}</>}
                     </Dica>

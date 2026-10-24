@@ -168,15 +168,21 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Verificação em duas etapas** opcional (aplicativo autenticador), em Minha conta. Com ela ativa, o
   banco só entrega dados à sessão confirmada com o código (`privado.sessao_verificada`, aal2).
 - **Situação das etapas, uma só em toda a tela** (`situacaoDaEtapa` em `src/lib/projeto.ts`): devolvida,
-  enviada, atrasada (fim da execução passou), pronta para enviar, em andamento ou não iniciada. O cabeçalho,
+  enviada, atrasada (passou do fim da execução ou do fim do plano do HUB), pronta para enviar, em andamento ou não iniciada. O cabeçalho,
   a trilha dos relatórios, o gráfico, os cartões e o painel usam a mesma função. Só há data de início
   quando a etapa começou de fato (`iniciadaEm`, registrada quando ela sai de "não iniciada"); uma etapa
   enviada sem esse registro começou no envio da anterior (ou, a primeira, no pagamento). Etapa que não
   começou mostra só o previsto.
-- **Desvio do plano do HUB**: o atraso (`Atrasada`) conta pela execução, a partir do pagamento; separado
-  disso, o sistema mostra "N dias além do plano do HUB" (cabeçalho, cartão, trilha, Entregas e balão do
-  gráfico) quando uma etapa ainda não enviada passou do fim previsto no orçamento, ou foi enviada depois
-  dele (`diasAlemDoPlano`). A IA corrige as datas do plano com a ação `alterar_plano_hub` (todas as etapas
+- **Uma regra de atraso só** (`prazoDaEtapa` em `src/lib/projeto.ts`): etapa não enviada está atrasada
+  quando passou do fim da execução (conta do pagamento) **ou** do fim do plano do HUB (o orçamento). A função
+  devolve os dois números, a data vencida mais antiga e o texto ("3 dias de atraso · 7 dias além do plano do
+  HUB"). Nenhuma tela compara datas por conta própria: situação da etapa, `etapasAtrasadas` (por projeto,
+  só com a execução em curso), painel (números, pendências, cronograma, calendário, gráficos), cartões,
+  filtro "Atrasados", tarefas, Entregas, trilha, balão do gráfico e o contexto da IA leem dela
+  (`textoDoPrazo` para o texto). Etapa enviada guarda só a informação histórica ("enviada N dias além do plano").
+- **Desvio do plano do HUB**: o sistema mostra "N dias além do plano do HUB" (cabeçalho, cartão, trilha,
+  Entregas e balão do gráfico) quando uma etapa ainda não enviada passou do fim previsto no orçamento, ou
+  foi enviada depois dele (`diasAlemDoPlano`). A IA corrige as datas do plano com a ação `alterar_plano_hub` (todas as etapas
   citadas de uma vez, em sequência, com desfazer); `alterar_datas_etapa` mexe só na execução.
   A situação do projeto (`situacaoProjeto`) segue a mesma regra do desvio (`desvioDoPlano`): devolvida >
   "Atrasado" (execução) > "N dias além do plano do HUB" > "Em dia", então nunca diz "Em dia" com o desvio à

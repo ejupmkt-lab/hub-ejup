@@ -22,7 +22,7 @@ import {
   textoPlanoAjustado,
   type Fase,
 } from "@/lib/fase";
-import { diasAlemDoPlano, entregaFinal, etapaAtual, etapaConcluida, periodoEfetivo, situacaoDaEtapa, textoDiasAlemDoPlano } from "@/lib/projeto";
+import { entregaFinal, etapaAtual, etapaConcluida, periodoEfetivo, situacaoDaEtapa, textoDoPrazo } from "@/lib/projeto";
 import { dataCurta, formatarData, hojeIso, periodoCurto } from "@/lib/datas";
 import { Botao, Cartao, Chip } from "@/components/ui";
 import { IconeCheck } from "@/components/icones";
@@ -98,19 +98,16 @@ function datasDoRelatorio(p: Projeto, e: Etapa): string[] {
 
 // Relatório de cada etapa do serviço: enviado, em curso (com o status) ou não começado
 function itemRelatorio(p: Projeto, e: Etapa, atual: Etapa | undefined): Item {
-  const alem = antesDaContratacao(p) ? 0 : diasAlemDoPlano(e);
-  const base = { chave: String(e.ordem), numero: e.ordem, rotulo: `Relatório ${e.ordem}`, datas: datasDoRelatorio(p, e), desvio: alem ? textoDiasAlemDoPlano(alem) : undefined };
+  const prazo = antesDaContratacao(p) ? null : textoDoPrazo(e);
+  const base = { chave: String(e.ordem), numero: e.ordem, rotulo: `Relatório ${e.ordem}`, datas: datasDoRelatorio(p, e), desvio: prazo ?? undefined };
   const nome = capitalizar(e.nome);
   if (antesDaContratacao(p)) return { ...base, detalhe: nome, estado: "pendente" };
   if (etapaConcluida(e)) return { ...base, detalhe: `${nome} · enviado`, estado: "feito" };
   if (e.status === "devolvida") return { ...base, detalhe: `${nome} · devolvido`, estado: "alerta" };
+  const atrasada = situacaoDaEtapa(e).chave === "atrasada";
   if (atual?.ordem === e.ordem)
-    return {
-      ...base,
-      detalhe: `${nome} · ${situacaoDaEtapa(e).rotulo.toLowerCase()}`,
-      estado: situacaoDaEtapa(e).chave === "atrasada" ? "alerta" : "agora",
-    };
-  return { ...base, detalhe: nome, estado: "pendente" };
+    return { ...base, detalhe: `${nome} · ${situacaoDaEtapa(e).rotulo.toLowerCase()}`, estado: atrasada ? "alerta" : "agora" };
+  return { ...base, detalhe: nome, estado: atrasada ? "alerta" : "pendente" };
 }
 
 // O projeto no HUB SEBRAE (as 6 etapas do HUB) e, embaixo, os relatórios do

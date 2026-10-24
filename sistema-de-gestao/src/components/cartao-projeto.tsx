@@ -9,7 +9,7 @@ import {
   codigoHub,
   avancoProjeto,
   entregaFinal,
-  etapaAtrasada,
+  etapasAtrasadas,
   etapaAtual,
   previstoProjeto,
   desvioDoPlano,
@@ -47,7 +47,7 @@ export function CartaoProjeto({
   const avanco = avancoProjeto(p);
   const previsto = previstoProjeto(p);
   const et = etapaAtual(p);
-  const atrasadas = p.etapas.filter((e) => etapaAtrasada(e) && e.status !== "devolvida").length;
+  const atrasadas = etapasAtrasadas(p).length;
   const devolvidas = p.etapas.filter((e) => e.status === "devolvida").length;
   const alemDoPlano = desvioDoPlano(p);
   const entregueAlem = entregueAlemDoPlano(p);

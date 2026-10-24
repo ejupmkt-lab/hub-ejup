@@ -6,7 +6,7 @@ import { useEstado } from "@/lib/dados/store";
 import { novoId } from "@/lib/dados/store";
 import { formatarData, hojeIso, periodoCurto } from "@/lib/datas";
 import { antesDaContratacao } from "@/lib/fase";
-import { diasAlemDoPlano, etapaAtrasada, etapaConcluida, progressoAtividades, textoDiasAlemDoPlano } from "@/lib/projeto";
+import { etapaAtrasada, etapaConcluida, progressoAtividades, textoDoPrazo } from "@/lib/projeto";
 import { bloqueioStatus } from "@/lib/regras-etapa";
 import { relatorioFeitoFora, verificarCompletude } from "@/lib/relatorio/secoes";
 import { doisDigitos } from "@/lib/rotulos";
@@ -84,7 +84,7 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
         {e.descricao && <p className="mt-1 line-clamp-3 text-sm text-tinta-2">{e.descricao}</p>}
         <p className="num mt-2 text-[13px] text-tinta-2">
           {periodoCurto(e.dataInicio, e.dataFim)} · {e.horasPrevistas} h · checklist {prog.feitas}/{prog.total}
-          {!antes && diasAlemDoPlano(e) > 0 && <span className="font-semibold text-laranja"> · {textoDiasAlemDoPlano(diasAlemDoPlano(e))}</span>}
+          {!antes && textoDoPrazo(e) && <span className="font-semibold text-laranja"> · {textoDoPrazo(e)}</span>}
           {!concluida && !antes && (
             <>
               {" · "}

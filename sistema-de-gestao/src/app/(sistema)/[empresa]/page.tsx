@@ -11,7 +11,7 @@ import {
   alertasDoProjeto,
   avancoProjeto,
   entregaFinal,
-  etapaAtrasada,
+  etapasAtrasadas,
   etapaAtual,
   previstoProjeto,
   servicoDoProjeto,
@@ -57,7 +57,7 @@ export default function Projetos() {
   const passa = (p: Projeto, s: Situacao) =>
     s === "todos" ||
     (s === "andamento" && p.status !== "encerrado") ||
-    (s === "atrasados" && p.status !== "encerrado" && p.etapas.some((e) => etapaAtrasada(e) || e.status === "devolvida")) ||
+    (s === "atrasados" && p.status !== "encerrado" && (etapasAtrasadas(p).length > 0 || p.etapas.some((e) => e.status === "devolvida"))) ||
     (s === "comigo" && p.status !== "encerrado" && comQuem(p) === "consultor") ||
     (s === "aguardando" && aguardandoOutros(p)) ||
     (s === "encerrados" && p.status === "encerrado");
@@ -212,7 +212,7 @@ function Lista({ projetos, nome }: { projetos: Projeto[]; nome: (p: Projeto) => 
             const previsto = previstoProjeto(p);
             const sit = situacaoProjeto(p);
             const entrega = entregaFinal(p);
-            const atrasada = et && (etapaAtrasada(et) || et.status === "devolvida");
+            const atrasada = et && (et.status === "devolvida" || etapasAtrasadas(p).some((x) => x.ordem === et.ordem));
             return (
               <li key={p.id} className="relative">
                 <div className={`px-5 py-4 hover:bg-pedra/50 ${colunas}`}>

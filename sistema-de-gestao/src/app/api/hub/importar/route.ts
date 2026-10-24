@@ -5,7 +5,7 @@ import type { Cliente, Projeto, Servico } from "@/lib/dados/tipos";
 import { antesDaContratacao, fases, hubDoProjeto, passosHub, passoHubDoProjeto } from "@/lib/fase";
 import { hojeIso } from "@/lib/datas";
 import { statusEtapa } from "@/lib/rotulos";
-import { diasAlemDoPlano, textoDiasAlemDoPlano } from "@/lib/projeto";
+import { textoDoPrazo } from "@/lib/projeto";
 
 // Importar do HUB: o consultor cola o texto da página do pedido no HUB (ou manda
 // print e PDF) e a IA devolve o que dá para registrar no projeto. Nada é gravado
@@ -281,7 +281,7 @@ function contextoHub(p: Projeto, c: Partial<Cliente>) {
   ];
   for (const e of p.etapas)
     linhas.push(
-      `- Etapa ${e.ordem}: ${e.nome}; ${e.horasPrevistas} h; ${statusEtapa[e.status].rotulo}; plano do HUB ${e.dataInicioPlano && e.dataFimPlano ? `${e.dataInicioPlano} a ${e.dataFimPlano}` : "a definir"}; execução ${e.dataInicio && e.dataFim ? `${e.dataInicio} a ${e.dataFim}` : "a definir"}${e.enviadaEm ? `; enviada no HUB em ${e.enviadaEm}` : ""}${diasAlemDoPlano(e) ? `; ${textoDiasAlemDoPlano(diasAlemDoPlano(e))}` : ""}`,
+      `- Etapa ${e.ordem}: ${e.nome}; ${e.horasPrevistas} h; ${statusEtapa[e.status].rotulo}; plano do HUB ${e.dataInicioPlano && e.dataFimPlano ? `${e.dataInicioPlano} a ${e.dataFimPlano}` : "a definir"}; execução ${e.dataInicio && e.dataFim ? `${e.dataInicio} a ${e.dataFim}` : "a definir"}${e.enviadaEm ? `; enviada no HUB em ${e.enviadaEm}` : ""}${textoDoPrazo(e) ? `; ${textoDoPrazo(e)}` : ""}`,
     );
   return linhas.join("\n");
 }

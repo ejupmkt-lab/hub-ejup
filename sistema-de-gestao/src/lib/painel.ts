@@ -1,6 +1,6 @@
 import type { Etapa, Projeto } from "./dados/tipos";
 import { diferencaDias, hojeIso, somarDias } from "./datas";
-import { etapaConcluida, situacaoDaEtapa, type SituacaoEtapa } from "./projeto";
+import { etapaConcluida, prazoDaEtapa, situacaoDaEtapa, type SituacaoEtapa } from "./projeto";
 import { antesDaContratacao, comQuem, etapasTodasEnviadas, faseDoProjeto, ondeEsta, comQuemTexto } from "./fase";
 
 // Números, cronograma, calendário e gráficos do painel, calculados a partir
@@ -42,7 +42,8 @@ export function indicadores(projetos: Projeto[]) {
   const etapas = lista.flatMap((p) => p.etapas);
   const semPlano = lista.filter((p) => !p.planoFechadoEm && !antesDaContratacao(p)).length;
   const comPlano = lista.filter((p) => p.planoFechadoEm && !antesDaContratacao(p)).flatMap((p) => p.etapas);
-  const proximos7 = comPlano.filter((e) => !etapaConcluida(e) && e.dataFim && e.dataFim >= hoje && e.dataFim <= somarDias(hoje, 7)).length;
+  // Prazos que vêm aí: quem já está atrasada é contada em "atrasadas", nunca nos dois
+  const proximos7 = comPlano.filter((e) => !etapaConcluida(e) && grupoDaEtapa(e, hoje) !== "atrasada" && e.dataFim && e.dataFim >= hoje && e.dataFim <= somarDias(hoje, 7)).length;
   const acao = comPlano.filter((e) => pedeAcao(grupoDaEtapa(e, hoje))).length;
   const atrasadas = comPlano.filter((e) => grupoDaEtapa(e, hoje) === "atrasada").length;
   const devolvidas = comPlano.filter((e) => e.status === "devolvida").length;
@@ -131,11 +132,11 @@ export function pendenciasDoGrupo(projetos: Projeto[]): Pendencia[] {
     for (const e of p.etapas) {
       const g = grupoDaEtapa(e, hoje);
       if (e.status === "devolvida") lista.push({ projeto: p, etapa: e, texto: "Devolvida pelo SEBRAE", grupo: "devolvida" });
-      else if (g === "atrasada" && e.status === "a_enviar")
-        lista.push({ projeto: p, etapa: e, texto: "Pronta para enviar, com o prazo vencido", grupo: "atrasada", data: e.dataFim! });
       else if (g === "atrasada") {
-        const d = diferencaDias(e.dataFim!, hoje);
-        lista.push({ projeto: p, etapa: e, texto: d === 1 ? "1 dia de atraso" : `${d} dias de atraso`, grupo: "atrasada", data: e.dataFim! });
+        // O atraso vem da regra única da etapa: fim da execução e/ou fim do plano do HUB
+        const prazo = prazoDaEtapa(e, hoje);
+        const texto = e.status === "a_enviar" ? `Pronta para enviar, com o prazo vencido: ${prazo.texto}` : prazo.texto!;
+        lista.push({ projeto: p, etapa: e, texto, grupo: "atrasada", data: prazo.vencidoDesde ?? e.dataFim ?? undefined });
       } else if (g === "a_enviar") lista.push({ projeto: p, etapa: e, texto: "Pronta para enviar no HUB", grupo: "a_enviar" });
       else if (!etapaConcluida(e) && e.dataFim && e.dataFim >= hoje && e.dataFim <= somarDias(hoje, 7)) {
         const d = diferencaDias(hoje, e.dataFim);
