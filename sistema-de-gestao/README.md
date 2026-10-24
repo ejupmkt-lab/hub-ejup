@@ -118,7 +118,8 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   **Ler agora com a extensão do Chrome/Edge** (`extensao-hub/`, arquivo para baixar em
   `public/blimp-hub-extensao.zip`, ponte em `src/lib/hub-extensao.ts`): uma página não lê outro site, então
   o consultor, na página do HUB, clica no ícone da extensão e em "Ler agora". A extensão lê o texto (com
-  os quadros internos), acha os links de anexos, baixa com a sessão do próprio consultor (PDF e imagens
+  os quadros internos e os balões que só aparecem ao passar o mouse: dispara só eventos de passar o mouse
+  em iniciais em círculo, ícones com title/tooltip e gatilhos de popover, nunca clica), acha os links de anexos, baixa com a sessão do próprio consultor (PDF e imagens
   até 10 MB cada, 24 MB no total, 12 arquivos; página de login no lugar do arquivo é recusada) e entrega
   ao projeto aberto no Blimp, cuja tela abre o painel sozinha. A IA lê o texto e os menores PDFs/imagens
   (limite de 4 MB do pedido); ao aplicar, todos os arquivos ficam em "Dados do projeto › Materiais do
