@@ -5,6 +5,7 @@ const botao = el("ler");
 let abaHub = null;
 let abaBlimp = null;
 let acompanhando = null;
+let ultimoDiagnostico = null;
 
 const dizer = (texto, classe = "") => {
   el("estado").textContent = texto;
@@ -51,6 +52,17 @@ function mostrarResultado(r) {
   }
   const { arquivos, caracteres, balaos, diag } = r.resumo;
   dizer(`Pronto: li a página (${caracteres.toLocaleString("pt-BR")} caracteres) e baixei ${arquivos} ${arquivos === 1 ? "arquivo" : "arquivos"}. Confira a prévia no Blimp.`, "ok");
+  ultimoDiagnostico = r.resumo.diag ?? null;
+  if (ultimoDiagnostico) {
+    const b = document.createElement("button");
+    b.className = "sec";
+    b.textContent = "Copiar diagnóstico da leitura";
+    b.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(JSON.stringify({ versao: chrome.runtime.getManifest().version, ...r.resumo }, null, 1));
+      b.textContent = "Copiado";
+    });
+    el("acoes").append(b);
+  }
   if (balaos) item(`Li ${balaos} ${balaos === 1 ? "balão" : "balões"} que só aparecem ao passar o mouse.`);
   if (diag?.botoesSemEndereco) item(`${diag.botoesSemEndereco} ${diag.botoesSemEndereco === 1 ? "botão de download não tem" : "botões de download não têm"} endereço para eu baixar. O que está listado vai para o histórico do projeto.`);
   for (const f of r.falhas ?? []) item(`Não baixei “${f.nome}”: ${f.motivo}.`);

@@ -5,12 +5,12 @@ import type { MaterialHub, Projeto } from "@/lib/dados/tipos";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { useEstado } from "@/lib/dados/store";
 import { aplicarAcoes } from "@/lib/conversa";
-import { acoesDaImportacao, conferirIdentificacao, type RespostaImportacao } from "@/lib/hub-importar";
+import { completarVazio, conferirIdentificacao, montarAcoes, pendenciasDoHub, type Completar, type RespostaImportacao } from "@/lib/hub-importar";
 import { traduzirErro } from "@/lib/erros";
 import { Botao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 import { registrarDocumentosNoHistorico } from "@/lib/hub-documentos";
-import { DocumentosDoHub, EntradaDoHub, LidoDaPagina, useLeituraHub } from "./hub-leitura";
+import { CompletarDados, DocumentosDoHub, EntradaDoHub, LidoDaPagina, relatoriosDasEtapas, useLeituraHub } from "./hub-leitura";
 
 const BUCKET = "evidencias";
 
@@ -21,6 +21,7 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
   const { alterar, cliente, usuario } = useProjeto();
   const { salvarAgora } = useEstado();
   const [lido, setLido] = useState<RespostaImportacao | null>(null);
+  const [c, setC] = useState<Completar>(completarVazio);
   const [insistir, setInsistir] = useState(false);
   const [aplicado, setAplicado] = useState<string[] | null>(null);
   const [aplicando, setAplicando] = useState(false);
@@ -31,6 +32,7 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
     codigoParaPuxar: projeto.codigoSolicitacaoHub || projeto.numeroProjetoHub,
     aoLer: (r) => {
       setLido(r);
+      setC(completarVazio);
       setInsistir(false);
     },
     aoReceber: () => {
@@ -43,14 +45,22 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
 
   const conferencia = useMemo(() => (lido ? conferirIdentificacao(projeto, cliente, lido.identificacao) : null), [lido, projeto, cliente]);
   const bloqueado = !!conferencia?.bloqueios.length && !insistir;
-  const acoes = useMemo(() => (lido ? acoesDaImportacao(lido.acoes, lido.identificacao, !bloqueado) : []), [lido, bloqueado]);
+  // O primeiro PDF de cada etapa, baixado do cartão dela no HUB, vira o relatório da etapa em Entregas
+  const relFiles = useMemo(() => relatoriosDasEtapas(materiais), [materiais]);
+  const relPrevia = useMemo(() => Object.fromEntries(Object.entries(relFiles).map(([e, f]) => [Number(e), { caminho: "previa", nome: f.name }])), [relFiles]);
+  const pend = useMemo(() => (lido ? pendenciasDoHub(lido, projeto) : null), [lido, projeto]);
+  const acoes = useMemo(() => (lido ? montarAcoes(lido, !bloqueado, c, projeto, relPrevia) : []), [lido, bloqueado, c, projeto, relPrevia]);
+  const etapasComRelatorio = useMemo(() => new Set(acoes.flatMap((a) => (a.tipo === "registrar_envio_etapa" && a.relatorio ? [a.etapa] : []))), [acoes]);
+  // Os demais arquivos ficam em "Materiais do HUB"
+  const paraMateriais = materiais.filter((m) => !(m.etapa > 0 && relFiles[m.etapa] === m.arquivo && etapasComRelatorio.has(m.etapa)));
   // O que vai mudar, calculado numa cópia do projeto
   const previa = useMemo(() => (acoes.length ? aplicarAcoes(structuredClone(projeto), acoes, [], "previa", usuario.nome).itens : []), [acoes, projeto, usuario.nome]);
   const feitos = previa.filter((i) => !i.aviso);
   const avisos = previa.filter((i) => i.aviso);
+  const nadaParaAplicar = !feitos.length && !paraMateriais.length && !lido?.documentos?.length;
 
   const aplicar = async () => {
-    if (!lido || (!feitos.length && !materiais.length && !lido.documentos?.length)) return;
+    if (!lido || nadaParaAplicar) return;
     setAplicando(true);
     setErro(null);
     try {
@@ -58,7 +68,17 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
       // Os arquivos baixados do HUB ficam guardados no projeto
       const guardados: MaterialHub[] = [];
       const naoSubiu: string[] = [];
-      for (const m of materiais) {
+      // Relatórios das etapas, direto em Entregas
+      const relatorios: Record<number, { caminho: string; nome: string }> = {};
+      for (const etapa of etapasComRelatorio) {
+        const arquivo = relFiles[etapa];
+        const caminho = `${projeto.empresa}/${projeto.id}/${etapa}/assinado-${crypto.randomUUID()}.pdf`;
+        const { error } = await sb.storage.from(BUCKET).upload(caminho, arquivo, { contentType: "application/pdf" });
+        if (error) naoSubiu.push(arquivo.name);
+        else relatorios[etapa] = { caminho, nome: arquivo.name };
+      }
+      const acoesFinais = montarAcoes(lido, !bloqueado, c, projeto, relatorios);
+      for (const m of paraMateriais) {
         const ext = m.arquivo.name.match(/\.([a-z0-9]{2,5})$/i)?.[1]?.toLowerCase() ?? "bin";
         const caminho = `${projeto.empresa}/${projeto.id}/hub/${crypto.randomUUID()}.${ext}`;
         const { error } = await sb.storage.from(BUCKET).upload(caminho, m.arquivo, { contentType: m.arquivo.type });
@@ -66,12 +86,12 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
         else guardados.push({ id: crypto.randomUUID(), nome: m.arquivo.name, tipo: m.arquivo.type, tamanho: m.arquivo.size, caminho, origem: entrega?.origem ?? "", baixadoEm: new Date().toISOString(), por: usuario.nome });
       }
       const id = crypto.randomUUID();
-      const { itens, desfazer } = aplicarAcoes(structuredClone(projeto), acoes, [], id, usuario.nome);
+      const { itens, desfazer } = aplicarAcoes(structuredClone(projeto), acoesFinais, [], id, usuario.nome);
       const efetivos = itens.filter((x) => !x.aviso);
       const dosMateriais = guardados.length ? [{ descricao: `Materiais do HUB guardados no projeto: ${guardados.map((g) => g.nome).join(", ")}` }] : [];
       alterar(
         (p) => {
-          void aplicarAcoes(p, acoes, [], id, usuario.nome);
+          void aplicarAcoes(p, acoesFinais, [], id, usuario.nome);
           if (guardados.length) p.materiaisHub = [...(p.materiaisHub ?? []), ...guardados];
           // O que o HUB lista e não deu para baixar fica ao menos no histórico
           registrarDocumentosNoHistorico(p, usuario.nome, lido.documentos, guardados.map((g) => g.nome));
@@ -142,6 +162,8 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
             ))
           )}
 
+          {!bloqueado && pend && <CompletarDados pend={pend} c={c} setC={setC} relatorios={relFiles} />}
+
           {!bloqueado && (
             <div>
               <h3 className="mb-1.5 text-[13px] font-semibold">O que vai mudar no projeto</h3>
@@ -176,11 +198,11 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
               </ul>
             </div>
           )}
-          {!bloqueado && entrega && <LidoDaPagina h={h} destino="no projeto" />}
+          {!bloqueado && entrega && <LidoDaPagina h={h} destino="no projeto" emEntregas={(m) => (m.etapa > 0 && relFiles[m.etapa] === m.arquivo && etapasComRelatorio.has(m.etapa) ? m.etapa : 0)} />}
           {!bloqueado && <DocumentosDoHub documentos={lido.documentos} nomesBaixados={materiais.map((m) => m.arquivo.name)} />}
           {erro && <p className="text-[13px] text-vermelho">{erro}</p>}
           <div className="flex flex-wrap gap-2">
-            <Botao tamanho="pequeno" onClick={() => void aplicar()} disabled={aplicando || bloqueado || (!feitos.length && !materiais.length && !lido.documentos?.length)}>
+            <Botao tamanho="pequeno" onClick={() => void aplicar()} disabled={aplicando || bloqueado || nadaParaAplicar}>
               {aplicando ? "Aplicando…" : "Aplicar no projeto"}
             </Botao>
             <Botao variante="secundario" tamanho="pequeno" onClick={() => setLido(null)} disabled={aplicando}>

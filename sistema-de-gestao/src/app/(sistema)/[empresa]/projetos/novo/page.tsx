@@ -105,7 +105,7 @@ function Conteudo() {
         importando ? null : <Vazio titulo="Cadastre o cliente primeiro" acao={<BotaoLink href={`/${slug}/clientes?novo=1&voltar=novo-projeto`}>Cadastrar cliente</BotaoLink>}>
           O projeto é criado para um cliente já cadastrado, porque os dados dele preenchem a ficha de todos os relatórios.
         </Vazio>
-      ) : (
+      ) : importando ? null : (
         <div className="grid gap-10 lg:grid-cols-[1fr_20rem]">
           <form
             onSubmit={(e) => {

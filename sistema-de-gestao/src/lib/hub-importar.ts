@@ -1,5 +1,6 @@
-import type { Cliente, Projeto } from "./dados/tipos";
+import type { Cliente, PassoHub, Projeto } from "./dados/tipos";
 import type { AcaoIA } from "./conversa";
+import { antesDaContratacao, ordemPassos, passoHubDoProjeto } from "./fase";
 
 // Importar do HUB: o consultor cola o texto (ou manda print/PDF) da página do
 // pedido no HUB e a IA lê o que está lá. Aqui ficam as conferências que o
@@ -23,7 +24,18 @@ export type AcaoImportacao = Extract<AcaoIA, { tipo: "dados_hub" | "definir_cron
 export const tiposDaImportacao = ["definir_cronograma", "alterar_plano_hub", "avancar_hub", "mudar_situacao_etapa"] as const;
 
 export type DocumentoDoHub = { nome: string; data: string; por: string };
-export type RespostaImportacao = { resumo: string; identificacao: IdentificacaoHub; acoes: unknown[]; nao_importado: string[]; documentos?: DocumentoDoHub[] };
+// Situação de cada etapa do serviço (a "ETAPA 01 | PREPARAÇÃO"…) como a página do HUB mostra
+export type EtapaNoHub = { etapa: number; situacao: "enviada" | "aprovada" | "devolvida" | "em_andamento" | "nao_iniciada"; data: string };
+export type RespostaImportacao = {
+  resumo: string;
+  identificacao: IdentificacaoHub;
+  acoes: unknown[];
+  nao_importado: string[];
+  documentos?: DocumentoDoHub[];
+  // Passos do HUB que a página mostra como já cumpridos, mas sem data
+  passos_sem_data?: string[];
+  etapas?: EtapaNoHub[];
+};
 
 const digitos = (t: string) => (t ?? "").replace(/\D/g, "");
 
@@ -72,4 +84,88 @@ export function acoesDaImportacao(bruto: unknown[], id: IdentificacaoHub, semBlo
       ? [{ tipo: "dados_hub", codigo_hub: id.codigo_hub?.trim() ?? "", gestor: id.gestor?.trim() ?? "" }]
       : [];
   return [...dados, ...lista];
+}
+
+// ─── O que a página do HUB não traz e o consultor completa ──────────────────────
+
+export const rotuloDoPasso: Record<PassoHub, string> = {
+  solicitacao: "Solicitação aberta",
+  diagnostico: "Demanda recebida do gestor",
+  diagnostico_enviado: "Diagnóstico enviado no HUB",
+  proposta: "Gestor pediu a proposta",
+  proposta_funcern: "Plano enviado à FUNCERN",
+  proposta_cliente: "FUNCERN lançou a proposta no HUB",
+  execucao: "Pagamento do cliente",
+  finalizado: "Projeto finalizado no HUB",
+  avaliado: "Cliente avaliou a consultoria",
+  concluido: "Gestor concluiu o projeto",
+};
+
+// Datas que o consultor informa (o que ficar em branco não é registrado)
+export type Completar = { passos: Record<string, string>; planoInicio: string; planoFim: string; envios: Record<number, string> };
+export const completarVazio: Completar = { passos: {}, planoInicio: "", planoFim: "", envios: {} };
+
+const dataIso = (d: string) => /^\d{4}-\d{2}-\d{2}$/.test(d ?? "") && !Number.isNaN(Date.parse(d));
+const ePasso = (p: string): p is PassoHub => (ordemPassos as readonly string[]).includes(p);
+
+export type Pendencias = {
+  passosSemData: PassoHub[];
+  pedePlano: boolean;
+  // Etapas que o HUB mostra como enviadas e ainda não estão assim no projeto (com a data que a IA achou, se achou)
+  etapasEnviadas: { etapa: number; dataDaIA: string }[];
+};
+
+// projeto: o projeto em que se importa; null quando o projeto será criado agora (começa no diagnóstico, sem plano)
+export function pendenciasDoHub(r: RespostaImportacao, projeto: Projeto | null): Pendencias {
+  const atual = projeto ? ordemPassos.indexOf(passoHubDoProjeto(projeto)) : ordemPassos.indexOf("diagnostico");
+  const comData = new Set((r.acoes as { tipo?: string; passo?: string }[]).filter((a) => a?.tipo === "avancar_hub").map((a) => a.passo));
+  const passosSemData = (r.passos_sem_data ?? []).filter(ePasso).filter((p, i, l) => l.indexOf(p) === i && !comData.has(p) && ordemPassos.indexOf(p) > atual);
+  const planoFechado = !!projeto?.planoFechadoEm;
+  const algumDepoisDaProposta = [...passosSemData, ...[...comData].filter((p): p is PassoHub => !!p && ePasso(p))].some((p) => ordemPassos.indexOf(p) > ordemPassos.indexOf("proposta"));
+  const aiDefiniu = (r.acoes as { tipo?: string }[]).some((a) => a?.tipo === "definir_cronograma");
+  const pedePlano = !planoFechado && !aiDefiniu && algumDepoisDaProposta && (!projeto || antesDaContratacao(projeto));
+  const etapasEnviadas = (r.etapas ?? [])
+    .filter((e) => (e.situacao === "enviada" || e.situacao === "aprovada") && (!projeto || !projeto.etapas.find((x) => x.ordem === e.etapa && (x.status === "enviada" || x.status === "aprovada" ) && x.relatorioAssinado)))
+    .filter((e) => !projeto || projeto.etapas.some((x) => x.ordem === e.etapa))
+    .map((e) => ({ etapa: e.etapa, dataDaIA: dataIso(e.data) ? e.data : "" }));
+  return { passosSemData, pedePlano, etapasEnviadas };
+}
+
+// As ações na ordem em que o sistema as aceita: dados, plano, passos até o pagamento, envios das etapas, passos de depois
+export function montarAcoes(
+  r: RespostaImportacao,
+  semBloqueio: boolean,
+  c: Completar,
+  projeto: Projeto | null,
+  relatorios: Record<number, { caminho: string; nome: string }>,
+  incluirDiagnostico = true,
+): AcaoIA[] {
+  const base = acoesDaImportacao(r.acoes, r.identificacao, semBloqueio);
+  const dados = base.filter((a) => a.tipo === "dados_hub");
+  let definir = base.filter((a) => a.tipo === "definir_cronograma");
+  const plano = base.filter((a) => a.tipo === "alterar_plano_hub");
+  const situacao = base.filter((a) => a.tipo === "mudar_situacao_etapa");
+  const passos = base.filter((a): a is Extract<AcaoIA, { tipo: "avancar_hub" }> => a.tipo === "avancar_hub" && (incluirDiagnostico || a.passo !== "diagnostico"));
+  const pend = pendenciasDoHub(r, projeto);
+
+  // Datas informadas pelo consultor
+  for (const p of pend.passosSemData) if (dataIso(c.passos[p])) passos.push({ tipo: "avancar_hub", passo: p, data: c.passos[p] });
+  if (!definir.length && pend.pedePlano && dataIso(c.planoInicio)) definir = [{ tipo: "definir_cronograma", inicio: c.planoInicio, fim: dataIso(c.planoFim) ? c.planoFim : "" }];
+  passos.sort((a, b) => ordemPassos.indexOf(a.passo) - ordemPassos.indexOf(b.passo));
+
+  const execIdx = ordemPassos.indexOf("execucao");
+  const antes = passos.filter((a) => ordemPassos.indexOf(a.passo) <= execIdx);
+  const depois = passos.filter((a) => ordemPassos.indexOf(a.passo) > execIdx);
+  const envios: AcaoIA[] = [];
+  for (const e of pend.etapasEnviadas) {
+    const data = dataIso(c.envios[e.etapa]) ? c.envios[e.etapa] : e.dataDaIA;
+    if (dataIso(data)) envios.push({ tipo: "registrar_envio_etapa", etapa: e.etapa, data, relatorio: relatorios[e.etapa] });
+  }
+  // Etapa já enviada no projeto, sem o PDF: só anexa o relatório
+  if (projeto)
+    for (const [ordem, rel] of Object.entries(relatorios)) {
+      const e = projeto.etapas.find((x) => x.ordem === Number(ordem));
+      if (e && (e.status === "enviada" || e.status === "aprovada") && !e.relatorioAssinado && e.enviadaEm) envios.push({ tipo: "registrar_envio_etapa", etapa: e.ordem, data: e.enviadaEm, relatorio: rel });
+    }
+  return [...dados, ...definir, ...plano, ...antes, ...envios, ...depois, ...situacao];
 }

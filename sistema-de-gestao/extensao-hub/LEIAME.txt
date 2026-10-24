@@ -12,6 +12,10 @@ Instalar:
 3. Clique em "Carregar sem compactação" e escolha a pasta descompactada.
 4. Deixe o projeto (ou a tela Novo projeto, para criar um do zero) aberto numa aba do Blimp. Vá à página do HUB e clique no ícone da extensão em "Ler agora".
 
+Cada relatório baixado do cartão de uma etapa (ETAPA 01, 02…) vai para a entrega daquela etapa. Se o
+botão de download não tiver endereço, a janelinha mostra "Copiar diagnóstico da leitura": cole o
+texto para quem mantém o Blimp ajustar a leitura.
+
 O que a página lista e a extensão não consegue baixar (por exemplo, um botão de download sem endereço) fica
 registrado no histórico do projeto, para constar que o documento existe. A extensão só passa o mouse; ela
 nunca clica em nada na página do HUB.

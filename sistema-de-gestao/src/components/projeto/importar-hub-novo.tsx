@@ -7,7 +7,7 @@ import type { Cliente, EmpresaSlug } from "@/lib/dados/tipos";
 import { novoId, registrarEvento, useEstado, useUsuario } from "@/lib/dados/store";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { aplicarAcoes, type AcaoIA } from "@/lib/conversa";
-import { acoesDaImportacao, type RespostaImportacao } from "@/lib/hub-importar";
+import { completarVazio, montarAcoes, pendenciasDoHub, type Completar, type RespostaImportacao } from "@/lib/hub-importar";
 import { carimbarInicios, reencadearExecucao } from "@/lib/fase";
 import { montarProjeto } from "@/lib/projeto-novo";
 import { servicosDaEmpresa } from "@/lib/servicos";
@@ -17,7 +17,7 @@ import { dadosParaFormulario, formatarCnpj, type DadosCnpj } from "@/lib/cnpj";
 import { traduzirErro } from "@/lib/erros";
 import { Botao, Campo } from "@/components/ui";
 import { registrarDocumentosNoHistorico } from "@/lib/hub-documentos";
-import { DocumentosDoHub, EntradaDoHub, LidoDaPagina, useLeituraHub } from "./hub-leitura";
+import { CompletarDados, DocumentosDoHub, EntradaDoHub, LidoDaPagina, relatoriosDasEtapas, useLeituraHub } from "./hub-leitura";
 
 const BUCKET = "evidencias";
 const digitos = (t: string) => (t ?? "").replace(/\D/g, "");
@@ -31,6 +31,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
   const usuario = useUsuario();
   const router = useRouter();
   const [lido, setLido] = useState<RespostaImportacao | null>(null);
+  const [c, setC] = useState<Completar>(completarVazio);
   const [servicoEscolhido, setServicoEscolhido] = useState<string | null>(null);
   const [clienteEscolhido, setClienteEscolhido] = useState("");
   // Quando o CNPJ não aparece no que foi lido, o consultor digita
@@ -42,6 +43,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
     codigoParaPuxar: "",
     aoLer: (r) => {
       setLido(r);
+      setC(completarVazio);
       setServicoEscolhido(null);
       setClienteEscolhido("");
       setCnpjDigitado("");
@@ -79,15 +81,18 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
   const emAndamento = clienteExistente ? estado.projetos.filter((p) => p.clienteId === clienteExistente.id && p.status !== "encerrado").length : 0;
   const passouDoLimite = emAndamento > LIMITE_PROJETOS_CLIENTE;
 
+  // Relatórios por etapa (o primeiro PDF do cartão de cada etapa no HUB) e o que o consultor completou
+  const relFiles = useMemo(() => relatoriosDasEtapas(materiais), [materiais]);
+  const relPrevia = useMemo(() => Object.fromEntries(Object.entries(relFiles).map(([e, f]) => [Number(e), { caminho: "previa", nome: f.name }])), [relFiles]);
+  const pend = useMemo(() => (lido ? pendenciasDoHub(lido, null) : null), [lido]);
   // Ações da importação: o diagnóstico define a data do começo do projeto; código e gestor entram na criação
-  const { acoes, dataDiagnostico } = useMemo(() => {
-    const todas = lido ? acoesDaImportacao(lido.acoes, lido.identificacao, false) : [];
-    const diag = todas.find((a): a is Extract<AcaoIA, { tipo: "avancar_hub" }> => a.tipo === "avancar_hub" && a.passo === "diagnostico");
-    return { acoes: todas.filter((a) => a !== diag), dataDiagnostico: diag?.data };
-  }, [lido]);
+  const dataDiagnostico = useMemo(() => (lido?.acoes as { tipo?: string; passo?: string; data?: string }[] | undefined)?.find((a) => a?.tipo === "avancar_hub" && a.passo === "diagnostico")?.data, [lido]);
+  const acoes = useMemo(() => (lido ? montarAcoes(lido, false, c, null, relPrevia, false) : []), [lido, c, relPrevia]);
+  const etapasComRelatorio = useMemo(() => new Set(acoes.flatMap((a) => (a.tipo === "registrar_envio_etapa" && a.relatorio ? [a.etapa] : []))), [acoes]);
+  const paraMateriais = materiais.filter((m) => !(m.etapa > 0 && relFiles[m.etapa] === m.arquivo && etapasComRelatorio.has(m.etapa)));
 
   // O projeto como ficaria, para a prévia (cópia): passos e plano aplicados pelas mesmas regras da conversa
-  const montar = (id: string, clienteId: string, ramo: string) => {
+  const montar = (id: string, clienteId: string, ramo: string, acoesUsar: AcaoIA[] = acoes) => {
     if (!modelo) return null;
     const areaBase = modelo.areaAtuacao || modelo.fichaTecnica || "";
     const p = montarProjeto({
@@ -105,7 +110,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
       horasDaEtapa: (_ordem, padrao) => padrao,
     });
     const antes = new Map(p.etapas.map((e) => [e.ordem, e.status]));
-    const resultado = aplicarAcoes(p, acoes, [], `hub-${id}`, usuario.nome);
+    const resultado = aplicarAcoes(p, acoesUsar, [], `hub-${id}`, usuario.nome);
     carimbarInicios(p, antes);
     reencadearExecucao(p);
     return { projeto: p, itens: resultado.itens };
@@ -150,13 +155,21 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
         if (!ident?.contato_nome?.trim() && !receita.responsavel) avisosFinais.push("o responsável do cliente não veio do HUB: complete em Clientes");
       }
       const id = novoId("prj");
-      const montado = montar(id, clienteId, cliente?.ramo ?? clienteExistente?.ramo ?? "");
-      if (!montado) throw new Error("Escolha o serviço.");
-
-      // 2. Arquivos baixados do HUB
-      const guardados = [];
+      // 2. Relatórios das etapas, direto em Entregas, e os demais arquivos baixados do HUB
       const naoSubiu: string[] = [];
-      for (const m of materiais) {
+      const relatorios: Record<number, { caminho: string; nome: string }> = {};
+      for (const etapa of etapasComRelatorio) {
+        const arquivo = relFiles[etapa];
+        const caminho = `${slug}/${id}/${etapa}/assinado-${crypto.randomUUID()}.pdf`;
+        const { error } = await sb.storage.from(BUCKET).upload(caminho, arquivo, { contentType: "application/pdf" });
+        if (error) naoSubiu.push(arquivo.name);
+        else relatorios[etapa] = { caminho, nome: arquivo.name };
+      }
+      const acoesFinais = montarAcoes(lido, false, c, null, relatorios, false);
+      const montado = montar(id, clienteId, cliente?.ramo ?? clienteExistente?.ramo ?? "", acoesFinais);
+      if (!montado) throw new Error("Escolha o serviço.");
+      const guardados = [];
+      for (const m of paraMateriais) {
         const ext = m.arquivo.name.match(/\.([a-z0-9]{2,5})$/i)?.[1]?.toLowerCase() ?? "bin";
         const caminho = `${slug}/${id}/hub/${crypto.randomUUID()}.${ext}`;
         const { error } = await sb.storage.from(BUCKET).upload(caminho, m.arquivo, { contentType: m.arquivo.type });
@@ -167,7 +180,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
 
       // 3. Tudo de uma vez, para o projeto nascer já completo
       const itens = montado.itens.filter((i) => !i.aviso).map((i) => i.descricao);
-      registrarDocumentosNoHistorico(montado.projeto, usuario.nome, lido.documentos, guardados.map((g) => g.nome));
+      registrarDocumentosNoHistorico(montado.projeto, usuario.nome, lido.documentos, [...guardados.map((g) => g.nome), ...Object.values(relatorios).map((r) => r.nome)]);
       registrarEvento(montado.projeto, usuario.nome, "Projeto criado a partir do HUB", [...itens, ...avisosFinais, ...(naoSubiu.length ? [`não guardei: ${naoSubiu.join(", ")}`] : [])].join("; ") || undefined);
       atualizar((r) => {
         if (cliente) r.clientes.push(cliente);
@@ -270,6 +283,8 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
             </p>
           )}
 
+          {pend && <CompletarDados pend={pend} c={c} setC={setC} relatorios={relFiles} />}
+
           <div>
             <h3 className="mb-1.5 text-[13px] font-semibold">O projeto nasce com</h3>
             {feitos.length ? (
@@ -303,7 +318,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
               </ul>
             </div>
           )}
-          {entrega && <LidoDaPagina h={h} destino="no projeto" />}
+          {entrega && <LidoDaPagina h={h} destino="no projeto" emEntregas={(m) => (m.etapa > 0 && relFiles[m.etapa] === m.arquivo && etapasComRelatorio.has(m.etapa) ? m.etapa : 0)} />}
           <DocumentosDoHub documentos={lido.documentos} nomesBaixados={materiais.map((m) => m.arquivo.name)} />
           {erro && <p className="text-[13px] text-vermelho">{erro}</p>}
           <div className="flex flex-wrap gap-2">

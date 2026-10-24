@@ -36,8 +36,9 @@ Regras:
    - "avaliado": o cliente avaliou a consultoria;
    - "concluido": o gestor concluiu o projeto.
    Quando o conteúdo mostrar vários passos já cumpridos, devolva uma ação para cada um, com a data de cada um.
+   Se a página mostra que um passo já aconteceu mas não traz a data, NÃO crie a ação: liste o passo em "passos_sem_data" (o consultor informa a data). Use documentos como evidência da data quando o vínculo é claro, e diga isso no "resumo": a data do recibo de pagamento é a data do pagamento ("execucao"); o atesto final do gestor é a conclusão ("concluido"). Situações como "Aguardando envio das notas fiscais" ou "Aguardando pagamento" do SEBRAE aparecem depois da conclusão: o projeto já passou por "finalizado", "avaliado" e "concluido" (inclua os que não tiverem data em "passos_sem_data").
 5. Plano de trabalho: se o projeto ainda não tem o plano definido e o conteúdo traz as datas de início e fim do projeto, use "definir_cronograma" com início e fim (fim vazio se não houver) e, logo depois, "alterar_plano_hub" para cada etapa com as datas exatas que o HUB mostra, quando o conteúdo trouxer o cronograma por etapa. Se o plano já está definido e as datas do HUB diferem das do projeto, use só "alterar_plano_hub" (uma ação por etapa afetada, com as novas datas de todas elas, em sequência e sem sobreposição). Essas são as datas do plano do HUB (o orçamento), nunca as da execução. Envie o plano antes dos passos que dependem dele ("proposta_funcern" em diante).
-6. Entregas: o relatório de uma etapa só é dado como enviado pelo sistema quando o PDF assinado está no projeto, então não crie ação para "enviada". Se o HUB mostrar uma entrega enviada, anote em "nao_importado" qual etapa e a data, para o consultor anexar o PDF assinado em Entregas. Use "mudar_situacao_etapa" só quando o HUB mostrar que o gestor aprovou ("aprovada") ou devolveu ("devolvida") uma entrega, com o pedido de ajuste do gestor na observação.
+6. Etapas do serviço (o "Plano de Entrega": ETAPA 01, ETAPA 02…): preencha "etapas" com a situação de cada uma como a página mostra ("enviada" quando está como Enviada, "aprovada", "devolvida", "em_andamento", "nao_iniciada") e a data de envio quando aparecer (vazio se não aparecer). O número é o da etapa (ETAPA 01 = 1). Não use "mudar_situacao_etapa" para "enviada": o próprio sistema registra o envio. Use "mudar_situacao_etapa" só quando o HUB mostrar que o gestor aprovou ("aprovada") ou devolveu ("devolvida") uma entrega, com o pedido de ajuste do gestor na observação.
 7. Balões: a seção "[Informações que aparecem ao passar o mouse sobre ícones e iniciais da página]" traz o que o HUB só mostra ao passar o mouse (por exemplo, as iniciais dos envolvidos: cliente, gestor do SEBRAE, consultor). Use-a para identificar o cliente (razão social, CNPJ, e-mail, telefone; o "Proprietário" ou responsável da empresa é o contato), o gestor ou gestora do SEBRAE e o consultor. Nomes de gestor, cliente e consultor são pessoas diferentes: não troque os papéis.
 8. Documentos: liste em "documentos" todos os arquivos que a página mostra como anexados ou gerados no pedido (contrato, recibo, atesto, proposta, nota fiscal…), com o nome como aparece, a data e hora em texto livre (como na página; vazio se não houver) e quem enviou (vazio se não houver). Só o que a página mostra; nunca invente.
 9. Se o conteúdo não parece ser de um pedido do HUB, ou não traz nada novo, devolva "acoes" vazio e explique no "resumo".
@@ -116,6 +117,23 @@ const ESQUEMA = {
       },
     },
     nao_importado: { type: "array", items: { type: "string" } },
+    passos_sem_data: {
+      type: "array",
+      items: { type: "string", enum: ["diagnostico", "diagnostico_enviado", "proposta", "proposta_funcern", "proposta_cliente", "execucao", "finalizado", "avaliado", "concluido"] },
+    },
+    etapas: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          etapa: { type: "integer" },
+          situacao: { type: "string", enum: ["enviada", "aprovada", "devolvida", "em_andamento", "nao_iniciada"] },
+          data: { type: "string" },
+        },
+        required: ["etapa", "situacao", "data"],
+        additionalProperties: false,
+      },
+    },
     documentos: {
       type: "array",
       items: {
@@ -126,7 +144,7 @@ const ESQUEMA = {
       },
     },
   },
-  required: ["resumo", "identificacao", "acoes", "nao_importado", "documentos"],
+  required: ["resumo", "identificacao", "acoes", "nao_importado", "documentos", "passos_sem_data", "etapas"],
   additionalProperties: false,
 } as const;
 

@@ -36,6 +36,16 @@ async function lerPagina(passarMouse) {
   const ehArquivo = /\.(pdf|docx?|xlsx?|pptx?|odt|ods|csv|txt|png|jpe?g|webp|gif|zip)(?:[?#]|$)/i;
   const palavras = /(anexo|download|baixar|arquivo|documento|comprovante|proposta|diagn[oó]stico|relat[oó]rio|contrato|plano|recibo|atesto|nota)/i;
   const caminhoDeArquivo = /(download|baixar|arquivo|anexo|attachment|document|file|blob|storage|upload)/i;
+  // A que etapa do serviço o link pertence: o cartão mais próximo que cita só uma "ETAPA 0N"
+  const etapaDoElemento = (el) => {
+    let atual = el;
+    for (let i = 0; i < 10 && atual; i++, atual = atual.parentElement) {
+      const numeros = new Set([...(atual.innerText ?? "").matchAll(/ETAPA\s*0?(\d{1,2})\b/gi)].map((m) => Number(m[1])));
+      if (numeros.size === 1) return [...numeros][0];
+      if (numeros.size > 1) return 0;
+    }
+    return 0;
+  };
   const vistos = new Set();
   const links = [];
   let linksIgnorados = 0;
@@ -63,7 +73,7 @@ async function lerPagina(passarMouse) {
       continue;
     }
     vistos.add(url.href);
-    links.push({ url: url.href, rotulo, nomeNoLink: a.getAttribute("download") || "" });
+    links.push({ url: url.href, rotulo, nomeNoLink: a.getAttribute("download") || "", etapa: etapaDoElemento(a) });
   }
   // Botões de download que não têm endereço: o navegador só baixa clicando, e a extensão não clica
   const botoesSemEndereco = [...document.querySelectorAll("button, [role=button]")].filter((b) =>
@@ -72,7 +82,37 @@ async function lerPagina(passarMouse) {
 
   // ── Balões: o texto de title/tooltip e o que aparece ao passar o mouse sobre ícones e iniciais
   const passeios = [];
-  const diag = { linksIgnorados, botoesSemEndereco, candidatosAoPassarMouse: 0 };
+  const diag = { linksIgnorados, botoesSemEndereco, candidatosAoPassarMouse: 0, amostras: [] };
+  // Amostra da estrutura dos botões de download e links sem texto (sem conteúdo da página), para entender o que não deu para baixar
+  const descrever = (el) => {
+    const cadeia = [];
+    for (let p = el, i = 0; p && i < 4; p = p.parentElement, i++) cadeia.push(`${p.tagName.toLowerCase()}${p.className && typeof p.className === "string" ? "." + p.className.trim().split(/\s+/).slice(0, 3).join(".") : ""}`);
+    let href = "";
+    try {
+      const u = new URL(el.getAttribute("href") ?? "", location.href);
+      href = el.getAttribute("href") ? `${u.origin}${u.pathname}${u.search ? "?…" : ""}` : "";
+    } catch {
+      href = "";
+    }
+    return {
+      tag: el.tagName.toLowerCase(),
+      href,
+      classe: String(el.className ?? "").slice(0, 80),
+      title: normalizar(el.getAttribute("title")).slice(0, 40),
+      ariaLabel: normalizar(el.getAttribute("aria-label")).slice(0, 40),
+      temOnclick: el.hasAttribute("onclick") || [...el.attributes].some((a) => /^(\(click\)|@click|v-on:click|ng-click|data-action)/.test(a.name)),
+      atributosData: [...el.attributes].map((a) => a.name).filter((n) => /^(data-|\(|@|ng-|v-)/.test(n)).slice(0, 6),
+      temIcone: !!el.querySelector("svg, img, i, mat-icon"),
+      cadeia,
+    };
+  };
+  for (const el of document.querySelectorAll("a, button, [role=button]")) {
+    if (diag.amostras.length >= 8) break;
+    const texto = normalizar(el.innerText);
+    const dica = `${el.getAttribute("title") ?? ""} ${el.getAttribute("aria-label") ?? ""} ${el.className ?? ""}`;
+    if (/download|baixar|file_download|arrow_downward/i.test(dica) || (!texto && el.querySelector("svg, img, i, mat-icon") && el.closest("li, tr, [class*=item], [class*=doc]")))
+      diag.amostras.push(descrever(el));
+  }
   if (passarMouse) {
     const atributos = ["title", "data-tooltip", "data-original-title", "data-bs-original-title", "mattooltip", "ngbtooltip", "data-tippy-content"];
     for (const el of document.querySelectorAll(atributos.map((a) => `[${a}]`).join(","))) {
@@ -95,8 +135,16 @@ async function lerPagina(passarMouse) {
         if (!(raio >= Math.min(r.width, r.height) * 0.3) || !/^\p{L}{1,3}$/u.test(t)) continue;
       }
       candidatos.push(e);
-      if (candidatos.length >= 24) break;
+      if (candidatos.length >= 40) break;
     }
+    // Botões só com ícone (informações, ver detalhes): o balão aparece ao passar o mouse
+    if (candidatos.length < 40)
+      for (const e of document.querySelectorAll("button, a, [role=button]")) {
+        if (!(e instanceof HTMLElement) || candidatos.includes(e) || candidatos.length >= 40) continue;
+        const r = e.getBoundingClientRect();
+        if (r.width < 14 || r.height < 14 || r.width > 64 || r.height > 64 || normalizar(e.innerText)) continue;
+        if (e.querySelector("svg, img, i, mat-icon")) candidatos.push(e);
+      }
     diag.candidatosAoPassarMouse = candidatos.length;
     const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
     const disparar = (el, tipos, x, y) => {
@@ -195,8 +243,13 @@ async function textoDeTodosOsQuadros(tabId, passarMouse = false) {
   const secaoBalao = balao.length ? `\n\n[Informações que aparecem ao passar o mouse sobre ícones e iniciais da página]\n${balao.join("\n")}` : "";
   const textoPagina = resultados.map((r) => r.texto).filter(Boolean).join("\n\n").trim();
   const diag = resultados.reduce(
-    (d, r) => ({ linksIgnorados: d.linksIgnorados + r.diag.linksIgnorados, botoesSemEndereco: d.botoesSemEndereco + r.diag.botoesSemEndereco, candidatosAoPassarMouse: d.candidatosAoPassarMouse + r.diag.candidatosAoPassarMouse }),
-    { linksIgnorados: 0, botoesSemEndereco: 0, candidatosAoPassarMouse: 0 },
+    (d, r) => ({
+      linksIgnorados: d.linksIgnorados + r.diag.linksIgnorados,
+      botoesSemEndereco: d.botoesSemEndereco + r.diag.botoesSemEndereco,
+      candidatosAoPassarMouse: d.candidatosAoPassarMouse + r.diag.candidatosAoPassarMouse,
+      amostras: [...d.amostras, ...r.diag.amostras].slice(0, 8),
+    }),
+    { linksIgnorados: 0, botoesSemEndereco: 0, candidatosAoPassarMouse: 0, amostras: [] },
   );
   return { texto: textoPagina + secaoBalao, textoPagina, secaoBalao, balaos: balao.length, links, quadros: partes.length, diag };
 }
@@ -296,7 +349,7 @@ async function lerAgora({ tabId, blimpTabId }) {
         continue;
       }
       total += r.tamanho;
-      arquivos.push({ nome, tipo, tamanho: r.tamanho, base64: r.base64, url: link.url });
+      arquivos.push({ nome, tipo, tamanho: r.tamanho, base64: r.base64, url: link.url, etapa: link.etapa || 0 });
     }
 
     const pendente = {

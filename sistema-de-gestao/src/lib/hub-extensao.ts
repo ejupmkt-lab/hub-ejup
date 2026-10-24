@@ -51,7 +51,7 @@ export type PendenteDoHub = {
   texto: string;
   textoCortado: boolean;
   quadros: number;
-  arquivos: { nome: string; tipo: string; tamanho: number; base64: string; url: string }[];
+  arquivos: { nome: string; tipo: string; tamanho: number; base64: string; url: string; etapa?: number }[];
   falhas: { nome: string; url: string; motivo: string; origemBloqueada?: string }[];
   naoGuardados: { nome: string; tipo: string }[];
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { DocumentoDoHub, RespostaImportacao } from "@/lib/hub-importar";
+import { rotuloDoPasso, type Completar, type DocumentoDoHub, type Pendencias, type RespostaImportacao } from "@/lib/hub-importar";
 import { itensDosDocumentos } from "@/lib/hub-documentos";
 import {
   ARQUIVO_DA_EXTENSAO,
@@ -14,7 +14,7 @@ import {
   pegarPendente,
   type PendenteDoHub,
 } from "@/lib/hub-extensao";
-import { Botao } from "@/components/ui";
+import { Botao, Campo } from "@/components/ui";
 
 // A leitura do HUB, comum à importação num projeto e à criação de um projeto novo:
 // texto colado, prints e PDFs, o que a extensão do navegador traz ao clicar em "Ler agora",
@@ -23,7 +23,7 @@ import { Botao } from "@/components/ui";
 export const MAX_ARQUIVOS = 3;
 const MAX_BYTES = 4 * 1024 * 1024;
 
-export type Material = { arquivo: File; lidoPelaIA: boolean };
+export type Material = { arquivo: File; lidoPelaIA: boolean; etapa: number }; // etapa 0: anexo geral do pedido
 export type Entrega = { origem: string; titulo: string; falhas: PendenteDoHub["falhas"]; naoGuardados: PendenteDoHub["naoGuardados"]; textoCortado: boolean };
 
 export const tamanhoFmt = (b: number) => (b >= 1024 * 1024 ? `${(b / 1024 / 1024).toFixed(1).replace(".", ",")} MB` : `${Math.max(1, Math.round(b / 1024))} KB`);
@@ -128,7 +128,7 @@ export function useLeituraHub(opcoes: Opcoes) {
     try {
       const todos = p.arquivos.map(arquivoDoPendente);
       const paraIA = escolherParaIA(todos);
-      setMateriais(todos.map((arquivo) => ({ arquivo, lidoPelaIA: paraIA.includes(arquivo) })));
+      setMateriais(todos.map((arquivo, i) => ({ arquivo, lidoPelaIA: paraIA.includes(arquivo), etapa: p.arquivos[i].etapa ?? 0 })));
       setEntrega({ origem: p.origem.endereco, titulo: p.origem.titulo, falhas: p.falhas, naoGuardados: p.naoGuardados, textoCortado: p.textoCortado });
       setTexto(p.texto);
       setArquivos([]);
@@ -287,7 +287,7 @@ export function EntradaDoHub({ h, aoCancelar, aviso }: { h: LeituraHub; aoCancel
 }
 
 // O que veio da página do HUB: arquivos baixados e o que não deu para baixar
-export function LidoDaPagina({ h, destino }: { h: LeituraHub; destino: string }) {
+export function LidoDaPagina({ h, destino, emEntregas }: { h: LeituraHub; destino: string; emEntregas?: (m: Material) => number }) {
   const { entrega, materiais } = h;
   if (!entrega) return null;
   return (
@@ -300,7 +300,12 @@ export function LidoDaPagina({ h, destino }: { h: LeituraHub; destino: string })
           <ul className="list-disc space-y-1 pl-5 text-[14px]">
             {materiais.map((m, i) => (
               <li key={`${m.arquivo.name}-${i}`}>
-                {m.arquivo.name} <span className="text-tinta-2">({tamanhoFmt(m.arquivo.size)}{m.lidoPelaIA ? ", lido pela IA" : ", guardado, mas grande demais para a IA ler junto"})</span>
+                {m.arquivo.name}{" "}
+                <span className="text-tinta-2">
+                  ({tamanhoFmt(m.arquivo.size)}
+                  {m.lidoPelaIA ? ", lido pela IA" : ", grande demais para a IA ler junto"}
+                  {emEntregas?.(m) ? `; vai para Entregas, etapa ${String(emEntregas(m)).padStart(2, "0")}` : m.etapa > 0 ? `; é da etapa ${String(m.etapa).padStart(2, "0")}, guardado em Materiais do HUB` : "; guardado em Materiais do HUB"})
+                </span>
               </li>
             ))}
           </ul>
@@ -344,6 +349,48 @@ export function DocumentosDoHub({ documentos, nomesBaixados }: { documentos: Doc
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+// O primeiro PDF de cada etapa vira o relatório dela em Entregas (a etapa é a do cartão onde o link está no HUB)
+export function relatoriosDasEtapas(materiais: Material[]) {
+  const por: Record<number, File> = {};
+  for (const m of materiais) if (m.etapa > 0 && m.arquivo.type === "application/pdf" && !por[m.etapa]) por[m.etapa] = m.arquivo;
+  return por;
+}
+
+// O que a página do HUB não mostra: o consultor completa as datas que souber (em branco não é registrado)
+export function CompletarDados({ pend, c, setC, relatorios }: { pend: Pendencias; c: Completar; setC: (c: Completar) => void; relatorios: Record<number, File> }) {
+  if (!pend.passosSemData.length && !pend.pedePlano && !pend.etapasEnviadas.length) return null;
+  const campo = (rotulo: string, valor: string, aoMudar: (v: string) => void, dica?: string) => (
+    <Campo key={rotulo} rotulo={rotulo} dica={dica}>
+      <input type="date" className="campo num" value={valor} onChange={(e) => aoMudar(e.target.value)} />
+    </Campo>
+  );
+  return (
+    <div className="space-y-3 rounded-[var(--radius-campo)] border border-laranja/30 bg-laranja-claro p-3">
+      <div>
+        <h3 className="text-[13px] font-semibold text-laranja">O HUB não mostra estas datas</h3>
+        <p className="text-[13px] text-tinta-2">Preencha as que souber. O que ficar em branco não é registrado, e dá para completar depois.</p>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {pend.pedePlano && (
+          <>
+            {campo("Início do projeto (plano de trabalho)", c.planoInicio, (v) => setC({ ...c, planoInicio: v }), "Sem o plano, o sistema não registra o pagamento.")}
+            {campo("Fim do projeto (plano de trabalho)", c.planoFim, (v) => setC({ ...c, planoFim: v }))}
+          </>
+        )}
+        {pend.passosSemData.map((p) => campo(rotuloDoPasso[p], c.passos[p] ?? "", (v) => setC({ ...c, passos: { ...c.passos, [p]: v } })))}
+        {pend.etapasEnviadas.map((e) =>
+          campo(
+            `Etapa ${String(e.etapa).padStart(2, "0")} enviada no HUB em`,
+            c.envios[e.etapa] ?? e.dataDaIA,
+            (v) => setC({ ...c, envios: { ...c.envios, [e.etapa]: v } }),
+            relatorios[e.etapa] ? `O relatório “${relatorios[e.etapa].name}” vai para Entregas.` : "O HUB não tinha o relatório para baixar: anexe o PDF depois em Entregas.",
+          ),
+        )}
+      </div>
     </div>
   );
 }

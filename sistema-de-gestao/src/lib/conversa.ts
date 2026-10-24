@@ -26,7 +26,9 @@ export type AcaoIA =
   | { tipo: "avancar_hub"; passo: PassoHub; data: string }
   | { tipo: "preencher_tabela"; tabela: string; linhas: string[][]; substituir: boolean }
   // Só vem da importação do HUB (a conversa não oferece): código do pedido e gestor lidos na página do HUB
-  | { tipo: "dados_hub"; codigo_hub: string; gestor: string };
+  | { tipo: "dados_hub"; codigo_hub: string; gestor: string }
+  // Só vem da importação do HUB: a etapa já foi enviada no HUB na data dada; com o PDF do relatório, ele fica em Entregas
+  | { tipo: "registrar_envio_etapa"; etapa: number; data: string; relatorio?: { caminho: string; nome: string } };
 
 // O que a IA fez (ou tentou e o sistema não deixou, com o motivo)
 export type ItemAcao = { descricao: string; aviso?: boolean };
@@ -52,6 +54,7 @@ export type Desfazer =
   | { tipo: "plano"; planoFechadoEm: string | null; status: Projeto["status"] }
   | { tipo: "hub"; hub: Hub | null; contratacao: Contratacao | null; status: Projeto["status"] }
   | { tipo: "registros"; registros: Registro[] }
+  | { tipo: "etapa"; etapa: number; antes: Etapa }
   | { tipo: "dados"; numeroProjetoHub: string; codigoSolicitacaoHub: string; gestorSebrae: string }
   | { tipo: "assinatura"; etapa: number; assinaturaConsultor: string | null; assinaturaCliente: string | null; relatorioAssinado: RelatorioAssinado | null };
 
@@ -208,6 +211,33 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
     const e = p.etapas.find((x) => x.ordem === a.etapa);
     if (!e) return;
     const et = `Etapa ${doisDigitos(e.ordem)}`;
+
+    // Importação do HUB: a etapa já foi enviada lá. Sem o PDF no sistema, só o envio fica registrado
+    if (a.tipo === "registrar_envio_etapa") {
+      if (!dataValida(a.data)) return avisar(`${et}: não registrei o envio porque a data de envio no HUB não é válida`);
+      const jaEnviada = concluida(e.status);
+      if (jaEnviada && (!a.relatorio || e.relatorioAssinado)) return;
+      if (!jaEnviada && ordemPassos.indexOf(passoHubDoProjeto(p)) < ordemPassos.indexOf("execucao"))
+        return avisar(`${et}: não registrei o envio no HUB porque o pagamento do cliente ainda não está registrado`);
+      desfazer.push({ tipo: "etapa", etapa: e.ordem, antes: structuredClone(e) });
+      if (!jaEnviada) {
+        e.status = "enviada";
+        e.enviadaEm = a.data;
+        e.dataRelatorio ??= a.data;
+        e.atividades.forEach((x) => x.status === "pendente" && (x.status = "feito"));
+        situacaoDefinida.add(e.ordem);
+      }
+      if (a.relatorio) {
+        e.relatorioAssinado = { caminho: a.relatorio.caminho, nome: a.relatorio.nome, enviadoEm: `${a.data}T12:00:00`, por: autor };
+        e.relatorioExterno = true;
+        e.assinaturaConsultor ??= a.data;
+        e.assinaturaCliente ??= a.data;
+      }
+      feito(
+        `${et}: ${jaEnviada ? "relatório guardado em Entregas" : `enviada no HUB em ${formatarData(a.data)}`}${a.relatorio && !jaEnviada ? `, com o relatório “${resumo(a.relatorio.nome)}” em Entregas` : a.relatorio ? ` (“${resumo(a.relatorio.nome)}”)` : ""}`,
+      );
+      return;
+    }
 
     // Situação: a única ação que vale para etapas já enviadas (aprovação ou devolução do SEBRAE)
     if (a.tipo === "mudar_situacao_etapa") {
@@ -371,6 +401,11 @@ export function desfazerAcoes(p: Projeto, passos: Desfazer[]) {
       if (d.contratacao) p.contratacao = d.contratacao;
       else delete p.contratacao;
       p.status = d.status;
+      continue;
+    }
+    if (d.tipo === "etapa") {
+      const i = p.etapas.findIndex((x) => x.ordem === d.etapa);
+      if (i >= 0) p.etapas[i] = d.antes;
       continue;
     }
     if (d.tipo === "dados") {
