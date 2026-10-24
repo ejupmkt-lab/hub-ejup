@@ -29,6 +29,16 @@ export type Entrega = { origem: string; titulo: string; falhas: PendenteDoHub["f
 
 export const tamanhoFmt = (b: number) => (b >= 1024 * 1024 ? `${(b / 1024 / 1024).toFixed(1).replace(".", ",")} MB` : `${Math.max(1, Math.round(b / 1024))} KB`);
 
+// A etapa pelo nome do arquivo ("Relatorio_Tecnico_2a_Entrega…", "Etapa 03", "relatorio-etapa-1.pdf"); 0 se o nome não diz
+export function etapaPeloNome(nome: string) {
+  const n = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const m = /etapa[\s_.-]*0?(\d{1,2})\b/i.exec(n) ?? /\b0?(\d{1,2})\s*[ao]?[\s_.-]*entrega/i.exec(n) ?? /(?:relatorio|rel)[\s_.-]*(?:tecnico[\s_.-]*)?0?(\d{1,2})(?!\d)/i.exec(n);
+  const v = m ? Number(m[1]) : 0;
+  return v > 0 && v <= 20 ? v : 0;
+}
+// Documentos que claramente não são relatório de etapa: não gastam leitura da IA
+const naoRelatorio = /recibo|atesto|contrato|nota[\s_.-]*fiscal|comprovante|termo|proposta|diagn[oó]stico|plano[\s_.-]*de[\s_.-]*trabalho/i;
+
 // Dos arquivos baixados do HUB, a IA lê os menores (PDFs e imagens) que cabem no limite do pedido
 function escolherParaIA(arquivos: File[]) {
   const escolhidos: File[] = [];
@@ -123,25 +133,30 @@ export function useLeituraHub(opcoes: Opcoes) {
   };
 
   // A IA lê cada relatório baixado (um pedido por PDF, dois ao mesmo tempo) e devolve as datas escritas nele
-  const lerRelatorios = async (porEtapa: Record<number, File>) => {
-    const fila = Object.keys(porEtapa).map(Number).sort((a, b) => a - b);
+  // desconhecidos: PDFs sem etapa; a IA diz de que etapa são, pelo cabeçalho do relatório
+  const lerRelatorios = async (porEtapa: Record<number, File>, desconhecidos: File[] = []) => {
+    const fila: (number | File)[] = [...Object.keys(porEtapa).map(Number).sort((a, b) => a - b), ...desconhecidos.slice(0, 6)];
     if (!fila.length) return;
     const trabalhar = async () => {
-      for (let n = fila.shift(); n !== undefined; n = fila.shift()) {
-        const arquivo = porEtapa[n];
-        setLendoRelatorios(`Lendo o relatório da etapa ${String(n).padStart(2, "0")}…`);
+      for (let item = fila.shift(); item !== undefined; item = fila.shift()) {
+        const arquivo = typeof item === "number" ? porEtapa[item] : item;
+        const n = typeof item === "number" ? item : 0;
+        setLendoRelatorios(n ? `Lendo o relatório da etapa ${String(n).padStart(2, "0")}…` : `Identificando a etapa de “${arquivo.name.slice(0, 40)}”…`);
         try {
           if (arquivo.size > 3.8 * 1024 * 1024) throw new Error("O PDF é grande demais para a IA ler (mais de 3,8 MB). Informe as datas à mão.");
           const f = new FormData();
           f.append("modo", "relatorio");
-          f.append("etapa", String(n));
+          f.append("etapa", n ? String(n) : "?");
           f.append("arquivos", arquivo);
           const r = await fetch("/api/hub/importar", { method: "POST", body: f });
-          const d = await r.json().catch(() => ({}));
+          const d = (await r.json().catch(() => ({}))) as LeituraRelatorio & { erro?: string };
           if (!r.ok) throw new Error(d.erro ?? "Não foi possível ler o relatório.");
-          setLeituras((l) => ({ ...l, [n]: d as LeituraRelatorio }));
+          // Sem etapa conhecida: vale a que a IA leu no cabeçalho do relatório
+          const etapa = n || (d.eh_relatorio_tecnico && d.etapa && d.etapa > 0 ? d.etapa : 0);
+          if (!n && etapa) setMateriais((ms) => ms.map((m) => (m.arquivo === arquivo && !m.etapa ? { ...m, etapa } : m)));
+          if (etapa) setLeituras((l) => ({ ...l, [etapa]: d as LeituraRelatorio }));
         } catch (e) {
-          setLeituras((l) => ({ ...l, [n]: { erro: e instanceof Error ? e.message : "Não foi possível ler o relatório." } }));
+          if (n) setLeituras((l) => ({ ...l, [n]: { erro: e instanceof Error ? e.message : "Não foi possível ler o relatório." } }));
         }
       }
     };
@@ -159,18 +174,26 @@ export function useLeituraHub(opcoes: Opcoes) {
     try {
       const todos = p.arquivos.map(arquivoDoPendente);
       const paraIA = escolherParaIA(todos);
-      setMateriais(todos.map((arquivo, i) => ({ arquivo, lidoPelaIA: paraIA.includes(arquivo), etapa: p.arquivos[i].etapa ?? 0 })));
+      const comEtapa: Material[] = todos.map((arquivo, i) => ({ arquivo, lidoPelaIA: paraIA.includes(arquivo), etapa: p.arquivos[i].etapa || etapaPeloNome(arquivo.name) }));
+      setMateriais(comEtapa);
       setEntrega({ origem: p.origem.endereco, titulo: p.origem.titulo, falhas: p.falhas, naoGuardados: p.naoGuardados, textoCortado: p.textoCortado, diag: p.diag });
       setTexto(p.texto);
       setArquivos([]);
       pendenteId.current = p.id;
       setLeituras({});
-      const relatorios = relatoriosDasEtapas(todos.map((arquivo, i) => ({ arquivo, lidoPelaIA: false, etapa: p.arquivos[i].etapa ?? 0 })));
-      const [leu] = await Promise.all([ler(p.texto, paraIA), lerRelatorios(relatorios)]);
+      const relatorios = relatoriosDasEtapas(comEtapa);
+      const desconhecidos = comEtapa.filter((m) => !m.etapa && m.arquivo.type === "application/pdf" && !naoRelatorio.test(m.arquivo.name) && m.arquivo.size <= 3.8 * 1024 * 1024).map((m) => m.arquivo);
+      const [leu] = await Promise.all([ler(p.texto, paraIA), lerRelatorios(relatorios, desconhecidos)]);
       if (leu && op.current.consumirAoLer) void consumirPendente(p.id);
     } finally {
       setPuxando(false);
     }
+  };
+
+  // O consultor diz de que etapa é um PDF (quando a detecção não achou ou errou); a IA lê o relatório dessa etapa
+  const atribuirEtapa = (arquivo: File, etapa: number) => {
+    setMateriais((ms) => ms.map((m) => (m.arquivo === arquivo ? { ...m, etapa } : m)));
+    if (etapa > 0 && !leituras[etapa]) void lerRelatorios({ [etapa]: arquivo });
   };
 
   // Botão do Blimp: pede à extensão a aba do HUB que o consultor já permitiu nas opções dela
@@ -229,6 +252,7 @@ export function useLeituraHub(opcoes: Opcoes) {
     entrega,
     leituras,
     lendoRelatorios,
+    atribuirEtapa,
     escolher,
     ler,
     puxar,
@@ -322,7 +346,7 @@ export function EntradaDoHub({ h, aoCancelar, aviso }: { h: LeituraHub; aoCancel
 }
 
 // O que veio da página do HUB: arquivos baixados e o que não deu para baixar
-export function LidoDaPagina({ h, destino, emEntregas }: { h: LeituraHub; destino: string; emEntregas?: (m: Material) => number }) {
+export function LidoDaPagina({ h, destino, emEntregas, totalEtapas = 0 }: { h: LeituraHub; destino: string; emEntregas?: (m: Material) => number; totalEtapas?: number }) {
   const { entrega, materiais } = h;
   if (!entrega) return null;
   return (
@@ -356,6 +380,19 @@ export function LidoDaPagina({ h, destino, emEntregas }: { h: LeituraHub; destin
                   {m.lidoPelaIA ? ", lido pela IA" : ", grande demais para a IA ler junto"}
                   {emEntregas?.(m) ? `; vai para Entregas, etapa ${String(emEntregas(m)).padStart(2, "0")}` : m.etapa > 0 ? `; é da etapa ${String(m.etapa).padStart(2, "0")}, guardado em Materiais do HUB` : "; guardado em Materiais do HUB"})
                 </span>
+                {m.arquivo.type === "application/pdf" && totalEtapas > 0 && (
+                  <label className="ml-2 inline-flex items-center gap-1.5 text-[13px] text-tinta-2">
+                    é o relatório da
+                    <select className="campo !min-h-7 !w-auto !py-0.5 !text-[13px]" aria-label={`Etapa de ${m.arquivo.name}`} value={m.etapa} onChange={(e) => h.atribuirEtapa(m.arquivo, Number(e.target.value))}>
+                      <option value={0}>nenhuma etapa</option>
+                      {Array.from({ length: totalEtapas }, (_, k) => (
+                        <option key={k + 1} value={k + 1}>
+                          etapa {String(k + 1).padStart(2, "0")}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
               </li>
             ))}
           </ul>

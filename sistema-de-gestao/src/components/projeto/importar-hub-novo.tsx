@@ -86,8 +86,8 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
   const relFiles = useMemo(() => relatoriosDasEtapas(materiais), [materiais]);
   const relPrevia = useMemo(() => Object.fromEntries(Object.entries(relFiles).map(([e, f]) => [Number(e), { caminho: "previa", nome: f.name }])), [relFiles]);
   const totalEtapas = modelo?.etapas.length ?? 0;
-  const pend = lido ? pendenciasDoHub(lido, null, leituras, totalEtapas) : null;
-  const ef = lido ? efetivosDoHub(lido, null, c, leituras, totalEtapas) : null;
+  const pend = lido ? pendenciasDoHub(lido, null, leituras, totalEtapas, Object.keys(relFiles).map(Number)) : null;
+  const ef = lido ? efetivosDoHub(lido, null, c, leituras, totalEtapas, Object.keys(relFiles).map(Number)) : null;
   // Ações da importação: o diagnóstico define a data do começo do projeto; código e gestor entram na criação
   const dataDiagnostico = (lido?.acoes as { tipo?: string; passo?: string; data?: string }[] | undefined)?.find((a) => a?.tipo === "avancar_hub" && a.passo === "diagnostico")?.data;
   const acoes = lido ? montarAcoes(lido, false, c, null, relPrevia, false, leituras, totalEtapas) : [];
@@ -323,7 +323,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
               </ul>
             </div>
           )}
-          {entrega && <LidoDaPagina h={h} destino="no projeto" emEntregas={(m) => (m.etapa > 0 && relFiles[m.etapa] === m.arquivo && etapasComRelatorio.has(m.etapa) ? m.etapa : 0)} />}
+          {entrega && <LidoDaPagina h={h} destino="no projeto" totalEtapas={totalEtapas} emEntregas={(m) => (m.etapa > 0 && relFiles[m.etapa] === m.arquivo && etapasComRelatorio.has(m.etapa) ? m.etapa : 0)} />}
           <DocumentosDoHub documentos={lido.documentos} nomesBaixados={materiais.map((m) => m.arquivo.name)} />
           {erro && <p className="text-[13px] text-vermelho">{erro}</p>}
           <div className="flex flex-wrap gap-2">

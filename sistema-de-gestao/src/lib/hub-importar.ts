@@ -94,6 +94,9 @@ export type LeituraRelatorio = {
   inicio_das_atividades: string;
   fim_das_atividades: string;
   datas: { data: string; o_que: string }[];
+  // De que etapa a IA diz que o PDF é (0 = não é relatório técnico de etapa)
+  etapa?: number;
+  eh_relatorio_tecnico?: boolean;
   resumo: string;
 };
 export type LeiturasDosRelatorios = Record<number, LeituraRelatorio | { erro: string }>;
@@ -163,7 +166,7 @@ export type Pendencias = {
 
 // projeto: o projeto em que se importa; null quando o projeto será criado agora (começa no diagnóstico, sem plano)
 // totalEtapas: quantas etapas o serviço tem (só preciso quando o projeto ainda não existe)
-export function pendenciasDoHub(r: RespostaImportacao, projeto: Projeto | null, leituras?: LeiturasDosRelatorios, totalEtapas?: number): Pendencias {
+export function pendenciasDoHub(r: RespostaImportacao, projeto: Projeto | null, leituras?: LeiturasDosRelatorios, totalEtapas?: number, comArquivo: number[] = []): Pendencias {
   const atual = projeto ? ordemPassos.indexOf(passoHubDoProjeto(projeto)) : ordemPassos.indexOf("diagnostico");
   const comData = passosComData(r);
   const passosSemData = (r.passos_sem_data ?? []).filter(ePasso).filter((p, i, l) => l.indexOf(p) === i && !comData[p] && ordemPassos.indexOf(p) > atual);
@@ -175,7 +178,8 @@ export function pendenciasDoHub(r: RespostaImportacao, projeto: Projeto | null, 
   // Atesto final (conclusão provada) → todas as etapas já foram entregues, mesmo que a página não diga uma a uma
   const todasProvadas = !!comData.concluido;
   const ordens = projeto ? projeto.etapas.map((e) => e.ordem) : Array.from({ length: totalEtapas ?? 0 }, (_, i) => i + 1);
-  const enviadasNoHub = new Set((r.etapas ?? []).filter((e) => e.situacao === "enviada" || e.situacao === "aprovada").map((e) => e.etapa));
+  // Etapa com relatório anexado no HUB foi entregue lá
+  const enviadasNoHub = new Set([...(r.etapas ?? []).filter((e) => e.situacao === "enviada" || e.situacao === "aprovada").map((e) => e.etapa), ...comArquivo]);
   const etapasEnviadas = ordens
     .filter((o) => enviadasNoHub.has(o) || todasProvadas)
     .filter((o) => !projeto || !projeto.etapas.find((x) => x.ordem === o && (x.status === "enviada" || x.status === "aprovada") && x.relatorioAssinado))
@@ -197,8 +201,8 @@ export type Efetivos = {
   envios: Record<number, { data: string; origem: "consultor" | "hub" | "relatorio" | "estimativa" | "" }>;
   passos: Partial<Record<PassoHub, string>>;
 };
-export function efetivosDoHub(r: RespostaImportacao, projeto: Projeto | null, c: Completar, leituras?: LeiturasDosRelatorios, totalEtapas?: number): Efetivos {
-  const pend = pendenciasDoHub(r, projeto, leituras, totalEtapas);
+export function efetivosDoHub(r: RespostaImportacao, projeto: Projeto | null, c: Completar, leituras?: LeiturasDosRelatorios, totalEtapas?: number, comArquivo: number[] = []): Efetivos {
+  const pend = pendenciasDoHub(r, projeto, leituras, totalEtapas, comArquivo);
   const passos = { ...passosComData(r) };
   for (const p of pend.passosSemData) if (dataIso(c.passos[p])) passos[p] = c.passos[p];
   // Envio de cada etapa
@@ -250,7 +254,7 @@ export function montarAcoes(
   let definir = base.filter((a) => a.tipo === "definir_cronograma");
   const plano = base.filter((a) => a.tipo === "alterar_plano_hub");
   const situacao = base.filter((a) => a.tipo === "mudar_situacao_etapa");
-  const ef = efetivosDoHub(r, projeto, c, leituras, totalEtapas);
+  const ef = efetivosDoHub(r, projeto, c, leituras, totalEtapas, Object.keys(relatorios).map(Number));
   const atual = projeto ? ordemPassos.indexOf(passoHubDoProjeto(projeto)) : ordemPassos.indexOf("diagnostico");
 
   // Passos: os da IA, os provados pelos documentos e os que o consultor datou (sem repetir passo)

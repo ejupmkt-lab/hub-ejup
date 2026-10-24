@@ -49,8 +49,8 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
   // O primeiro PDF de cada etapa, baixado do cartão dela no HUB, vira o relatório da etapa em Entregas
   const relFiles = useMemo(() => relatoriosDasEtapas(materiais), [materiais]);
   const relPrevia = useMemo(() => Object.fromEntries(Object.entries(relFiles).map(([e, f]) => [Number(e), { caminho: "previa", nome: f.name }])), [relFiles]);
-  const pend = useMemo(() => (lido ? pendenciasDoHub(lido, projeto, leituras) : null), [lido, projeto, leituras]);
-  const ef = useMemo(() => (lido ? efetivosDoHub(lido, projeto, c, leituras) : null), [lido, projeto, c, leituras]);
+  const pend = useMemo(() => (lido ? pendenciasDoHub(lido, projeto, leituras, undefined, Object.keys(relFiles).map(Number)) : null), [lido, projeto, leituras, relFiles]);
+  const ef = useMemo(() => (lido ? efetivosDoHub(lido, projeto, c, leituras, undefined, Object.keys(relFiles).map(Number)) : null), [lido, projeto, c, leituras, relFiles]);
   const acoes = useMemo(() => (lido ? montarAcoes(lido, !bloqueado, c, projeto, relPrevia, true, leituras) : []), [lido, bloqueado, c, projeto, relPrevia, leituras]);
   const etapasComRelatorio = useMemo(() => new Set(acoes.flatMap((a) => (a.tipo === "registrar_envio_etapa" && a.relatorio ? [a.etapa] : []))), [acoes]);
   // Os demais arquivos ficam em "Materiais do HUB"
@@ -203,7 +203,7 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
               </ul>
             </div>
           )}
-          {!bloqueado && entrega && <LidoDaPagina h={h} destino="no projeto" emEntregas={(m) => (m.etapa > 0 && relFiles[m.etapa] === m.arquivo && etapasComRelatorio.has(m.etapa) ? m.etapa : 0)} />}
+          {!bloqueado && entrega && <LidoDaPagina h={h} destino="no projeto" totalEtapas={projeto.etapas.length} emEntregas={(m) => (m.etapa > 0 && relFiles[m.etapa] === m.arquivo && etapasComRelatorio.has(m.etapa) ? m.etapa : 0)} />}
           {!bloqueado && <DocumentosDoHub documentos={lido.documentos} nomesBaixados={materiais.map((m) => m.arquivo.name)} />}
           {erro && <p className="text-[13px] text-vermelho">{erro}</p>}
           <div className="flex flex-wrap gap-2">
