@@ -331,6 +331,162 @@ async function baixarNaPagina(url, limite) {
   }
 }
 
+// Clica UMA vez no botão de situação do pedido (o de cima, à direita, que muda conforme o status:
+// "Em andamento", "Aguardando Envio das notas fiscais"…) e lê o que a página mostra por causa do clique.
+// Se o clique só abre e fecha a trilha, clica de novo para deixar a página como estava.
+// Nunca clica em link, botão de enviar do formulário ou nada fora do cartão da trilha. (roda dentro da página)
+async function lerStatus() {
+  const normalizar = (t) => String(t ?? "").replace(/\s+/g, " ").trim();
+  const linhas = () => (document.body?.innerText ?? "").split("\n").map(normalizar).filter(Boolean);
+  const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+  const diag = { achou: false, rotulo: "", novas: 0, sumiram: 0, motivo: "" };
+  const tem = (el, re) => re.test(el.innerText ?? "");
+  // A trilha: o menor elemento que mostra os passos do HUB (Solicitação aberta … Projeto concluído)
+  let trilha = null;
+  for (const el of document.querySelectorAll("div, ul, ol, section, aside, nav")) {
+    if (!(el instanceof HTMLElement) || !tem(el, /solicita[cç][aã]o aberta/i) || !tem(el, /projeto conclu[ií]do/i)) continue;
+    if ([...el.children].some((f) => f instanceof HTMLElement && tem(f, /solicita[cç][aã]o aberta/i) && tem(f, /projeto conclu[ií]do/i))) continue;
+    trilha = el;
+    break;
+  }
+  if (!trilha) return { novas: [], diag: { ...diag, motivo: "não achei a trilha de passos do HUB" } };
+  const rt = trilha.getBoundingClientRect();
+  // O botão: logo acima da trilha, largo, com texto e um ícone (a setinha), no mesmo cartão. Entre os elementos aninhados
+  // que servem, o mais interno: o clique sobe até quem escuta, e o contrário não vale.
+  const candidatos = [];
+  const cartao = trilha.parentElement?.parentElement?.parentElement ?? trilha.parentElement ?? document.body;
+  for (const el of cartao.querySelectorAll("button, [role=button], div, span, a")) {
+    if (!(el instanceof HTMLElement) || trilha.contains(el) || el.contains(trilha)) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width < 140 || r.height < 28 || r.height > 130) continue;
+    if (r.bottom > rt.top + 14 || rt.top - r.bottom > 220) continue;
+    if (r.right < rt.left || r.left > rt.right) continue;
+    const t = normalizar(el.innerText);
+    if (!t || t.length > 80 || !el.querySelector("svg, img, i, mat-icon, span[class*=icon]")) continue;
+    const eLink = el.closest("a[href]");
+    if (eLink && !/^(#|javascript:)/.test(eLink.getAttribute("href") ?? "#")) continue;
+    if (el.closest("form") && el.getAttribute("type") === "submit") continue;
+    candidatos.push({ el, r, t });
+  }
+  let melhor = null;
+  for (const c of candidatos) {
+    if (candidatos.some((o) => o !== c && c.el.contains(o.el))) continue;
+    const clicavel = c.el.matches("button, [role=button]") || getComputedStyle(c.el).cursor === "pointer" || !!c.el.closest("button, [role=button]");
+    const nota = (clicavel ? 100 : 0) + c.r.bottom - (c.r.width > 700 ? 200 : 0);
+    if (!melhor || nota > melhor.nota) melhor = { el: c.el, nota, t: c.t };
+  }
+  if (!melhor) return { novas: [], diag: { ...diag, motivo: "não achei o botão de situação acima da trilha" } };
+  const antes = linhas();
+  const antesSet = new Set(antes);
+  diag.achou = true;
+  diag.rotulo = melhor.t.slice(0, 60);
+  melhor.el.click();
+  await esperar(900);
+  const depois = linhas();
+  const depoisSet = new Set(depois);
+  const novas = depois.filter((l) => !antesSet.has(l) && l.length < 300).slice(0, 60);
+  const sumiram = antes.filter((l) => !depoisSet.has(l));
+  diag.novas = novas.length;
+  diag.sumiram = sumiram.length;
+  // Abriu ou fechou algo: volta ao estado em que estava
+  if (novas.length || sumiram.length) {
+    melhor.el.click();
+    await esperar(500);
+  }
+  return { novas, diag };
+}
+
+// Acha, na lista de pedidos do HUB, o botão de abrir de cada linha (o código do pedido, de 4 a 7 números, identifica a linha).
+// Marca cada botão com data-blimp-linha para o clique. (roda dentro da página)
+function descobrirLinhas() {
+  const normalizar = (t) => String(t ?? "").replace(/\s+/g, " ").trim();
+  const codigos = [];
+  for (const el of document.querySelectorAll("a, span, div, p, td, strong, b")) {
+    if (!(el instanceof HTMLElement) || el.children.length > 1) continue;
+    const t = normalizar(el.textContent);
+    if (!/^\d{4,7}$/.test(t) || codigos.some((c) => c.codigo === t)) continue;
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height) continue;
+    codigos.push({ el, codigo: t });
+  }
+  const todos = new Set(codigos.map((c) => c.codigo));
+  const achadas = [];
+  for (const { el, codigo } of codigos) {
+    // A linha: o maior elemento em volta do código que ainda não traz o código de outro pedido
+    let linha = el;
+    for (let i = 0, atual = el.parentElement; i < 10 && atual && atual !== document.body; i++, atual = atual.parentElement) {
+      const nessa = new Set((atual.innerText ?? "").match(/\b\d{4,7}\b/g)?.filter((n) => todos.has(n)) ?? []);
+      if (nessa.size > 1 || atual.getBoundingClientRect().height > 420) break;
+      linha = atual;
+    }
+    if (linha === el) continue;
+    const rl = linha.getBoundingClientRect();
+    const textoLinha = (linha.innerText ?? "").split("\n").map(normalizar).filter(Boolean);
+    // 1) link de verdade para outra página do mesmo site (menos o ícone de abrir em outra aba, ao lado do código)
+    let controle = null;
+    let tipo = "";
+    let href = "";
+    for (const a of linha.querySelectorAll("a[href]")) {
+      const h = a.getAttribute("href") ?? "";
+      if (!h || /^(#|javascript:|mailto:|tel:)/i.test(h) || a.getAttribute("target") === "_blank") continue;
+      try {
+        if (new URL(h, location.href).origin !== location.origin) continue;
+      } catch {
+        continue;
+      }
+      controle = a;
+      tipo = "link";
+      href = h.slice(0, 80);
+      break;
+    }
+    // 2) o botão da lateral direita (a faixa colorida com a setinha), alto como a linha
+    if (!controle) {
+      let melhor = null;
+      for (const f of linha.querySelectorAll("button, a, [role=button], div, span")) {
+        if (!(f instanceof HTMLElement) || f === linha) continue;
+        const r = f.getBoundingClientRect();
+        if (r.width < 18 || r.width > 100 || r.height < rl.height * 0.45 || r.left < rl.right - 140) continue;
+        if (!melhor || r.right > melhor.r.right || (r.right === melhor.r.right && r.height > melhor.r.height)) melhor = { f, r };
+      }
+      if (melhor) {
+        controle = melhor.f;
+        tipo = "lateral";
+      }
+    }
+    // 3) a própria linha
+    if (!controle) {
+      controle = linha;
+      tipo = "linha";
+    }
+    controle.setAttribute("data-blimp-linha", codigo);
+    achadas.push({
+      codigo,
+      titulo: textoLinha.filter((l) => l !== codigo && !/^(cliente|gestor|prestador|aberta em)$/i.test(l))[0] ?? "",
+      resumo: textoLinha.join(" | ").slice(0, 400),
+      tipo,
+      href,
+      topo: Math.round(rl.top + scrollY),
+    });
+  }
+  return achadas.sort((a, b) => a.topo - b.topo);
+}
+
+// Clica no botão marcado da linha do pedido (a página pode abrir o pedido na mesma aba ou numa nova)
+function clicarLinha(codigo) {
+  const el = document.querySelector(`[data-blimp-linha="${codigo}"]`);
+  if (!el) return false;
+  el.scrollIntoView({ block: "center" });
+  el.click();
+  return true;
+}
+
+// A página do pedido já abriu? (mostra o código e os cartões, e não é mais a lista) (roda dentro da página)
+function paginaDoPedido(codigo) {
+  const t = document.body?.innerText ?? "";
+  const abriu = new RegExp(`solicita[cç][aã]o\\s+${codigo}\\b`, "i").test(t) || (t.includes(codigo) && /plano de entrega|documenta[cç][aã]o/i.test(t) && !/busque pela empresa/i.test(t));
+  return { abriu, tamanho: t.length };
+}
+
 // ─── Lado da extensão ──────────────────────────────────────────────────────────
 
 async function origensPermitidas() {
@@ -424,17 +580,32 @@ async function lerAbasPermitidas(origens, codigo) {
 
 async function progresso(passo) {
   await chrome.storage.session.set({ progresso: { ...passo, em: Date.now() } }).catch(() => {});
+  // No ícone da extensão, para quem fechou a janelinha: "2/7" enquanto lê a lista
+  if (passo.etapa === "lote") await chrome.action.setBadgeText({ text: `${passo.atual}/${passo.de}` }).catch(() => {});
+  else if (passo.etapa === "pronto") await chrome.action.setBadgeText({ text: "" }).catch(() => {});
 }
 
-async function lerAgora({ tabId, blimpTabId }) {
-  // Mantém a extensão acordada durante downloads demorados
-  const batida = setInterval(() => void chrome.runtime.getPlatformInfo(), 20000);
-  try {
+// Lê uma página de pedido do HUB: o texto, os balões, o que o botão de situação mostra, e os anexos (por link e
+// clicando nos botões de download). Devolve o que a extensão guarda para o Blimp pedir.
+async function lerDetalhe(tabId, prefixo = "") {
+  {
     const aba = await chrome.tabs.get(tabId);
     const hub = new URL(aba.url);
-    await progresso({ etapa: "lendo", texto: "Lendo a página do HUB e passando o mouse nos ícones…" });
+    await progresso({ etapa: "lendo", texto: `${prefixo}Lendo a página do HUB e passando o mouse nos ícones…` });
     const { texto, textoPagina, secaoBalao, balaos, links, quadros, diag } = await textoDeTodosOsQuadros(tabId, true);
-    if (!texto && !links.length) return { ok: false, motivo: "vazia" };
+    if (!texto && !links.length) return { vazia: true };
+    // O botão de situação do pedido (a que passo está): um clique, e lê o que a página mostra
+    await progresso({ etapa: "lendo", texto: `${prefixo}Clicando no botão de situação do pedido…` });
+    let secaoStatus = "";
+    const status = { achou: false, rotulo: "", novas: 0, sumiram: 0, motivo: "" };
+    try {
+      const [st] = await chrome.scripting.executeScript({ target: { tabId }, func: lerStatus });
+      Object.assign(status, st?.result?.diag ?? { motivo: "sem resposta" });
+      const novas = st?.result?.novas ?? [];
+      if (novas.length) secaoStatus = `\n\n[Ao clicar no botão de situação do projeto${status.rotulo ? ` (“${status.rotulo}”)` : ""}, a página mostrou]\n${novas.join("\n")}`;
+    } catch (e) {
+      status.motivo = String(e?.message ?? e).slice(0, 80);
+    }
 
     const arquivos = [];
     const falhas = [];
@@ -446,7 +617,7 @@ async function lerAgora({ tabId, blimpTabId }) {
 
     for (const [i, link] of candidatos.entries()) {
       const rotulo = link.rotulo || baseDe(link.url) || link.url;
-      await progresso({ etapa: "baixando", texto: `Baixando ${i + 1} de ${candidatos.length}: ${rotulo.slice(0, 60)}`, atual: i + 1, de: candidatos.length });
+      await progresso({ etapa: "baixando", texto: `${prefixo}Baixando ${i + 1} de ${candidatos.length}: ${rotulo.slice(0, 60)}`, atual: i + 1, de: candidatos.length });
       let r;
       const mesmoSite = new URL(link.url).origin === hub.origin;
       // Outro endereço (ex.: armazenamento de arquivos): só com permissão dada antes
@@ -500,7 +671,7 @@ async function lerAgora({ tabId, blimpTabId }) {
       const [achou] = await chrome.scripting.executeScript({ target: { tabId }, func: descobrirBotoesDeDownload, args: [etapasBaixadas, rotulosBaixados] });
       const botoes = achou?.result ?? [];
       for (const [n, b] of botoes.entries()) {
-        await progresso({ etapa: "clicando", texto: `Baixando ${n + 1} de ${botoes.length}: ${b.etapa ? `etapa ${String(b.etapa).padStart(2, "0")}` : b.rotulo.slice(0, 50)}`, atual: n + 1, de: botoes.length });
+        await progresso({ etapa: "clicando", texto: `${prefixo}Baixando ${n + 1} de ${botoes.length}: ${b.etapa ? `etapa ${String(b.etapa).padStart(2, "0")}` : b.rotulo.slice(0, 50)}`, atual: n + 1, de: botoes.length });
         const [exec] = await chrome.scripting.executeScript({ target: { tabId }, world: "MAIN", func: clicarECapturar, args: [b.i, 7000, MAX_ARQUIVO] });
         const r = exec?.result ?? { ok: false, motivo: "sem resposta" };
         const registro = { etapa: b.etapa, rotulo: b.rotulo, motivo: b.motivo, gerou: 0, erro: "" };
@@ -545,34 +716,183 @@ async function lerAgora({ tabId, blimpTabId }) {
       }
     }
 
+    const textoFinal = textoPagina.slice(0, Math.max(2000, LIMITE_TEXTO - secaoBalao.length - secaoStatus.length)) + secaoBalao + secaoStatus;
     const pendente = {
       id: crypto.randomUUID(),
       criadoEm: new Date().toISOString(),
       origem: { endereco: hub.origin, titulo: aba.title ?? "", url: `${hub.origin}${hub.pathname}` },
-      // Os balões vão inteiros; o corte, se houver, é no texto da página
-      texto: textoPagina.slice(0, Math.max(2000, LIMITE_TEXTO - secaoBalao.length)) + secaoBalao,
-      textoCortado: texto.length > LIMITE_TEXTO,
+      // Os balões e o que o botão de situação mostrou vão inteiros; o corte, se houver, é no texto da página
+      texto: textoFinal,
+      textoCortado: textoPagina.length + secaoBalao.length + secaoStatus.length > LIMITE_TEXTO,
       quadros,
       balaos,
-      diag: { ...diag, linksAchados: links.length, cliques },
+      diag: { ...diag, linksAchados: links.length, cliques, status },
       arquivos,
       falhas,
       naoGuardados,
     };
-    await chrome.storage.local.set({ pendente });
+    return {
+      pendente,
+      resumo: { arquivos: arquivos.length, falhas: falhas.length, naoGuardados: naoGuardados.length, quadros, caracteres: textoFinal.length, balaos, cliques: cliques.length, status, diag: { ...diag, linksAchados: links.length, cliques, status } },
+    };
+  }
+}
+
+// "Ler agora": a página que está na tela, entregue ao projeto aberto no Blimp
+async function lerAgora({ tabId, blimpTabId }) {
+  // Mantém a extensão acordada durante downloads demorados
+  const batida = setInterval(() => void chrome.runtime.getPlatformInfo(), 20000);
+  try {
+    const r = await lerDetalhe(tabId);
+    if (r.vazia) return { ok: false, motivo: "vazia" };
+    await chrome.storage.local.set({ pendente: r.pendente });
 
     // Avisa a aba do projeto no Blimp (só um aviso; os dados vão quando o Blimp pede)
-    await progresso({ etapa: "entregando", texto: "Levando para o Blimp…" });
-    await chrome.scripting.executeScript({ target: { tabId: blimpTabId }, func: (o) => window.postMessage({ tipo: "blimp-hub-pendente" }, o), args: [new URL((await chrome.tabs.get(blimpTabId)).url).origin] });
-    await chrome.tabs.update(blimpTabId, { active: true });
-    const jan = await chrome.tabs.get(blimpTabId);
-    await chrome.windows.update(jan.windowId, { focused: true }).catch(() => {});
-    await progresso({ etapa: "pronto", texto: "Pronto. A prévia está no Blimp." });
-    return { ok: true, resumo: { arquivos: arquivos.length, falhas: falhas.length, naoGuardados: naoGuardados.length, quadros, caracteres: texto.length, balaos, cliques: cliques.length, diag: { ...diag, linksAchados: links.length, cliques } } };
+    await avisarBlimp(blimpTabId, "blimp-hub-pendente", "Levando para o Blimp…", "Pronto. A prévia está no Blimp.");
+    return { ok: true, resumo: r.resumo };
   } catch (e) {
     return { ok: false, motivo: "erro", detalhe: String(e?.message ?? e) };
   } finally {
     clearInterval(batida);
+  }
+}
+
+async function avisarBlimp(blimpTabId, tipo, textoEntregando, textoPronto) {
+  await progresso({ etapa: "entregando", texto: textoEntregando });
+  await chrome.scripting.executeScript({ target: { tabId: blimpTabId }, func: (t, o) => window.postMessage({ tipo: t }, o), args: [tipo, new URL((await chrome.tabs.get(blimpTabId)).url).origin] });
+  await chrome.tabs.update(blimpTabId, { active: true });
+  const jan = await chrome.tabs.get(blimpTabId);
+  await chrome.windows.update(jan.windowId, { focused: true }).catch(() => {});
+  await progresso({ etapa: "pronto", texto: textoPronto });
+}
+
+// ─── "Ler todos": a lista de pedidos do HUB, um por um ─────────────────────────
+
+const MAX_LOTE = 40;
+const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+const cancelado = async () => !!(await chrome.storage.session.get("cancelar")).cancelar;
+
+// Espera a página do pedido abrir (e os cartões terminarem de carregar)
+async function esperarPedido(tabId, codigo, limite = 20000) {
+  const inicio = Date.now();
+  let ultimo = -1;
+  let estavel = 0;
+  while (Date.now() - inicio < limite) {
+    await esperar(500);
+    let r;
+    try {
+      [r] = await chrome.scripting.executeScript({ target: { tabId }, func: paginaDoPedido, args: [codigo] });
+    } catch {
+      continue; // a página está trocando
+    }
+    const v = r?.result;
+    if (!v?.abriu) continue;
+    estavel = v.tamanho === ultimo ? estavel + 1 : 0;
+    ultimo = v.tamanho;
+    if (estavel >= 2) return true;
+  }
+  return false;
+}
+
+async function linhasDaLista(tabId) {
+  try {
+    const [r] = await chrome.scripting.executeScript({ target: { tabId }, func: descobrirLinhas });
+    return r?.result ?? [];
+  } catch {
+    return [];
+  }
+}
+
+async function esperarLista(tabId, limite = 20000) {
+  const inicio = Date.now();
+  while (Date.now() - inicio < limite) {
+    await esperar(600);
+    if ((await linhasDaLista(tabId)).length) return true;
+  }
+  return false;
+}
+
+// Percorre a lista de pedidos da aba: abre cada um (clicando na linha), lê, volta para a lista
+async function lerLote({ tabId, blimpTabId }) {
+  const batida = setInterval(() => void chrome.runtime.getPlatformInfo(), 20000);
+  await chrome.storage.session.remove("cancelar");
+  try {
+    const aba = await chrome.tabs.get(tabId);
+    const hub = new URL(aba.url);
+    const linhas = (await linhasDaLista(tabId)).slice(0, MAX_LOTE);
+    if (!linhas.length) return { ok: false, motivo: "sem-lista" };
+    const lote = { id: crypto.randomUUID(), criadoEm: new Date().toISOString(), origem: { endereco: hub.origin, url: `${hub.origin}${hub.pathname}` }, itens: [], problemas: [], total: linhas.length, trilha: [] };
+    // Registro curto do caminho (endereços sem a parte depois do ?), para entender o que houve se algo falhar
+    const marca = async (t, id = tabId) => lote.trilha.push(`${t}: ${(await chrome.tabs.get(id).catch(() => null))?.url?.split("?")[0] ?? "?"}`);
+    // Volta à lista carregando o endereço dela de novo. O botão "voltar" do navegador não serve: o Chrome pula as
+    // telas que a página abriu sem que a pessoa tenha clicado, e a lista não seria a tela de antes.
+    const listaUrl = aba.url;
+    const voltar = async (id) => {
+      await chrome.tabs.update(id, { url: listaUrl }).catch((e) => lote.trilha.push(`voltar falhou: ${String(e?.message ?? e).slice(0, 60)}`));
+    };
+    await chrome.storage.local.set({ lote });
+    for (const [i, linha] of linhas.entries()) {
+      if (await cancelado()) {
+        lote.interrompido = true;
+        break;
+      }
+      const prefixo = `Pedido ${i + 1} de ${linhas.length} (${linha.codigo}): `;
+      await progresso({ etapa: "lote", texto: `${prefixo}abrindo…`, atual: i + 1, de: linhas.length });
+      // As linhas se redesenham ao voltar: marca de novo e acha a do código
+      const agora = (await linhasDaLista(tabId)).find((l) => l.codigo === linha.codigo);
+      if (!agora) {
+        lote.problemas.push({ codigo: linha.codigo, motivo: "a linha não estava mais na lista (a página mudou ao voltar)" });
+        continue;
+      }
+      const abasAntes = new Set((await chrome.tabs.query({})).map((a) => a.id));
+      const clicou = (await chrome.scripting.executeScript({ target: { tabId }, func: clicarLinha, args: [linha.codigo] }))[0]?.result;
+      if (!clicou) {
+        lote.problemas.push({ codigo: linha.codigo, motivo: "não consegui clicar na linha" });
+        continue;
+      }
+      // O pedido pode abrir na mesma aba ou numa nova
+      await esperar(600);
+      const novas = (await chrome.tabs.query({})).filter((a) => !abasAntes.has(a.id) && a.url !== "chrome://newtab/");
+      const alvo = novas[0]?.id ?? tabId;
+      const abriu = await esperarPedido(alvo, linha.codigo);
+      await marca(`${linha.codigo} aberto=${abriu}${novas[0] ? " (aba nova)" : ""}`, alvo);
+      if (!abriu) {
+        lote.problemas.push({ codigo: linha.codigo, motivo: "a página do pedido não abriu" });
+        if (novas[0]) await chrome.tabs.remove(novas[0].id).catch(() => {});
+        // Se a aba ainda mostra outra coisa que não a lista, volta
+        if (!(await linhasDaLista(tabId)).length) await voltar(tabId);
+        continue;
+      }
+      let r;
+      try {
+        r = await lerDetalhe(alvo, prefixo);
+      } catch (e) {
+        r = { erro: String(e?.message ?? e).slice(0, 100) };
+      }
+      if (r.pendente) {
+        lote.itens.push({ id: r.pendente.id, codigo: linha.codigo, titulo: linha.titulo, linha: linha.resumo, pendente: r.pendente, resumo: r.resumo });
+        await chrome.storage.local.set({ lote });
+      } else lote.problemas.push({ codigo: linha.codigo, motivo: r.vazia ? "a página do pedido veio vazia" : (r.erro ?? "erro ao ler") });
+      // Volta para a lista
+      if (novas[0]) await chrome.tabs.remove(novas[0].id).catch(() => {});
+      else await voltar(tabId);
+      const voltou = await esperarLista(tabId);
+      await marca(`${linha.codigo} voltou=${voltou}`);
+      if (!voltou) {
+        lote.problemas.push({ codigo: "", motivo: "não consegui voltar à lista de pedidos; parei por aqui" });
+        break;
+      }
+    }
+    await chrome.storage.local.set({ lote });
+    await chrome.storage.session.remove("cancelar");
+    if (!lote.itens.length) return { ok: false, motivo: "nenhum", problemas: lote.problemas, trilha: lote.trilha, linhas: linhas.map((l) => ({ codigo: l.codigo, tipo: l.tipo, href: l.href })) };
+    await avisarBlimp(blimpTabId, "blimp-hub-lote", "Levando para o Blimp…", `Pronto. ${lote.itens.length} ${lote.itens.length === 1 ? "pedido lido" : "pedidos lidos"}: confira no Blimp.`);
+    return { ok: true, lidos: lote.itens.length, total: lote.total, problemas: lote.problemas, interrompido: !!lote.interrompido, trilha: lote.trilha, linhas: linhas.map((l) => ({ codigo: l.codigo, tipo: l.tipo, href: l.href })) };
+  } catch (e) {
+    return { ok: false, motivo: "erro", detalhe: String(e?.message ?? e) };
+  } finally {
+    clearInterval(batida);
+    await chrome.action.setBadgeText({ text: "" }).catch(() => {});
   }
 }
 
@@ -583,6 +903,7 @@ chrome.runtime.onMessage.addListener((pedido, remetente, responder) => {
   if (remetente.id !== chrome.runtime.id) return false;
   (async () => {
     if (pedido?.tipo === "ler-agora") return responder(await lerAgora(pedido));
+    if (pedido?.tipo === "ler-lote") return responder(await lerLote(pedido));
     if (pedido?.tipo === "permitir-origem-feita") return responder({ ok: true });
     responder({ ok: false, motivo: "pedido-desconhecido" });
   })().catch((e) => responder({ ok: false, motivo: "erro", detalhe: String(e?.message ?? e) }));
@@ -601,6 +922,40 @@ chrome.runtime.onMessageExternal.addListener((pedido, _remetente, responder) => 
     if (pedido?.tipo === "pegar") {
       const { pendente } = await chrome.storage.local.get("pendente");
       return responder(pendente ? { ok: true, pendente } : { ok: false, motivo: "nada" });
+    }
+    if (pedido?.tipo === "pegar-lote") {
+      const { lote } = await chrome.storage.local.get("lote");
+      if (!lote) return responder({ ok: false, motivo: "nada" });
+      // Só o resumo de cada pedido; os arquivos vêm um a um (pegar-item)
+      const itens = lote.itens.map((x) => ({
+        id: x.id,
+        codigo: x.codigo,
+        titulo: x.titulo,
+        linha: x.linha,
+        arquivos: x.pendente.arquivos.length,
+        falhas: x.pendente.falhas.length,
+        caracteres: x.pendente.texto.length,
+        status: x.resumo?.status?.rotulo ?? "",
+      }));
+      return responder({ ok: true, lote: { id: lote.id, criadoEm: lote.criadoEm, origem: lote.origem, total: lote.total, interrompido: !!lote.interrompido, problemas: lote.problemas, itens } });
+    }
+    if (pedido?.tipo === "pegar-item") {
+      const { lote } = await chrome.storage.local.get("lote");
+      const item = lote?.itens.find((x) => x.id === pedido.id);
+      return responder(item ? { ok: true, pendente: item.pendente } : { ok: false, motivo: "nada" });
+    }
+    if (pedido?.tipo === "consumir-item") {
+      const { lote } = await chrome.storage.local.get("lote");
+      if (lote) {
+        lote.itens = lote.itens.filter((x) => x.id !== pedido.id);
+        if (lote.itens.length) await chrome.storage.local.set({ lote });
+        else await chrome.storage.local.remove("lote");
+      }
+      return responder({ ok: true });
+    }
+    if (pedido?.tipo === "descartar-lote") {
+      await chrome.storage.local.remove("lote");
+      return responder({ ok: true });
     }
     if (pedido?.tipo === "consumir") {
       const { pendente } = await chrome.storage.local.get("pendente");

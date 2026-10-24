@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Cliente, EmpresaSlug } from "@/lib/dados/tipos";
 import { novoId, registrarEvento, useEstado, useUsuario } from "@/lib/dados/store";
@@ -18,6 +18,7 @@ import { traduzirErro } from "@/lib/erros";
 import { Botao, Campo } from "@/components/ui";
 import { registrarDocumentosNoHistorico } from "@/lib/hub-documentos";
 import { registrarLinhaDoTempoDoHub } from "@/lib/hub-historico";
+import type { PendenteDoHub } from "@/lib/hub-extensao";
 import { CompletarDados, DatasDosRelatorios, DocumentosDoHub, EntradaDoHub, LidoDaPagina, relatoriosDasEtapas, useLeituraHub } from "./hub-leitura";
 
 const BUCKET = "evidencias";
@@ -27,7 +28,24 @@ const vazioCliente = Object.fromEntries(camposCliente.map((c) => [c.chave, ""]))
 // Novo projeto a partir do HUB: o consultor lê a página do pedido (extensão, texto colado, print ou PDF) e o
 // Blimp mostra o cliente, o serviço e os passos que achou. Ao confirmar, cadastra o cliente (se ainda não existir,
 // pelos dados da Receita), cria o projeto já no passo certo do HUB e guarda os arquivos baixados.
-export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFechar: () => void }) {
+//
+// No lote ("Ler todos os projetos da lista"), `inicial` traz o pedido já lido pela extensão; com `automatico`, o projeto é
+// criado sozinho quando não falta nada que só a pessoa saiba (CNPJ, serviço reconhecido, sem código repetido).
+export function ImportarHubNovo({
+  slug,
+  aoFechar,
+  inicial,
+  automatico = false,
+  aoCriado,
+  rotuloFechar = "Cancelar",
+}: {
+  slug: EmpresaSlug;
+  aoFechar: () => void;
+  inicial?: PendenteDoHub;
+  automatico?: boolean;
+  aoCriado?: (projetoId: string) => void;
+  rotuloFechar?: string;
+}) {
   const { estado, atualizar } = useEstado();
   const usuario = useUsuario();
   const router = useRouter();
@@ -53,8 +71,17 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
     aoReceber: () => setLido(null),
     // Só se consome o que a extensão guardou quando o projeto é criado
     consumirAoLer: false,
+    ignorarExtensao: !!inicial,
   });
   const { materiais, entrega, erro, setErro, leituras } = h;
+  // Pedido do lote: entra na leitura (e a IA lê) assim que o painel abre
+  const comecou = useRef(false);
+  useEffect(() => {
+    if (!inicial || comecou.current) return;
+    comecou.current = true;
+    void h.receber(inicial);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const modelos = servicosDaEmpresa(estado, slug);
   const clientes = estado.clientes.filter((c) => c.empresa === slug);
@@ -122,9 +149,19 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
   const feitos = previa?.itens.filter((i) => !i.aviso) ?? [];
   const avisos = previa?.itens.filter((i) => i.aviso) ?? [];
   const bloqueado = !modelo || semCliente || passouDoLimite || (!!duplicado && !insistir);
+  // Criação automática: só sem nada que dependa de uma decisão da pessoa
+  const motivosParaRevisar = [
+    !servicoDaIA && "não reconheci o serviço pelo nome no HUB (escolha abaixo)",
+    semCliente && "não encontrei o CNPJ do cliente (digite abaixo)",
+    !!duplicado && !insistir && `já existe um projeto com o código ${codigoHub}`,
+    passouDoLimite && "o cliente já está no limite de projetos em andamento",
+  ].filter((m): m is string => !!m);
+  const lendoAinda = h.lendo || h.puxando || !!h.lendoRelatorios;
 
+  const jaCriou = useRef(false);
   const criar = async () => {
-    if (!lido || !modelo || bloqueado || criando) return;
+    if (!lido || !modelo || bloqueado || criando || jaCriou.current) return;
+    jaCriou.current = true;
     setCriando(true);
     setErro(null);
     try {
@@ -191,12 +228,23 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
         r.projetos.unshift(montado.projeto);
       });
       h.consumirLeitura();
-      router.push(`/${slug}/projetos/${id}`);
+      if (aoCriado) aoCriado(id);
+      else router.push(`/${slug}/projetos/${id}`);
     } catch (e) {
+      jaCriou.current = false;
       setErro(traduzirErro(e, "Não foi possível criar o projeto."));
       setCriando(false);
     }
   };
+  // Automático: cria quando a leitura terminou e nada pede a pessoa
+  const criarDeNovo = useRef(criar);
+  useEffect(() => {
+    criarDeNovo.current = criar;
+  });
+  const podeSozinho = automatico && !!lido && !lendoAinda && !criando && !erro && motivosParaRevisar.length === 0;
+  useEffect(() => {
+    if (podeSozinho) void criarDeNovo.current();
+  }, [podeSozinho]);
 
   return (
     <div className="mb-8 space-y-4 rounded-[var(--radius-bloco)] border border-linha bg-pedra/60 p-3 sm:p-5" aria-label="Importar do HUB">
@@ -204,7 +252,18 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
         <h2 className="text-lg font-bold">Novo projeto a partir do HUB</h2>
         <p className="text-[13px] text-tinta-2">O Blimp lê o pedido, cadastra o cliente se ainda não existir, escolhe o serviço e registra o passo do HUB e o plano. Você confere antes de criar.</p>
       </div>
-      {!lido ? (
+      {inicial && !lido && !erro && <p className="text-[13px] font-semibold text-azul">Lendo o pedido {entrega?.titulo ? `“${entrega.titulo.slice(0, 50)}”` : ""} e criando o projeto…</p>}
+      {inicial && !lido && erro && (
+        <div className="space-y-2">
+          <p role="alert" className="text-[13px] text-vermelho">
+            {erro}
+          </p>
+          <Botao variante="fantasma" tamanho="pequeno" onClick={aoFechar}>
+            {rotuloFechar}
+          </Botao>
+        </div>
+      )}
+      {inicial && !lido ? null : !lido ? (
         <EntradaDoHub
           h={h}
           aoCancelar={aoFechar}
@@ -213,6 +272,11 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
       ) : (
         <div className="space-y-4">
           <p className="text-[15px]">{lido.resumo}</p>
+          {automatico && motivosParaRevisar.length > 0 && (
+            <p role="alert" className="rounded-[var(--radius-campo)] border border-laranja/30 bg-laranja-claro px-3 py-2 text-[13px] text-laranja">
+              Preciso de você neste pedido: {motivosParaRevisar.join("; ")}. Assim que você resolver, o projeto é criado sozinho; ou pule para o próximo.
+            </p>
+          )}
 
           <div className="space-y-1.5 rounded-[var(--radius-campo)] bg-folha p-3 text-[14px] ring-1 ring-linha">
             <p>
@@ -330,11 +394,13 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
             <Botao tamanho="pequeno" onClick={() => void criar()} disabled={criando || bloqueado}>
               {criando ? "Criando…" : "Criar projeto"}
             </Botao>
-            <Botao variante="secundario" tamanho="pequeno" onClick={() => setLido(null)} disabled={criando}>
-              Voltar
-            </Botao>
+            {!inicial && (
+              <Botao variante="secundario" tamanho="pequeno" onClick={() => setLido(null)} disabled={criando}>
+                Voltar
+              </Botao>
+            )}
             <Botao variante="fantasma" tamanho="pequeno" onClick={aoFechar} disabled={criando}>
-              Cancelar
+              {rotuloFechar}
             </Botao>
           </div>
         </div>

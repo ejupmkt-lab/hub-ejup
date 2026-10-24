@@ -13,7 +13,8 @@ import type { PassoHub } from "@/lib/dados/tipos";
 import { Botao, BotaoLink, Cabecalho, Campo, Vazio } from "@/components/ui";
 import { EscolherGestorSebrae } from "@/components/projeto/gestor-sebrae";
 import { ImportarHubNovo } from "@/components/projeto/importar-hub-novo";
-import { AVISO_DA_EXTENSAO } from "@/lib/hub-extensao";
+import { AVISO_DA_EXTENSAO, AVISO_DO_LOTE, pegarLote } from "@/lib/hub-extensao";
+import { LoteDoHub } from "@/components/projeto/lote-hub";
 
 function Conteudo() {
   const { empresa: slug } = useParams<{ empresa: EmpresaSlug }>();
@@ -53,11 +54,17 @@ function Conteudo() {
   const [criando, setCriando] = useState(false);
   // Criar o projeto a partir da página do pedido no HUB; o painel abre sozinho quando a extensão entrega a leitura
   const [importando, setImportando] = useState(false);
+  // Os pedidos da lista do HUB lidos de uma vez pela extensão ("Ler todos os projetos da lista")
+  const [lotando, setLotando] = useState(false);
   useEffect(() => {
     const ouvir = (ev: MessageEvent) => {
-      if (ev.source === window && ev.origin === window.location.origin && ev.data?.tipo === AVISO_DA_EXTENSAO) setImportando(true);
+      if (ev.source !== window || ev.origin !== window.location.origin) return;
+      if (ev.data?.tipo === AVISO_DA_EXTENSAO) setImportando(true);
+      if (ev.data?.tipo === AVISO_DO_LOTE) setLotando(true);
     };
     window.addEventListener("message", ouvir);
+    // Já há um lote esperando (lido antes de abrir esta tela)?
+    void pegarLote().then((l) => l && setLotando(true));
     return () => window.removeEventListener("message", ouvir);
   }, []);
   // Até 3 projetos em andamento por cliente; um 4º só excepcionalmente, e nunca um 5º
@@ -94,18 +101,19 @@ function Conteudo() {
   return (
     <>
       <Cabecalho migalhas={[{ rotulo: empresa.nome, href: `/${slug}` }, { rotulo: "Novo projeto" }]} titulo="Novo projeto">
-        {!importando && (
+        {!importando && !lotando && (
           <Botao variante="secundario" onClick={() => setImportando(true)}>
             Importar do HUB
           </Botao>
         )}
       </Cabecalho>
-      {importando && <ImportarHubNovo slug={slug} aoFechar={() => setImportando(false)} />}
+      {lotando && <LoteDoHub slug={slug} aoFechar={() => setLotando(false)} />}
+      {importando && !lotando && <ImportarHubNovo slug={slug} aoFechar={() => setImportando(false)} />}
       {clientes.length === 0 ? (
-        importando ? null : <Vazio titulo="Cadastre o cliente primeiro" acao={<BotaoLink href={`/${slug}/clientes?novo=1&voltar=novo-projeto`}>Cadastrar cliente</BotaoLink>}>
+        importando || lotando ? null : <Vazio titulo="Cadastre o cliente primeiro" acao={<BotaoLink href={`/${slug}/clientes?novo=1&voltar=novo-projeto`}>Cadastrar cliente</BotaoLink>}>
           O projeto é criado para um cliente já cadastrado, porque os dados dele preenchem a ficha de todos os relatórios.
         </Vazio>
-      ) : importando ? null : (
+      ) : importando || lotando ? null : (
         <div className="grid gap-10 lg:grid-cols-[1fr_20rem]">
           <form
             onSubmit={(e) => {

@@ -319,6 +319,9 @@ isOneToOne: false
               "admin_grupo": boolean,"email": string,"membro": boolean,"nome": string,"nome_completo": string,"papel": string,"situacao": string
             }[]
                            },
+"mover_projeto":
+{ Args: { "p_destino": string,"p_id": string,"p_servico_id"?: string | null,"p_usuario"?: string }; Returns: Json
+                           },
 "retirar_acesso":
 { Args: { "p_email": string }; Returns: undefined
                            },

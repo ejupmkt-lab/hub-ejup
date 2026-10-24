@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useProjeto } from "@/components/projeto/use-projeto";
 import { useExcluirProjeto } from "@/components/projeto/excluir-projeto";
+import { MoverProjeto } from "@/components/projeto/mover-projeto";
 import { PlanoTrabalho } from "@/components/projeto/plano-trabalho";
 import { DadosProjeto } from "@/components/projeto/dados";
 import { CronogramaProjeto } from "@/components/projeto/cronograma-projeto";
@@ -311,6 +312,7 @@ export default function PaginaProjeto() {
           </>
         }
       >
+        <MoverProjeto projeto={projeto} />
         {podeExcluir && (
           <Botao variante="perigo" tamanho="pequeno" onClick={() => void excluirProjeto()} disabled={excluindo}>
             {excluindo ? "Excluindo…" : "Excluir projeto"}

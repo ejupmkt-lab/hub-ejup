@@ -12,11 +12,11 @@ export type LeituraDoHub =
 
 type Chrome = { runtime?: { sendMessage?: (id: string, msg: unknown, cb: (r: unknown) => void) => void; lastError?: unknown } };
 
-function enviar<T>(mensagem: unknown): Promise<T | null> {
+function enviar<T>(mensagem: unknown, limiteMs = 15000): Promise<T | null> {
   return new Promise((resolver) => {
     const c = (globalThis as unknown as { chrome?: Chrome }).chrome;
     if (!c?.runtime?.sendMessage) return resolver(null);
-    const limite = setTimeout(() => resolver(null), 15000);
+    const limite = setTimeout(() => resolver(null), limiteMs);
     try {
       c.runtime.sendMessage(EXTENSAO_HUB_ID, mensagem, (r) => {
         clearTimeout(limite);
@@ -67,6 +67,35 @@ export async function pegarPendente() {
 }
 export async function consumirPendente(id: string) {
   await enviar({ tipo: "consumir", id });
+}
+
+// "Ler todos os projetos da lista": a extensão lê os pedidos um a um e guarda o lote; o Blimp pede o resumo
+// e, depois, um pedido de cada vez (com os arquivos)
+export type ItemDoLote = { id: string; codigo: string; titulo: string; linha: string; arquivos: number; falhas: number; caracteres: number; status: string };
+export type LoteDoHub = {
+  id: string;
+  criadoEm: string;
+  origem: { endereco: string; url: string };
+  total: number;
+  interrompido: boolean;
+  problemas: { codigo: string; motivo: string }[];
+  itens: ItemDoLote[];
+};
+export const AVISO_DO_LOTE = "blimp-hub-lote";
+
+export async function pegarLote() {
+  const r = await enviar<{ ok: boolean; lote?: LoteDoHub }>({ tipo: "pegar-lote" });
+  return r?.ok && r.lote ? r.lote : null;
+}
+export async function pegarItemDoLote(id: string) {
+  const r = await enviar<{ ok: boolean; pendente?: PendenteDoHub }>({ tipo: "pegar-item", id }, 60000);
+  return r?.ok && r.pendente ? r.pendente : null;
+}
+export async function consumirItemDoLote(id: string) {
+  await enviar({ tipo: "consumir-item", id });
+}
+export async function descartarLote() {
+  await enviar({ tipo: "descartar-lote" });
 }
 
 export function arquivoDoPendente(a: PendenteDoHub["arquivos"][number]) {

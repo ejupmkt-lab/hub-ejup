@@ -79,6 +79,8 @@ type Opcoes = {
   aoReceber?: () => void;
   // Projeto novo só consome o que a extensão guardou quando o projeto é criado
   consumirAoLer: boolean;
+  // A leitura vem de quem chamou (um pedido do lote), não do que a extensão guardou como "Ler agora"
+  ignorarExtensao?: boolean;
 };
 
 export function useLeituraHub(opcoes: Opcoes) {
@@ -212,6 +214,13 @@ export function useLeituraHub(opcoes: Opcoes) {
 
   // Ao abrir: se a extensão já trouxe a página do HUB, usa; senão, se o HUB foi permitido, puxa a aba aberta
   useEffect(() => {
+    if (op.current.ignorarExtensao) {
+      void extensaoInstalada().then((e) => {
+        setExtensao(e ? "sim" : "nao");
+        setConfigurada(!!e?.configurada);
+      });
+      return;
+    }
     let ativo = true;
     void extensaoInstalada().then(async (e) => {
       if (!ativo) return;
@@ -256,6 +265,7 @@ export function useLeituraHub(opcoes: Opcoes) {
     escolher,
     ler,
     puxar,
+    receber,
     // Para quem consome só depois (projeto novo)
     consumirLeitura: () => {
       if (pendenteId.current) void consumirPendente(pendenteId.current);

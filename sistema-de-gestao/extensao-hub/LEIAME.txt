@@ -6,6 +6,17 @@ iniciais, como os envolvidos do pedido), baixa os arquivos anexados com a sua pr
 HUB e leva tudo para o projeto que está aberto numa aba do Blimp. No Blimp aparece a prévia do que
 vai mudar; só vale quando você confirma. Os PDFs e imagens baixados ficam guardados no projeto.
 
+Botão de situação do pedido: ao ler a página, a extensão clica UMA vez no botão colorido de cima, à direita
+("Em andamento", "Aguardando Envio das notas fiscais"…), lê o que a página mostra por causa do clique e
+clica de novo para deixar a página como estava. O que apareceu vai para o Blimp junto com a leitura.
+
+Ler todos os projetos da lista: na lista de projetos do HUB (a que mostra todos os pedidos), clique no ícone
+da extensão e em "Ler todos os projetos da lista" (deixe a tela Novo projeto aberta numa aba do Blimp).
+A extensão abre cada pedido, lê a página, o botão de situação e os anexos, e volta à lista (recarrega o
+endereço dela). O número no ícone mostra o andamento; "Parar depois do pedido atual" interrompe. Na primeira
+vez o navegador pede permissão para o endereço do HUB. No Blimp, cada pedido vira um projeto (com o cliente
+pelo CNPJ), sozinho ou um a um para você conferir. Lê até 40 pedidos por vez, os que estão na tela da lista.
+
 Instalar:
 1. Descompacte esta pasta.
 2. No Chrome (ou Edge) abra chrome://extensions e ligue o "Modo do desenvolvedor".

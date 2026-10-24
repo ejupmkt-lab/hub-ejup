@@ -4,6 +4,7 @@ const el = (id) => document.getElementById(id);
 const botao = el("ler");
 let abaHub = null;
 let abaBlimp = null;
+let abaNovo = null;
 let acompanhando = null;
 let ultimoDiagnostico = null;
 
@@ -17,6 +18,7 @@ async function preparar() {
   const blimps = (await chrome.tabs.query({ url: `${ORIGEM_BLIMP}/*` })).filter((a) => /\/projetos\/(prj-|novo)/.test(a.url ?? ""));
   blimps.sort((a, b) => (b.lastAccessed ?? 0) - (a.lastAccessed ?? 0));
   abaBlimp = blimps[0] ?? null;
+  abaNovo = blimps.find((a) => /\/projetos\/novo/.test(a.url ?? "")) ?? null;
   const url = ativa?.url ?? "";
   if (!ativa || !/^https?:/.test(url)) {
     el("onde").textContent = "Abra a página do pedido no HUB nesta aba e clique de novo.";
@@ -33,6 +35,10 @@ async function preparar() {
   }
   el("onde").textContent = `Vai ler “${(ativa.title || new URL(url).host).slice(0, 60)}” e levar para o Blimp (projeto aberto ou tela Novo projeto).`;
   botao.disabled = false;
+  el("lote").disabled = !abaNovo;
+  el("ondeLote").textContent = abaNovo
+    ? "Na lista de projetos do HUB (a lista com todos os pedidos), leio cada pedido: abro, leio, baixo os anexos e volto. Os projetos aparecem na tela Novo projeto do Blimp."
+    : "Para ler todos os pedidos da lista, abra a tela Novo projeto numa aba do Blimp e volte à lista do HUB.";
 }
 
 // Mostra o andamento enquanto a extensão trabalha em segundo plano
@@ -106,7 +112,66 @@ async function iniciar() {
   }
 }
 
+async function iniciarLote() {
+  botao.disabled = true;
+  el("lote").disabled = true;
+  el("parar").style.display = "block";
+  el("parar").disabled = false;
+  el("parar").textContent = "Parar depois do pedido atual";
+  el("detalhes").replaceChildren();
+  el("acoes").replaceChildren();
+  try {
+    // O navegador pede a permissão uma vez: com ela, a extensão abre cada pedido sem perder o acesso à página
+    const origem = `${new URL(abaHub.url).origin}/*`;
+    if (!(await chrome.permissions.contains({ origins: [origem] })) && !(await chrome.permissions.request({ origins: [origem] }))) {
+      return dizer("Sem a permissão para este endereço do HUB não consigo abrir um pedido depois do outro.", "erro");
+    }
+    dizer("Procurando os pedidos da lista…");
+    acompanhar();
+    const r = await chrome.runtime.sendMessage({ tipo: "ler-lote", tabId: abaHub.id, blimpTabId: abaNovo.id });
+    mostrarLote(r ?? { ok: false, motivo: "erro", detalhe: "sem resposta" });
+  } finally {
+    clearInterval(acompanhando);
+    el("parar").style.display = "none";
+    botao.disabled = false;
+    el("lote").disabled = !abaNovo;
+  }
+}
+
+function mostrarLote(r) {
+  el("detalhes").replaceChildren();
+  el("acoes").replaceChildren();
+  // Para quem mantém o Blimp ajustar a leitura da lista: como cada linha foi achada e por onde a extensão andou
+  const b = document.createElement("button");
+  b.className = "sec";
+  b.textContent = "Copiar diagnóstico da leitura";
+  b.addEventListener("click", async () => {
+    await navigator.clipboard.writeText(JSON.stringify({ versao: chrome.runtime.getManifest().version, ...r }, null, 1));
+    b.textContent = "Copiado";
+  });
+  el("acoes").append(b);
+  if (!r.ok) {
+    const motivo =
+      r.motivo === "sem-lista"
+        ? "Não achei a lista de pedidos nesta página. Abra a lista de projetos do HUB (a que mostra todos os pedidos) e tente de novo."
+        : r.motivo === "nenhum"
+          ? "Não consegui ler nenhum pedido da lista."
+          : `Não consegui ler: ${r.detalhe ?? r.motivo}`;
+    dizer(motivo, "erro");
+    for (const p of r.problemas ?? []) item(`${p.codigo ? `Pedido ${p.codigo}: ` : ""}${p.motivo}.`);
+    return;
+  }
+  dizer(`Pronto: li ${r.lidos} de ${r.total} ${r.total === 1 ? "pedido" : "pedidos"}${r.interrompido ? " (parei a pedido seu)" : ""}. Confira no Blimp, na tela Novo projeto.`, "ok");
+  for (const p of r.problemas ?? []) item(`${p.codigo ? `Pedido ${p.codigo}: ` : ""}${p.motivo}.`);
+}
+
 botao.addEventListener("click", iniciar);
+el("lote").addEventListener("click", iniciarLote);
+el("parar").addEventListener("click", async () => {
+  await chrome.storage.session.set({ cancelar: true });
+  el("parar").disabled = true;
+  el("parar").textContent = "Parando…";
+});
 el("opcoes").addEventListener("click", (e) => {
   e.preventDefault();
   chrome.runtime.openOptionsPage();
