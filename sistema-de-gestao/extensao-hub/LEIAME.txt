@@ -16,9 +16,10 @@ Cada relatório baixado do cartão de uma etapa (ETAPA 01, 02…) vai para a ent
 botão de download não tiver endereço, a janelinha mostra "Copiar diagnóstico da leitura": cole o
 texto para quem mantém o Blimp ajustar a leitura.
 
-O que a página lista e a extensão não consegue baixar (por exemplo, um botão de download sem endereço) fica
-registrado no histórico do projeto, para constar que o documento existe. A extensão só passa o mouse; ela
-nunca clica em nada na página do HUB.
+O que a página lista e a extensão não consegue baixar fica
+registrado no histórico do projeto, para constar que o documento existe. Para baixar os relatórios, a extensão CLICA nos botões de download de cada etapa e documento (só nos que
+parecem de baixar: nunca em enviar, informações, excluir ou editar). Dá para desligar isso na janelinha, na
+caixa "Clicar nos botões de download".
 
 Se um anexo estiver em outro endereço (por exemplo, um armazenamento de arquivos), o navegador
 bloqueia o download. A extensão mostra um botão "Permitir baixar de ..." e lê de novo.

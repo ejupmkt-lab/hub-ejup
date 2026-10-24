@@ -169,6 +169,145 @@ async function lerPagina(passarMouse) {
   return { texto, links, passeios, diag };
 }
 
+// Acha, em cada cartão (ETAPA 01…) e em cada linha de documento, o botão de download que só tem ícone.
+// Só marca os que parecem de download; botões de enviar, excluir ou detalhes nunca entram.
+// (roda dentro da página: autossuficiente)
+function descobrirBotoesDeDownload(ignorarEtapas, ignorarRotulos) {
+  const normalizar = (t) => String(t ?? "").replace(/\s+/g, " ").trim();
+  const positivo = /download|baixar|file_download|cloud_download|arrow_downward|fa-download|bi-download|save_alt|get_app|tray-arrow-down|arrow-down-tray|\bdl\b/i;
+  const negativo = /upload|enviar|anexar|attach|publish|cloud_upload|arrow_upward|fa-upload|bi-upload|excluir|remover|delete|trash|lixeira|apagar|cancel|fechar|close|editar|edit|salvar|info|help|ajuda|detalh|visualiz|view|olho|\beye\b|\bver\b|add|plus|novo|nova/i;
+  const descritor = (el) => {
+    const partes = [el.getAttribute("title"), el.getAttribute("aria-label"), el.getAttribute("mattooltip"), el.getAttribute("data-tooltip"), typeof el.className === "string" ? el.className : "", el.innerText];
+    for (const f of el.querySelectorAll("*")) {
+      partes.push(typeof f.className === "string" ? f.className : f.getAttribute?.("class"));
+      if (f.tagName.toLowerCase() === "title") partes.push(f.textContent);
+      if (f.tagName.toLowerCase() === "use") partes.push(f.getAttribute("href") || f.getAttribute("xlink:href"));
+      if (f.tagName.toLowerCase() === "img") partes.push(f.getAttribute("alt"), (f.getAttribute("src") ?? "").split("/").pop());
+    }
+    return normalizar(partes.filter(Boolean).join(" ")).toLowerCase();
+  };
+  const soIcone = (el) => {
+    if (!(el instanceof HTMLElement)) return false;
+    const r = el.getBoundingClientRect();
+    if (r.width < 14 || r.height < 14 || r.width > 72 || r.height > 72) return false;
+    const t = normalizar(el.innerText);
+    return (!t || /^[a-z_]{3,30}$/.test(t)) && !!el.querySelector("svg, img, i, mat-icon, span[class*=icon]") || /^[a-z_]{3,30}$/.test(t);
+  };
+  const etapaDoElemento = (el) => {
+    let atual = el;
+    for (let i = 0; i < 10 && atual; i++, atual = atual.parentElement) {
+      const numeros = new Set([...(atual.innerText ?? "").matchAll(/ETAPA\s*0?(\d{1,2})\b/gi)].map((m) => Number(m[1])));
+      if (numeros.size === 1) return { etapa: [...numeros][0], cartao: atual };
+      if (numeros.size > 1) return { etapa: 0, cartao: null };
+    }
+    return { etapa: 0, cartao: null };
+  };
+  const grupos = new Map();
+  for (const el of document.querySelectorAll("button, a, [role=button]")) {
+    if (!soIcone(el)) continue;
+    const { etapa, cartao } = etapaDoElemento(el);
+    const chave = cartao ?? el.closest("li, tr, [class*=item], [class*=row], [class*=linha], [class*=doc]");
+    if (!chave) continue;
+    if (!grupos.has(chave)) grupos.set(chave, { etapa, botoes: [] });
+    grupos.get(chave).botoes.push(el);
+  }
+  const achados = [];
+  for (const [chave, g] of grupos) {
+    if (achados.length >= 14) break;
+    const rotulo = normalizar((chave.innerText ?? "").split("\n").map((l) => l.trim()).find(Boolean) ?? "").slice(0, 60);
+    if ((g.etapa && ignorarEtapas.includes(g.etapa)) || (rotulo && ignorarRotulos.some((r) => r && rotulo.toLowerCase().includes(r.toLowerCase())))) continue;
+    const notas = g.botoes.map((b) => {
+      const d = descritor(b);
+      return { b, nota: negativo.test(d) ? -100 : positivo.test(d) ? 10 : 0 };
+    });
+    let alvo = notas.filter((n) => n.nota >= 10)[0];
+    let motivo = "ícone de download";
+    // Cartão com vários botões só de ícone (informações, enviar, baixar): o de baixar é o último que não parece outra coisa
+    if (!alvo && g.botoes.length >= 2) {
+      const ultimo = notas[notas.length - 1];
+      if (ultimo.nota === 0) {
+        alvo = ultimo;
+        motivo = "último botão do cartão";
+      }
+    }
+    if (!alvo) continue;
+    const i = achados.length;
+    alvo.b.setAttribute("data-blimp-dl", String(i));
+    achados.push({ i, etapa: g.etapa, rotulo, motivo });
+  }
+  return achados;
+}
+
+// Clica no botão marcado e captura o arquivo que a página gera: o Blob que ela monta, ou o endereço que ela abriria.
+// Durante o clique, a página não consegue baixar sozinha nem sair dela. (roda no mundo da própria página)
+async function clicarECapturar(i, espera, limite) {
+  const el = document.querySelector(`[data-blimp-dl="${i}"]`);
+  if (!el) return { ok: false, motivo: "o botão não está mais na página" };
+  const capturas = [];
+  const tinhaCliqueProprio = Object.prototype.hasOwnProperty.call(HTMLAnchorElement.prototype, "click");
+  const orig = {
+    objeto: URL.createObjectURL,
+    clique: HTMLAnchorElement.prototype.click,
+    envio: EventTarget.prototype.dispatchEvent,
+    abrir: window.open,
+  };
+  const guardarLink = (a) => capturas.push({ tipo: "href", href: a.href, nome: a.getAttribute("download") || "" });
+  URL.createObjectURL = function (obj) {
+    if (obj instanceof Blob) capturas.push({ tipo: "blob", blob: obj });
+    return orig.objeto.call(URL, obj);
+  };
+  HTMLAnchorElement.prototype.click = function () {
+    if (this.href) guardarLink(this);
+  };
+  EventTarget.prototype.dispatchEvent = function (ev) {
+    if (this instanceof HTMLAnchorElement && ev?.type === "click" && this.href) {
+      guardarLink(this);
+      return true;
+    }
+    return orig.envio.call(this, ev);
+  };
+  window.open = function (url) {
+    if (url) capturas.push({ tipo: "href", href: new URL(String(url), location.href).href, nome: "" });
+    return null;
+  };
+  const lerBlob = (blob) =>
+    new Promise((resolve, reject) => {
+      const leitor = new FileReader();
+      leitor.onload = () => resolve(String(leitor.result).split(",")[1] ?? "");
+      leitor.onerror = () => reject(new Error("leitura"));
+      leitor.readAsDataURL(blob);
+    });
+  try {
+    el.click();
+    const inicio = Date.now();
+    let primeiro = 0;
+    while (Date.now() - inicio < espera) {
+      await new Promise((r) => setTimeout(r, 150));
+      if (capturas.length && !primeiro) primeiro = Date.now();
+      if (primeiro && Date.now() - primeiro > 450) break;
+    }
+    const itens = [];
+    // O nome que a página deu ao arquivo (atributo download do link que ela clicou)
+    const nomeSugerido = capturas.find((c) => c.tipo === "href" && c.nome)?.nome ?? "";
+    for (const c of capturas.slice(0, 3)) {
+      if (c.tipo === "blob") {
+        if (c.blob.size > limite) itens.push({ tipo: "grande", tamanho: c.blob.size });
+        else itens.push({ tipo: "blob", nome: nomeSugerido, mime: c.blob.type || "", tamanho: c.blob.size, base64: await lerBlob(c.blob) });
+      } else if (!/^(blob:|javascript:)/i.test(c.href) && !itens.some((x) => x.href === c.href)) itens.push({ tipo: "href", href: c.href, nome: c.nome });
+    }
+    return itens.length ? { ok: true, itens } : { ok: false, motivo: "o botão não gerou nenhum arquivo" };
+  } catch (e) {
+    return { ok: false, motivo: String(e?.message ?? e).slice(0, 80) };
+  } finally {
+    URL.createObjectURL = orig.objeto;
+    if (tinhaCliqueProprio) HTMLAnchorElement.prototype.click = orig.clique;
+    else delete HTMLAnchorElement.prototype.click;
+    EventTarget.prototype.dispatchEvent = orig.envio;
+    window.open = orig.abrir;
+    el.removeAttribute("data-blimp-dl");
+  }
+}
+
 // Baixa um arquivo com a sessão da própria página (mesmo endereço, com cookies)
 async function baixarNaPagina(url, limite) {
   try {
@@ -352,6 +491,60 @@ async function lerAgora({ tabId, blimpTabId }) {
       arquivos.push({ nome, tipo, tamanho: r.tamanho, base64: r.base64, url: link.url, etapa: link.etapa || 0 });
     }
 
+    // Botões de download sem endereço (como os do cartão de cada etapa): a extensão clica neles e captura o arquivo
+    const cliques = [];
+    const { opcoes } = await chrome.storage.local.get("opcoes");
+    if (opcoes?.clicar !== false) {
+      const etapasBaixadas = [...new Set(arquivos.map((a) => a.etapa).filter(Boolean))];
+      const rotulosBaixados = candidatos.map((l) => l.rotulo).filter(Boolean);
+      const [achou] = await chrome.scripting.executeScript({ target: { tabId }, func: descobrirBotoesDeDownload, args: [etapasBaixadas, rotulosBaixados] });
+      const botoes = achou?.result ?? [];
+      for (const [n, b] of botoes.entries()) {
+        await progresso({ etapa: "clicando", texto: `Baixando ${n + 1} de ${botoes.length}: ${b.etapa ? `etapa ${String(b.etapa).padStart(2, "0")}` : b.rotulo.slice(0, 50)}`, atual: n + 1, de: botoes.length });
+        const [exec] = await chrome.scripting.executeScript({ target: { tabId }, world: "MAIN", func: clicarECapturar, args: [b.i, 7000, MAX_ARQUIVO] });
+        const r = exec?.result ?? { ok: false, motivo: "sem resposta" };
+        const registro = { etapa: b.etapa, rotulo: b.rotulo, motivo: b.motivo, gerou: 0, erro: "" };
+        if (!r.ok) {
+          registro.erro = r.motivo;
+          cliques.push(registro);
+          continue;
+        }
+        for (const item of r.itens) {
+          let dados = null;
+          if (item.tipo === "grande") {
+            falhas.push({ nome: b.rotulo || `etapa ${b.etapa}`, url: "", motivo: "passa de 10 MB" });
+            continue;
+          }
+          if (item.tipo === "blob") dados = { tipo: item.mime, tamanho: item.tamanho, base64: item.base64, disposicao: "" };
+          else {
+            const [ex2] = await chrome.scripting.executeScript({ target: { tabId }, func: baixarNaPagina, args: [item.href, MAX_ARQUIVO] });
+            const x = ex2?.result;
+            if (!x?.ok) {
+              falhas.push({ nome: b.rotulo || `etapa ${b.etapa}`, url: item.href, motivo: x?.motivo ?? "sem resposta" });
+              continue;
+            }
+            dados = x;
+          }
+          const nomeBase = item.nome || (b.etapa ? `Relatorio-etapa-${String(b.etapa).padStart(2, "0")}` : b.rotulo || "arquivo-do-hub");
+          const nome = nomeDoArquivo({ nomeNoLink: item.nome || "", url: item.href ?? "", rotulo: nomeBase }, dados.disposicao, dados.tipo);
+          const tipo = TIPOS_GUARDADOS.includes(dados.tipo) ? dados.tipo : tipoPeloNome(nome);
+          if (!tipo) {
+            naoGuardados.push({ nome, tipo: (/\.([a-z0-9]{2,5})$/i.exec(nome)?.[1] ?? dados.tipo ?? "desconhecido").toUpperCase() });
+            continue;
+          }
+          if (total + dados.tamanho > MAX_TOTAL) {
+            falhas.push({ nome, url: "", motivo: "passou do limite total de 24 MB por leitura" });
+            continue;
+          }
+          total += dados.tamanho;
+          arquivos.push({ nome, tipo, tamanho: dados.tamanho, base64: dados.base64, url: item.href ?? "", etapa: b.etapa || 0 });
+          registro.gerou++;
+        }
+        cliques.push(registro);
+        await new Promise((r) => setTimeout(r, 400));
+      }
+    }
+
     const pendente = {
       id: crypto.randomUUID(),
       criadoEm: new Date().toISOString(),
@@ -361,7 +554,7 @@ async function lerAgora({ tabId, blimpTabId }) {
       textoCortado: texto.length > LIMITE_TEXTO,
       quadros,
       balaos,
-      diag: { ...diag, linksAchados: links.length },
+      diag: { ...diag, linksAchados: links.length, cliques },
       arquivos,
       falhas,
       naoGuardados,
@@ -375,7 +568,7 @@ async function lerAgora({ tabId, blimpTabId }) {
     const jan = await chrome.tabs.get(blimpTabId);
     await chrome.windows.update(jan.windowId, { focused: true }).catch(() => {});
     await progresso({ etapa: "pronto", texto: "Pronto. A prévia está no Blimp." });
-    return { ok: true, resumo: { arquivos: arquivos.length, falhas: falhas.length, naoGuardados: naoGuardados.length, quadros, caracteres: texto.length, balaos, diag: { ...diag, linksAchados: links.length } } };
+    return { ok: true, resumo: { arquivos: arquivos.length, falhas: falhas.length, naoGuardados: naoGuardados.length, quadros, caracteres: texto.length, balaos, cliques: cliques.length, diag: { ...diag, linksAchados: links.length, cliques } } };
   } catch (e) {
     return { ok: false, motivo: "erro", detalhe: String(e?.message ?? e) };
   } finally {

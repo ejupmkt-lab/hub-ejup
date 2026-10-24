@@ -63,8 +63,12 @@ function mostrarResultado(r) {
     });
     el("acoes").append(b);
   }
+  const cliques = r.resumo.diag?.cliques ?? [];
+  const bons = cliques.filter((c) => c.gerou);
+  if (bons.length) item(`Cliquei em ${bons.length} ${bons.length === 1 ? "botão" : "botões"} de download e baixei os arquivos (${bons.map((c) => (c.etapa ? `etapa ${String(c.etapa).padStart(2, "0")}` : c.rotulo)).join(", ")}).`);
+  for (const c of cliques.filter((x) => !x.gerou)) item(`O botão de download de ${c.etapa ? `etapa ${String(c.etapa).padStart(2, "0")}` : `“${c.rotulo}”`} não gerou arquivo (${c.erro || "sem arquivo"}).`);
   if (balaos) item(`Li ${balaos} ${balaos === 1 ? "balão" : "balões"} que só aparecem ao passar o mouse.`);
-  if (diag?.botoesSemEndereco) item(`${diag.botoesSemEndereco} ${diag.botoesSemEndereco === 1 ? "botão de download não tem" : "botões de download não têm"} endereço para eu baixar. O que está listado vai para o histórico do projeto.`);
+  if (diag?.botoesSemEndereco && !(r.resumo.diag?.cliques ?? []).some((c) => c.gerou)) item(`${diag.botoesSemEndereco} ${diag.botoesSemEndereco === 1 ? "botão de download não tem" : "botões de download não têm"} endereço para eu baixar. O que está listado vai para o histórico do projeto.`);
   for (const f of r.falhas ?? []) item(`Não baixei “${f.nome}”: ${f.motivo}.`);
   for (const n of r.naoGuardados ?? []) item(`“${n.nome}” (${n.tipo}) não é PDF nem imagem, então não foi guardado.`);
   const origens = [...new Set((r.falhas ?? []).map((f) => f.origemBloqueada).filter(Boolean))];
@@ -107,4 +111,8 @@ el("opcoes").addEventListener("click", (e) => {
   e.preventDefault();
   chrome.runtime.openOptionsPage();
 });
+chrome.storage.local.get("opcoes").then(({ opcoes }) => {
+  el("clicar").checked = opcoes?.clicar !== false;
+});
+el("clicar").addEventListener("change", () => chrome.storage.local.set({ opcoes: { clicar: el("clicar").checked } }));
 preparar();

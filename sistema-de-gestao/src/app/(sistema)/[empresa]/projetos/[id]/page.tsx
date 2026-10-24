@@ -355,7 +355,7 @@ export default function PaginaProjeto() {
               >
                 <span className="num text-sm text-tinta-2">
                   {h.em.slice(0, 10).split("-").reverse().join("/")}
-                  <span className="block">{h.em.slice(11, 16)}</span>
+                  {h.em.slice(11, 16) !== "00:00" && <span className="block">{h.em.slice(11, 16)}</span>}
                 </span>
                 <span className="min-w-0 break-words">
                   <span className="text-tinta">{h.acao}</span>

@@ -86,6 +86,27 @@ export function acoesDaImportacao(bruto: unknown[], id: IdentificacaoHub, semBlo
   return [...dados, ...lista];
 }
 
+// O que a IA leu no PDF do relatório de uma etapa baixado do HUB
+export type LeituraRelatorio = {
+  data_do_relatorio: string;
+  assinatura_consultor: string;
+  assinatura_cliente: string;
+  inicio_das_atividades: string;
+  fim_das_atividades: string;
+  datas: { data: string; o_que: string }[];
+  resumo: string;
+};
+export type LeiturasDosRelatorios = Record<number, LeituraRelatorio | { erro: string }>;
+const comLeitura = (l: LeiturasDosRelatorios | undefined, etapa: number): LeituraRelatorio | null => {
+  const x = l?.[etapa];
+  return x && !("erro" in x) ? x : null;
+};
+// Quando o relatório foi enviado, se o HUB não diz: no mínimo depois da última assinatura (ou da data do relatório)
+export function envioPeloRelatorio(l: LeituraRelatorio | null): string {
+  const datas = [l?.assinatura_cliente, l?.assinatura_consultor, l?.data_do_relatorio].filter((d): d is string => !!d && dataIso(d));
+  return datas.sort().at(-1) ?? "";
+}
+
 // ─── O que a página do HUB não traz e o consultor completa ──────────────────────
 
 export const rotuloDoPasso: Record<PassoHub, string> = {
@@ -112,11 +133,11 @@ export type Pendencias = {
   passosSemData: PassoHub[];
   pedePlano: boolean;
   // Etapas que o HUB mostra como enviadas e ainda não estão assim no projeto (com a data que a IA achou, se achou)
-  etapasEnviadas: { etapa: number; dataDaIA: string }[];
+  etapasEnviadas: { etapa: number; dataDaIA: string; dataDoRelatorio: boolean }[];
 };
 
 // projeto: o projeto em que se importa; null quando o projeto será criado agora (começa no diagnóstico, sem plano)
-export function pendenciasDoHub(r: RespostaImportacao, projeto: Projeto | null): Pendencias {
+export function pendenciasDoHub(r: RespostaImportacao, projeto: Projeto | null, leituras?: LeiturasDosRelatorios): Pendencias {
   const atual = projeto ? ordemPassos.indexOf(passoHubDoProjeto(projeto)) : ordemPassos.indexOf("diagnostico");
   const comData = new Set((r.acoes as { tipo?: string; passo?: string }[]).filter((a) => a?.tipo === "avancar_hub").map((a) => a.passo));
   const passosSemData = (r.passos_sem_data ?? []).filter(ePasso).filter((p, i, l) => l.indexOf(p) === i && !comData.has(p) && ordemPassos.indexOf(p) > atual);
@@ -127,8 +148,19 @@ export function pendenciasDoHub(r: RespostaImportacao, projeto: Projeto | null):
   const etapasEnviadas = (r.etapas ?? [])
     .filter((e) => (e.situacao === "enviada" || e.situacao === "aprovada") && (!projeto || !projeto.etapas.find((x) => x.ordem === e.etapa && (x.status === "enviada" || x.status === "aprovada" ) && x.relatorioAssinado)))
     .filter((e) => !projeto || projeto.etapas.some((x) => x.ordem === e.etapa))
-    .map((e) => ({ etapa: e.etapa, dataDaIA: dataIso(e.data) ? e.data : "" }));
+    .map((e) => {
+      const doHub = dataIso(e.data) ? e.data : "";
+      const doRelatorio = envioPeloRelatorio(comLeitura(leituras, e.etapa));
+      return { etapa: e.etapa, dataDaIA: doHub || doRelatorio, dataDoRelatorio: !doHub && !!doRelatorio };
+    });
   return { passosSemData, pedePlano, etapasEnviadas };
+}
+
+// As datas escritas no relatório, para a ação de envio da etapa
+function datasDoRelatorio(l: LeituraRelatorio | null) {
+  if (!l) return {};
+  const v = (d: string) => (dataIso(d) ? d : undefined);
+  return { inicio: v(l.inicio_das_atividades), data_relatorio: v(l.data_do_relatorio), assinatura_consultor: v(l.assinatura_consultor), assinatura_cliente: v(l.assinatura_cliente) };
 }
 
 // As ações na ordem em que o sistema as aceita: dados, plano, passos até o pagamento, envios das etapas, passos de depois
@@ -139,6 +171,7 @@ export function montarAcoes(
   projeto: Projeto | null,
   relatorios: Record<number, { caminho: string; nome: string }>,
   incluirDiagnostico = true,
+  leituras?: LeiturasDosRelatorios,
 ): AcaoIA[] {
   const base = acoesDaImportacao(r.acoes, r.identificacao, semBloqueio);
   const dados = base.filter((a) => a.tipo === "dados_hub");
@@ -146,7 +179,7 @@ export function montarAcoes(
   const plano = base.filter((a) => a.tipo === "alterar_plano_hub");
   const situacao = base.filter((a) => a.tipo === "mudar_situacao_etapa");
   const passos = base.filter((a): a is Extract<AcaoIA, { tipo: "avancar_hub" }> => a.tipo === "avancar_hub" && (incluirDiagnostico || a.passo !== "diagnostico"));
-  const pend = pendenciasDoHub(r, projeto);
+  const pend = pendenciasDoHub(r, projeto, leituras);
 
   // Datas informadas pelo consultor
   for (const p of pend.passosSemData) if (dataIso(c.passos[p])) passos.push({ tipo: "avancar_hub", passo: p, data: c.passos[p] });
@@ -159,13 +192,13 @@ export function montarAcoes(
   const envios: AcaoIA[] = [];
   for (const e of pend.etapasEnviadas) {
     const data = dataIso(c.envios[e.etapa]) ? c.envios[e.etapa] : e.dataDaIA;
-    if (dataIso(data)) envios.push({ tipo: "registrar_envio_etapa", etapa: e.etapa, data, relatorio: relatorios[e.etapa] });
+    if (dataIso(data)) envios.push({ tipo: "registrar_envio_etapa", etapa: e.etapa, data, relatorio: relatorios[e.etapa], ...datasDoRelatorio(comLeitura(leituras, e.etapa)) });
   }
   // Etapa já enviada no projeto, sem o PDF: só anexa o relatório
   if (projeto)
     for (const [ordem, rel] of Object.entries(relatorios)) {
       const e = projeto.etapas.find((x) => x.ordem === Number(ordem));
-      if (e && (e.status === "enviada" || e.status === "aprovada") && !e.relatorioAssinado && e.enviadaEm) envios.push({ tipo: "registrar_envio_etapa", etapa: e.ordem, data: e.enviadaEm, relatorio: rel });
+      if (e && (e.status === "enviada" || e.status === "aprovada") && !e.relatorioAssinado && e.enviadaEm) envios.push({ tipo: "registrar_envio_etapa", etapa: e.ordem, data: e.enviadaEm, relatorio: rel, ...datasDoRelatorio(comLeitura(leituras, e.ordem)) });
     }
   return [...dados, ...definir, ...plano, ...antes, ...envios, ...depois, ...situacao];
 }

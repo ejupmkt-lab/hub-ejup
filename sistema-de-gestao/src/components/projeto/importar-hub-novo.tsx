@@ -17,7 +17,8 @@ import { dadosParaFormulario, formatarCnpj, type DadosCnpj } from "@/lib/cnpj";
 import { traduzirErro } from "@/lib/erros";
 import { Botao, Campo } from "@/components/ui";
 import { registrarDocumentosNoHistorico } from "@/lib/hub-documentos";
-import { CompletarDados, DocumentosDoHub, EntradaDoHub, LidoDaPagina, relatoriosDasEtapas, useLeituraHub } from "./hub-leitura";
+import { registrarLinhaDoTempoDoHub } from "@/lib/hub-historico";
+import { CompletarDados, DatasDosRelatorios, DocumentosDoHub, EntradaDoHub, LidoDaPagina, relatoriosDasEtapas, useLeituraHub } from "./hub-leitura";
 
 const BUCKET = "evidencias";
 const digitos = (t: string) => (t ?? "").replace(/\D/g, "");
@@ -53,7 +54,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
     // Só se consome o que a extensão guardou quando o projeto é criado
     consumirAoLer: false,
   });
-  const { materiais, entrega, erro, setErro } = h;
+  const { materiais, entrega, erro, setErro, leituras } = h;
 
   const modelos = servicosDaEmpresa(estado, slug);
   const clientes = estado.clientes.filter((c) => c.empresa === slug);
@@ -84,10 +85,10 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
   // Relatórios por etapa (o primeiro PDF do cartão de cada etapa no HUB) e o que o consultor completou
   const relFiles = useMemo(() => relatoriosDasEtapas(materiais), [materiais]);
   const relPrevia = useMemo(() => Object.fromEntries(Object.entries(relFiles).map(([e, f]) => [Number(e), { caminho: "previa", nome: f.name }])), [relFiles]);
-  const pend = useMemo(() => (lido ? pendenciasDoHub(lido, null) : null), [lido]);
+  const pend = useMemo(() => (lido ? pendenciasDoHub(lido, null, leituras) : null), [lido, leituras]);
   // Ações da importação: o diagnóstico define a data do começo do projeto; código e gestor entram na criação
   const dataDiagnostico = useMemo(() => (lido?.acoes as { tipo?: string; passo?: string; data?: string }[] | undefined)?.find((a) => a?.tipo === "avancar_hub" && a.passo === "diagnostico")?.data, [lido]);
-  const acoes = useMemo(() => (lido ? montarAcoes(lido, false, c, null, relPrevia, false) : []), [lido, c, relPrevia]);
+  const acoes = useMemo(() => (lido ? montarAcoes(lido, false, c, null, relPrevia, false, leituras) : []), [lido, c, relPrevia, leituras]);
   const etapasComRelatorio = useMemo(() => new Set(acoes.flatMap((a) => (a.tipo === "registrar_envio_etapa" && a.relatorio ? [a.etapa] : []))), [acoes]);
   const paraMateriais = materiais.filter((m) => !(m.etapa > 0 && relFiles[m.etapa] === m.arquivo && etapasComRelatorio.has(m.etapa)));
 
@@ -165,7 +166,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
         if (error) naoSubiu.push(arquivo.name);
         else relatorios[etapa] = { caminho, nome: arquivo.name };
       }
-      const acoesFinais = montarAcoes(lido, false, c, null, relatorios, false);
+      const acoesFinais = montarAcoes(lido, false, c, null, relatorios, false, leituras);
       const montado = montar(id, clienteId, cliente?.ramo ?? clienteExistente?.ramo ?? "", acoesFinais);
       if (!montado) throw new Error("Escolha o serviço.");
       const guardados = [];
@@ -181,6 +182,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
       // 3. Tudo de uma vez, para o projeto nascer já completo
       const itens = montado.itens.filter((i) => !i.aviso).map((i) => i.descricao);
       registrarDocumentosNoHistorico(montado.projeto, usuario.nome, lido.documentos, [...guardados.map((g) => g.nome), ...Object.values(relatorios).map((r) => r.nome)]);
+      registrarLinhaDoTempoDoHub(montado.projeto, usuario.nome, acoesFinais, leituras);
       registrarEvento(montado.projeto, usuario.nome, "Projeto criado a partir do HUB", [...itens, ...avisosFinais, ...(naoSubiu.length ? [`não guardei: ${naoSubiu.join(", ")}`] : [])].join("; ") || undefined);
       atualizar((r) => {
         if (cliente) r.clientes.push(cliente);
@@ -283,6 +285,7 @@ export function ImportarHubNovo({ slug, aoFechar }: { slug: EmpresaSlug; aoFecha
             </p>
           )}
 
+          <DatasDosRelatorios h={h} />
           {pend && <CompletarDados pend={pend} c={c} setC={setC} relatorios={relFiles} />}
 
           <div>

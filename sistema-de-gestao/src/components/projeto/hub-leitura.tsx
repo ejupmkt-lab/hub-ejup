@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { rotuloDoPasso, type Completar, type DocumentoDoHub, type Pendencias, type RespostaImportacao } from "@/lib/hub-importar";
+import { rotuloDoPasso, type Completar, type DocumentoDoHub, type LeituraRelatorio, type LeiturasDosRelatorios, type Pendencias, type RespostaImportacao } from "@/lib/hub-importar";
+import { formatarData } from "@/lib/datas";
 import { itensDosDocumentos } from "@/lib/hub-documentos";
 import {
   ARQUIVO_DA_EXTENSAO,
@@ -84,6 +85,9 @@ export function useLeituraHub(opcoes: Opcoes) {
   const [configurada, setConfigurada] = useState(false);
   const [materiais, setMateriais] = useState<Material[]>([]);
   const [entrega, setEntrega] = useState<Entrega | null>(null);
+  // O que a IA leu nos PDFs dos relatórios de cada etapa (datas de assinatura, atividades…)
+  const [leituras, setLeituras] = useState<LeiturasDosRelatorios>({});
+  const [lendoRelatorios, setLendoRelatorios] = useState<string | null>(null);
   const pendenteId = useRef<string | null>(null);
   const tentouSozinho = useRef(false);
   const jaRecebidos = useRef(new Set<string>());
@@ -118,6 +122,33 @@ export function useLeituraHub(opcoes: Opcoes) {
     }
   };
 
+  // A IA lê cada relatório baixado (um pedido por PDF, dois ao mesmo tempo) e devolve as datas escritas nele
+  const lerRelatorios = async (porEtapa: Record<number, File>) => {
+    const fila = Object.keys(porEtapa).map(Number).sort((a, b) => a - b);
+    if (!fila.length) return;
+    const trabalhar = async () => {
+      for (let n = fila.shift(); n !== undefined; n = fila.shift()) {
+        const arquivo = porEtapa[n];
+        setLendoRelatorios(`Lendo o relatório da etapa ${String(n).padStart(2, "0")}…`);
+        try {
+          if (arquivo.size > 3.8 * 1024 * 1024) throw new Error("O PDF é grande demais para a IA ler (mais de 3,8 MB). Informe as datas à mão.");
+          const f = new FormData();
+          f.append("modo", "relatorio");
+          f.append("etapa", String(n));
+          f.append("arquivos", arquivo);
+          const r = await fetch("/api/hub/importar", { method: "POST", body: f });
+          const d = await r.json().catch(() => ({}));
+          if (!r.ok) throw new Error(d.erro ?? "Não foi possível ler o relatório.");
+          setLeituras((l) => ({ ...l, [n]: d as LeituraRelatorio }));
+        } catch (e) {
+          setLeituras((l) => ({ ...l, [n]: { erro: e instanceof Error ? e.message : "Não foi possível ler o relatório." } }));
+        }
+      }
+    };
+    await Promise.all([trabalhar(), trabalhar()]);
+    setLendoRelatorios(null);
+  };
+
   // A extensão leu a página (e baixou os anexos) a pedido do consultor: entra aqui e a IA já lê
   const receber = async (p: PendenteDoHub) => {
     if (jaRecebidos.current.has(p.id)) return;
@@ -133,7 +164,9 @@ export function useLeituraHub(opcoes: Opcoes) {
       setTexto(p.texto);
       setArquivos([]);
       pendenteId.current = p.id;
-      const leu = await ler(p.texto, paraIA);
+      setLeituras({});
+      const relatorios = relatoriosDasEtapas(todos.map((arquivo, i) => ({ arquivo, lidoPelaIA: false, etapa: p.arquivos[i].etapa ?? 0 })));
+      const [leu] = await Promise.all([ler(p.texto, paraIA), lerRelatorios(relatorios)]);
       if (leu && op.current.consumirAoLer) void consumirPendente(p.id);
     } finally {
       setPuxando(false);
@@ -194,6 +227,8 @@ export function useLeituraHub(opcoes: Opcoes) {
     configurada,
     materiais,
     entrega,
+    leituras,
+    lendoRelatorios,
     escolher,
     ler,
     puxar,
@@ -405,10 +440,45 @@ export function CompletarDados({ pend, c, setC, relatorios }: { pend: Pendencias
             `Etapa ${String(e.etapa).padStart(2, "0")} enviada no HUB em`,
             c.envios[e.etapa] ?? e.dataDaIA,
             (v) => setC({ ...c, envios: { ...c.envios, [e.etapa]: v } }),
-            relatorios[e.etapa] ? `O relatório “${relatorios[e.etapa].name}” vai para Entregas.` : "O HUB não tinha o relatório para baixar: anexe o PDF depois em Entregas.",
+            e.dataDoRelatorio
+              ? `Data tirada do relatório “${relatorios[e.etapa]?.name ?? ""}” (a mais recente entre o fechamento e as assinaturas). Confira.`
+              : relatorios[e.etapa]
+                ? `O relatório “${relatorios[e.etapa].name}” vai para Entregas.`
+                : "O HUB não tinha o relatório para baixar: anexe o PDF depois em Entregas.",
           ),
         )}
       </div>
+    </div>
+  );
+}
+
+// O que a IA leu nos relatórios das etapas: as datas escritas neles, que passam para as etapas e o histórico
+export function DatasDosRelatorios({ h }: { h: LeituraHub }) {
+  const etapas = Object.keys(h.leituras).map(Number).sort((a, b) => a - b);
+  if (!etapas.length && !h.lendoRelatorios) return null;
+  const f = (d: string) => (/^\d{4}-\d{2}-\d{2}$/.test(d ?? "") ? formatarData(d) : "");
+  return (
+    <div>
+      <h3 className="mb-1.5 text-[13px] font-semibold">Datas lidas nos relatórios das etapas</h3>
+      {h.lendoRelatorios && <p className="mb-1 text-[13px] font-semibold text-azul">{h.lendoRelatorios}</p>}
+      <ul className="list-disc space-y-1 pl-5 text-[14px]">
+        {etapas.map((n) => {
+          const l = h.leituras[n];
+          if ("erro" in l) return <li key={n} className="text-laranja">Etapa {String(n).padStart(2, "0")}: {l.erro}</li>;
+          const partes = [
+            f(l.data_do_relatorio) && `fechado em ${f(l.data_do_relatorio)}`,
+            f(l.assinatura_consultor) && `assinado pelo consultor em ${f(l.assinatura_consultor)}`,
+            f(l.assinatura_cliente) && `assinado pela empresa em ${f(l.assinatura_cliente)}`,
+            f(l.inicio_das_atividades) && `atividades de ${f(l.inicio_das_atividades)}${f(l.fim_das_atividades) ? ` a ${f(l.fim_das_atividades)}` : ""}`,
+          ].filter(Boolean);
+          return (
+            <li key={n}>
+              Etapa {String(n).padStart(2, "0")}: {partes.length ? partes.join("; ") : "o relatório não traz datas"}
+              {l.datas?.length ? <span className="text-tinta-2"> · {l.datas.length} {l.datas.length === 1 ? "data citada" : "datas citadas"}, que entram no histórico</span> : null}
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }

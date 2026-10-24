@@ -10,7 +10,8 @@ import { traduzirErro } from "@/lib/erros";
 import { Botao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 import { registrarDocumentosNoHistorico } from "@/lib/hub-documentos";
-import { CompletarDados, DocumentosDoHub, EntradaDoHub, LidoDaPagina, relatoriosDasEtapas, useLeituraHub } from "./hub-leitura";
+import { registrarLinhaDoTempoDoHub } from "@/lib/hub-historico";
+import { CompletarDados, DatasDosRelatorios, DocumentosDoHub, EntradaDoHub, LidoDaPagina, relatoriosDasEtapas, useLeituraHub } from "./hub-leitura";
 
 const BUCKET = "evidencias";
 
@@ -41,15 +42,15 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
     },
     consumirAoLer: true,
   });
-  const { materiais, entrega, erro, setErro } = h;
+  const { materiais, entrega, erro, setErro, leituras } = h;
 
   const conferencia = useMemo(() => (lido ? conferirIdentificacao(projeto, cliente, lido.identificacao) : null), [lido, projeto, cliente]);
   const bloqueado = !!conferencia?.bloqueios.length && !insistir;
   // O primeiro PDF de cada etapa, baixado do cartão dela no HUB, vira o relatório da etapa em Entregas
   const relFiles = useMemo(() => relatoriosDasEtapas(materiais), [materiais]);
   const relPrevia = useMemo(() => Object.fromEntries(Object.entries(relFiles).map(([e, f]) => [Number(e), { caminho: "previa", nome: f.name }])), [relFiles]);
-  const pend = useMemo(() => (lido ? pendenciasDoHub(lido, projeto) : null), [lido, projeto]);
-  const acoes = useMemo(() => (lido ? montarAcoes(lido, !bloqueado, c, projeto, relPrevia) : []), [lido, bloqueado, c, projeto, relPrevia]);
+  const pend = useMemo(() => (lido ? pendenciasDoHub(lido, projeto, leituras) : null), [lido, projeto, leituras]);
+  const acoes = useMemo(() => (lido ? montarAcoes(lido, !bloqueado, c, projeto, relPrevia, true, leituras) : []), [lido, bloqueado, c, projeto, relPrevia, leituras]);
   const etapasComRelatorio = useMemo(() => new Set(acoes.flatMap((a) => (a.tipo === "registrar_envio_etapa" && a.relatorio ? [a.etapa] : []))), [acoes]);
   // Os demais arquivos ficam em "Materiais do HUB"
   const paraMateriais = materiais.filter((m) => !(m.etapa > 0 && relFiles[m.etapa] === m.arquivo && etapasComRelatorio.has(m.etapa)));
@@ -77,7 +78,7 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
         if (error) naoSubiu.push(arquivo.name);
         else relatorios[etapa] = { caminho, nome: arquivo.name };
       }
-      const acoesFinais = montarAcoes(lido, !bloqueado, c, projeto, relatorios);
+      const acoesFinais = montarAcoes(lido, !bloqueado, c, projeto, relatorios, true, leituras);
       for (const m of paraMateriais) {
         const ext = m.arquivo.name.match(/\.([a-z0-9]{2,5})$/i)?.[1]?.toLowerCase() ?? "bin";
         const caminho = `${projeto.empresa}/${projeto.id}/hub/${crypto.randomUUID()}.${ext}`;
@@ -94,7 +95,9 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
           void aplicarAcoes(p, acoesFinais, [], id, usuario.nome);
           if (guardados.length) p.materiaisHub = [...(p.materiaisHub ?? []), ...guardados];
           // O que o HUB lista e não deu para baixar fica ao menos no histórico
-          registrarDocumentosNoHistorico(p, usuario.nome, lido.documentos, guardados.map((g) => g.nome));
+          registrarDocumentosNoHistorico(p, usuario.nome, lido.documentos, [...guardados.map((g) => g.nome), ...Object.values(relatorios).map((r) => r.nome)]);
+          // A linha do tempo como realmente foi: cada passo e cada envio com a data de verdade
+          registrarLinhaDoTempoDoHub(p, usuario.nome, acoesFinais, leituras);
         },
         { acao: "HUB: dados importados da página do pedido", detalhe: [...efetivos, ...dosMateriais].map((x) => x.descricao).join("; ") },
       );
@@ -162,6 +165,7 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
             ))
           )}
 
+          {!bloqueado && <DatasDosRelatorios h={h} />}
           {!bloqueado && pend && <CompletarDados pend={pend} c={c} setC={setC} relatorios={relFiles} />}
 
           {!bloqueado && (

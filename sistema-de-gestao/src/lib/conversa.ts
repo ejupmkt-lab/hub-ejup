@@ -28,7 +28,17 @@ export type AcaoIA =
   // Só vem da importação do HUB (a conversa não oferece): código do pedido e gestor lidos na página do HUB
   | { tipo: "dados_hub"; codigo_hub: string; gestor: string }
   // Só vem da importação do HUB: a etapa já foi enviada no HUB na data dada; com o PDF do relatório, ele fica em Entregas
-  | { tipo: "registrar_envio_etapa"; etapa: number; data: string; relatorio?: { caminho: string; nome: string } };
+  | {
+      tipo: "registrar_envio_etapa";
+      etapa: number;
+      data: string;
+      relatorio?: { caminho: string; nome: string };
+      // Datas lidas no relatório da etapa (quando a IA leu o PDF baixado do HUB)
+      inicio?: string;
+      data_relatorio?: string;
+      assinatura_consultor?: string;
+      assinatura_cliente?: string;
+    };
 
 // O que a IA fez (ou tentou e o sistema não deixou, com o motivo)
 export type ItemAcao = { descricao: string; aviso?: boolean };
@@ -230,11 +240,24 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
       if (a.relatorio) {
         e.relatorioAssinado = { caminho: a.relatorio.caminho, nome: a.relatorio.nome, enviadoEm: `${a.data}T12:00:00`, por: autor };
         e.relatorioExterno = true;
-        e.assinaturaConsultor ??= a.data;
-        e.assinaturaCliente ??= a.data;
       }
+      // Datas escritas no relatório: assinaturas, fechamento e começo das atividades
+      const consultorEm = a.assinatura_consultor && dataValida(a.assinatura_consultor) ? a.assinatura_consultor : null;
+      const clienteEm = a.assinatura_cliente && dataValida(a.assinatura_cliente) ? a.assinatura_cliente : null;
+      if (a.relatorio || consultorEm || clienteEm) {
+        e.assinaturaConsultor = consultorEm ?? e.assinaturaConsultor ?? (a.relatorio ? a.data : null);
+        e.assinaturaCliente = clienteEm ?? e.assinaturaCliente ?? (a.relatorio ? a.data : null);
+      }
+      if (a.data_relatorio && dataValida(a.data_relatorio)) e.dataRelatorio = a.data_relatorio;
+      if (a.inicio && dataValida(a.inicio) && a.inicio <= a.data) e.iniciadaEm = a.inicio;
+      const datasDoRelatorio = [
+        a.data_relatorio && dataValida(a.data_relatorio) && `relatório de ${formatarData(a.data_relatorio)}`,
+        a.inicio && dataValida(a.inicio) && `atividades desde ${formatarData(a.inicio)}`,
+        consultorEm && `assinado pelo consultor em ${formatarData(consultorEm)}`,
+        clienteEm && `assinado pela empresa em ${formatarData(clienteEm)}`,
+      ].filter(Boolean);
       feito(
-        `${et}: ${jaEnviada ? "relatório guardado em Entregas" : `enviada no HUB em ${formatarData(a.data)}`}${a.relatorio && !jaEnviada ? `, com o relatório “${resumo(a.relatorio.nome)}” em Entregas` : a.relatorio ? ` (“${resumo(a.relatorio.nome)}”)` : ""}`,
+        `${et}: ${jaEnviada ? "relatório guardado em Entregas" : `enviada no HUB em ${formatarData(a.data)}`}${a.relatorio && !jaEnviada ? `, com o relatório “${resumo(a.relatorio.nome)}” em Entregas` : a.relatorio ? ` (“${resumo(a.relatorio.nome)}”)` : ""}${datasDoRelatorio.length ? `; lido do relatório: ${datasDoRelatorio.join(", ")}` : ""}`,
       );
       return;
     }

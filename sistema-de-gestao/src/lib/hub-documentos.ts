@@ -1,5 +1,4 @@
 import type { Projeto } from "./dados/tipos";
-import { registrarEvento } from "./dados/store";
 import type { DocumentoDoHub } from "./hub-importar";
 
 // Documentos que a página do HUB lista (contrato, recibo, atesto…). Os que a extensão não consegue baixar
@@ -33,12 +32,28 @@ export function itensDosDocumentos(docs: DocumentoDoHub[] | undefined, nomesBaix
   return (docs ?? []).filter((d) => d.nome?.trim()).map((d) => ({ doc: d, baixado: foiBaixado(d, nomesBaixados), texto: descrever(d, foiBaixado(d, nomesBaixados)) }));
 }
 
-// Registra no histórico (uma vez só, mesmo que a mesma lista seja importada de novo)
+// "10/09/2026 21:52:53" ou "10/09/2026" → "2026-09-10T21:52:53" (Brasília), como o histórico guarda
+export function dataHoraDoHub(texto: string): string | null {
+  const m = /(\d{2})\/(\d{2})\/(\d{4})(?:\D+(\d{2}):(\d{2})(?::(\d{2}))?)?/.exec(texto ?? "");
+  if (!m) return null;
+  const [, d, mes, a, h = "00", mi = "00", se = "00"] = m;
+  return `${a}-${mes}-${d}T${h}:${mi}:${se}`;
+}
+
+// Cada documento que o HUB lista entra no histórico com a data em que foi gerado ou enviado lá;
+// os que não deu para baixar dizem isso (uma vez só, mesmo que a mesma lista seja importada de novo)
 export function registrarDocumentosNoHistorico(p: Projeto, usuario: string, docs: DocumentoDoHub[] | undefined, nomesBaixados: string[]) {
-  const itens = itensDosDocumentos(docs, nomesBaixados);
-  if (!itens.length) return;
-  const acao = "HUB: documentos listados na página do pedido";
-  const detalhe = itens.map((i) => i.texto).join("; ");
-  if (p.historico.some((e) => e.acao === acao && e.detalhe === detalhe)) return;
-  registrarEvento(p, usuario, acao, detalhe);
+  for (const i of itensDosDocumentos(docs, nomesBaixados)) {
+    const em = dataHoraDoHub(i.doc.data) ?? new Date(Date.now() - 3 * 3_600_000).toISOString().slice(0, 19);
+    const acao = `Documento no HUB: ${i.doc.nome.trim()}`;
+    const detalhe = `${i.baixado ? "Baixado e guardado no projeto" : "Só registrado: não deu para baixar"}; importado por ${usuario}`;
+    if (p.historico.some((e) => e.em === em && e.acao === acao)) continue;
+    p.historico.push({ em, usuario: i.doc.por?.trim() || "HUB SEBRAE", acao, detalhe });
+  }
+  ordenarHistorico(p);
+}
+
+// O histórico fica do mais novo para o mais antigo, pela data de verdade
+export function ordenarHistorico(p: Projeto) {
+  p.historico = p.historico.map((e, i) => ({ e, i })).sort((x, y) => (y.e.em < x.e.em ? -1 : y.e.em > x.e.em ? 1 : x.i - y.i)).map((x) => x.e);
 }
