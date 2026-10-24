@@ -31,10 +31,10 @@ const situacoes = {
   comigo: "Comigo",
   aguardando: "Aguardando outros",
   atrasados: "Atrasados",
-  encerrados: "Concluídos",
   todos: "Todos",
 } as const;
-type Situacao = keyof typeof situacoes;
+// "encerrados" é a aba dos projetos finalizados (concluídos no HUB), fora da lista de situações
+type Situacao = keyof typeof situacoes | "encerrados";
 
 const ordens = { urgencia: "Por urgência", nome: "Por nome", entrega: "Por entrega", avanco: "Por avanço" } as const;
 type Ordem = keyof typeof ordens;
@@ -61,6 +61,9 @@ export default function Projetos() {
     (s === "comigo" && p.status !== "encerrado" && comQuem(p) === "consultor") ||
     (s === "aguardando" && aguardandoOutros(p)) ||
     (s === "encerrados" && p.status === "encerrado");
+  const finalizados = daEmpresa.filter((p) => p.status === "encerrado").length;
+  const emAndamento = daEmpresa.length - finalizados;
+  const aba: "andamento" | "finalizados" = situacao === "encerrados" ? "finalizados" : "andamento";
   const termo = busca.trim().toLowerCase();
   const urgencia = (p: Projeto) => Math.min(9, ...alertasDoProjeto(p).map((a) => a.ordem));
   const projetos = daEmpresa
@@ -78,7 +81,7 @@ export default function Projetos() {
 
   return (
     <>
-      <Cabecalho titulo="Projetos" subtitulo={`${empresa.nome} · ${daEmpresa.filter((p) => p.status !== "encerrado").length} em andamento`}>
+      <Cabecalho titulo="Projetos" subtitulo={`${empresa.nome} · ${emAndamento} em andamento${finalizados ? ` · ${finalizados} ${finalizados === 1 ? "finalizado" : "finalizados"}` : ""}`}>
         <BotaoLink href={`/${slug}/projetos/novo`} className="w-full sm:w-auto">
           <IconeMaisSinal className="h-4 w-4" />
           Novo projeto
@@ -92,6 +95,16 @@ export default function Projetos() {
       ) : (
         <div className="space-y-4">
           <Segmentos
+            rotulo="Projetos"
+            atual={aba}
+            aoTrocar={(v) => setSituacao(v === "finalizados" ? "encerrados" : "andamento")}
+            opcoes={[
+              { valor: "andamento", rotulo: `Em andamento (${emAndamento})` },
+              { valor: "finalizados", rotulo: `Finalizados (${finalizados})` },
+            ]}
+          />
+
+          <Segmentos
             rotulo="Visão"
             atual={visao}
             aoTrocar={setVisao}
@@ -103,21 +116,23 @@ export default function Projetos() {
             ]}
           />
 
-          <Cartao className="grid grid-cols-2 gap-2 p-2 sm:grid-cols-[minmax(0,13rem)_minmax(0,13rem)_1fr]">
-            <label className="min-w-0">
-              <span className="sr-only">Situação</span>
-              <select
-                className="campo !pl-2.5 !pr-7 !text-sm sm:!pl-3 sm:!text-[15px]"
-                value={situacao}
-                onChange={(e) => setSituacao(e.target.value as Situacao)}
-              >
-                {(Object.keys(situacoes) as Situacao[]).map((s) => (
-                  <option key={s} value={s}>
-                    {situacoes[s]}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <Cartao className={`grid grid-cols-2 gap-2 p-2 ${aba === "andamento" ? "sm:grid-cols-[minmax(0,13rem)_minmax(0,13rem)_1fr]" : "sm:grid-cols-[minmax(0,13rem)_1fr]"}`}>
+            {aba === "andamento" && (
+              <label className="min-w-0">
+                <span className="sr-only">Situação</span>
+                <select
+                  className="campo !pl-2.5 !pr-7 !text-sm sm:!pl-3 sm:!text-[15px]"
+                  value={situacao}
+                  onChange={(e) => setSituacao(e.target.value as Situacao)}
+                >
+                  {(Object.keys(situacoes) as (keyof typeof situacoes)[]).map((s) => (
+                    <option key={s} value={s}>
+                      {situacoes[s]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
             <label className="min-w-0">
               <span className="sr-only">Ordenar</span>
               <select className="campo !pl-2.5 !pr-7 !text-sm sm:!pl-3 sm:!text-[15px]" value={ordem} onChange={(e) => setOrdem(e.target.value as Ordem)}>
@@ -143,7 +158,12 @@ export default function Projetos() {
 
           {projetos.length === 0 ? (
             <p className="rounded-[var(--radius-bloco)] border border-dashed border-linha-forte py-10 text-center text-[15px] text-tinta-2">
-              Nenhum projeto nesta busca ou situação.
+              {aba === "finalizados" ? "Nenhum projeto finalizado ainda. Os projetos concluídos no HUB ficam aqui." : "Nenhum projeto nesta busca ou situação."}
+              {aba === "andamento" && !termo && finalizados > 0 && situacao === "andamento" && (
+                <button type="button" className="ml-1 font-semibold text-azul underline-offset-4 hover:underline" onClick={() => setSituacao("encerrados")}>
+                  Ver os {finalizados} finalizados
+                </button>
+              )}
             </p>
           ) : visao === "lista" ? (
             <Lista projetos={projetos} nome={nome} />

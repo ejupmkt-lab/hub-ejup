@@ -56,7 +56,7 @@ export function indicadores(projetos: Projeto[]) {
 
 export function janelaCronograma(projetos: Projeto[]) {
   const hoje = hojeIso();
-  const datas = ativos(projetos)
+  const datas = projetos
     .filter((p) => p.planoFechadoEm)
     .flatMap((p) => p.etapas.flatMap((e) => [e.dataInicio, e.dataFim]))
     .filter((d): d is string => !!d)

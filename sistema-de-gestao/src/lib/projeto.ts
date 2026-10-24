@@ -163,8 +163,11 @@ export function etapaAtrasada(e: Etapa, hoje = hojeIso()) {
   return !concluidas.has(e.status) && !!e.dataFim && e.dataFim < hoje;
 }
 
-// Fim previsto do projeto: o fim da última etapa
-export const entregaFinal = (p: Projeto) => p.etapas[p.etapas.length - 1]?.dataFim ?? null;
+// Fim do projeto: o fim previsto da última etapa; com ela já enviada no HUB, o dia em que foi de fato enviada
+export const entregaFinal = (p: Projeto) => {
+  const ultima = p.etapas[p.etapas.length - 1];
+  return (ultima && concluidas.has(ultima.status) ? ultima.enviadaEm : null) ?? ultima?.dataFim ?? null;
+};
 
 // Horas: as do plano de trabalho. Uma etapa finalizada, com o relatório enviado
 // no HUB, tem cumpridas as horas definidas para ela.

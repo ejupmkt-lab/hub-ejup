@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { Projeto } from "@/lib/dados/tipos";
 import { useEstado } from "@/lib/dados/store";
 import { diferencaDias, hojeIso, periodoCurto, somarDias } from "@/lib/datas";
-import { ativos, grupoDaEtapa, grupos, janelaCronograma } from "@/lib/painel";
+import { grupoDaEtapa, grupos, janelaCronograma } from "@/lib/painel";
 import { doisDigitos, } from "@/lib/rotulos";
 import { useDica } from "./dica";
 import { Legenda } from "./legenda";
@@ -13,12 +13,13 @@ import { situacaoDaEtapa } from "@/lib/projeto";
 
 const mesesCurtos = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
 
-// Gantt de todos os projetos em andamento: uma linha por projeto, uma barra
+// Gantt dos projetos escolhidos: uma linha por projeto, uma barra
 // por etapa, na cor da situação; a linha vermelha marca hoje.
 export function Cronograma({ projetos }: { projetos: Projeto[] }) {
   const { estado } = useEstado();
   const { props, elemento } = useDica();
-  const lista = ativos(projetos);
+  // Quem chama já escolheu os projetos (inclusive os finalizados, quando a aba é a dos finalizados)
+  const lista = projetos;
   const { inicio, dias } = janelaCronograma(projetos);
   const hoje = hojeIso();
   const pos = (d: string) => (diferencaDias(inicio, d) / dias) * 100;
