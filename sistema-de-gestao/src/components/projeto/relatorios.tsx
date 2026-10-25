@@ -33,13 +33,6 @@ export function Relatorios({ projeto, aoDesenvolver, abrirOrdem }: { projeto: Pr
   const atual = etapaAtual(projeto);
   return (
     <div className="space-y-4">
-      <p className="max-w-3xl text-sm text-tinta-2">
-        Os relatórios são escritos no{" "}
-        <button type="button" onClick={aoDesenvolver} className="font-semibold text-azul hover:underline">
-          Desenvolvimento
-        </button>
-        . Aqui você baixa o relatório em Word, anexa o PDF assinado e registra o envio no HUB.
-      </p>
       <Cartao className="p-3 sm:p-5">
         <h2 className="px-1 pb-4 text-[17px] font-bold">Plano de Entrega</h2>
         <ol className="space-y-4">

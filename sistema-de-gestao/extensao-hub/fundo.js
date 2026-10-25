@@ -119,72 +119,122 @@ async function lerPagina(passarMouse) {
       const valor = atributos.map((a) => normalizar(el.getAttribute(a))).find((v) => v.length > 2);
       if (valor && passeios.length < 40) passeios.push({ rotulo: normalizar(el.innerText).slice(0, 30), linhas: [valor.slice(0, 200)] });
     }
-    // Iniciais em círculo (MN, LN, TC) e gatilhos de tooltip: passa o mouse e vê o que apareceu
+    // Quem aparece em círculo (a foto e as iniciais dos "Envolvidos": cliente, gestor do SEBRAE, consultor) e os gatilhos
+    // de balão: passa o mouse e vê o que apareceu. As fotos e iniciais vêm primeiro, para não ficarem fora do limite.
     const candidatos = [];
-    const gatilhos = "[data-toggle=tooltip],[data-bs-toggle=tooltip],[data-bs-toggle=popover],[data-toggle=popover],[mattooltip],[ngbtooltip],[data-tippy-content],[aria-haspopup=true],[aria-describedby]";
-    for (const e of document.querySelectorAll(`*, ${gatilhos}`)) {
-      if (!(e instanceof HTMLElement) || candidatos.includes(e)) continue;
-      const curto = e.children.length <= 2 && (e.textContent ?? "").trim().length <= 4 && (e.textContent ?? "").trim().length > 0;
-      const gatilho = e.matches(gatilhos);
-      if (!curto && !gatilho) continue;
+    const circulo = (e) => {
       const r = e.getBoundingClientRect();
-      if (r.width < 14 || r.height < 14 || r.width > 120 || r.height > 120) continue;
-      if (curto && !gatilho) {
-        const raio = parseFloat(getComputedStyle(e).borderTopLeftRadius) || 0;
-        const t = normalizar(e.textContent);
-        if (!(raio >= Math.min(r.width, r.height) * 0.3) || !/^\p{L}{1,3}$/u.test(t)) continue;
-      }
-      candidatos.push(e);
-      if (candidatos.length >= 40) break;
+      if (r.width < 20 || r.height < 20 || r.width > 96 || r.height > 96) return false;
+      if (Math.abs(r.width - r.height) > Math.max(6, r.width * 0.18)) return false;
+      const cs = getComputedStyle(e);
+      const raio = parseFloat(cs.borderTopLeftRadius) || 0;
+      return raio >= Math.min(r.width, r.height) * 0.4 || /50%|9999|999px/.test(cs.borderTopLeftRadius);
+    };
+    const eAvatar = (e) => {
+      if (!(e instanceof HTMLElement) || !circulo(e)) return false;
+      // O texto que se vê (o balão escondido dentro do círculo não conta)
+      const t = normalizar(e.innerText);
+      if (e instanceof HTMLImageElement) return true;
+      if (e.querySelector("img") && !t) return true;
+      return /^\p{L}{1,3}$/u.test(t) && e.children.length <= 2;
+    };
+    const eixos = [];
+    for (const e of document.querySelectorAll("img, div, span, a, button, li, figure")) if (eAvatar(e)) eixos.push(e);
+    // Fica o elemento mais externo de cada círculo (o balão costuma ser ligado nele)
+    for (const e of eixos) if (!eixos.some((o) => o !== e && o.contains(e) && circulo(o))) candidatos.push(e);
+    const gatilhos = "[data-toggle=tooltip],[data-bs-toggle=tooltip],[data-bs-toggle=popover],[data-toggle=popover],[mattooltip],[ngbtooltip],[ngbPopover],[data-tippy-content],[aria-haspopup=true],[aria-describedby]";
+    for (const e of document.querySelectorAll(gatilhos)) {
+      if (!(e instanceof HTMLElement) || candidatos.includes(e) || candidatos.length >= 60) continue;
+      const r = e.getBoundingClientRect();
+      if (r.width >= 14 && r.height >= 14 && r.width <= 120 && r.height <= 120) candidatos.push(e);
     }
-    // Botões só com ícone (informações, ver detalhes): o balão aparece ao passar o mouse
-    if (candidatos.length < 40)
-      for (const e of document.querySelectorAll("button, a, [role=button]")) {
-        if (!(e instanceof HTMLElement) || candidatos.includes(e) || candidatos.length >= 40) continue;
-        const r = e.getBoundingClientRect();
-        if (r.width < 14 || r.height < 14 || r.width > 64 || r.height > 64 || normalizar(e.innerText)) continue;
-        if (e.querySelector("svg, img, i, mat-icon")) candidatos.push(e);
-      }
+    // Botões só com ícone (informações, enviar, baixar): o balão aparece ao passar o mouse
+    for (const e of document.querySelectorAll("button, a, [role=button]")) {
+      if (!(e instanceof HTMLElement) || candidatos.includes(e) || candidatos.length >= 60) continue;
+      const r = e.getBoundingClientRect();
+      if (r.width < 14 || r.height < 14 || r.width > 64 || r.height > 64 || normalizar(e.innerText)) continue;
+      if (e.querySelector("svg, img, i, mat-icon")) candidatos.push(e);
+    }
     diag.candidatosAoPassarMouse = candidatos.length;
+    diag.avatares = candidatos.filter(eAvatar).length;
+    const rotuloDe = (el) =>
+      normalizar(el.innerText) || normalizar(el.getAttribute("alt") || el.getAttribute("title") || el.querySelector("img")?.getAttribute("alt") || "") || (eAvatar(el) ? "foto" : "");
+    // Só marcar: quem passa o mouse é a extensão, com o mouse de verdade (depurador do navegador)
+    if (passarMouse === "coletar") {
+      const coletados = candidatos.map((el, i) => {
+        el.setAttribute("data-blimp-mouse", String(i));
+        return { i, rotulo: rotuloDe(el).slice(0, 30), longo: eAvatar(el) || el.matches(gatilhos) };
+      });
+      return { texto, links, passeios, diag, coletados };
+    }
     const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
-    const disparar = (el, tipos, x, y) => {
-      for (const t of tipos) {
-        const base = { bubbles: !/enter|leave/.test(t), cancelable: true, view: window, clientX: x, clientY: y };
-        el.dispatchEvent(t.startsWith("pointer") ? new PointerEvent(t, { ...base, pointerType: "mouse" }) : new MouseEvent(t, base));
+    // Balões desenhados pela página (Bootstrap, Material, tippy…): o texto deles, mesmo quando já havia outro texto igual na página
+    const seletorBalao = "[role=tooltip],.tooltip,.popover,.mat-tooltip,.mat-mdc-tooltip,.mdc-tooltip__surface,.cdk-overlay-pane,.tippy-box,.ngb-tooltip,[class*=tooltip],[class*=popover],[class*=Tooltip],[class*=Popover]";
+    const balaosVisiveis = () => {
+      const lista = [];
+      for (const b of document.querySelectorAll(seletorBalao)) {
+        if (!(b instanceof HTMLElement)) continue;
+        const r = b.getBoundingClientRect();
+        const cs = getComputedStyle(b);
+        if (r.width < 8 || r.height < 8 || cs.visibility === "hidden" || cs.display === "none" || Number(cs.opacity) === 0) continue;
+        for (const l of (b.innerText ?? "").split("\n").map(normalizar).filter(Boolean)) if (l.length < 300 && !lista.includes(l)) lista.push(l);
       }
+      return lista;
+    };
+    const disparar = (el, tipos, x, y) => {
+      // Do mais externo ao elemento: o balão pode estar ligado a um pai, e "mouseenter" não sobe sozinho
+      const cadeia = [];
+      for (let a = el, i = 0; a && i < 3 && a !== document.body; a = a.parentElement, i++) cadeia.unshift(a);
+      for (const alvo of cadeia)
+        for (const t of tipos) {
+          if (t === "focus" || t === "focusin" || t === "blur" || t === "focusout") {
+            if (alvo === el) alvo.dispatchEvent(new FocusEvent(t, { bubbles: t === "focusin" || t === "focusout", cancelable: false, view: window }));
+            continue;
+          }
+          const base = { bubbles: !/enter|leave/.test(t), cancelable: true, view: window, clientX: x, clientY: y };
+          alvo.dispatchEvent(t.startsWith("pointer") ? new PointerEvent(t, { ...base, pointerType: "mouse" }) : new MouseEvent(t, base));
+        }
     };
     for (const el of candidatos) {
-      const base = new Set(linhasDaPagina());
+      el.scrollIntoView({ block: "nearest", inline: "nearest" });
+      const antes = new Set(linhasDaPagina());
+      const antesBalao = new Set(balaosVisiveis());
       const r = el.getBoundingClientRect();
       const x = r.left + r.width / 2;
       const y = r.top + r.height / 2;
-      disparar(el, ["pointerover", "pointerenter", "mouseover", "mouseenter", "mousemove"], x, y);
-      await esperar(350);
-      const novas = linhasDaPagina().filter((l) => !base.has(l) && l.length < 300).slice(0, 14);
-      disparar(el, ["mousemove", "pointerout", "pointerleave", "mouseout", "mouseleave"], x + 400, y + 400);
-      await esperar(120);
-      if (novas.length) passeios.push({ rotulo: normalizar(el.innerText).slice(0, 30), linhas: novas });
+      disparar(el, ["pointerover", "pointerenter", "mouseover", "mouseenter", "mousemove", "focus", "focusin"], x, y);
+      await esperar(eAvatar(el) || el.matches(gatilhos) ? 750 : 420);
+      const novas = [...new Set([...balaosVisiveis().filter((l) => !antesBalao.has(l)), ...linhasDaPagina().filter((l) => !antes.has(l) && l.length < 300)])].slice(0, 14);
+      disparar(el, ["mousemove", "pointerout", "pointerleave", "mouseout", "mouseleave", "blur", "focusout"], x + 400, y + 400);
+      await esperar(150);
+      if (novas.length) passeios.push({ rotulo: rotuloDe(el).slice(0, 30), linhas: novas });
     }
   }
   return { texto, links, passeios, diag };
 }
 
 // Acha, em cada cartão (ETAPA 01…) e em cada linha de documento, o botão de download que só tem ícone.
-// Só marca os que parecem de download; botões de enviar, excluir ou detalhes nunca entram.
+// Passa o mouse em cada botão do cartão e lê o balão ("Baixar", "Enviar", "Informações"): é o jeito mais seguro de saber qual é qual,
+// porque as classes dos três botões costumam ser iguais. Só marca o de baixar; enviar, excluir ou detalhes nunca entram.
 // (roda dentro da página: autossuficiente)
-function descobrirBotoesDeDownload(ignorarEtapas, ignorarRotulos) {
+async function descobrirBotoesDeDownload(ignorarEtapas, ignorarRotulos) {
   const normalizar = (t) => String(t ?? "").replace(/\s+/g, " ").trim();
-  const positivo = /download|baixar|file_download|cloud_download|arrow_downward|fa-download|bi-download|save_alt|get_app|tray-arrow-down|arrow-down-tray|\bdl\b/i;
-  const negativo = /upload|enviar|anexar|attach|publish|cloud_upload|arrow_upward|fa-upload|bi-upload|excluir|remover|delete|trash|lixeira|apagar|cancel|fechar|close|editar|edit|salvar|info|help|ajuda|detalh|visualiz|view|olho|\beye\b|\bver\b|add|plus|novo|nova/i;
-  const descritor = (el) => {
-    const partes = [el.getAttribute("title"), el.getAttribute("aria-label"), el.getAttribute("mattooltip"), el.getAttribute("data-tooltip"), typeof el.className === "string" ? el.className : "", el.innerText];
-    for (const f of el.querySelectorAll("*")) {
-      partes.push(typeof f.className === "string" ? f.className : f.getAttribute?.("class"));
-      if (f.tagName.toLowerCase() === "title") partes.push(f.textContent);
-      if (f.tagName.toLowerCase() === "use") partes.push(f.getAttribute("href") || f.getAttribute("xlink:href"));
-      if (f.tagName.toLowerCase() === "img") partes.push(f.getAttribute("alt"), (f.getAttribute("src") ?? "").split("/").pop());
+  const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+  const positivo = /download|baixar|file_download|cloud_download|arrow_downward|fa-download|bi-download|save_alt|get_app|tray-arrow-down|arrow-down-tray|exportar|\bdl\b/i;
+  const negativo = /upload|enviar|anexar|attach|publish|cloud_upload|arrow_upward|fa-upload|bi-upload|excluir|remover|delete|trash|lixeira|apagar|cancel|fechar|close|editar|edit|salvar|info|help|ajuda|detalh|visualiz|view|olho|\beye\b|\bver\b|add|plus|novo|nova|substituir|inserir/i;
+  // Tudo o que descreve o botão: atributos (título, rótulo, balão, alt), classes dos ícones e o texto
+  const palavrasDe = (el) => {
+    const partes = [el.innerText];
+    for (const n of [el, ...el.querySelectorAll("*")]) {
+      for (const a of n.attributes) if (/title|label|tooltip|alt|class|ng-reflect|^data-|href/.test(a.name) && a.value.length < 120) partes.push(a.value);
+      if (n.tagName.toLowerCase() === "title") partes.push(n.textContent);
+      if (n.tagName.toLowerCase() === "img") partes.push((n.getAttribute("src") ?? "").split("/").pop());
     }
-    return normalizar(partes.filter(Boolean).join(" ")).toLowerCase();
+    return new Set(normalizar(partes.filter(Boolean).join(" ")).toLowerCase().split(/[^a-zà-ú0-9_]+/).filter((w) => w.length > 1));
+  };
+  const desabilitado = (el) => {
+    const cs = getComputedStyle(el);
+    return !!el.disabled || el.getAttribute("aria-disabled") === "true" || /(^|\s)(disabled|is-disabled|mat-mdc-button-disabled)(\s|$)/.test(String(el.className)) || cs.pointerEvents === "none";
   };
   const soIcone = (el) => {
     if (!(el instanceof HTMLElement)) return false;
@@ -202,6 +252,44 @@ function descobrirBotoesDeDownload(ignorarEtapas, ignorarRotulos) {
     }
     return { etapa: 0, cartao: null };
   };
+  // O balão que aparece ao passar o mouse no botão (texto novo na página ou balão visível)
+  const seletorBalao = "[role=tooltip],.tooltip,.popover,.mat-tooltip,.mat-mdc-tooltip,.mdc-tooltip__surface,.cdk-overlay-pane,.tippy-box,[class*=tooltip],[class*=Tooltip]";
+  const linhas = () => (document.body?.innerText ?? "").split("\n").map(normalizar).filter(Boolean);
+  const balaos = () => {
+    const l = [];
+    for (const b of document.querySelectorAll(seletorBalao)) {
+      if (!(b instanceof HTMLElement)) continue;
+      const r = b.getBoundingClientRect();
+      const cs = getComputedStyle(b);
+      if (r.width < 8 || r.height < 8 || cs.visibility === "hidden" || cs.display === "none" || Number(cs.opacity) === 0) continue;
+      for (const x of (b.innerText ?? "").split("\n").map(normalizar).filter(Boolean)) if (x.length < 100) l.push(x);
+    }
+    return l;
+  };
+  const disparar = (el, tipos) => {
+    const r = el.getBoundingClientRect();
+    const cadeia = [];
+    for (let a = el, i = 0; a && i < 3 && a !== document.body; a = a.parentElement, i++) cadeia.unshift(a);
+    for (const alvo of cadeia)
+      for (const t of tipos) {
+        if (/focus|blur/.test(t)) {
+          if (alvo === el) alvo.dispatchEvent(new FocusEvent(t, { bubbles: t === "focusin" || t === "focusout", view: window }));
+          continue;
+        }
+        const base = { bubbles: !/enter|leave/.test(t), cancelable: true, view: window, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 };
+        alvo.dispatchEvent(t.startsWith("pointer") ? new PointerEvent(t, { ...base, pointerType: "mouse" }) : new MouseEvent(t, base));
+      }
+  };
+  const balaoDe = async (el) => {
+    const antes = new Set([...linhas(), ...balaos()]);
+    const antesB = new Set(balaos());
+    disparar(el, ["pointerover", "pointerenter", "mouseover", "mouseenter", "mousemove", "focus", "focusin"]);
+    await esperar(450);
+    const novas = [...balaos().filter((l) => !antesB.has(l)), ...linhas().filter((l) => !antes.has(l) && l.length < 100)];
+    disparar(el, ["mousemove", "pointerout", "pointerleave", "mouseout", "mouseleave", "blur", "focusout"]);
+    await esperar(80);
+    return normalizar([...new Set(novas)].join(" ")).toLowerCase();
+  };
   const grupos = new Map();
   for (const el of document.querySelectorAll("button, a, [role=button]")) {
     if (!soIcone(el)) continue;
@@ -216,24 +304,38 @@ function descobrirBotoesDeDownload(ignorarEtapas, ignorarRotulos) {
     if (achados.length >= 14) break;
     const rotulo = normalizar((chave.innerText ?? "").split("\n").map((l) => l.trim()).find(Boolean) ?? "").slice(0, 60);
     if ((g.etapa && ignorarEtapas.includes(g.etapa)) || (rotulo && ignorarRotulos.some((r) => r && rotulo.toLowerCase().includes(r.toLowerCase())))) continue;
-    const notas = g.botoes.map((b) => {
-      const d = descritor(b);
-      return { b, nota: negativo.test(d) ? -100 : positivo.test(d) ? 10 : 0 };
-    });
-    let alvo = notas.filter((n) => n.nota >= 10)[0];
-    let motivo = "ícone de download";
+    // O que só um botão tem (as classes iguais nos três não dizem nada)
+    const todas = g.botoes.map(palavrasDe);
+    const comuns = g.botoes.length > 1 ? [...todas[0]].filter((w) => todas.every((t) => t.has(w))) : [];
+    const itens = g.botoes.map((b, k) => ({ b, d: [...todas[k]].filter((w) => !comuns.includes(w)).join(" "), desab: desabilitado(b), tip: "", nota: 0 }));
+    const claro = itens.some((x) => !x.desab && positivo.test(x.d) && !negativo.test(x.d));
+    if (!claro && itens.length > 1) for (const x of itens) if (!x.desab) x.tip = await balaoDe(x.b);
+    for (const x of itens) {
+      if (/baixar|download|exportar/.test(x.tip)) x.nota += 100;
+      else if (/enviar|anexar|upload|inserir|substituir|informa|detalh|excluir|remover|editar|ver /.test(x.tip)) x.nota -= 100;
+      if (positivo.test(x.d)) x.nota += 50;
+      if (negativo.test(x.d)) x.nota -= 50;
+    }
+    const livres = itens.filter((x) => !x.desab);
+    let alvo = livres.filter((x) => x.nota >= 50).sort((a, b) => b.nota - a.nota)[0];
+    let motivo = alvo?.tip && /baixar|download|exportar/.test(alvo.tip) ? `balão “${alvo.tip.slice(0, 20)}”` : "ícone de download";
     // Cartão com vários botões só de ícone (informações, enviar, baixar): o de baixar é o último que não parece outra coisa
-    if (!alvo && g.botoes.length >= 2) {
-      const ultimo = notas[notas.length - 1];
-      if (ultimo.nota === 0) {
+    if (!alvo && itens.length >= 2) {
+      const ultimo = livres[livres.length - 1];
+      if (ultimo && ultimo === itens[itens.length - 1] && ultimo.nota >= 0) {
         alvo = ultimo;
         motivo = "último botão do cartão";
       }
     }
-    if (!alvo) continue;
-    const i = achados.length;
+    if (!alvo) {
+      // Todos desligados: a etapa ainda não foi enviada, não há relatório para baixar
+      if (itens.length && (itens.every((x) => x.desab) || (itens.length >= 2 && itens[itens.length - 1].desab)))
+        achados.push({ i: -1, etapa: g.etapa, rotulo, motivo: "botão de baixar desligado no HUB (sem relatório para baixar)" });
+      continue;
+    }
+    const i = achados.filter((x) => x.i >= 0).length;
     alvo.b.setAttribute("data-blimp-dl", String(i));
-    achados.push({ i, etapa: g.etapa, rotulo, motivo });
+    achados.push({ i, etapa: g.etapa, rotulo, motivo, balao: alvo.tip.slice(0, 30) });
   }
   return achados;
 }
@@ -487,6 +589,31 @@ function paginaDoPedido(codigo) {
   return { abriu, tamanho: t.length };
 }
 
+// Leva o elemento marcado à vista e devolve o centro dele na tela (para o mouse de verdade). (roda dentro da página)
+function posicionarMarcado(atributo, i) {
+  const el = document.querySelector(`[${atributo}="${i}"]`);
+  if (!el) return null;
+  el.scrollIntoView({ block: "center", inline: "nearest" });
+  const r = el.getBoundingClientRect();
+  if (r.width < 4 || r.height < 4) return null;
+  return { x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) };
+}
+
+// O texto da tela e os balões visíveis agora, para ver o que apareceu depois de passar o mouse. (roda dentro da página)
+function fotografarTela() {
+  const normalizar = (t) => String(t ?? "").replace(/\s+/g, " ").trim();
+  const linhas = (document.body?.innerText ?? "").split("\n").map(normalizar).filter(Boolean);
+  const balaos = [];
+  for (const b of document.querySelectorAll("[role=tooltip],.tooltip,.popover,.mat-tooltip,.mat-mdc-tooltip,.mdc-tooltip__surface,.cdk-overlay-pane,.tippy-box,[class*=tooltip],[class*=popover],[class*=Tooltip],[class*=Popover]")) {
+    if (!(b instanceof HTMLElement)) continue;
+    const r = b.getBoundingClientRect();
+    const cs = getComputedStyle(b);
+    if (r.width < 8 || r.height < 8 || cs.visibility === "hidden" || cs.display === "none" || Number(cs.opacity) === 0) continue;
+    for (const l of (b.innerText ?? "").split("\n").map(normalizar).filter(Boolean)) if (l.length < 300) balaos.push(l);
+  }
+  return { linhas, balaos };
+}
+
 // ─── Lado da extensão ──────────────────────────────────────────────────────────
 
 async function origensPermitidas() {
@@ -521,9 +648,16 @@ function nomeDoArquivo(link, disposicao, tipo) {
 const TIPOS_GUARDADOS = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
 const tipoPeloNome = (nome) => ({ pdf: "application/pdf", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp" })[(/\.([a-z0-9]+)$/i.exec(nome)?.[1] ?? "").toLowerCase()];
 
-async function textoDeTodosOsQuadros(tabId, passarMouse = false) {
-  const partes = await chrome.scripting.executeScript({ target: { tabId, allFrames: true }, func: lerPagina, args: [passarMouse] });
+async function textoDeTodosOsQuadros(tabId, passarMouse = false, sessao = null) {
+  const partes = await chrome.scripting.executeScript({ target: { tabId, allFrames: true }, func: lerPagina, args: [passarMouse && !sessao] });
   const resultados = partes.map((p) => p.result).filter(Boolean);
+  // Mouse de verdade: os balões vêm do passeio feito pelo depurador, só na página principal
+  if (sessao && passarMouse && resultados[0]) {
+    const real = await passeioReal(tabId, sessao);
+    resultados[0].passeios.push(...real.passeios);
+    resultados[0].diag.candidatosAoPassarMouse = real.candidatos;
+    resultados[0].diag.mouseReal = true;
+  }
   const links = [];
   for (const r of resultados) for (const l of r.links) if (!links.some((x) => x.url === l.url)) links.push(l);
   // Balões: "LN: Cliente: … CNPJ: …" (sem repetir o que já está na página)
@@ -547,6 +681,140 @@ async function textoDeTodosOsQuadros(tabId, passarMouse = false) {
     { linksIgnorados: 0, botoesSemEndereco: 0, candidatosAoPassarMouse: 0, amostras: [] },
   );
   return { texto: textoPagina + secaoBalao, textoPagina, secaoBalao, balaos: balao.length, links, quadros: partes.length, diag };
+}
+
+// ─── Mouse de verdade (depurador do navegador) ────────────────────────────────
+// Opcional (permissão "debugger", pedida na janelinha): passa o mouse e clica como uma pessoa, o que acende balões feitos só com
+// CSS e deixa o navegador dizer quais arquivos a página baixou. Enquanto lê, o navegador mostra o aviso de "depuração".
+
+async function modoReal() {
+  const { opcoes } = await chrome.storage.local.get("opcoes");
+  return !!opcoes?.real && (await chrome.permissions.contains({ permissions: ["debugger"] }));
+}
+
+async function abrirSessao(tabId) {
+  const alvo = { tabId };
+  await chrome.debugger.attach(alvo, "1.3");
+  const enviar = (metodo, params = {}) => chrome.debugger.sendCommand(alvo, metodo, params);
+  const eventos = [];
+  const ouvinte = (origem, metodo, params) => {
+    if (origem.tabId === tabId) eventos.push({ metodo, params });
+  };
+  chrome.debugger.onEvent.addListener(ouvinte);
+  try {
+    await enviar("Page.enable");
+    // Buffers grandes: sem eles o navegador não guarda o corpo das respostas e o arquivo vem vazio
+    await enviar("Network.enable", { maxTotalBufferSize: 100 * 1024 * 1024, maxResourceBufferSize: 30 * 1024 * 1024 });
+    // O arquivo não é salvo na pasta de downloads: a extensão pega o conteúdo e leva ao Blimp
+    await enviar("Page.setDownloadBehavior", { behavior: "deny" }).catch(() => {});
+  } catch (e) {
+    chrome.debugger.onEvent.removeListener(ouvinte);
+    await chrome.debugger.detach(alvo).catch(() => {});
+    throw e;
+  }
+  return {
+    enviar,
+    eventos,
+    fechar: async () => {
+      chrome.debugger.onEvent.removeListener(ouvinte);
+      await chrome.debugger.detach(alvo).catch(() => {});
+    },
+  };
+}
+
+const moverMouse = (sessao, x, y) => sessao.enviar("Input.dispatchMouseEvent", { type: "mouseMoved", x, y, pointerType: "mouse" });
+
+// Passa o mouse de verdade em cada foto, iniciais e ícone da página e anota o que apareceu
+async function passeioReal(tabId, sessao) {
+  const [col] = await chrome.scripting.executeScript({ target: { tabId }, func: lerPagina, args: ["coletar"] });
+  const itens = col?.result?.coletados ?? [];
+  const passeios = [];
+  for (const it of itens) {
+    const [pos] = await chrome.scripting.executeScript({ target: { tabId }, func: posicionarMarcado, args: ["data-blimp-mouse", it.i] });
+    const ponto = pos?.result;
+    if (!ponto) continue;
+    const [antes] = await chrome.scripting.executeScript({ target: { tabId }, func: fotografarTela });
+    await moverMouse(sessao, ponto.x, ponto.y);
+    await esperar(it.longo ? 800 : 500);
+    const [depois] = await chrome.scripting.executeScript({ target: { tabId }, func: fotografarTela });
+    await moverMouse(sessao, 2, 2);
+    await esperar(120);
+    const a = antes?.result ?? { linhas: [], balaos: [] };
+    const d = depois?.result ?? { linhas: [], balaos: [] };
+    const vistas = new Set([...a.linhas, ...a.balaos]);
+    const balaosAntes = new Set(a.balaos);
+    const novas = [...new Set([...d.balaos.filter((l) => !balaosAntes.has(l)), ...d.linhas.filter((l) => !vistas.has(l) && l.length < 300)])].slice(0, 14);
+    if (novas.length) passeios.push({ rotulo: it.rotulo, linhas: novas });
+  }
+  return { passeios, candidatos: itens.length, coletados: col?.result ?? null };
+}
+
+const cabecalho = (headers, nome) => {
+  for (const k of Object.keys(headers ?? {})) if (k.toLowerCase() === nome) return String(headers[k]);
+  return "";
+};
+const nomeDaDisposicao = (disp) => {
+  const m = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disp || "");
+  try {
+    return m ? decodeURIComponent(m[1]) : "";
+  } catch {
+    return m ? m[1] : "";
+  }
+};
+
+// Clica de verdade no botão marcado e junta o que o navegador viu a página baixar (resposta de rede com arquivo, ou download)
+async function cliqueReal(tabId, sessao, i, limite) {
+  const [pos] = await chrome.scripting.executeScript({ target: { tabId }, func: posicionarMarcado, args: ["data-blimp-dl", i] });
+  const ponto = pos?.result;
+  if (!ponto) return { ok: false, motivo: "o botão não está mais na página" };
+  sessao.eventos.length = 0;
+  await moverMouse(sessao, ponto.x, ponto.y);
+  await esperar(250);
+  await sessao.enviar("Input.dispatchMouseEvent", { type: "mousePressed", x: ponto.x, y: ponto.y, button: "left", clickCount: 1 });
+  await sessao.enviar("Input.dispatchMouseEvent", { type: "mouseReleased", x: ponto.x, y: ponto.y, button: "left", clickCount: 1 });
+  const ehArquivo = (r) =>
+    r.status < 400 &&
+    (/pdf|octet-stream|msword|officedocument|spreadsheet|ms-excel|zip|image\/(png|jpe?g|webp)|csv/i.test(r.mimeType ?? "") ||
+      /attachment/i.test(cabecalho(r.headers, "content-disposition")) ||
+      /\.(pdf|docx?|xlsx?|png|jpe?g|webp|zip)(\?|#|$)/i.test(r.url ?? ""));
+  const inicio = Date.now();
+  let achouEm = 0;
+  while (Date.now() - inicio < 7000) {
+    await esperar(200);
+    const tem = sessao.eventos.some((e) => (e.metodo === "Network.responseReceived" && ehArquivo(e.params.response)) || e.metodo === "Page.downloadWillBegin");
+    if (tem && !achouEm) achouEm = Date.now();
+    // Dá um tempo para o arquivo terminar de chegar
+    if (achouEm && Date.now() - achouEm > 1200) break;
+  }
+  const itens = [];
+  const vistos = new Set();
+  const respostas = sessao.eventos.filter((e) => e.metodo === "Network.responseReceived" && ehArquivo(e.params.response));
+  for (const e of respostas.slice(0, 3)) {
+    const r = e.params.response;
+    if (vistos.has(r.url)) continue;
+    vistos.add(r.url);
+    const nome = nomeDaDisposicao(cabecalho(r.headers, "content-disposition"));
+    try {
+      // Só pede o corpo quando a resposta terminou de chegar
+      for (let k = 0; k < 20 && !sessao.eventos.some((f) => f.metodo === "Network.loadingFinished" && f.params.requestId === e.params.requestId); k++) await esperar(150);
+      const corpo = await sessao.enviar("Network.getResponseBody", { requestId: e.params.requestId });
+      if (!corpo.base64Encoded && !corpo.body) throw new Error("corpo vazio");
+      const base64 = corpo.base64Encoded ? corpo.body : btoa(unescape(encodeURIComponent(corpo.body)));
+      const tamanho = Math.floor((base64.length * 3) / 4) - (base64.endsWith("==") ? 2 : base64.endsWith("=") ? 1 : 0);
+      if (tamanho > limite) itens.push({ tipo: "grande", tamanho });
+      else itens.push({ tipo: "blob", nome, mime: String(r.mimeType ?? "").split(";")[0], tamanho, base64 });
+    } catch {
+      // Download que o navegador conduziu sozinho: o conteúdo não passa pela rede da página; baixa-se pelo endereço
+      if (!/^(blob:|data:)/i.test(r.url)) itens.push({ tipo: "href", href: r.url, nome });
+    }
+  }
+  for (const e of sessao.eventos.filter((x) => x.metodo === "Page.downloadWillBegin")) {
+    const u = e.params.url;
+    if (!u || vistos.has(u) || /^(blob:|data:)/i.test(u)) continue;
+    vistos.add(u);
+    itens.push({ tipo: "href", href: u, nome: e.params.suggestedFilename ?? "" });
+  }
+  return itens.length ? { ok: true, itens } : { ok: false, motivo: "o botão não gerou nenhum arquivo (mouse de verdade)" };
 }
 
 // ─── Pedido do Blimp: lê a aba do HUB que a pessoa já permitiu ─────────────────
@@ -588,11 +856,35 @@ async function progresso(passo) {
 // Lê uma página de pedido do HUB: o texto, os balões, o que o botão de situação mostra, e os anexos (por link e
 // clicando nos botões de download). Devolve o que a extensão guarda para o Blimp pedir.
 async function lerDetalhe(tabId, prefixo = "") {
+  let sessao = null;
+  const mouseReal = { pedido: false, usado: false, motivo: "" };
+  if (await modoReal()) {
+    mouseReal.pedido = true;
+    try {
+      sessao = await abrirSessao(tabId);
+      mouseReal.usado = true;
+    } catch (e) {
+      mouseReal.motivo = String(e?.message ?? e).slice(0, 100);
+    }
+  }
+  try {
+    const r = await lerDetalheCom(tabId, prefixo, sessao);
+    if (r.pendente) {
+      r.pendente.diag = { ...r.pendente.diag, mouseReal };
+      if (r.resumo) r.resumo.diag = { ...r.resumo.diag, mouseReal };
+    }
+    return r;
+  } finally {
+    await sessao?.fechar();
+  }
+}
+
+async function lerDetalheCom(tabId, prefixo, sessao) {
   {
     const aba = await chrome.tabs.get(tabId);
     const hub = new URL(aba.url);
     await progresso({ etapa: "lendo", texto: `${prefixo}Lendo a página do HUB e passando o mouse nos ícones…` });
-    const { texto, textoPagina, secaoBalao, balaos, links, quadros, diag } = await textoDeTodosOsQuadros(tabId, true);
+    const { texto, textoPagina, secaoBalao, balaos, links, quadros, diag } = await textoDeTodosOsQuadros(tabId, true, sessao);
     if (!texto && !links.length) return { vazia: true };
     // O botão de situação do pedido (a que passo está): um clique, e lê o que a página mostra
     await progresso({ etapa: "lendo", texto: `${prefixo}Clicando no botão de situação do pedido…` });
@@ -671,9 +963,17 @@ async function lerDetalhe(tabId, prefixo = "") {
       const [achou] = await chrome.scripting.executeScript({ target: { tabId }, func: descobrirBotoesDeDownload, args: [etapasBaixadas, rotulosBaixados] });
       const botoes = achou?.result ?? [];
       for (const [n, b] of botoes.entries()) {
+        if (b.i < 0) {
+          cliques.push({ etapa: b.etapa, rotulo: b.rotulo, motivo: b.motivo, gerou: 0, erro: b.motivo });
+          continue;
+        }
         await progresso({ etapa: "clicando", texto: `${prefixo}Baixando ${n + 1} de ${botoes.length}: ${b.etapa ? `etapa ${String(b.etapa).padStart(2, "0")}` : b.rotulo.slice(0, 50)}`, atual: n + 1, de: botoes.length });
-        const [exec] = await chrome.scripting.executeScript({ target: { tabId }, world: "MAIN", func: clicarECapturar, args: [b.i, 7000, MAX_ARQUIVO] });
-        const r = exec?.result ?? { ok: false, motivo: "sem resposta" };
+        let r = sessao ? await cliqueReal(tabId, sessao, b.i, MAX_ARQUIVO).catch((e) => ({ ok: false, motivo: String(e?.message ?? e).slice(0, 80) })) : { ok: false };
+        // Sem mouse de verdade (ou ele não pegou nada): o clique da página, com a captura do arquivo que ela gera
+        if (!r.ok) {
+          const [exec] = await chrome.scripting.executeScript({ target: { tabId }, world: "MAIN", func: clicarECapturar, args: [b.i, 7000, MAX_ARQUIVO] });
+          r = exec?.result ?? { ok: false, motivo: "sem resposta" };
+        }
         const registro = { etapa: b.etapa, rotulo: b.rotulo, motivo: b.motivo, gerou: 0, erro: "" };
         if (!r.ok) {
           registro.erro = r.motivo;

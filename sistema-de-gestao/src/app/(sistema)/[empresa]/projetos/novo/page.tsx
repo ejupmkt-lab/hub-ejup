@@ -27,14 +27,15 @@ function Conteudo() {
   const consultores = estado.usuarios.filter((u) => u.acessos[slug]);
 
   const [f, setF] = useState({
-    modeloId: (modelos.find((m) => m.id === params.get("servico")) ?? modelos[0])?.id ?? "",
-    clienteId: "", // em branco = cliente indicado no endereço (?cliente=) ou o mais recente
-    consultorId: (consultores.find((u) => u.id === usuario.id) ?? consultores[0])?.id ?? "",
+    // Nada vem preenchido: quem preenche é a importação do HUB (a extensão); à mão, só o que o endereço indicar (?servico=, ?cliente=)
+    modeloId: modelos.find((m) => m.id === params.get("servico"))?.id ?? "",
+    clienteId: "", // em branco = o cliente indicado no endereço (?cliente=), se houver
+    consultorId: "",
     codigoHub: "", // código do pedido = nº do projeto no HUB
     gestorSebrae: "",
     segmento: "",
     areaAtuacao: "",
-    situacao: "diagnostico" as PassoHub, // onde o projeto está no HUB
+    situacao: "" as PassoHub | "", // onde o projeto está no HUB; em branco = Diagnóstico
   });
   // Horas de cada etapa: as da ficha do serviço, ou as da proposta (quando a ficha não traz)
   const [horas, setHoras] = useState<Record<string, string>>({});
@@ -42,7 +43,7 @@ function Conteudo() {
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setF({ ...f, [k]: e.target.value });
   const modelo = modelos.find((m) => m.id === f.modeloId);
   // Calculado a cada render: o cliente recém-cadastrado pode chegar à lista um instante depois
-  const clienteId = f.clienteId || (clientes.find((c) => c.id === params.get("cliente")) ?? clientes[clientes.length - 1])?.id || "";
+  const clienteId = f.clienteId || clientes.find((c) => c.id === params.get("cliente"))?.id || "";
   const cliente = clientes.find((c) => c.id === clienteId);
   // Sugestões a partir da atividade do cliente (CNAE); valem se o campo ficar em branco
   const segmentoSugerido = cliente?.ramo ?? "";
@@ -87,7 +88,7 @@ function Conteudo() {
         gestorSebrae: f.gestorSebrae,
         segmento: f.segmento.trim() || segmentoSugerido,
         areaAtuacao: f.areaAtuacao.trim() || areaSugerida,
-        situacao: f.situacao,
+        situacao: f.situacao || "diagnostico",
         horasDaEtapa: (ordem, padrao) => Number(horaDaEtapa(ordem, padrao).replace(",", ".")) || 0,
       });
       registrarEvento(p, usuario.nome, "Projeto criado");
@@ -126,6 +127,7 @@ function Conteudo() {
               <legend className="mb-3 text-[15px] font-medium">Serviço e cliente</legend>
               <Campo rotulo="Serviço" className="sm:col-span-2">
                 <select className="campo" value={f.modeloId} onChange={set("modeloId")}>
+                  <option value="">Escolha…</option>
                   {modelos.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.fichaTecnica}
@@ -140,6 +142,7 @@ function Conteudo() {
               </Campo>
               <Campo rotulo="Cliente">
                 <select className="campo" value={clienteId} onChange={set("clienteId")}>
+                  <option value="">Escolha…</option>
                   {clientes.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.razaoSocial}
@@ -164,6 +167,7 @@ function Conteudo() {
               </Campo>
               <Campo rotulo="Consultor responsável">
                 <select className="campo" value={f.consultorId} onChange={set("consultorId")}>
+                  <option value="">A definir</option>
                   {consultores.map((u) => (
                     <option key={u.id} value={u.id}>
                       {u.nomeCompleto}
@@ -174,8 +178,9 @@ function Conteudo() {
             </fieldset>
             <fieldset className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
               <legend className="mb-3 text-[15px] font-medium">Dados do HUB SEBRAE</legend>
-              <Campo rotulo="Onde o projeto está no HUB" className="sm:col-span-2" dica={fases[passosHub[f.situacao].fase].descricao}>
+              <Campo rotulo="Onde o projeto está no HUB" className="sm:col-span-2" dica={f.situacao ? fases[passosHub[f.situacao].fase].descricao : "Em branco, o projeto começa no Diagnóstico."}>
                 <select className="campo" value={f.situacao} onChange={set("situacao")}>
+                  <option value="">Escolha…</option>
                   {ordemPassos.slice(0, ordemPassos.indexOf("execucao") + 1).map((s) => (
                     <option key={s} value={s}>
                       {rotuloPassoHub(s)}
@@ -215,7 +220,7 @@ function Conteudo() {
               <Botao type="submit" disabled={!clienteId || !modelo || criando || bloqueado}>
                 {criando ? "Criando…" : "Criar projeto"}
               </Botao>
-              {!modelo && (
+              {modelos.length === 0 && (
                 <span className="ml-3 text-sm text-tinta-2">
                   Esta empresa ainda não tem serviço cadastrado.{" "}
                   <Link href={`/${slug}/servicos/novo`} className="font-semibold text-azul hover:underline">
