@@ -11,12 +11,13 @@ import { relatorioFeitoFora, verificarCompletude } from "./relatorio/secoes";
 // projetos, no projeto e na etapa, para ninguém precisar adivinhar o caminho.
 
 // Abas do projeto que podem ser abertas pelo endereço (#plano, #desenvolvimento…).
-// #ficha abre os dados do projeto (no "Mais"); #etapa-2 abre a entrega da etapa 2.
+// #ficha e #dados abrem os Dados do projeto; #etapa-2 abre a entrega da etapa 2.
 export const ancoraAbaProjeto = {
   desenvolvimento: "Desenvolvimento",
   conversa: "Desenvolvimento",
   registrar: "Desenvolvimento",
-  ficha: "Dados do projeto",
+  ficha: "Dados",
+  dados: "Dados",
   cronograma: "Plano de trabalho",
   plano: "Plano de trabalho",
   entregas: "Entregas",

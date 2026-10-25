@@ -87,6 +87,12 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
   // A conversa faz parte da página: ao abrir, nada rola. Mensagem nova ou
   // resposta da IA traz o fim da conversa e a caixa de mensagem à vista.
   const total = mensagens?.length ?? 0;
+  // A lista de mensagens tem altura limitada e rola por dentro; fica sempre no fim, na mensagem mais nova
+  const lista = useRef<HTMLOListElement>(null);
+  const carregando = mensagens === null;
+  useEffect(() => {
+    lista.current?.scrollTo({ top: lista.current.scrollHeight, behavior: jaCarregou.current ? "smooth" : "auto" });
+  }, [total, ocupado, carregando]);
   useEffect(() => {
     if (mensagens === null) return;
     if (!jaCarregou.current) return void (jaCarregou.current = true);
@@ -234,7 +240,7 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
         <p className="py-10 text-center text-sm text-tinta-2">Carregando a conversa…</p>
       ) : (
         mensagens.length > 0 && (
-          <ol className="space-y-4 px-3 py-5 sm:px-6" aria-label="Conversa">
+          <ol ref={lista} className="max-h-[min(65vh,36rem)] space-y-4 overflow-y-auto overscroll-contain px-3 py-5 sm:px-6" aria-label="Conversa" tabIndex={0}>
             {mensagens.map((m) => (
               <li key={m.id}>{m.papel === "usuario" ? <BolhaUsuario m={m} urls={urls} /> : <BolhaIA m={m} aoDesfazer={() => void desfazer(m)} />}</li>
             ))}

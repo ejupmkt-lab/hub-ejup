@@ -113,12 +113,13 @@ function itemRelatorio(p: Projeto, e: Etapa, atual: Etapa | undefined): Item {
 // O projeto no HUB SEBRAE (as 6 etapas do HUB) e, embaixo, os relatórios do
 // serviço (tantos quantas as etapas da ficha). O passo atual diz com quem está
 // a bola e há quantos dias; cada passo é registrado com a data.
-export function LinhaDoHub({ projeto, aoAbrirPlano }: { projeto: Projeto; aoAbrirPlano: () => void }) {
+// abrirImportacao: a extensão entregou a leitura enquanto a pessoa estava em outra aba do projeto; o painel já nasce aberto
+export function LinhaDoHub({ projeto, aoAbrirPlano, abrirImportacao = false }: { projeto: Projeto; aoAbrirPlano: () => void; abrirImportacao?: boolean }) {
   const { alterar, cliente } = useProjeto();
   const { estado } = useEstado();
   const [data, setData] = useState(hojeIso());
   const [perguntas, setPerguntas] = useState(false);
-  const [importando, setImportando] = useState(false);
+  const [importando, setImportando] = useState(abrirImportacao && projeto.status !== "encerrado");
   // "Ler agora" na extensão: o painel de importar abre sozinho e recebe o que ela leu
   useEffect(() => {
     if (projeto.status === "encerrado") return;

@@ -35,14 +35,14 @@ import {
 } from "@/lib/projeto";
 import { doisDigitos, } from "@/lib/rotulos";
 import { ancoraAbaProjeto, passoDoProjeto } from "@/lib/proximo-passo";
+import { AVISO_DA_EXTENSAO } from "@/lib/hub-extensao";
 import { Abas, Barra, Botao, BotaoLink, Cabecalho, Cartao, Chip, ProximoPasso, Vazio } from "@/components/ui";
 import { nomeDoCliente } from "@/lib/campos-cliente";
 
-// Três abas para o dia a dia; o resto fica no "Mais". O processo (ficha,
-// textos, referências) fica no serviço; aqui, só o que é do projeto.
-const principais = ["Desenvolvimento", "Plano de trabalho", "Entregas"] as const;
-const secundarias = ["Dados do projeto", "Histórico"] as const;
-type Aba = (typeof principais)[number] | (typeof secundarias)[number];
+// Dados (o projeto no HUB, as etapas e a ficha) abre primeiro; o Desenvolvimento é a conversa com a IA.
+// O processo (ficha, textos, referências) fica no serviço; aqui, só o que é do projeto.
+const abas = ["Dados", "Desenvolvimento", "Plano de trabalho", "Entregas", "Histórico"] as const;
+type Aba = (typeof abas)[number];
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
 export default function PaginaProjeto() {
@@ -50,10 +50,21 @@ export default function PaginaProjeto() {
   const { mudarStatus } = useAcoesEtapa();
   const { excluirProjeto, excluindo, podeExcluir } = useExcluirProjeto(projeto);
   const { empresa: slug } = useParams<{ empresa: string }>();
-  // O projeto abre sempre no Desenvolvimento (a conversa com a IA)
-  const [aba, setAba] = useState<Aba>("Desenvolvimento");
-  // Menu "Mais" aberto logo abaixo da aba que o abriu (posição dentro da faixa de abas)
-  const [menuMais, setMenuMais] = useState<{ left: number; top: number } | null>(null);
+  // O projeto abre sempre nos Dados
+  const [aba, setAba] = useState<Aba>("Dados");
+  // Entrega (etapa) que um atalho pediu para abrir: #etapa-2, "Resolver" no próximo passo…
+  const [entregaAberta, setEntregaAberta] = useState<number | undefined>(undefined);
+  // "Ler agora" na extensão com outra aba aberta: volta aos Dados, onde o painel de importar do HUB abre sozinho
+  const [chegouDoHub, setChegouDoHub] = useState(false);
+  useEffect(() => {
+    const ouvir = (ev: MessageEvent) => {
+      if (ev.source !== window || ev.origin !== window.location.origin || ev.data?.tipo !== AVISO_DA_EXTENSAO) return;
+      setChegouDoHub(true);
+      setAba("Dados");
+    };
+    window.addEventListener("message", ouvir);
+    return () => window.removeEventListener("message", ouvir);
+  }, []);
   // Atalho "Registrar" do menu (#registrar) traz a caixa de mensagem à vista
   const [focar, setFocar] = useState(0);
 
@@ -68,6 +79,7 @@ export default function PaginaProjeto() {
       const etapa = /^etapa-(\d+)$/.exec(ancora)?.[1];
       if (etapa) {
         setAba("Entregas");
+        setEntregaAberta(Number(etapa));
         setTimeout(() => document.getElementById(`entrega-${etapa}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
       }
       if (ancora === "registrar") setFocar((n) => n + 1);
@@ -80,14 +92,6 @@ export default function PaginaProjeto() {
       window.removeEventListener("hashchange", ler);
     };
   }, []);
-
-  // Esc fecha o menu "Mais", onde quer que esteja o foco
-  useEffect(() => {
-    if (!menuMais) return;
-    const fechar = (e: KeyboardEvent) => e.key === "Escape" && setMenuMais(null);
-    window.addEventListener("keydown", fechar);
-    return () => window.removeEventListener("keydown", fechar);
-  }, [menuMais]);
 
   if (!projeto || !cliente)
     return (
@@ -123,19 +127,7 @@ export default function PaginaProjeto() {
     );
     if (para === "concluido") void guardarProjetoNaBiblioteca(projeto, cliente).then((erro) => erro && alert(erro));
   };
-  const irPara = (a: Aba) => {
-    setAba(a);
-    setMenuMais(null);
-  };
-  const abrirMais = (botao: HTMLElement) => {
-    if (menuMais) return setMenuMais(null);
-    const faixa = botao.closest("[data-faixa-abas]")!.getBoundingClientRect();
-    const b = botao.getBoundingClientRect();
-    const largura = 240;
-    // Alinha pela esquerda da aba; se não couber, pela direita
-    const left = b.left - faixa.left + largura <= faixa.width ? b.left - faixa.left : Math.max(0, b.right - faixa.left - largura);
-    setMenuMais({ left, top: b.bottom - faixa.top + 6 });
-  };
+  const irPara = (a: Aba) => setAba(a);
   const abrirPlano = () => {
     setAba("Plano de trabalho");
     setTimeout(() => document.getElementById("plano")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
@@ -152,6 +144,7 @@ export default function PaginaProjeto() {
   const diasEntrega = entrega ? diferencaDias(hoje, entrega) : null;
   const abrirEntrega = (ordem: number) => {
     setAba("Entregas");
+    setEntregaAberta(ordem);
     setTimeout(() => document.getElementById(`entrega-${ordem}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
   };
   const agir = (x: NonNullable<typeof passo>) => {
@@ -164,7 +157,6 @@ export default function PaginaProjeto() {
     return undefined;
   };
   const proximoPasso = passo && <ProximoPasso passo={passo} aoAgir={agir(passo)} />;
-  const abaMais = (secundarias as readonly string[]).includes(aba) ? aba : "Mais";
 
   const situacao = situacaoProjeto(projeto);
   // O mesmo desvio em relação ao plano do HUB que a situação já diz (e, nos concluídos, a entrega final)
@@ -280,34 +272,7 @@ export default function PaginaProjeto() {
               </div>
             </Cartao>
             <div className="relative mt-5" data-faixa-abas>
-              <Abas
-                abas={[...principais, abaMais]}
-                atual={aba === abaMais ? abaMais : aba}
-                aoTrocar={(a, botao) => (a === abaMais ? abrirMais(botao) : irPara(a as Aba))}
-                extra={{ [abaMais]: <span aria-hidden>▾</span> }}
-                naFaixa
-                gradeNoCelular
-              />
-              {menuMais && (
-                <>
-                  <div aria-hidden className="fixed inset-0 z-30" onClick={() => setMenuMais(null)} />
-                  <ul
-                    style={menuMais}
-                    className="absolute z-40 w-60 rounded-[var(--radius-bloco)] border border-linha bg-folha p-1.5 shadow-lg"
-                  >
-                    {secundarias.map((s) => (
-                      <li key={s}>
-                        <button
-                          onClick={() => irPara(s)}
-                          className={`w-full rounded-[var(--radius-campo)] px-3 py-2.5 text-left text-[15px] ${s === aba ? "bg-azul-claro font-semibold text-azul" : "text-tinta hover:bg-pedra"}`}
-                        >
-                          {s}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
+              <Abas abas={abas} atual={aba} aoTrocar={(a) => irPara(a)} naFaixa gradeNoCelular />
             </div>
           </>
         }
@@ -320,12 +285,14 @@ export default function PaginaProjeto() {
         )}
       </Cabecalho>
 
-      {aba === "Desenvolvimento" && (
-        <>
-          <LinhaDoHub projeto={projeto} aoAbrirPlano={abrirPlano} />
-          <Conversa projeto={projeto} passo={passo?.texto} focar={focar} />
-        </>
+      {aba === "Dados" && (
+        <div className="space-y-6">
+          <LinhaDoHub projeto={projeto} aoAbrirPlano={abrirPlano} abrirImportacao={chegouDoHub} />
+          <DadosProjeto projeto={projeto} />
+        </div>
       )}
+
+      {aba === "Desenvolvimento" && <Conversa projeto={projeto} passo={passo?.texto} focar={focar} />}
 
       {aba === "Plano de trabalho" && (
         <div className="space-y-4">
@@ -349,10 +316,9 @@ export default function PaginaProjeto() {
       {aba === "Entregas" && (
         <div className="space-y-4">
           {proximoPasso}
-          <Relatorios projeto={projeto} aoDesenvolver={desenvolver} />
+          <Relatorios projeto={projeto} aoDesenvolver={desenvolver} abrirOrdem={entregaAberta} />
         </div>
       )}
-      {aba === "Dados do projeto" && <DadosProjeto projeto={projeto} aoFechar={() => setAba("Desenvolvimento")} />}
       {aba === "Histórico" && (
         <Cartao className="px-4 py-1 sm:px-6">
           <ol className="max-w-3xl">
@@ -375,7 +341,7 @@ export default function PaginaProjeto() {
           </ol>
         </Cartao>
       )}
-      {aba !== "Desenvolvimento" && (
+      {aba !== "Desenvolvimento" && aba !== "Dados" && (
         <p className="mt-6 text-center text-[13px] text-tinta-2">
           Outros projetos deste cliente:{" "}
           <Link href={`/${projeto.empresa}/clientes/${cliente.id}`} className="font-semibold text-azul hover:underline">

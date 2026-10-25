@@ -76,7 +76,7 @@ function MateriaisDoHub({ projeto }: { projeto: Projeto }) {
   );
 }
 
-export function DadosProjeto({ projeto, aoFechar }: { projeto: Projeto; aoFechar: () => void }) {
+export function DadosProjeto({ projeto }: { projeto: Projeto }) {
   const { alterar, cliente } = useProjeto();
   const { estado } = useEstado();
   const { excluirProjeto, excluindo, podeExcluir } = useExcluirProjeto(projeto);
@@ -93,9 +93,6 @@ export function DadosProjeto({ projeto, aoFechar }: { projeto: Projeto; aoFechar
               Estes dados, os do cliente ({cliente?.razaoSocial}) e a ficha do serviço preenchem a identificação no topo dos relatórios.
             </p>
           </div>
-          <Botao variante="secundario" tamanho="pequeno" onClick={aoFechar}>
-            Voltar ao Desenvolvimento
-          </Botao>
         </div>
         <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
           <Campo

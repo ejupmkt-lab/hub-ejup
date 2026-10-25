@@ -96,7 +96,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen">
       {/* Menu lateral (computador) */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-linha bg-folha lg:flex">
-        <Link href="/" className="block px-5 pb-5 pt-6" aria-label="Blimp, ir para o painel">
+        <Link href="/" className="flex flex-col items-center px-5 pb-5 pt-6 text-center" aria-label="Blimp, ir para o painel">
           <LogoBlimp className="h-8 w-auto" />
           <span className="mt-1.5 block text-[13px] text-tinta-2">Sistema de gestão</span>
         </Link>

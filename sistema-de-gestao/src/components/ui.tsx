@@ -180,13 +180,13 @@ export function Abas<T extends string>({
       role="tablist"
       className={`grid grid-cols-2 gap-1 rounded-[var(--radius-bloco)] border border-linha bg-folha p-1 shadow-[var(--shadow-cartao)] sm:hidden ${naFaixa ? "" : "mb-6"}`}
     >
-      {abas.map((a) => (
+      {abas.map((a, i) => (
         <button
           key={a}
           role="tab"
           aria-selected={a === atual}
           onClick={(e) => aoTrocar(a, e.currentTarget)}
-          className={`flex min-h-11 items-center justify-center gap-1.5 rounded-[var(--radius-campo)] px-2 py-2 text-center text-[14px] font-semibold leading-tight transition-colors ${
+          className={`${abas.length % 2 === 1 && i === abas.length - 1 ? "col-span-2" : ""} flex min-h-11 items-center justify-center gap-1.5 rounded-[var(--radius-campo)] px-2 py-2 text-center text-[14px] font-semibold leading-tight transition-colors ${
             a === atual ? "bg-azul text-folha shadow-sm" : "text-tinta-2 hover:bg-pedra hover:text-tinta"
           }`}
         >

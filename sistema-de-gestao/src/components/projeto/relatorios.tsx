@@ -6,7 +6,7 @@ import { useEstado } from "@/lib/dados/store";
 import { novoId } from "@/lib/dados/store";
 import { formatarData, hojeIso, periodoCurto } from "@/lib/datas";
 import { antesDaContratacao } from "@/lib/fase";
-import { etapaAtrasada, etapaConcluida, progressoAtividades, textoDoPrazo } from "@/lib/projeto";
+import { etapaAtrasada, etapaAtual, etapaConcluida, progressoAtividades, textoDoPrazo } from "@/lib/projeto";
 import { bloqueioStatus } from "@/lib/regras-etapa";
 import { relatorioFeitoFora, verificarCompletude } from "@/lib/relatorio/secoes";
 import { doisDigitos } from "@/lib/rotulos";
@@ -29,21 +29,29 @@ function situacao(p: Projeto, e: Etapa): { rotulo: string; texto: string; faixa:
 // Entregas: os relatórios de cada etapa, como no Plano de Entrega do HUB. A
 // elaboração é feita no Desenvolvimento; aqui ficam o relatório em Word, o PDF
 // assinado e o registro do envio (ou da devolução pelo gestor).
-export function Relatorios({ projeto, aoDesenvolver }: { projeto: Projeto; aoDesenvolver: () => void }) {
+export function Relatorios({ projeto, aoDesenvolver, abrirOrdem }: { projeto: Projeto; aoDesenvolver: () => void; abrirOrdem?: number }) {
+  const atual = etapaAtual(projeto);
   return (
     <div className="space-y-4">
-      <p className="text-sm text-tinta-2">
-        Os relatórios de cada etapa, no modelo da ficha {projeto.codigoFichaTecnica}. Eles são escritos no{" "}
+      <p className="max-w-3xl text-sm text-tinta-2">
+        Os relatórios são escritos no{" "}
         <button type="button" onClick={aoDesenvolver} className="font-semibold text-azul hover:underline">
           Desenvolvimento
         </button>
-        ; aqui você baixa o relatório em Word, anexa o PDF assinado no gov.br e registra o envio no Plano de Entrega do HUB.
+        . Aqui você baixa o relatório em Word, anexa o PDF assinado e registra o envio no HUB.
       </p>
-      <Cartao className="p-3 sm:p-4">
-        <h2 className="px-1 pb-3 text-[17px] font-bold">Plano de Entrega</h2>
-        <ol className="space-y-3">
+      <Cartao className="p-3 sm:p-5">
+        <h2 className="px-1 pb-4 text-[17px] font-bold">Plano de Entrega</h2>
+        <ol className="space-y-4">
           {projeto.etapas.map((e) => (
-            <Entrega key={e.ordem} projeto={projeto} etapa={e} aoDesenvolver={aoDesenvolver} />
+            <Entrega
+              key={`${e.ordem}${abrirOrdem === e.ordem ? "-aberta" : ""}`}
+              projeto={projeto}
+              etapa={e}
+              aoDesenvolver={aoDesenvolver}
+              abertaDeInicio={antesDaContratacao(projeto) || e.ordem === atual?.ordem || e.status === "devolvida"}
+              forcarAberta={abrirOrdem === e.ordem}
+            />
           ))}
         </ol>
       </Cartao>
@@ -51,12 +59,26 @@ export function Relatorios({ projeto, aoDesenvolver }: { projeto: Projeto; aoDes
   );
 }
 
-function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa: Etapa; aoDesenvolver: () => void }) {
+// Só a etapa em curso (e a devolvida) vem aberta: as já enviadas e as futuras mostram um resumo, e "Detalhes" abre o resto
+function Entrega({
+  projeto,
+  etapa: e,
+  aoDesenvolver,
+  abertaDeInicio,
+  forcarAberta,
+}: {
+  projeto: Projeto;
+  etapa: Etapa;
+  aoDesenvolver: () => void;
+  abertaDeInicio: boolean;
+  forcarAberta: boolean;
+}) {
   const { mudarStatus, baixar, gerando, alterarEtapa } = useAcoesEtapa();
   const { alterar } = useProjeto();
   const { estado } = useEstado();
   const [verPendencias, setVerPendencias] = useState(false);
   const [importando, setImportando] = useState(false);
+  const [aberta, setAberta] = useState(abertaDeInicio || forcarAberta);
   const sit = situacao(projeto, e);
   const antes = antesDaContratacao(projeto);
   const concluida = etapaConcluida(e);
@@ -67,6 +89,7 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
   const refsServico = estado.servicos.find((s) => s.id === projeto.modeloId)?.referencias ?? [];
   const semReferencias = pendencias.some((x) => x.onde === "Referências") && projeto.referencias.length === 0 && refsServico.length > 0;
 
+  const mostrar = aberta || importando || verPendencias;
   const usarReferenciasDoServico = () =>
     alterar((p) => void (p.referencias = refsServico.map((r) => ({ ...r, id: novoId("ref"), consultadoEm: r.url ? hojeIso() : "" }))), {
       acao: "Referências do serviço aplicadas ao projeto",
@@ -75,29 +98,49 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
   return (
     <li id={`entrega-${e.ordem}`} className="flex scroll-mt-6 overflow-hidden rounded-[var(--radius-campo)] border border-linha bg-folha">
       <div className="min-w-0 flex-1 p-4 sm:p-5">
-        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
-          <h3 className="min-w-0 break-words text-[15px] font-bold uppercase tracking-wide text-tinta">
-            Etapa {doisDigitos(e.ordem)} | {e.nome}
-          </h3>
-          <span className={`text-[14px] font-semibold ${sit.texto}`}>{sit.rotulo}</span>
-        </div>
-        {e.descricao && <p className="mt-1 line-clamp-3 text-sm text-tinta-2">{e.descricao}</p>}
-        <p className="num mt-2 text-[13px] text-tinta-2">
-          {periodoCurto(e.dataInicio, e.dataFim)} · {e.horasPrevistas} h · checklist {prog.feitas}/{prog.total}
-          {!antes && textoDoPrazo(e) && <span className="font-semibold text-laranja"> · {textoDoPrazo(e)}</span>}
-          {!concluida && !antes && (
-            <>
-              {" · "}
-              {pendencias.length === 0 ? (
-                <span className="text-verde">relatório completo</span>
-              ) : (
-                <button type="button" onClick={() => setVerPendencias(!verPendencias)} className="text-laranja underline-offset-4 hover:underline" aria-expanded={verPendencias}>
-                  {pendencias.length === 1 ? "1 pendência no relatório" : `${pendencias.length} pendências no relatório`}
-                </button>
+        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+          <div className="min-w-0">
+            <h3 className="break-words text-[15px] font-bold uppercase tracking-wide text-tinta">
+              Etapa {doisDigitos(e.ordem)} | {e.nome}
+            </h3>
+            <p className="num mt-1 text-[13px] text-tinta-2">
+              {periodoCurto(e.dataInicio, e.dataFim)} · {e.horasPrevistas} h · checklist {prog.feitas}/{prog.total}
+              {!concluida && !antes && (
+                <>
+                  {" · "}
+                  {pendencias.length === 0 ? (
+                    <span className="text-verde">relatório completo</span>
+                  ) : (
+                    <button type="button" onClick={() => setVerPendencias(!verPendencias)} className="text-laranja underline-offset-4 hover:underline" aria-expanded={verPendencias}>
+                      {pendencias.length === 1 ? "1 pendência no relatório" : `${pendencias.length} pendências no relatório`}
+                    </button>
+                  )}
+                </>
               )}
-            </>
-          )}
-        </p>
+            </p>
+            {!antes && textoDoPrazo(e) && <p className="num mt-0.5 text-[13px] font-semibold text-laranja">{textoDoPrazo(e)}</p>}
+          </div>
+          <div className="flex shrink-0 items-center gap-3">
+            <span className={`text-[14px] font-semibold ${sit.texto}`}>{sit.rotulo}</span>
+            {!importando && !verPendencias && (
+              <button
+                type="button"
+                onClick={() => setAberta(!aberta)}
+                aria-expanded={mostrar}
+                className="rounded-md px-2 py-1 text-[13px] font-semibold text-azul hover:bg-azul-claro"
+              >
+                {mostrar ? "Recolher" : "Detalhes"}
+              </button>
+            )}
+          </div>
+        </div>
+        {!mostrar && concluida && (
+          <p className="mt-2 text-[13px] text-tinta-2">
+            {e.relatorioAssinado ? `PDF assinado: ${e.relatorioAssinado.nome}` : "Sem PDF assinado guardado"}
+            {e.enviadaEm ? ` · enviada em ${formatarData(e.enviadaEm)}` : ""}
+          </p>
+        )}
+        {mostrar && e.descricao && <p className="mt-3 line-clamp-3 text-sm text-tinta-2">{e.descricao}</p>}
 
         {verPendencias && pendencias.length > 0 && (
           <div className="mt-2 rounded-[var(--radius-campo)] bg-pedra/70 px-3 py-2.5 text-[13px]">
@@ -127,15 +170,15 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
           </div>
         )}
 
-        {!antes && (
-          <div className="mt-3">
+        {mostrar && !antes && (
+          <div className="mt-4">
             <RelatorioAssinado projeto={projeto} etapa={e} alterarEtapa={alterarEtapa(e.ordem)} compacto />
             {!concluida && !feitoFora && <AssinaturaOnline projeto={projeto} etapa={e} alterarEtapa={alterarEtapa(e.ordem)} />}
           </div>
         )}
 
-        {!antes && (
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+        {mostrar && !antes && (
+          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-linha pt-4">
             {!feitoFora && (
               <Botao variante="secundario" tamanho="pequeno" onClick={() => void baixar(e.ordem)} disabled={gerando === e.ordem}>
                 {gerando === e.ordem ? "Gerando…" : "Baixar relatório em Word"}
@@ -178,7 +221,7 @@ function Entrega({ projeto, etapa: e, aoDesenvolver }: { projeto: Projeto; etapa
         {importando && !concluida && (
           <ImportarRelatorio projeto={projeto} etapa={e} alterarEtapa={alterarEtapa(e.ordem)} aoFechar={() => setImportando(false)} />
         )}
-        {feitoFora && <p className="mt-2 text-[13px] text-tinta-2">Relatório feito fora do sistema: o PDF assinado é o relatório desta etapa.</p>}
+        {mostrar && feitoFora && <p className="mt-2 text-[13px] text-tinta-2">Relatório feito fora do sistema: o PDF assinado é o relatório desta etapa.</p>}
       </div>
       <span aria-hidden className={`w-2 shrink-0 ${sit.faixa}`} />
     </li>
