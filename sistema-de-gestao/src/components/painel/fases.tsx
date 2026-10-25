@@ -31,7 +31,7 @@ export function FasesDosProjetos({ projetos }: { projetos: Projeto[] }) {
           <li key={f} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1">
             <span className="flex min-w-0 items-center gap-2 text-sm text-tinta">
               <span aria-hidden className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: fases[f].cor }} />
-              <span className="num">{fases[f].numero}</span> {fases[f].rotulo}
+              {fases[f].rotulo}
             </span>
             <span className="num text-sm font-semibold text-tinta">
               {conta(f)}
