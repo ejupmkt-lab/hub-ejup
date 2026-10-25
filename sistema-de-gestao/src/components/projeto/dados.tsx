@@ -5,9 +5,8 @@ import type { PassoHub, Projeto } from "@/lib/dados/tipos";
 import { mudarHub, ordemPassos, passoHubDoProjeto, rotuloPassoHub } from "@/lib/fase";
 import { hojeIso } from "@/lib/datas";
 import { useEstado } from "@/lib/dados/store";
-import { Botao, Campo, Cartao } from "@/components/ui";
+import { Campo, Cartao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
-import { useExcluirProjeto } from "./excluir-projeto";
 import { EscolherGestorSebrae } from "./gestor-sebrae";
 import { ValoresProjeto } from "@/components/financeiro/valores-projeto";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
@@ -79,7 +78,6 @@ function MateriaisDoHub({ projeto }: { projeto: Projeto }) {
 export function DadosProjeto({ projeto }: { projeto: Projeto }) {
   const { alterar, cliente } = useProjeto();
   const { estado } = useEstado();
-  const { excluirProjeto, excluindo, podeExcluir } = useExcluirProjeto(projeto);
   const consultores = estado.usuarios.filter((u) => u.acessos[projeto.empresa]);
   const consultorAtual = consultores.find((u) => u.id === projeto.consultorId);
 
@@ -187,14 +185,6 @@ export function DadosProjeto({ projeto }: { projeto: Projeto }) {
         <ValoresProjeto projeto={projeto} />
         <MateriaisDoHub projeto={projeto} />
       </Cartao>
-      {podeExcluir && (
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-linha pt-6">
-          <p className="text-[13px] text-tinta-2">Projeto criado por engano ou cancelado pelo SEBRAE? A exclusão é definitiva.</p>
-          <Botao variante="perigo" onClick={excluirProjeto} disabled={excluindo}>
-            {excluindo ? "Excluindo…" : "Excluir projeto"}
-          </Botao>
-        </div>
-      )}
     </>
   );
 }
