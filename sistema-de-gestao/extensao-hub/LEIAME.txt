@@ -1,0 +1,41 @@
+Blimp: importar do HUB SEBRAE (extensão do Chrome e do Edge)
+
+O que faz: na página do HUB que você quer ler, você clica no ícone da extensão e em "Ler agora".
+Ela lê a página (texto, quadros internos e os balões que só aparecem ao passar o mouse sobre ícones e
+iniciais, como os envolvidos do pedido), baixa os arquivos anexados com a sua própria sessão do
+HUB e leva tudo para o projeto que está aberto numa aba do Blimp. No Blimp aparece a prévia do que
+vai mudar; só vale quando você confirma. Os PDFs e imagens baixados ficam guardados no projeto.
+
+Botão de situação do pedido: ao ler a página, a extensão clica UMA vez no botão colorido de cima, à direita
+("Em andamento", "Aguardando Envio das notas fiscais"…), lê o que a página mostra por causa do clique e
+clica de novo para deixar a página como estava. O que apareceu vai para o Blimp junto com a leitura.
+
+Ler todos os projetos da lista: na lista de projetos do HUB (a que mostra todos os pedidos), clique no ícone
+da extensão e em "Ler todos os projetos da lista" (deixe a tela Novo projeto aberta numa aba do Blimp).
+A extensão abre cada pedido, lê a página, o botão de situação e os anexos, e volta à lista (recarrega o
+endereço dela). O número no ícone mostra o andamento; "Parar depois do pedido atual" interrompe. Na primeira
+vez o navegador pede permissão para o endereço do HUB. No Blimp, cada pedido vira um projeto (com o cliente
+pelo CNPJ), sozinho ou um a um para você conferir. Lê até 40 pedidos por vez, os que estão na tela da lista.
+
+Instalar:
+1. Descompacte esta pasta.
+2. No Chrome (ou Edge) abra chrome://extensions e ligue o "Modo do desenvolvedor".
+3. Clique em "Carregar sem compactação" e escolha a pasta descompactada.
+4. Deixe o projeto (ou a tela Novo projeto, para criar um do zero) aberto numa aba do Blimp. Vá à página do HUB e clique no ícone da extensão em "Ler agora".
+
+Cada relatório baixado do cartão de uma etapa (ETAPA 01, 02…) vai para a entrega daquela etapa. Se o
+botão de download não tiver endereço, a janelinha mostra "Copiar diagnóstico da leitura": cole o
+texto para quem mantém o Blimp ajustar a leitura.
+
+O que a página lista e a extensão não consegue baixar fica
+registrado no histórico do projeto, para constar que o documento existe. Para baixar os relatórios, a extensão CLICA nos botões de download de cada etapa e documento (só nos que
+parecem de baixar: nunca em enviar, informações, excluir ou editar). Dá para desligar isso na janelinha, na
+caixa "Clicar nos botões de download".
+
+Se um anexo estiver em outro endereço (por exemplo, um armazenamento de arquivos), o navegador
+bloqueia o download. A extensão mostra um botão "Permitir baixar de ..." e lê de novo.
+
+Privacidade: a extensão lê a página só quando você clica nela, e só a aba que está na tela. Ela não
+guarda nem lê senha, não roda sozinha e não envia nada para fora do seu navegador; o que ela lê vai
+só para o Blimp. Os arquivos baixados só saem da extensão quando o Blimp pede, e ela apaga a cópia
+depois. Para parar de vez, remova a extensão.

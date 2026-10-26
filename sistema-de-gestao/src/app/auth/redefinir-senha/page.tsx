@@ -1,0 +1,48 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { supabaseNavegador } from "@/lib/supabase/navegador";
+import { Botao, Campo } from "@/components/ui";
+import { TelaAcesso } from "@/components/tela-acesso";
+import { MSG_SENHA_VAZADA, senhaVazada } from "@/lib/senha";
+import { traduzirErro } from "@/lib/erros";
+
+export default function RedefinirSenha() {
+  const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
+
+  const salvar = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEnviando(true);
+    setErro(null);
+    if (await senhaVazada(senha)) {
+      setEnviando(false);
+      return setErro(MSG_SENHA_VAZADA);
+    }
+    const { error } = await supabaseNavegador().auth.updateUser({ password: senha });
+    setEnviando(false);
+    if (error) setErro(traduzirErro(error));
+    else window.location.href = "/";
+  };
+
+  return (
+    <TelaAcesso titulo="Nova senha">
+      <form onSubmit={salvar} className="space-y-4">
+        <Campo rotulo="Nova senha" dica="Mínimo de 8 caracteres.">
+          <input type="password" required minLength={8} autoComplete="new-password" className="campo" value={senha} onChange={(e) => setSenha(e.target.value)} />
+        </Campo>
+        {erro && (
+          <p className="rounded-[var(--radius-campo)] bg-vermelho-claro p-3 text-sm text-vermelho">
+            {erro}{" "}
+            <Link href="/login" className="underline underline-offset-2">
+              Ir para o login
+            </Link>
+          </p>
+        )}
+        <Botao type="submit" disabled={enviando} className="w-full">{enviando ? "Salvando…" : "Salvar senha"}</Botao>
+      </form>
+    </TelaAcesso>
+  );
+}
