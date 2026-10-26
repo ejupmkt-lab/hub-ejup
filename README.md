@@ -14,6 +14,13 @@ O projeto **Experts** continua no seu próprio repositório: [`ejupmkt-lab/exper
 
 Cada projeto da Vercel aponta para este repositório e define o **Root Directory** como a pasta do projeto (ex.: `sistema-de-gestao`).
 
+| Projeto na Vercel | Root Directory |
+|---|---|
+| `sistema-de-gestao` | `sistema-de-gestao` |
+| `ejup-site` | `ejup-site` |
+
+Cada projeto usa o *Ignored Build Step* `git diff --quiet HEAD^ HEAD -- .`, então só faz deploy quando algo muda na sua própria pasta.
+
 ## Mídia do Minerva (Git LFS)
 
 Imagens, vídeos, áudios, PDFs e ZIPs de `minerva/` ficam no Git LFS. Instale o LFS antes de clonar (`git lfs install`) para baixar os arquivos reais.
