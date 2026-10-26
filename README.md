@@ -5,9 +5,10 @@ Repositório principal da EJUP. Cada projeto vive na sua própria pasta, com o h
 | Pasta | Projeto | Origem |
 |---|---|---|
 | [`sistema-de-gestao/`](sistema-de-gestao) | Sistema de gestão (Next.js + Supabase) | `ejupmkt-lab/sistema-de-gest-o` |
-| [`experts/`](experts) | Página de apresentação Experts | `ejupmkt-lab/experts` |
 | [`ejup-site/`](ejup-site) | Site da EJUP (projeto `ejup-site` na Vercel) | `victorbarrosoc-hub/EJUPMinerva`, pasta `site/` da branch `claude/tender-allen-jzf0ro` |
 | [`minerva/`](minerva) | EJUP Minerva (peças, skills e conteúdo) | `victorbarrosoc-hub/EJUPMinerva`, branch `claude/ejupminerva-repo-setup-j1rhgg` |
+
+O projeto **Experts** continua no seu próprio repositório: [`ejupmkt-lab/experts`](https://github.com/ejupmkt-lab/experts).
 
 ## Deploy na Vercel
 
