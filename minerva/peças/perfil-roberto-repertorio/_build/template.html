@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Modelo — perfil Roberto Pivotto</title>
+<style>
+__FONT_FACES__
+:root{--amarelo:#f2c744;--tinta:#141210;--papel:#e8e4dc}
+*{box-sizing:border-box}
+html,body{margin:0;background:#2a2723;color:#e8e4dc;
+  font-family:'Gotham','Montserrat',system-ui,sans-serif}
+header{padding:26px 32px 8px;max-width:1180px;margin:0 auto}
+header h1{margin:0;font-weight:900;font-size:26px;letter-spacing:-.02em}
+header p{margin:8px 0 0;font-weight:300;font-size:15px;line-height:1.55;
+  color:#b6afa4;max-width:70ch}
+header b{color:#f2c744;font-weight:500}
+.barra{position:sticky;top:0;z-index:50;background:#1d1b18;
+  border-bottom:1px solid #3a352e;padding:12px 32px;display:flex;gap:10px;
+  align-items:center;flex-wrap:wrap}
+.barra button{font:inherit;font-weight:500;font-size:14px;padding:9px 16px;
+  border-radius:4px;border:1px solid #554e44;background:#2a2723;color:#e8e4dc;
+  cursor:pointer}
+.barra button:hover{border-color:var(--amarelo);color:var(--amarelo)}
+.barra span{font-size:13px;color:#8d867b;font-weight:300}
+main{max-width:1180px;margin:0 auto;padding:24px 32px 80px;display:flex;
+  flex-direction:column;gap:44px}
+.peca{display:flex;gap:22px;align-items:flex-start}
+.rotulo{width:96px;flex:none;padding-top:6px}
+.rotulo b{display:block;font-weight:900;font-size:34px;color:var(--amarelo);
+  line-height:1}
+.rotulo span{display:block;margin-top:4px;font-weight:500;font-size:11px;
+  letter-spacing:.16em;text-transform:uppercase;color:#8d867b}
+.moldura{width:540px;flex:none}
+
+/* ---- a tela: 1080×1350, dois quadros de 1080×675 ---- */
+.slide{width:1080px;height:1350px;background:#000;position:relative;
+  overflow:hidden;transform-origin:0 0;display:flex;flex-direction:column}
+.quadro{position:relative;height:675px;overflow:hidden;background:#191714;
+  border-bottom:2px solid #000}
+.quadro:last-child{border-bottom:0}
+.quadro img{position:absolute;left:0;top:0;transform-origin:0 0;
+  user-select:none;-webkit-user-drag:none}
+.quadro.vazio::after{content:attr(data-dica);position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  padding:0 120px 90px;font-weight:300;font-size:30px;line-height:1.5;
+  color:#6b645a;letter-spacing:.01em}
+.quadro.vazio{background:
+  repeating-linear-gradient(135deg,#1c1a17 0 22px,#211e1a 22px 44px)}
+.quadro.sobre{outline:3px dashed var(--amarelo);outline-offset:-14px}
+.legenda{position:absolute;left:70px;right:70px;bottom:54px;z-index:3;
+  text-align:center;font-weight:900;font-size:44px;line-height:1.22;
+  color:var(--amarelo);letter-spacing:-.005em;
+  text-shadow:0 3px 0 rgba(0,0,0,.9),0 0 14px rgba(0,0,0,.75),
+              2px 0 0 rgba(0,0,0,.9),-2px 0 0 rgba(0,0,0,.9),
+              0 -2px 0 rgba(0,0,0,.9);outline:none}
+.legenda:focus{background:rgba(0,0,0,.35)}
+
+/* ---- controles ao lado ---- */
+.painel{flex:1;padding-top:6px;min-width:0}
+.painel h3{margin:0 0 4px;font-weight:900;font-size:17px}
+.painel .linha{display:flex;gap:10px;align-items:center;margin:10px 0;
+  font-size:13px;color:#b6afa4;font-weight:300}
+.painel .linha b{font-weight:500;color:#e8e4dc;min-width:72px}
+.painel input[type=range]{flex:1;accent-color:var(--amarelo)}
+.painel .fala{margin:8px 0 0;font-weight:300;font-size:14px;line-height:1.6;
+  color:#b6afa4}
+.painel .fala em{font-style:normal;color:var(--amarelo)}
+.painel button{font:inherit;font-size:13px;font-weight:500;padding:7px 13px;
+  border-radius:4px;border:1px solid #554e44;background:#2a2723;
+  color:#e8e4dc;cursor:pointer}
+.painel button:hover{border-color:var(--amarelo);color:var(--amarelo)}
+.nota{font-size:12px;color:#8d867b;font-weight:300;margin-top:14px;
+  line-height:1.6}
+</style></head>
+<body>
+<header>
+  <h1>Modelo do carrossel, perfil pessoal de Roberto Pivotto</h1>
+  <p>Cinco telas de 1080×1350, dois quadros por tela, no formato da referência.
+  <b>Arraste uma foto</b> para dentro de cada quadro, arraste dentro dela para
+  reenquadrar e use o zoom. <b>Clique no texto</b> para editar e trocar as
+  lacunas pelas frases da entrevista. Depois exporte em PNG.</p>
+</header>
+<div class="barra">
+  <button id="todas">Baixar as 5 telas em PNG</button>
+  <button id="limpar">Limpar fotos</button>
+  <span id="status">nenhuma foto carregada</span>
+</div>
+<main id="palco"></main>
+
+<script>
+const QUADROS = __QUADROS__;
+const LARG = 1080, ALT_Q = 675, ESCALA_VIS = 540 / LARG;
+const estado = QUADROS.map(() => ({src:null, x:0, y:0, zoom:1, w:0, h:0}));
+
+function montar(){
+  const palco = document.getElementById('palco');
+  for (let s = 0; s < QUADROS.length / 2; s++){
+    const peca = document.createElement('div');
+    peca.className = 'peca';
+    peca.innerHTML = `
+      <div class="rotulo"><b>${s + 1}</b><span>de 5</span></div>
+      <div class="moldura"><div class="slide" data-s="${s}"></div></div>
+      <div class="painel" data-p="${s}"></div>`;
+    palco.appendChild(peca);
+
+    const slide = peca.querySelector('.slide');
+    slide.style.transform = `scale(${ESCALA_VIS})`;
+    peca.querySelector('.moldura').style.height = (1350 * ESCALA_VIS) + 'px';
+
+    for (let k = 0; k < 2; k++){
+      const i = s * 2 + k;
+      const q = document.createElement('div');
+      q.className = 'quadro vazio';
+      q.dataset.i = i;
+      q.dataset.dica = QUADROS[i].dica;
+      q.innerHTML = `<div class="legenda" contenteditable="true"
+        spellcheck="false">${QUADROS[i].texto}</div>`;
+      slide.appendChild(q);
+      ligar(q, i);
+    }
+
+    const painel = peca.querySelector('.painel');
+    painel.innerHTML = `<h3>Tela ${s + 1}</h3>` +
+      [0,1].map(k => {
+        const i = s * 2 + k;
+        return `<p class="fala"><em>quadro ${i + 1}</em> · ${QUADROS[i].dica}</p>
+          <div class="linha"><b>zoom ${i + 1}</b>
+            <input type="range" min="100" max="320" value="100" data-z="${i}">
+            <button data-esc="${i}">escolher foto</button></div>`;
+      }).join('') +
+      `<div class="linha"><button data-png="${s}">baixar PNG desta tela</button></div>`;
+
+    painel.querySelectorAll('[data-z]').forEach(r =>
+      r.addEventListener('input', e => {
+        const i = +e.target.dataset.z;
+        estado[i].zoom = +e.target.value / 100; aplicar(i);
+      }));
+    painel.querySelectorAll('[data-esc]').forEach(b =>
+      b.addEventListener('click', () => escolher(+b.dataset.esc)));
+    painel.querySelector('[data-png]').addEventListener('click',
+      e => baixar(+e.target.dataset.png));
+  }
+}
+
+function ligar(q, i){
+  ['dragenter','dragover'].forEach(ev => q.addEventListener(ev, e => {
+    e.preventDefault(); q.classList.add('sobre'); }));
+  ['dragleave','drop'].forEach(ev => q.addEventListener(ev,
+    () => q.classList.remove('sobre')));
+  q.addEventListener('drop', e => {
+    e.preventDefault();
+    const f = [...e.dataTransfer.files].find(f => f.type.startsWith('image/'));
+    if (f) carregar(f, i);
+  });
+  q.addEventListener('click', e => {
+    if (!estado[i].src && !e.target.classList.contains('legenda')) escolher(i);
+  });
+  let arrasta = false, px = 0, py = 0;
+  q.addEventListener('mousedown', e => {
+    if (!estado[i].src || e.target.classList.contains('legenda')) return;
+    arrasta = true; px = e.clientX; py = e.clientY; e.preventDefault();
+  });
+  window.addEventListener('mousemove', e => {
+    if (!arrasta) return;
+    estado[i].x += (e.clientX - px) / ESCALA_VIS;
+    estado[i].y += (e.clientY - py) / ESCALA_VIS;
+    px = e.clientX; py = e.clientY; aplicar(i);
+  });
+  window.addEventListener('mouseup', () => { arrasta = false; });
+}
+
+function escolher(i){
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = () => inp.files[0] && carregar(inp.files[0], i);
+  inp.click();
+}
+
+function carregar(file, i){
+  const fr = new FileReader();
+  fr.onload = () => {
+    const im = new Image();
+    im.onload = () => {
+      const esc = Math.max(LARG / im.width, ALT_Q / im.height);
+      Object.assign(estado[i], {src: fr.result, w: im.width, h: im.height,
+        zoom: 1, x: (LARG - im.width * esc) / 2, y: (ALT_Q - im.height * esc) / 2});
+      aplicar(i); contar();
+    };
+    im.src = fr.result;
+  };
+  fr.readAsDataURL(file);
+}
+
+function aplicar(i){
+  const q = document.querySelector(`.quadro[data-i="${i}"]`);
+  const st = estado[i];
+  let img = q.querySelector('img');
+  if (!st.src){ if (img) img.remove(); q.classList.add('vazio'); return; }
+  if (!img){ img = new Image(); q.insertBefore(img, q.firstChild); }
+  img.src = st.src;
+  const base = Math.max(LARG / st.w, ALT_Q / st.h) * st.zoom;
+  img.style.width = st.w + 'px';
+  img.style.transform = `translate(${st.x}px,${st.y}px) scale(${base})`;
+  q.classList.remove('vazio');
+}
+
+function contar(){
+  const n = estado.filter(e => e.src).length;
+  document.getElementById('status').textContent =
+    n ? `${n} de 10 quadros com foto` : 'nenhuma foto carregada';
+}
+
+/* PNG por SVG + foreignObject, servido como data: URL para o canvas não
+   ficar marcado (blob: marca a tela em file:// e o toBlob morre). */
+function slideParaSVG(slide){
+  const css = [...document.styleSheets].map(s => {
+    try { return [...s.cssRules].map(r => r.cssText).join('\n'); }
+    catch (e) { return ''; }
+  }).join('\n');
+  const clone = slide.cloneNode(true);
+  clone.style.transform = 'none';
+  clone.querySelectorAll('.legenda').forEach(l => l.removeAttribute('contenteditable'));
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350">' +
+    '<foreignObject x="0" y="0" width="1080" height="1350">' +
+    '<div xmlns="http://www.w3.org/1999/xhtml"><style>' + css + '</style>' +
+    new XMLSerializer().serializeToString(clone) + '</div></foreignObject></svg>';
+}
+
+function pngBlob(s){
+  return new Promise((ok, falha) => {
+    const slide = document.querySelector(`.slide[data-s="${s}"]`);
+    const url = 'data:image/svg+xml;charset=utf-8,' +
+      encodeURIComponent(slideParaSVG(slide));
+    const im = new Image();
+    im.onload = () => {
+      const cv = document.createElement('canvas');
+      cv.width = 1080; cv.height = 1350;
+      const cx = cv.getContext('2d');
+      cx.fillStyle = '#000'; cx.fillRect(0, 0, 1080, 1350);
+      cx.drawImage(im, 0, 0);
+      try { cv.toBlob(b => b ? ok(b) : falha(new Error('canvas vazio')), 'image/png'); }
+      catch (e) { falha(e); }
+    };
+    im.onerror = () => falha(new Error('svg não carregou'));
+    im.src = url;
+  });
+}
+
+async function baixar(s){
+  const st = document.getElementById('status');
+  try {
+    const b = await pngBlob(s);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = `perfil-roberto-tela-${String(s + 1).padStart(2, '0')}.png`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    st.textContent = `tela ${s + 1} baixada`;
+  } catch (e) {
+    st.textContent = 'o navegador recusou o PNG: ' + e.message;
+  }
+}
+
+document.getElementById('todas').addEventListener('click', async () => {
+  for (let s = 0; s < QUADROS.length / 2; s++){ await baixar(s); await new Promise(r => setTimeout(r, 350)); }
+  document.getElementById('status').textContent = 'as 5 telas foram baixadas';
+});
+document.getElementById('limpar').addEventListener('click', () => {
+  estado.forEach((e, i) => { e.src = null; aplicar(i); });
+  document.querySelectorAll('input[type=range]').forEach(r => r.value = 100);
+  contar();
+});
+
+montar();
+</script>
+</body></html>

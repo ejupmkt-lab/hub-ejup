@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<title>Carrossel — decisões monocráticas no STF</title>
+<style>
+__FONT_FACES__
+:root{
+  --navy:#031c37; --deep:#061424; --ink:#0d131a; --steel:#304557;
+  --graphite:#414042; --gray:#5f6062; --silver:#d1d3d4;
+  --gold:#f0b855; --bronze:#9b6b26;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#5b6169}
+body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;
+     font-family:'Gotham','Montserrat',system-ui,sans-serif}
+
+.slide{position:relative;width:1080px;height:1440px;overflow:hidden;
+  color:#fff;display:flex;flex-direction:column;
+  background:linear-gradient(168deg,#0a2a49 0%,#061a30 46%,#04101c 100%)}
+.slide::before{content:"";position:absolute;inset:0;z-index:0;opacity:.035;
+  mix-blend-mode:overlay;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>")}
+
+/* ============ fotografia ============
+   Entra por cima, cheia na largura, e se dissolve no navy antes do texto.
+   A máscara (e não um gradiente pintado) deixa o fundo da tela aparecer,
+   então a emenda entre foto e fundo não existe. */
+.foto{position:absolute;left:0;top:0;width:1080px;z-index:0;overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 38%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 38%,transparent 100%)}
+.foto img{display:block;width:100%;height:auto}
+.foto::after{content:"";position:absolute;inset:0;
+  background:rgba(4,16,28,.22)}
+/* caixa de foto dentro de uma coluna */
+.caixa{position:absolute;z-index:1;overflow:hidden;
+  border:1px solid rgba(209,211,212,.28)}
+.caixa img{display:block;width:100%;height:100%;object-fit:cover}
+.caixa::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(4,16,28,.10) 30%,rgba(4,16,28,.92) 100%)}
+/* foto dentro de um painel */
+.painel .dentro{position:absolute;inset:0;z-index:0;overflow:hidden}
+.painel .dentro img{width:100%;height:100%;object-fit:cover;opacity:.5;display:block}
+.painel .dentro::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(8,32,58,.25),rgba(8,32,58,.9))}
+.painel > *{position:relative;z-index:1}
+.painel .selo{position:absolute}
+
+/* ============ AS CAMADAS ============
+   O dispositivo desta peça. Cada decisão é um painel translúcido, e eles se
+   sobrepõem no meio da tela. O carrossel inteiro é o empilhamento mudando de
+   estado: uma ordem, duas ordens em choque, as duas congeladas, uma só no fim.
+   Não há foto e não há alternância claro/escuro: a composição evolui. */
+.palco{position:absolute;left:0;right:0;z-index:1}
+.painel{position:absolute;width:520px;height:340px;padding:32px 36px;
+  border:2px solid rgba(209,211,212,.42);background:rgba(48,69,87,.42);
+  backdrop-filter:blur(2px);display:flex;flex-direction:column;
+  justify-content:space-between}
+.painel.b{background:rgba(209,211,212,.10)}
+.painel.ouro{border-color:var(--gold);background:rgba(8,32,58,.96);
+  box-shadow:0 24px 60px rgba(3,14,26,.55)}
+.painel.apagado{opacity:.36}
+.painel .car{font-weight:500;font-size:20px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--gold)}
+.painel.apagado .car{color:var(--silver)}
+.painel .verbo{font-weight:900;font-size:72px;line-height:1;letter-spacing:-.03em}
+.painel .de{font-weight:300;font-size:22px;color:var(--silver);margin-top:8px}
+.painel .selo{position:absolute;right:26px;top:26px;width:54px;height:54px;
+  border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-weight:900;font-size:22px;color:var(--gold)}
+/* a zona onde as duas se cruzam */
+.choque{position:absolute;z-index:3;pointer-events:none;
+  background:repeating-linear-gradient(135deg,rgba(240,184,85,.55) 0 3px,
+             transparent 3px 14px)}
+/* a moldura da suspensão */
+.congela{position:absolute;border:2px dashed var(--gold);z-index:4}
+.congela .rot{position:absolute;left:-2px;top:-34px;padding:6px 14px;
+  background:var(--gold);color:var(--navy);font-weight:700;font-size:18px;
+  letter-spacing:.18em;text-transform:uppercase}
+/* etiqueta solta */
+.tag{position:absolute;z-index:4;font-weight:500;font-size:19px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.tag.cinza{color:rgba(209,211,212,.7)}
+/* traço de ligação */
+.fio{position:absolute;z-index:2;pointer-events:none}
+.fio svg{display:block;width:100%;height:100%}
+
+/* ============ texto ============ */
+.bloco{position:absolute;left:80px;right:80px;z-index:5;font-size:100px}
+.topo{top:110px}
+.base{bottom:150px}
+.titulo{margin:0;font-size:.64em;line-height:1.12;letter-spacing:-.022em}
+.titulo .k{font-weight:900;color:#fff}
+.titulo .l{font-weight:300;color:rgba(255,255,255,.82)}
+.titulo .g{font-weight:900;color:var(--gold)}
+.corpo{margin:.3em 0 0;font-weight:300;font-size:.3em;line-height:1.6;
+  text-align:justify;color:rgba(209,211,212,.9)}
+.corpo b{font-weight:500;color:#fff}
+.fecho{margin:.36em 0 0;font-weight:500;font-size:.32em;line-height:1.36}
+.fecho b{color:var(--gold)}
+.lista{margin:.34em 0 0;border-top:1px solid rgba(255,255,255,.16)}
+.lista .it{display:flex;gap:.26em;align-items:baseline;padding:.2em 0;
+  border-bottom:1px solid rgba(255,255,255,.16)}
+.lista .n{font-weight:900;font-size:.28em;color:var(--gold);min-width:1em}
+.lista .t{font-weight:700;font-size:.27em;line-height:1.3}
+.lista .t small{display:block;font-weight:300;font-size:.8em;
+  color:rgba(209,211,212,.85);margin-top:.1em}
+.cita{margin:.34em 0 0;padding:.24em .3em;border-left:3px solid var(--gold);
+  background:rgba(255,255,255,.04)}
+.cita p{margin:0;font-weight:300;font-size:.29em;line-height:1.55;text-align:justify}
+.cita .ref{margin-top:.14em;font-weight:500;font-size:.18em;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--gold)}
+.pilula{margin:.4em 0 0;display:inline-flex;align-items:center;gap:.2em;
+  padding:.26em .36em;border-radius:999px;border:1px solid rgba(240,184,85,.55)}
+.pilula i{font-style:normal;color:var(--gold);font-size:.3em;line-height:1}
+.pilula span{font-weight:500;font-size:.26em}
+.assina{margin:.4em 0 0;padding-top:.24em;border-top:1px solid rgba(255,255,255,.2)}
+.assina .m{font-weight:500;font-size:.19em;letter-spacing:.24em;color:var(--gold)}
+.assina .s{margin-top:.08em;font-weight:300;font-size:.32em;line-height:1.26;
+  letter-spacing:-.012em}
+.hair{position:absolute;z-index:2;background:rgba(209,211,212,.22)}
+.legenda{position:absolute;z-index:4;font-weight:300;font-size:22px;
+  line-height:1.4;color:rgba(209,211,212,.88)}
+.legenda b{display:block;font-weight:900;font-size:30px;color:#fff;
+  letter-spacing:-.02em;margin-bottom:6px}
+.legenda b.ouro{color:var(--gold)}
+
+.logo{position:absolute;left:0;right:0;bottom:64px;z-index:5;display:flex;
+  justify-content:center}
+.logo div{width:244px}
+.logo svg{width:100%;height:auto;display:block}
+.logo path{fill:#fff !important}
+
+/* ============ tela clara ============ */
+.slide.claro{background:#f3f1ec;color:var(--navy)}
+.slide.claro::before{opacity:.06}
+.claro .titulo .k{color:var(--navy)}
+.claro .titulo .l{color:var(--graphite)}
+.claro .titulo .g{color:var(--bronze)}
+.claro .corpo{color:var(--graphite)}
+.claro .corpo b{color:var(--navy)}
+.claro .fecho{color:var(--navy)}
+.claro .fecho b{color:var(--bronze)}
+.claro .painel{border-color:rgba(65,64,66,.4);background:rgba(48,69,87,.05);
+  backdrop-filter:none}
+.claro .painel.apagado{opacity:.7}
+.claro .painel .car,.claro .painel.apagado .car{color:var(--bronze)}
+.claro .painel .verbo{color:var(--navy)}
+.claro .painel .de{color:var(--gray)}
+.claro .painel .selo{border-color:var(--bronze);color:var(--bronze)}
+.claro .choque{background:repeating-linear-gradient(135deg,rgba(155,107,38,.6) 0 3px,
+  transparent 3px 14px)}
+.claro .tag{color:var(--bronze)}
+.claro .tag.cinza{color:var(--gray)}
+.claro .hair{background:rgba(65,64,66,.25)}
+.claro .logo path{fill:var(--navy) !important}
+</style></head>
+<body>
+__SLIDES__
+<script>
+// Encolhe cada bloco de texto até caber na altura que a tela reservou para
+// ele (data-max). Os filhos são em-based, então escalam juntos.
+for (const b of document.querySelectorAll('.bloco')) {
+  const max = +b.dataset.max || 9999;
+  let f = 100;
+  b.style.fontSize = f + 'px';
+  while (b.getBoundingClientRect().height > max && f > 50) {
+    f -= 1; b.style.fontSize = f + 'px';
+  }
+  b.closest('.slide').dataset.escala = f;
+}
+</script>
+</body></html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EJUP — Carrossel · Apostas e superendividamento</title>
+<style>
+:root{--ink:#0d131a;--navy:#031c37;--steel:#304557;--silver:#d1d3d4;--gray:#5f6062;--gold:#f0b855;--bronze:#9b6b26}
+*{box-sizing:border-box}
+html,body{margin:0;background:#080b10;color:var(--silver);
+ font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+header{position:sticky;top:0;z-index:20;background:rgba(8,11,16,.95);backdrop-filter:blur(14px);
+ border-bottom:1px solid rgba(209,211,212,.13);padding:16px 28px;
+ display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+h1{font-size:15.5px;font-weight:600;color:#fff;margin:0}
+.meta{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gray);margin-top:3px}
+.acts{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
+.btn{font-size:12.5px;font-weight:600;letter-spacing:.04em;padding:12px 20px;border-radius:10px;
+ border:1px solid rgba(240,184,85,.38);color:var(--gold);background:rgba(240,184,85,.09);
+ cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:.15s}
+.btn:hover{background:rgba(240,184,85,.2)}
+.btn.sec{border-color:rgba(209,211,212,.24);color:var(--silver);background:rgba(209,211,212,.05)}
+.btn.sec:hover{background:rgba(209,211,212,.13)}
+.grid{max-width:1500px;margin:0 auto;padding:32px 28px 90px;
+ display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:28px}
+.shot{position:relative;border-radius:8px;overflow:hidden;border:1px solid rgba(209,211,212,.13);
+ box-shadow:0 16px 40px rgba(0,0,0,.5);background:#000}
+.shot img{width:100%;height:auto;display:block}
+.bar{display:flex;align-items:center;gap:11px;margin-top:11px}
+.num{font-size:12px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+.nm{font-size:12.5px;color:var(--gray)}
+.dl{margin-left:auto;font-size:11.5px;font-weight:600;padding:8px 14px;border-radius:8px;
+ border:1px solid rgba(209,211,212,.22);color:var(--silver);background:rgba(209,211,212,.05);
+ text-decoration:none;transition:.15s;white-space:nowrap}
+.dl:hover{background:rgba(240,184,85,.18);border-color:rgba(240,184,85,.42);color:var(--gold)}
+.note{max-width:1500px;margin:0 auto;padding:0 28px 44px;font-size:12.5px;color:var(--gray);line-height:1.6}
+</style></head><body>
+<header>
+ <div><h1>Apostas, superendividamento e proteção ao crédito</h1>
+  <div class="meta">14 telas · 1080 × 1440 px · linha contínua</div></div>
+ <div class="acts">
+  <a class="btn" href="EJUP-Mesclado-PNGs.zip" download>Baixar as 14 em PNG (ZIP)</a>
+  <button class="btn sec" id="um-a-um">Baixar uma a uma</button>
+  <a class="btn sec" href="EJUP-Carrossel-Apostas.pdf" download>PDF de aprovação</a>
+ </div>
+</header>
+<div class="grid" id="grid"></div>
+<p class="note">Cada peça tem o próprio botão, em 1080 × 1440 sem recompressão. O <b>ZIP</b> é o caminho mais seguro para levar tudo de uma vez; o botão “uma a uma” dispara 14 downloads seguidos e o navegador pode pedir permissão na primeira vez. O canvas completo de 15.120 × 1.440 px está na mesma pasta.</p>
+<script>
+const T=["Capa · a linha começa","O salto para R$ 30 bi","Inadimplência no país","A pergunta jurídica",
+"A definição legal","Civil x Lei das Bets","Depósito prévio","O problema real","Repactuação em duas etapas",
+"Proteções da Lei das Bets","29% negativados","CLT x OMS","O que isso pede","Assinatura"];
+const arq=n=>`tela-${String(n+1).padStart(2,'0')}.png`;
+document.getElementById('grid').innerHTML=T.map((t,i)=>`
+ <div><div class="shot"><img src="${arq(i)}" alt="Tela ${i+1}: ${t}" loading="lazy"></div>
+ <div class="bar"><span class="num">${String(i+1).padStart(2,'0')}</span><span class="nm">${t}</span>
+ <a class="dl" href="${arq(i)}" download="${arq(i)}">Baixar PNG</a></div></div>`).join('');
+document.getElementById('um-a-um').onclick=()=>{let k=0;
+ const t=setInterval(()=>{if(k>=14){clearInterval(t);return}
+  const a=document.createElement('a');a.href=arq(k);a.download=arq(k);
+  document.body.appendChild(a);a.click();a.remove();k++},420)};
+</script></body></html>

@@ -1,0 +1,70 @@
+<!-- @dsCard group="Site" viewport="1280x720" name="Homepage institucional" subtitle="Marketing site — hero, programas, docentes" -->
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>EJUP — Escola Jurídica</title>
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  html,body{margin:0;background:#fff;font-family:var(--font-sans);color:var(--text-body)}
+  *{box-sizing:border-box}
+  .drawer-back{position:fixed;inset:0;background:rgba(3,28,55,0.55);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .28s var(--ease-standard);z-index:40}
+  .drawer-back.on{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:460px;max-width:92vw;background:#fff;box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform .32s var(--ease-out);z-index:50;overflow:auto}
+  .drawer.on{transform:translateX(0)}
+</style></head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="../../_ds_bundle.js"></script>
+  <script type="text/babel" src="Header.jsx"></script>
+  <script type="text/babel" src="Hero.jsx"></script>
+  <script type="text/babel" src="Courses.jsx"></script>
+  <script type="text/babel" src="Professors.jsx"></script>
+  <script type="text/babel">
+    const { Button, Eyebrow, Badge } = window.EJUPDesignSystem_063f43;
+    function CourseDrawer({ course, onClose }){
+      const open = !!course;
+      return (<>
+        <div className={"drawer-back"+(open?" on":"")} onClick={onClose}></div>
+        <aside className={"drawer"+(open?" on":"")}>
+          {course && (<div>
+            <div style={{background:'var(--ejup-navy)',color:'#fff',padding:'32px 32px 28px'}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <Eyebrow>{course.area}</Eyebrow>
+                <button onClick={onClose} style={{background:'none',border:'none',color:'#fff',fontSize:24,cursor:'pointer',lineHeight:1}}>×</button>
+              </div>
+              <h2 style={{fontSize:28,fontWeight:900,margin:'14px 0 0',lineHeight:1.15}}>{course.title}</h2>
+              <div style={{fontSize:14,color:'rgba(255,255,255,0.7)',marginTop:12}}>{course.h} · certificado · {course.badge}</div>
+            </div>
+            <div style={{padding:32}}>
+              <p style={{fontSize:15,lineHeight:1.7,color:'var(--text-body)',marginTop:0}}>{course.desc} O programa privilegia a consistência sobre a velocidade e a clareza sobre o ruído, com avaliação contínua e mentoria.</p>
+              <Eyebrow tone="navy" style={{display:'block',marginTop:8}}>Módulos</Eyebrow>
+              <ul style={{listStyle:'none',padding:0,margin:'16px 0 0'}}>
+                {['Fundamentos e tradição','Jurisprudência aplicada','Linguagem contemporânea','Prática e peças'].map((m,i)=>(
+                  <li key={m} style={{display:'flex',gap:14,padding:'14px 0',borderBottom:'1px solid var(--border-subtle)'}}>
+                    <span style={{fontWeight:900,color:'var(--ejup-gold)'}}>{String(i+1).padStart(2,'0')}</span>
+                    <span style={{fontSize:14,color:'var(--text-body)'}}>{m}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button variant="gold" size="lg" fullWidth style={{marginTop:28}}>Matricule-se neste programa</Button>
+            </div>
+          </div>)}
+        </aside>
+      </>);
+    }
+    function App(){
+      const [active,setActive] = React.useState("Cursos");
+      const [course,setCourse] = React.useState(null);
+      return (<div>
+        <SiteHeader active={active} onNav={setActive} />
+        <SiteHero />
+        <SiteCourses onOpen={setCourse} />
+        <SiteProfessors />
+        <SiteFooter />
+        <CourseDrawer course={course} onClose={()=>setCourse(null)} />
+      </div>);
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body></html>

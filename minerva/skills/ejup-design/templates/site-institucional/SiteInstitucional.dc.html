@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Site Institucional" description="Homepage institucional da EJUP: hero navy, programas, corpo docente e rodapé. Cores MIV." -->
+<helmet>
+  <script src="./ds-base.js"></script>
+  <style>html,body{margin:0;background:#fff;font-family:var(--font-sans);color:var(--text-body)}*{box-sizing:border-box}</style>
+</helmet>
+<x-import component-from-global-scope="SiteHeader" from="../../ui_kits/site/Header.jsx" hint-size="100%,76px"></x-import>
+<x-import component-from-global-scope="SiteHero" from="../../ui_kits/site/Hero.jsx" hint-size="100%,640px"></x-import>
+<x-import component-from-global-scope="SiteCourses" from="../../ui_kits/site/Courses.jsx" hint-size="100%,560px"></x-import>
+<x-import component-from-global-scope="SiteProfessors" from="../../ui_kits/site/Professors.jsx" hint-size="100%,520px"></x-import>
+<x-import component-from-global-scope="SiteFooter" from="../../ui_kits/site/Professors.jsx" hint-size="100%,360px"></x-import>
+</x-dc>
+</body>
+</html>

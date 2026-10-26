@@ -1,0 +1,60 @@
+# Carrossel — decisões monocráticas no STF (setembro de 2026)
+
+Nove telas 1080×1440, no sistema de `skills/ejup-design/CARROSSEL.md`.
+
+```
+python3 _build/tratar_fotos.py && python3 _build/gerar.py && python3 _build/render.py
+```
+
+## Peça datada
+Retrata a situação em **10/09/2026**. O Plenário do STF decide em **15/09**.
+Depois dessa data a peça está vencida: ou sai antes, ou é refeita.
+
+## O dispositivo: os cards atravessam a borda
+Cada decisão é um card de 520×340, sempre na mesma grade, sem rotação. A
+ligação entre telas é o card **cruzando a borda**: sai cortado pela direita
+de uma tela (x = 820) e entra pela esquerda da seguinte (x = −260), na mesma
+altura. Acontece quatro vezes, onde a história passa o bastão: AFASTA (1→2),
+REINTEGRA (2→3), SUSPENDE (6→7) e PLENÁRIO (8→9). Na fita, o carrossel lê
+como uma tira contínua.
+
+Ritmo de fundo: foto (1) · desenho (2) · **branco** (3, a frase popular) ·
+caixas de foto (4) · desenho (5, 6) · **uma foto da sessão plenária dividida
+ao meio** (7 e 8) · foto (9). Desenhos em SVG no próprio `_build/gerar.py`.
+
+Fotos e licenças em `fotos/CREDITOS.md`. Crédito vai na legenda do post.
+`_build/figuras.py` é da versão anterior.
+
+## Postura editorial
+Descreve o mecanismo processual, sem defender resultado e sem atribuir
+motivo a ministro nenhum. Os verbos são os dos autos: afastou, reintegrou,
+suspendeu, convocou. Nenhum adjetivo sobre pessoas.
+
+## O gancho de engajamento, e por que ele não é isca
+O charter proíbe isca ("comenta EU QUERO", dor fabricada, urgência). O que
+esta peça usa é **assimetria real de informação**: o leitor viu a manchete e
+não viu o mecanismo. E corrige uma **crença errada que circula**, tirada dos
+comentários da própria imprensa: *"um ministro não pode anular a decisão do
+outro, isso é papel do Senado"*. A primeira metade está certa, a segunda troca
+de Poder. Contrariar um erro popular com o artigo na mão gera discussão de
+quem sabe e de quem achava que sabia, sem pedir comentário a ninguém.
+
+Cada tela termina numa linha que a seguinte responde. É o que sustenta o
+arrasto, e é honesto: exposição boa funciona assim.
+
+## Fatos verificados
+Confirmados em Agência Brasil, CNN Brasil e Metrópoles em 09 e 10/09/2026:
+suspensão das decisões de Mendonça e de Dino sobre o comando da PF, pedido de
+informações em 48 horas, avocação da relatoria do Inquérito das Fake News pela
+Presidência, suspensão de procedimentos que investiguem ministros e convocação
+de sessão plenária extraordinária para 15/09.
+
+## A verificar antes de publicar
+- **O texto literal da decisão.** A peça descreve o fundamento (decisões
+  monocráticas sucessivas com comandos incompatíveis) **sem aspas**, de
+  propósito: as versões que circulam vêm de resumo de imprensa, não do
+  inteiro teor. Só usar aspas depois de conferir no acórdão.
+- **Os instrumentos citados na tela 6** (agravo interno, competência da
+  Presidência, prevenção) estão descritos em termos gerais, sem artigo e
+  alínea do RISTF. Se o artigo do site for aprofundar, citar dispositivo.
+- **O quadro pode mudar antes de 15/09.** Reconferir na manhã da postagem.

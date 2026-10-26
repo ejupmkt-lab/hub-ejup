@@ -1,0 +1,553 @@
+<title>Carrossel Startup Summit</title>
+<style id="css">
+__FONT_FACES__
+
+/* ============================================================
+   TOKENS — mexa só aqui para reskin.
+   Peça de perfil PESSOAL (Roberto e Leonardo). Não usa a marca
+   EJUP; a gramática visual vem da referência do Sebrae SC
+   (chanfro, título em caixa alta com dois pesos, caixa
+   contornada com quadrado no canto, etiqueta girada), com
+   paleta própria e mais respiro, porque o texto aqui é denso.
+   ============================================================ */
+:root{
+  --paper:#f2efe9;         /* papel quente */
+  --paper2:#e9e5dc;        /* um tom abaixo, para ritmo entre telas */
+  --ink:#17191b;
+  --muted:#5f6469;
+  --deep:#12314b;          /* azul profundo: títulos */
+  --panel:#0e2237;         /* painel escuro */
+  --accent:#9a7433;        /* latão: 4,9:1 no papel */
+  --ouro:#d9bd7e;          /* latão claro, para fundo escuro */
+  --chanfro:58px;
+  --pad:80px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:#23262a;}
+/* .slide também: no PNG a tela é serializada sem <body>, e uma regra
+   presa ao body deixaria o texto cair em serif. */
+body,.slide{font-family:'Gotham','Montserrat',system-ui,sans-serif;}
+
+/* ---- a tela ---- */
+.slide{
+  position:relative; width:1080px; height:1440px; overflow:hidden;
+  background:var(--paper); color:var(--ink);
+  display:flex; flex-direction:column; padding:var(--pad);
+  --boxfill:var(--paper);
+}
+.slide.alt{ background:var(--paper2); --boxfill:var(--paper2); }
+
+/* ---- tipografia ---- */
+.ttl{
+  font-size:56px; font-weight:300; line-height:1.04; letter-spacing:-.005em;
+  text-transform:uppercase; color:var(--deep); margin:0 0 34px;
+  text-wrap:balance;
+}
+.ttl b{ font-weight:900; }
+.hook{
+  font-size:33px; font-weight:400; font-style:italic; line-height:1.38;
+  color:var(--ink); margin:0 0 22px;
+}
+.p{
+  font-size:26px; font-weight:300; line-height:1.55; color:var(--muted); margin:0 0 16px;
+}
+.p:last-of-type{ margin-bottom:0; }
+.p em{ font-style:italic; color:var(--ink); }
+.eyebrow{
+  font-size:18px; font-weight:500; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--ouro); margin:0 0 28px;
+}
+
+/* ---- foto: base comum. Cada enquadramento herda daqui. ---- */
+.shot{ position:relative; overflow:hidden; background:#ded9cf; }
+.shot img{
+  position:absolute; left:50%; top:50%; width:100%; height:100%;
+  object-fit:cover; transform:translate(-50%,-50%); transform-origin:center center;
+  user-select:none; -webkit-user-drag:none;
+}
+.shot.empty{ background:repeating-linear-gradient(45deg,#e4dfd4 0 20px,#ddd8cc 20px 40px); }
+
+/* ============================================================
+   OS CINCO ENQUADRAMENTOS
+   A ordem em CONTEUDO alterna para que duas telas vizinhas
+   nunca repitam o mesmo corte.
+   ============================================================ */
+
+/* 1. BANDA — foto larga entre o texto e a caixa, chanfro em cima à esquerda */
+.lay-banda .shot{
+  width:100%; flex:1 1 auto; min-height:360px; max-height:520px; margin:34px 0 0;
+  clip-path:polygon(var(--chanfro) 0, 100% 0, 100% 100%, 0 100%, 0 var(--chanfro));
+}
+
+/* 2. TOPO — foto sangrando pelo alto, chanfro embaixo à direita */
+.lay-topo{ padding-top:640px; }
+.lay-topo .shot{
+  position:absolute; top:0; left:0; right:0; height:580px; margin:0;
+  clip-path:polygon(0 0, 100% 0, 100% calc(100% - 72px), calc(100% - 72px) 100%, 0 100%);
+}
+.lay-topo .corpo{ flex:1 1 auto; display:flex; flex-direction:column;
+                  justify-content:center; }
+
+/* 3./4. COLUNA — texto e foto vertical lado a lado, a foto sangrando na borda */
+.dupla{ display:flex; gap:44px; flex:1 1 auto; min-height:0; }
+.dupla .col{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column;
+             justify-content:center; }
+.dupla .shot{ flex:none; width:420px; margin:0; }
+.lay-colDir .dupla .shot{
+  margin-right:calc(var(--pad) * -1);
+  clip-path:polygon(var(--chanfro) 0, 100% 0, 100% 100%, 0 100%, 0 var(--chanfro));
+}
+.lay-colEsq .dupla{ flex-direction:row-reverse; }
+.lay-colEsq .dupla .shot{
+  margin-left:calc(var(--pad) * -1);
+  clip-path:polygon(0 0, calc(100% - var(--chanfro)) 0, 100% var(--chanfro),
+                    100% 100%, 0 100%);
+}
+/* coluna estreita pede corpo um pouco menor */
+.dupla .ttl{ font-size:50px; }
+.dupla .hook{ font-size:30px; }
+.dupla .p{ font-size:24px; }
+
+/* 5. FUNDO — foto ocupando a tela, texto por cima */
+.lay-fundo{ justify-content:flex-end; }
+.lay-fundo .shot{ position:absolute; inset:0; margin:0; }
+.lay-fundo .scrim{
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(8,16,26,.50) 0%, rgba(8,16,26,.86) 58%, rgba(8,16,26,.94) 100%);
+}
+.lay-fundo .corpo, .lay-fundo .box{ position:relative; z-index:2; }
+
+/* 6. PAINEL — capa e fecho: foto sangrando + painel chanfrado por cima */
+.lay-painel{ padding:0; background:var(--panel); justify-content:flex-end; }
+.lay-painel .shot{ position:absolute; inset:0; margin:0; }
+.lay-painel .scrim{ position:absolute; inset:0; background:rgba(8,18,30,.42); }
+.painel-wrap{ position:relative; z-index:2; margin:0 56px 56px; }
+.painel{
+  position:relative; padding:64px 60px 56px; background:var(--panel);
+  clip-path:polygon(0 0, calc(100% - 88px) 0, 100% 88px, 100% 100%, 0 100%);
+  display:flex; flex-direction:column;
+}
+
+/* ---- texto sobre fundo escuro (fundo e painel) ---- */
+.on-dark{ --boxfill:rgba(9,19,31,.88); }
+.lay-painel .painel{ --boxfill:var(--panel); }
+.on-dark .ttl, .on-dark .ttl b{ color:#fff; }
+.on-dark .hook{ color:rgba(255,255,255,.92); }
+.on-dark .p{ color:rgba(255,255,255,.74); }
+.on-dark .p em{ color:#fff; }
+.on-dark .box__line{ background:var(--ouro); }
+.on-dark .box__sq{ border-color:var(--ouro); }
+.on-dark .kicker{ color:#e7cf95; }
+.on-dark .sig{ color:#fff; }
+.on-dark .sig span{ color:rgba(255,255,255,.66); }
+
+/* ---- caixa contornada ----
+   O contorno é feito com duas camadas recortadas (a de baixo pinta a
+   linha, a de cima devolve o fundo): clip-path corta qualquer border. */
+.box{ position:relative; margin:34px 0 0; flex:none; }
+.box__line, .box__fill{
+  clip-path:polygon(0 0, 100% 0, 100% 100%, var(--chanfro) 100%, 0 calc(100% - var(--chanfro)));
+}
+.box__line{ position:absolute; inset:0; background:var(--accent); }
+.box__fill{ position:absolute; inset:2px; background:var(--boxfill); }
+.box__in{ position:relative; padding:44px 48px 48px; }
+.kicker{
+  font-size:31px; font-weight:400; font-style:italic; line-height:1.38;
+  color:var(--deep); margin:0;
+}
+.box__sq{
+  position:absolute; left:0; bottom:-16px; width:30px; height:30px;
+  border:5px solid var(--accent); background:var(--boxfill);
+}
+
+/* ---- assinatura (só na capa e no fecho) ---- */
+.foot{ margin-top:34px; flex:none; }
+.sig{ font-size:19px; font-weight:500; color:var(--deep); }
+.sig span{ display:block; font-weight:300; color:var(--muted); font-size:17px; margin-top:5px; }
+
+/* ---- etiqueta girada, como o adesivo da referência ---- */
+.tag{
+  position:absolute; top:-30px; left:56px; z-index:3;
+  transform:rotate(-5deg);
+  background:var(--accent); color:#fff;
+  font-size:22px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  padding:16px 30px;
+  clip-path:polygon(22px 0, 100% 0, 100% 100%, 0 100%, 0 22px);
+}
+
+/* ============================================================
+   Interface — nada disto entra no PNG.
+   ============================================================ */
+.hint{
+  position:absolute; inset:20px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:12px; text-align:center;
+  border:2px dashed rgba(23,25,27,.3); border-radius:8px;
+  color:rgba(23,25,27,.6); pointer-events:none;
+}
+.hint b{ font-size:25px; font-weight:500; }
+.hint span{ font-size:18px; font-weight:300; }
+.shot.over .hint{ border-color:var(--accent); color:var(--accent); background:rgba(154,116,51,.08); }
+.lay-fundo .hint, .lay-painel .hint{ border-color:rgba(255,255,255,.45); color:rgba(255,255,255,.82); }
+/* nos cortes em que o texto cobre a foto, o clique tem de alcançá-la */
+.lay-fundo .corpo, .lay-fundo .box,
+.lay-painel .painel-wrap{ pointer-events:none; }
+
+.wrap{ max-width:1200px; margin:0 auto; padding:26px 20px 90px; }
+.bar{
+  position:sticky; top:0; z-index:50; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:16px 20px; margin-bottom:26px;
+  background:#15181b; border:1px solid #2f3338; border-radius:12px;
+}
+.bar h1{ font-size:17px; font-weight:500; color:#fff; margin:0 auto 0 0; }
+.bar small{ display:block; font-weight:300; color:#98a0a7; font-size:14px; margin-top:4px; }
+.btn{
+  font-family:inherit; font-size:14px; font-weight:500; letter-spacing:.06em;
+  text-transform:uppercase; color:#15181b; background:#e0bd79;
+  border:0; border-radius:999px; padding:12px 22px; cursor:pointer;
+}
+.btn.ghost{ background:transparent; color:#e0bd79; border:1px solid #6b5a35; }
+.btn:focus-visible,.ui button:focus-visible{ outline:2px solid #e0bd79; outline-offset:2px; }
+.ui .st{ color:#7f878e; font-size:12px; }
+.ui .lay{ color:#7f878e; font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+.card{ margin:0 0 34px; --w:min(540px, calc(100vw - 56px)); }
+.frame{ width:var(--w); height:calc(var(--w) * 4 / 3); overflow:hidden;
+        box-shadow:0 20px 50px rgba(0,0,0,.45); }
+.frame .slide{ transform:scale(var(--k, .5)); transform-origin:top left; }
+.ui{ display:flex; align-items:center; gap:12px; width:var(--w); padding:12px 2px 0;
+     flex-wrap:wrap; color:#98a0a7; font-size:13px; font-weight:300; }
+.ui .tg{ font-weight:500; color:#cdd2d6; letter-spacing:.1em; font-size:12px; }
+.ui input[type=range]{ flex:1; min-width:110px; accent-color:#e0bd79; }
+.ui button{
+  font-family:inherit; font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+  background:transparent; color:#98a0a7; border:1px solid #3a3f45;
+  border-radius:999px; padding:7px 13px; cursor:pointer;
+}
+.ui button:hover{ color:#e0bd79; border-color:#6b5a35; }
+.row{ display:flex; gap:26px; flex-wrap:wrap; }
+</style>
+
+<div class="wrap">
+  <div class="bar">
+    <h1>Startup Summit 2026 · Florianópolis
+      <small>Arraste uma foto para cada tela, reenquadre arrastando dentro dela e baixe uma a uma.</small></h1>
+    <span class="btn ghost" id="modo">verificando…</span>
+  </div>
+  <div class="row" id="row"></div>
+</div>
+
+<script>
+/* ============================================================
+   CONTEÚDO — o texto vive aqui.
+   titulo = caixa alta, <b> marca a parte em peso pesado
+   hook   = linha de abertura (itálico)
+   p      = corpo, um item por parágrafo
+   kicker = linha de fecho, dentro da caixa contornada
+   ============================================================ */
+const CONTEUDO = [
+  { lay:'painel', eyebrow:"Startup Summit 2026 · Florianópolis",
+    titulo:"<b>O que sustenta</b> as empresas que crescem",
+    hook:"Talvez o maior erro seja olhar para empresas extraordinárias como se elas crescessem sozinhas.",
+    p:["Em Santa Catarina, fomos entender o que existe por trás de negócios que conseguem inovar, escalar e continuar abrindo novas frentes."],
+    kicker:"E a resposta começa justamente onde a empresa termina.",
+    tag:"12 leituras" },
+
+  { lay:'topo', titulo:"<b>O território</b>",
+    hook:"Nossa primeira agenda foi com o prefeito de Florianópolis.",
+    p:["E a discussão começou pelo território.",
+       "Empresas que dependem de talento qualificado dependem também do território, porque profissionais qualificados escolhem onde querem viver, trabalhar e construir o futuro."],
+    kicker:"Competitividade também se constrói fora dos limites da empresa." },
+
+  { lay:'banda', titulo:"<b>A reforma</b> tributária",
+    hook:"A Reforma Tributária tende a tornar essa disputa ainda mais sofisticada.",
+    p:["Com o IBS no destino e a redução progressiva do espaço para a antiga lógica de benefícios de ICMS e ISS, parte relevante da velha guerra fiscal perde força.",
+       "Os territórios continuarão competindo."],
+    kicker:"Mas cada vez mais pela capacidade real de oferecer infraestrutura, talento, ambiente de negócios, inovação e qualidade institucional." },
+
+  { lay:'colDir', titulo:"<b>Audaces</b>",
+    hook:"Na Audaces, vimos que um mercado pode começar a ser construído antes mesmo da venda.",
+    p:["A aproximação com instituições de ensino insere a tecnologia no repertório do profissional ainda durante sua formação.",
+       "Quando ele chega ao mercado, a relação com aquela solução já começou."],
+    kicker:"Formar usuário também pode ser estratégia de formação de mercado." },
+
+  { lay:'fundo', titulo:"<b>IA</b> na operação",
+    hook:"Na mesma visita, a IA apareceu como parte da economia do próprio negócio.",
+    p:["Não apenas para acelerar tarefas.",
+       "Mas para interferir em produtividade, precisão, desperdício e custo de produção."],
+    kicker:"O valor da tecnologia começa quando ela altera uma variável econômica relevante da operação." },
+
+  { lay:'banda', titulo:"<b>RD Station</b> e Zoho",
+    hook:"RD Station e Zoho nos fizeram pensar sobre a profundidade da relação com o cliente.",
+    p:["Na Zoho, diferentes necessidades de uma empresa são atendidas dentro de um mesmo ecossistema de soluções.",
+       "O cliente muda. Os problemas mudam. A relação permanece."],
+    kicker:"Talvez escalar também seja aprender a crescer junto com quem compra de você." },
+
+  { lay:'colEsq', titulo:"<b>Delivery Much</b>",
+    hook:"Na Delivery Much, a inovação estava no desenho do modelo.",
+    p:["Uma alteração na lógica tradicional de franquias permitiu alcançar um mercado que a estrutura convencional deixava de fora.",
+       "E isso muda a pergunta:"],
+    kicker:"Quantas oportunidades parecem inexistentes apenas porque ainda estão sendo observadas pelo modelo errado?" },
+
+  { lay:'topo', titulo:"<b>SENAI</b>",
+    hook:"No SENAI, a discussão avançou da leitura de tendências para a formação de novas percepções de valor.",
+    p:["Um dos exemplos apresentados envolveu movimentos da JBS em torno de novos atributos associados à carne.",
+       "Empresas sofisticadas não apenas respondem ao que o mercado já demanda."],
+    kicker:"Algumas também ajudam a construir aquilo que o mercado aprenderá a valorizar." },
+
+  { lay:'banda', titulo:"<b>Softplan</b> e Estação Pública",
+    hook:"Vimos outra camada do ecossistema: a aproximação entre inovação e Estado.",
+    p:["A Softplan constrói soluções para problemas complexos do setor público.",
+       "A Estação Pública amplia essa lógica ao aproximar gestores, govtechs, empresas e especialistas."],
+    kicker:"Quando o problema e a capacidade de resolvê-lo não se encontram por acaso, alguém precisa desenhar essa conexão." },
+
+  { lay:'colDir', titulo:"<b>O Direito</b> na arquitetura",
+    hook:"E é justamente aí que o Direito deixa de ser apenas suporte e passa a fazer parte da arquitetura.",
+    p:["Quanto mais empresas, instituições e interesses passam a operar de forma interdependente, mais relevantes se tornam governança, contratos, propriedade intelectual, regulação e segurança institucional."],
+    kicker:"Ecossistemas crescem por conexão, mas permanecem de pé por estrutura." },
+
+  { lay:'fundo', titulo:"<b>A densidade</b> das relações",
+    hook:"Ao final, o que mais nos chamou atenção não foi um case isolado.",
+    p:["Foi a densidade das relações.",
+       "Empresas. Universidades. Indústria. Poder público. Capital. Formação. Tecnologia. Talentos."],
+    kicker:"Um ecossistema amadurece quando essas conexões deixam de depender do acaso e passam a fazer parte da própria infraestrutura do ambiente." },
+
+  { lay:'painel', eyebrow:"O que trouxemos de volta",
+    titulo:"<b>Conectados</b> o suficiente para crescerem juntos",
+    p:["Voltamos de Santa Catarina menos interessados em reproduzir empresas e mais interessados em compreender <em>as relações que tornam possível o crescimento delas.</em>",
+       "Porque construir um ecossistema não é simplesmente reunir bons negócios. É fazer com que capacidades diferentes se reforcem sem perder autonomia."],
+    kicker:"Negócios independentes o suficiente para terem identidade própria e conectados o suficiente para crescerem juntos.",
+    tag:"Obrigado, SC" },
+];
+
+const ASSINATURA = "Roberto Pivotto · Leonardo Pivotto";
+const TOTAL = CONTEUDO.length;
+const estado = CONTEUDO.map(() => ({ src:null, scale:1, x:0, y:0 }));
+const row = document.getElementById('row');
+
+function caixa(k){
+  return '<div class="box"><div class="box__line"></div><div class="box__fill"></div>' +
+         '<div class="box__in"><p class="kicker">' + k + '</p></div>' +
+         '<div class="box__sq"></div></div>';
+}
+function foto(i){
+  return '<div class="shot empty" data-drop="' + i + '">' +
+           '<div class="hint" data-ui="1"><b>Arraste a foto aqui</b>' +
+           '<span>ou clique para escolher</span></div></div>';
+}
+function texto(c){
+  return (c.eyebrow ? '<p class="eyebrow">' + c.eyebrow + '</p>' : '') +
+         '<h2 class="ttl">' + c.titulo + '</h2>' +
+         (c.hook ? '<p class="hook">' + c.hook + '</p>' : '') +
+         c.p.map(t => '<p class="p">' + t + '</p>').join('');
+}
+function assinatura(){
+  return '<div class="foot"><div class="sig">' + ASSINATURA +
+         '<span>Startup Summit 2026 · Florianópolis</span></div></div>';
+}
+
+/* Um enquadramento por tela: trocar o campo `lay` no CONTEUDO troca o corte.
+   A ordem alterna para que duas telas vizinhas nunca repitam o mesmo. */
+function montar(c, i){
+  const t = texto(c), b = caixa(c.kicker), f = foto(i);
+  switch (c.lay) {
+    case 'painel':
+      return f + '<div class="scrim"></div><div class="painel-wrap"><div class="painel">' +
+             t + b + assinatura() + '</div>' +
+             (c.tag ? '<div class="tag">' + c.tag + '</div>' : '') + '</div>';
+    case 'fundo':
+      return f + '<div class="scrim"></div><div class="corpo">' + t + '</div>' + b;
+    case 'topo':
+      return f + '<div class="corpo">' + t + '</div>' + b;
+    case 'colDir':
+    case 'colEsq':
+      return '<div class="dupla"><div class="col">' + t + '</div>' + f + '</div>' + b;
+    default:
+      return '<div class="corpo">' + t + '</div>' + f + b;
+  }
+}
+
+CONTEUDO.forEach((c, i) => {
+  const card = document.createElement('div'); card.className = 'card';
+  const frame = document.createElement('div'); frame.className = 'frame';
+  const sec = document.createElement('section');
+  const escuro = c.lay === 'painel' || c.lay === 'fundo';
+  sec.className = 'slide lay-' + c.lay + (escuro ? ' on-dark' : '')
+                + (!escuro && i % 2 ? ' alt' : '');
+  sec.dataset.i = i;
+  sec.innerHTML = montar(c, i);
+  frame.appendChild(sec);
+
+  const ui = document.createElement('div'); ui.className = 'ui';
+  ui.innerHTML = '<span class="tg">' + String(i + 1).padStart(2, '0') + '</span>' +
+    '<span class="lay">' + c.lay + '</span>' +
+    '<input type="range" min="1" max="3" step="0.01" value="1" title="Zoom">' +
+    '<button data-act="troca">Trocar</button>' +
+    '<button data-act="limpa">Limpar</button>' +
+    '<button data-act="png">Baixar PNG</button>' +
+    '<span class="st"></span>';
+
+  card.appendChild(frame); card.appendChild(ui); row.appendChild(card);
+
+  ligarFoto(sec.querySelector('.shot'), i);
+  ui.querySelector('input').addEventListener('input', e => {
+    estado[i].scale = parseFloat(e.target.value); aplicar(i);
+  });
+  ui.addEventListener('click', e => {
+    const a = e.target.dataset.act;
+    if (a === 'troca') escolher(i);
+    if (a === 'limpa') { estado[i] = { src:null, scale:1, x:0, y:0 };
+                         ui.querySelector('input').value = 1; aplicar(i); }
+    if (a === 'png') baixar(i, ui.querySelector('.st'));
+  });
+});
+
+/* A moldura e responsiva: scale() exige numero sem unidade, e
+   calc(px / numero) devolve px, entao a escala vem daqui, nao do CSS. */
+function ajustarEscala(){
+  document.querySelectorAll('.card').forEach(c => {
+    const f = c.querySelector('.frame');
+    if (f.clientWidth) c.style.setProperty('--k', f.clientWidth / 1080);
+  });
+}
+ajustarEscala();
+window.addEventListener('resize', ajustarEscala);
+
+/* ---------- foto: soltar, escolher, arrastar para reenquadrar ---------- */
+function ligarFoto(shot, i){
+  ['dragenter','dragover'].forEach(ev =>
+    shot.addEventListener(ev, e => { e.preventDefault(); shot.classList.add('over'); }));
+  ['dragleave','drop'].forEach(ev =>
+    shot.addEventListener(ev, () => shot.classList.remove('over')));
+  shot.addEventListener('drop', e => {
+    e.preventDefault();
+    const f = [...e.dataTransfer.files].find(x => x.type.startsWith('image/'));
+    if (f) carregar(f, i);
+  });
+  shot.addEventListener('click', () => { if (!estado[i].src) escolher(i); });
+
+  let arrasta = false, px = 0, py = 0;
+  shot.addEventListener('mousedown', e => {
+    if (!estado[i].src) return;
+    arrasta = true; px = e.clientX; py = e.clientY; e.preventDefault();
+  });
+  window.addEventListener('mousemove', e => {
+    if (!arrasta) return;
+    // a moldura é responsiva: converte o passo do mouse para a escala real
+    const k = shot.closest('.frame').clientWidth / 1080 || 1;
+    estado[i].x += (e.clientX - px) / k; estado[i].y += (e.clientY - py) / k;
+    px = e.clientX; py = e.clientY; aplicar(i);
+  });
+  window.addEventListener('mouseup', () => { arrasta = false; });
+}
+
+function escolher(i){
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = () => { if (inp.files[0]) carregar(inp.files[0], i); };
+  inp.click();
+}
+function carregar(file, i){
+  const r = new FileReader();
+  r.onload = () => { estado[i] = { src:r.result, scale:1, x:0, y:0 }; aplicar(i); };
+  r.readAsDataURL(file);
+}
+function aplicar(i){
+  const shot = document.querySelector('.slide[data-i="' + i + '"] .shot');
+  const st = estado[i];
+  let img = shot.querySelector('img');
+  if (!st.src) {
+    if (img) img.remove();
+    shot.classList.add('empty');
+    shot.querySelector('.hint').style.display = '';
+    return;
+  }
+  if (!img) { img = new Image(); shot.insertBefore(img, shot.firstChild); }
+  img.src = st.src;
+  img.style.transform = 'translate(calc(-50% + ' + st.x + 'px), calc(-50% + ' + st.y +
+                        'px)) scale(' + st.scale + ')';
+  shot.classList.remove('empty');
+  shot.querySelector('.hint').style.display = 'none';
+}
+
+/* ---------- exportação ----------
+   PNG por SVG + foreignObject: a tela é serializada com o próprio CSS
+   (fontes já em base64) e desenhada num canvas 1080×1440. Sem biblioteca
+   externa, porque a peça precisa rodar offline. */
+function slideParaSVG(slide){
+  const XHTML = 'http://www.w3.org/1999/xhtml';
+  const clone = slide.cloneNode(true);
+  clone.removeAttribute('data-i');
+  clone.querySelectorAll('[data-ui]').forEach(n => n.remove());
+  clone.setAttribute('xmlns', XHTML);
+  const style = document.createElementNS(XHTML, 'style');
+  style.textContent = document.getElementById('css').textContent;
+  const wrap = document.createElementNS(XHTML, 'div');
+  wrap.setAttribute('xmlns', XHTML);
+  wrap.appendChild(style); wrap.appendChild(clone);
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1440">' +
+         '<foreignObject x="0" y="0" width="1080" height="1440">' +
+         new XMLSerializer().serializeToString(wrap) +
+         '</foreignObject></svg>';
+}
+
+/* O PNG é gerado no navegador e entregue de dois jeitos: dentro do artifact,
+   pela capacidade "downloads" (o visitante confirma o salvamento — a página
+   não pode baixar sozinha); fora dele, por link comum. */
+const dlPromise = (window.claude && window.claude.use)
+  ? Promise.resolve(window.claude.use('downloads')).catch(() => null)
+  : Promise.resolve(null);
+
+dlPromise.then(dl => {
+  document.getElementById('modo').textContent =
+    dl ? 'Download tela a tela' : 'Download direto';
+});
+
+function pngBlob(i){
+  return new Promise((ok, falha) => {
+    const slide = document.querySelector('.slide[data-i="' + i + '"]');
+    // data: e não blob: — um SVG vindo de blob: contamina o canvas (origem
+    // opaca dentro do artifact e em file://), e aí toBlob morre em
+    // SecurityError. Com data: o canvas continua limpo.
+    const url = 'data:image/svg+xml;charset=utf-8,'
+              + encodeURIComponent(slideParaSVG(slide));
+    const img = new Image();
+    img.onload = () => {
+      const cv = document.createElement('canvas');
+      cv.width = 1080; cv.height = 1440;
+      cv.getContext('2d').drawImage(img, 0, 0);
+      try {
+        cv.toBlob(b => b ? ok(b) : falha(new Error('canvas vazio')), 'image/png');
+      } catch (e) { falha(e); }
+    };
+    img.onerror = () => falha(new Error('svg'));
+    img.src = url;
+  });
+}
+
+async function baixar(i, st){
+  const nome = 'tela-' + String(i + 1).padStart(2, '0') + '.png';
+  st.textContent = 'Gerando…';
+  let blob;
+  try { blob = await pngBlob(i); }
+  catch (_) { st.textContent = 'Não consegui gerar esta tela.'; return; }
+
+  const dl = await dlPromise;
+  if (!dl) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = nome; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    st.textContent = 'Baixado.';
+    return;
+  }
+  try {
+    await dl.save({ filename: nome, data: blob });
+    st.textContent = 'Salvo.';
+  } catch (e) {
+    const c = e && e.code;
+    if (c === 'declined') { st.textContent = ''; return; }
+    st.textContent = c === 'rate_limited'
+      ? 'Espere um instante e tente de novo.'
+      : 'Não deu para salvar aqui.';
+  }
+}
+
+</script>

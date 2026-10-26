@@ -1,0 +1,23 @@
+<!-- @dsCard group="Brand" viewport="700x360" name="Logo" subtitle="ejup lockups + símbolo — positivo & negativo" -->
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  body{margin:0;font-family:var(--font-sans)}
+  .grid{display:grid;grid-template-columns:1.4fr 1fr;grid-auto-rows:120px}
+  .cell{display:flex;align-items:center;justify-content:center;border-right:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle)}
+  .light{background:#fff}.muted{background:var(--surface-muted)}
+  .dark{background:var(--ejup-navy)}.ink{background:var(--ejup-ink)}
+  .lab{position:absolute;font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin:8px}
+  .cell{position:relative}
+  .cell .lab.l{color:var(--text-muted)} .cell .lab.d{color:rgba(255,255,255,.55)}
+</style></head>
+<body>
+  <div class="grid">
+    <div class="cell light"><span class="lab l">Horizontal · positivo</span><img src="../assets/logo/ejup-horizontal-navy.svg" style="height:58px"></div>
+    <div class="cell light"><span class="lab l">Símbolo</span><img src="../assets/logo/ejup-symbol-navy.svg" style="height:74px"></div>
+    <div class="cell dark"><span class="lab d">Horizontal · negativo</span><img src="../assets/logo/ejup-horizontal-white.svg" style="height:58px"></div>
+    <div class="cell dark"><span class="lab d">Símbolo</span><img src="../assets/logo/ejup-symbol-white.svg" style="height:74px"></div>
+    <div class="cell muted"><span class="lab l">Vertical · positivo</span><img src="../assets/logo/ejup-vertical-navy.svg" style="height:96px"></div>
+    <div class="cell ink"><span class="lab d">Símbolo · ouro</span><img src="../assets/logo/ejup-symbol-gold.svg" style="height:74px"></div>
+  </div>
+</body></html>

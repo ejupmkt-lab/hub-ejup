@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>A Estante EJUP</title>
+<style>
+__FONT_FACES__
+:root{
+  --ink:#0d131a; --navy:#031c37; --steel:#304557;
+  --silver:#d1d3d4; --gray:#8e969e;
+  --gold:#f0b855;              /* acento: só sobre fundo escuro (9,5:1) */
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#5b6169; display:flex; flex-wrap:wrap; gap:32px; padding:32px;
+     font-family:'Gotham','Montserrat',system-ui,sans-serif;}
+
+.story{
+  position:relative; width:1080px; height:1920px; overflow:hidden;
+  padding:96px 88px 0; display:flex; flex-direction:column;
+  color:#fff;
+  background:
+    radial-gradient(90% 55% at 50% 8%, #123252 0%, rgba(18,50,82,0) 62%),
+    linear-gradient(#031c37 0%, #071f38 34%, #0a1723 66%, #0d131a 100%);
+}
+/* grafismo: o símbolo ampliado, sangrando pelo canto superior direito */
+.marca-fundo{ position:absolute; top:-150px; right:-180px; width:660px; opacity:.16; }
+.marca-fundo svg{width:100%;height:auto;display:block}
+.marca-fundo path{fill:#8fb4d8 !important}
+
+/* ---------- cabeçalho fixo da série ---------- */
+.cab{ position:relative; text-align:center; margin-bottom:92px; }
+.cab .linha{ display:flex; align-items:center; justify-content:center; gap:28px; }
+.cab .linha::before,.cab .linha::after{
+  content:''; height:1px; width:132px; background:rgba(255,255,255,.28); }
+.cab .serie{ font-weight:500; font-size:33px; letter-spacing:.24em; }
+.cab .etapa{ margin-top:16px; font-weight:500; font-size:24px; letter-spacing:.22em;
+             color:var(--gold); }
+
+/* ---------- escala: a ideia caminhando pelos quatro estágios ---------- */
+.escala{ position:relative; margin-bottom:96px; }
+.trilho{ position:relative; height:4px; border-radius:2px; background:rgba(255,255,255,.16); }
+.trilho .feito{ position:absolute; left:0; top:0; height:100%; border-radius:2px;
+                background:var(--gold); }
+.trilho .bola{ position:absolute; top:50%; width:34px; height:34px; margin:-17px 0 0 -17px;
+               border-radius:50%; background:var(--gold);
+               box-shadow:0 0 0 10px rgba(240,184,85,.16); }
+.passos{ display:flex; margin-top:26px; }
+.passos span{ flex:1; font-weight:500; font-size:22px; letter-spacing:.16em;
+              color:rgba(255,255,255,.34); }
+.passos span:nth-child(2){text-align:center}
+.passos span:nth-child(3){text-align:center}
+.passos span:last-child{text-align:right}
+.passos span.aqui{ color:var(--gold); }
+
+/* escala com extremos: o 0 e o 1 nas pontas do trilho (De Zero a Um) */
+.story.sem-cab{ padding-top:230px; } /* abaixo da barra de perfil do Instagram */
+.escala.extremos{ display:flex; align-items:flex-start; gap:30px; }
+.escala.extremos .meio{ flex:1; position:relative; padding-top:38px; }
+.escala.extremos .ponta{ font-weight:900; font-size:80px; line-height:1;
+  letter-spacing:-.02em; color:rgba(255,255,255,.3); }
+.escala.extremos .ponta.aqui{ color:var(--gold); }
+.marcas{ position:relative; height:24px; margin-top:26px; }
+.marcas span{ position:absolute; top:0; transform:translateX(-50%); white-space:nowrap;
+  font-weight:500; font-size:20px; letter-spacing:.14em; color:rgba(255,255,255,.34); }
+.marcas span:first-child{ transform:none; }
+.marcas span:last-child{ transform:translateX(-100%); }
+.marcas span.aqui{ color:var(--gold); }
+/* extremos com palavra (1849 · HOJE): pontas menores, trilho mais largo */
+.escala.extremos.longa{ gap:22px; }
+.escala.extremos.longa .ponta{ font-size:48px; padding-top:18px; }
+.escala.extremos.longa .marcas span{ font-size:17px; letter-spacing:.1em; }
+.ficha .serie-ficha{ font-weight:500; font-size:.2em; letter-spacing:.2em;
+  color:var(--silver); opacity:.8; margin-bottom:.5em; }
+.capa.quadrada{ width:400px; height:400px; }
+
+/* ---------- conteúdo ----------
+   Os corpos são em `em` sobre .conteudo de propósito: o ajuste automático
+   mexe num número só e a proporção entre título, texto e ficha não muda. */
+.conteudo{ font-size:100px;
+  /* centrado no espaço entre a escala e o logo: sem isso o texto cola no topo
+     e a sobra toda cai embaixo, onde o Instagram já cobre com a barra */
+  margin-top:auto; margin-bottom:auto; }
+.titulo{ font-weight:900; font-size:.78em; line-height:1.08; letter-spacing:-.022em;
+         margin-bottom:.46em; }
+.titulo b{ color:var(--gold); font-weight:900; }
+.corpo p{ font-weight:300; font-size:.38em; line-height:1.5; color:var(--silver);
+          margin-bottom:.28em; }
+.corpo p:last-child{margin-bottom:0}
+.corpo b{ font-weight:500; color:#fff; }
+
+/* livro: capa + ficha */
+.livro{ display:flex; gap:44px; align-items:center; margin-top:64px; }
+.capa{ width:296px; height:452px; flex:none; border-radius:4px; overflow:hidden;
+       background:#16283c; box-shadow:0 18px 46px rgba(0,0,0,.45); }
+.capa img{width:100%;height:100%;object-fit:cover;display:block}
+.capa.vazia{ display:flex; flex-direction:column; justify-content:center; gap:14px;
+             padding:32px; border:2px dashed rgba(240,184,85,.5); text-align:center; }
+.capa.vazia b{ font-weight:500; font-size:22px; letter-spacing:.18em;
+                color:var(--gold); }
+.capa.vazia span{ font-weight:300; font-size:22px; color:var(--gray); }
+.ficha h3{ font-weight:900; font-size:.44em; letter-spacing:-.02em; }
+.ficha .autor{ font-weight:500; font-size:.26em; letter-spacing:.16em; color:var(--gold);
+               margin-top:.14em; }
+.ficha .sobre{ font-weight:300; font-size:.33em; line-height:1.42; color:var(--silver);
+               margin-top:.22em; }
+
+/* pílula de chamada, com a seta no lugar do emoji */
+.pilula{ margin-top:64px; display:flex; align-items:center; gap:24px;
+         padding:34px 44px; border-radius:999px;
+         border:1px solid rgba(240,184,85,.55); }
+.pilula i{ font-style:normal; color:var(--gold); font-size:.38em; line-height:1; }
+.pilula span{ font-weight:500; font-size:.33em; }
+
+.fecho{ margin-top:70px; }
+.fecho .pergunta{ font-weight:500; font-size:.38em; color:var(--gold); }
+/* a assinatura da marca não é mais uma linha do texto: ganha fio, rótulo e
+   escala próprios, para ler como fecho e não como continuação da pergunta */
+.assina{ margin-top:.52em; padding-top:.34em;
+         border-top:1px solid rgba(255,255,255,.18); }
+.assina .marca{ font-weight:500; font-size:.22em; letter-spacing:.24em;
+                color:var(--gold); }
+.assina .slogan{ margin-top:.12em; font-weight:300; font-size:.42em;
+                 line-height:1.24; letter-spacing:-.012em; color:#fff; }
+
+.logo{ margin-top:auto; margin-bottom:104px; align-self:center; width:300px; }
+.logo svg{width:100%;height:auto;display:block}
+.logo path{fill:#ffffff !important}
+</style></head>
+<body>__STORIES__
+
+<script>
+/* Cada story tem volume de texto diferente. Em vez de acertar corpo na mão, o
+   conteúdo encolhe até caber acima do logo — assim a série inteira mantém a
+   mesma margem inferior mesmo com um story bem mais longo que os outros. */
+document.querySelectorAll('.story').forEach(st => {
+  const alvo = st.querySelector('.conteudo');
+  const logo = st.querySelector('.logo');
+  const limite = () =>
+    alvo.getBoundingClientRect().bottom < logo.getBoundingClientRect().top - 48;
+  let k = +(st.dataset.teto || 100);
+  alvo.style.fontSize = k + 'px';
+  while (k > 60 && !limite()) { k -= 2; alvo.style.fontSize = k + 'px'; }
+  st.dataset.escala = k;
+});
+</script>
+</body></html>

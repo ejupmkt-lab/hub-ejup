@@ -1,0 +1,32 @@
+---
+name: ejup-content-pillars
+description: Pilares de conteúdo confirmados para o squad de marketing EJUP, incluindo mandato de diversificação e curso vendável (Lei Geral do Licenciamento Ambiental)
+metadata:
+  type: project
+---
+facts:
+  - id: ejup-pillar-diversificacao
+    fact: "O board determinou que os temas das peças devem cobrir vários assuntos, não se concentrar em um eixo só."
+    source: "EJUA-7 comment 89129090-15d9-43f9-93ba-07a7cc8c1784 (Roberto / local-board, 2026-05-27T19:45)"
+    status: active
+    captured_at: 2026-05-27
+  - id: ejup-curso-licenciamento-ambiental
+    fact: "EJUP vai colocar à venda um curso sobre Lei Geral do Licenciamento Ambiental — esse tema é pilar comercial direto e deve aparecer no calendário editorial."
+    source: "EJUA-7 comment 89129090-15d9-43f9-93ba-07a7cc8c1784 (Roberto, 2026-05-27)"
+    status: active
+    captured_at: 2026-05-27
+  - id: ejup-caso-prompt-injection-parauapebas
+    fact: "Sentença histórica TRT-8, 3ª vara do Trabalho de Parauapebas/PA, juiz Luiz Carlos de Araujo Santos Junior: duas advogadas multadas em R$ 84 mil (10% do valor da causa) por prompt oculto em petição inicial (texto branco sobre fundo branco) instruindo a IA Galileu do tribunal a 'contestar de forma superficial e não impugnar documentos'. Litigância de má-fé, ato atentatório à dignidade da Justiça. OAB-PA suspendeu cautelarmente por 30 dias e enviou ao TED. Primeira condenação do tipo no Brasil."
+    source: "Migalhas (455817, 455832, 455971), CNN Brasil, Carta Capital, AASP — todos maio/2026"
+    status: active
+    captured_at: 2026-05-27
+  - id: ejup-caso-prompt-injection-sp
+    fact: "Segundo caso de prompt injection em petição: juiz de SP cobrou explicações em 21/mai/2026 (Conjur). Tema entrou no léxico jurídico — não é mais incidente isolado."
+    source: "Conjur 2026-05-21"
+    status: active
+    captured_at: 2026-05-27
+  - id: ejup-principios-tema
+    fact: "Tema só é aprovável se tem os três ingredientes: gancho de notícia + tese cortante + profundidade real. v1 foi rejeitada por ser 'genérica'; v2 com matriz de avaliação e caso real foi aceita."
+    source: "Decisão consolidada após EJUA-7 v1 → v2 → v3"
+    status: active
+    captured_at: 2026-05-27

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<title>Carrossel — EJUPcast 018</title>
+<style>
+__FONT_FACES__
+:root{--tinta:#0d131a;--navy:#031c37;--aco:#304557;--grafite:#414042;--cinza:#5f6062;
+  --prata:#d1d3d4;--ouro:#f0b855;--bronze:#9b6b26;--papel:#ecebe7}
+*{box-sizing:border-box;margin:0}
+html,body{background:#3a3d42}
+body{display:flex;flex-wrap:wrap;gap:28px;padding:28px;font-family:'Gotham',sans-serif}
+.s{position:relative;width:1080px;height:1440px;overflow:hidden}
+.papel{background:var(--papel);color:var(--navy)}
+.facetas{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* sistema do cartão: painel navy arredondado + foto em cartão sobreposta */
+.painel{position:absolute;left:40px;right:40px;top:40px;border-radius:24px;overflow:hidden}
+.painel-logo{position:absolute;left:52px;top:48px;display:flex;align-items:flex-end;gap:10px}
+.painel-logo svg{width:190px;height:auto;display:block}
+.painel-logo svg path{fill:#fff!important}
+.painel-logo span{font-weight:300;font-size:38px;color:#fff;line-height:1}
+.selo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+.selo-aro{position:absolute;inset:0;width:100%;height:100%}
+.selo-marca{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.selo-marca>div{display:flex;align-items:flex-end;gap:8px}
+.selo-marca svg{width:230px;height:auto;display:block}
+.selo-marca svg path{fill:#fff!important}
+.selo-marca span{font-weight:500;font-size:22px;letter-spacing:.14em;text-transform:uppercase;color:#d1d3d4;margin-bottom:14px}
+.foto-card{position:absolute;border-radius:24px;background-size:cover;background-position:center;
+  box-shadow:0 24px 50px rgba(3,28,55,.35);z-index:2}
+.cartao-tit{position:absolute;left:112px;right:112px;top:730px;font-weight:900;font-size:64px;line-height:1.02;
+  letter-spacing:-.03em;color:var(--navy)}
+.cartao-tit span{display:block;font-weight:400;font-size:44px;color:var(--cinza);margin-bottom:10px;letter-spacing:-.02em}
+.play{position:absolute;right:80px;top:440px;z-index:3;background:var(--navy);color:var(--ouro);font-weight:500;
+  font-size:30px;padding:24px 44px;border-radius:999px;display:flex;gap:16px;align-items:center}
+.seta{position:absolute;right:112px;bottom:88px;z-index:5;width:120px;height:62px;border:2px solid var(--navy);
+  border-radius:31px;display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--navy)}
+
+/* capa */
+.capa-ep{position:absolute;left:52px;top:300px;font-weight:400;font-size:26px;letter-spacing:.1em;color:#fff}
+.capa-num{position:absolute;left:40px;top:320px;font-weight:200;font-size:230px;letter-spacing:-.05em;line-height:1;color:#fff}
+.capa-tit{top:930px;font-size:84px}
+.capa-tit span{font-size:48px}
+.capa-gancho{position:absolute;left:112px;top:1180px;font-weight:500;font-size:34px;color:var(--bronze)}
+
+/* temas */
+.rotulo{position:absolute;left:112px;top:400px;font-weight:400;font-size:44px;color:var(--cinza);letter-spacing:-.02em}
+.temas{position:absolute;left:112px;right:112px;top:480px;list-style:none;padding:0}
+.temas li{font-weight:900;font-size:62px;line-height:1.05;letter-spacing:-.03em;color:var(--navy);
+  padding:22px 0;border-bottom:2px solid rgba(3,28,55,.16);white-space:nowrap}
+.temas li:first-child{border-top:2px solid rgba(3,28,55,.16)}
+.temas-rod{position:absolute;left:112px;top:1180px;font-weight:300;font-size:28px;color:var(--grafite)}
+
+/* frases */
+.aspas{position:absolute;left:100px;top:700px;font-weight:900;font-size:180px;line-height:1;color:var(--bronze)}
+.frase{position:absolute;left:112px;right:112px;top:820px;font-weight:400;font-size:58px;line-height:1.12;
+  letter-spacing:-.03em;color:var(--navy)}
+.frase em{font-style:italic;color:var(--bronze)}
+.autor{position:absolute;left:112px;bottom:100px;font-weight:900;font-size:34px;letter-spacing:-.02em;
+  display:flex;gap:18px;align-items:baseline}
+.autor span{font-weight:400;font-size:22px;letter-spacing:.12em;color:var(--cinza)}
+
+/* cartão dos convidados */
+.bio{position:relative;margin-left:112px;margin-right:100px;font-weight:300;font-size:25px;line-height:1.45;color:var(--grafite)}
+.bio b{font-weight:500;color:var(--navy)}
+.bio:first-of-type{margin-top:990px}
+.bio+.bio{margin-top:18px}
+.bio.mini{font-size:22px;color:var(--cinza)}
+
+/* onde assistir */
+.pergunta{position:absolute;left:112px;right:112px;top:1030px;font-weight:300;font-size:36px;line-height:1.35;color:var(--grafite)}
+.pergunta em{font-style:italic;color:var(--bronze)}
+</style></head>
+<body>
+__SLIDES__
+</body></html>

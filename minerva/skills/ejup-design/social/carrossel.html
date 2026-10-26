@@ -1,0 +1,174 @@
+<!-- @dsCard group="Carrossel" viewport="1080x1440" name="Carrossel interativo" subtitle="Post completo navegável — abra para deslizar" -->
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>EJUP — Carrossel</title>
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="carousel.css">
+<style>
+  html,body{margin:0;height:100%;background:#0a0c10;overflow:hidden}
+  .stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  .frame{width:1080px;height:1440px;position:relative;transform-origin:center center;box-shadow:0 30px 90px rgba(0,0,0,.6);border-radius:6px;overflow:hidden}
+  .track{position:absolute;inset:0;display:flex;transition:transform .5s cubic-bezier(.16,1,.3,1)}
+  .track .post{flex:0 0 1080px}
+  /* nav */
+  .nav{position:fixed;top:50%;transform:translateY(-50%);z-index:20;width:54px;height:54px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(10,12,16,.6);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+  .nav:hover{background:rgba(240,184,85,.18);border-color:var(--ejup-gold)}
+  .nav.prev{left:24px}.nav.next{right:24px}
+  .nav:disabled{opacity:.25;cursor:default}
+  .dots{position:fixed;bottom:22px;left:0;right:0;z-index:20;display:flex;gap:9px;justify-content:center}
+  .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.28);cursor:pointer;transition:all .2s}
+  .dot.on{background:var(--ejup-gold);width:22px;border-radius:5px}
+  .count{position:fixed;top:20px;right:24px;z-index:20;font-family:var(--font-sans);font-size:13px;letter-spacing:.1em;color:rgba(255,255,255,.5)}
+</style></head>
+<body>
+  <div class="stage"><div class="frame"><div class="track" id="track">
+
+    <!-- 1 · Capa -->
+    <div class="post post--dark">
+      <img class="post__mark post__mark--tr" src="../assets/logo/ejup-symbol-white.svg" alt="" aria-hidden="true">
+      <div class="post__body">
+        <p class="eyebrow-soc">Coleção institucional · 01</p>
+        <h1 class="headline">Existe uma forma silenciosa de enfraquecer o Direito — <b>e quase ninguém percebe.</b></h1>
+        <p class="subhead">Não é erro técnico. Não é falta de estudo. <b>É outro fenômeno.</b></p>
+      </div>
+      <div class="post__logo"><img src="../assets/logo/ejup-horizontal-white.svg" alt="ejup"></div>
+    </div>
+
+    <!-- 2 · Citação -->
+    <div class="post post--dark">
+      <div class="post__body">
+        <p class="statement" style="margin-bottom:48px">Novas leis.<br>Novos precedentes.<br>Novas tecnologias.</p>
+        <span class="quote-glyph">&#8220;</span>
+        <p class="statement" style="margin-top:18px"><b>A exigência não diminuiu — aumentou.</b></p>
+        <span class="quote-glyph quote-glyph--close" style="margin-top:26px">&#8220;</span>
+      </div>
+      <div class="post__logo"><img src="../assets/logo/ejup-horizontal-white.svg" alt="ejup"></div>
+    </div>
+
+    <!-- 3 · Número gigante -->
+    <div class="post post--dark">
+      <img class="post__mark post__mark--lg post__mark--tr2" src="../assets/logo/ejup-symbol-white.svg" alt="" aria-hidden="true">
+      <div class="post__body">
+        <p class="lead-line">Entre a norma e a prática, o intervalo pesa:</p>
+        <div class="stat-hero"><span class="pre">até</span><span class="num">11</span><span class="unit">anos</span></div>
+        <p class="takeaway">O tempo não se explica pela obra, e sim pela regulamentação que ainda precisa ser escrita.</p>
+        <div class="hair-rule"></div>
+        <p class="note-italic">E é nesse intervalo que o jurista preparado faz diferença.</p>
+      </div>
+      <div class="post__logo"><img src="../assets/logo/ejup-horizontal-white.svg" alt="ejup"></div>
+    </div>
+
+    <!-- 4 · Statement (silver) -->
+    <div class="post post--silver">
+      <div class="post__body">
+        <h1 class="headline">Quando a pressa vira padrão, <b>o Direito perde densidade.</b></h1>
+        <p class="subhead">E o jurista <b>perde segurança na própria atuação.</b></p>
+      </div>
+      <div class="post__logo"><img src="../assets/logo/ejup-horizontal-navy.svg" alt="ejup"></div>
+    </div>
+
+    <!-- 4 · Comparativo -->
+    <div class="post post--dark">
+      <div class="post__body">
+        <div class="panel-grid" style="grid-template-columns:1fr 1fr">
+          <div class="panel">
+            <p class="panel__title">O debate começou aqui</p>
+            <div class="panel__rule"></div>
+            <p class="panel__kicker"><b>ANTES:</b><br>simplificação do rito</p>
+            <ul class="panel__list"><li>Menos entraves</li><li>Mais agilidade</li><li>Mais fluidez</li></ul>
+          </div>
+          <div class="panel">
+            <p class="panel__title">Mas o problema real está se movendo para cá</p>
+            <div class="panel__rule"></div>
+            <p class="panel__kicker"><b>AGORA:</b> estrutura para sustentar o controle</p>
+            <ul class="panel__list"><li>Mais regulação local</li><li>Mais capacidade técnica</li><li>Mais fiscalização</li><li>Mais coordenação</li></ul>
+          </div>
+        </div>
+      </div>
+      <div class="post__logo"><img src="../assets/logo/ejup-horizontal-white.svg" alt="ejup"></div>
+    </div>
+
+    <!-- 6 · Dados / R$ -->
+    <div class="post post--navy">
+      <img class="post__mark post__mark--lg post__mark--tr2" src="../assets/logo/ejup-symbol-white.svg" alt="" aria-hidden="true">
+      <img class="post__mark post__mark--lg post__mark--br2" src="../assets/logo/ejup-symbol-white.svg" alt="" aria-hidden="true">
+      <div class="post__body">
+        <div class="stat-hero"><span class="pre">R$ 18,3</span><span class="bold-gold" style="font-size:190px">bi</span></div>
+        <p class="takeaway" style="font-weight:300">em créditos fiscais já têm destinatário e prazo — <b>e permanecem inacessíveis.</b></p>
+        <div class="data-row" style="margin-top:48px">
+          <div class="item"><p class="k">Lei 14.948/2024</p><p class="v">marco do hidrogênio de baixo carbono</p></div>
+          <div class="item"><p class="k">PHBC · 2028–2032</p><p class="v">programa que promete o incentivo</p></div>
+        </div>
+        <p class="note-italic" style="margin-top:40px">Não se mede em reais — mede-se em posição perdida no exterior.</p>
+      </div>
+      <div class="post__logo"><img src="../assets/logo/ejup-horizontal-white.svg" alt="ejup"></div>
+    </div>
+
+    <!-- 7 · Pílula (navy — momento de identidade) -->
+    <div class="post post--navy">
+      <img class="post__mark post__mark--br" src="../assets/logo/ejup-symbol-white.svg" alt="" aria-hidden="true">
+      <div class="post__body">
+        <p class="statement" style="margin-bottom:64px">É por isso que a <b>EJUP</b> existe:</p>
+        <div class="pill">para sustentar a formação do jurista em um tempo que insiste em simplificar o Direito.</div>
+      </div>
+      <div class="post__logo"><img src="../assets/logo/ejup-horizontal-white.svg" alt="ejup"></div>
+    </div>
+
+    <!-- 6 · Foto -->
+    <div class="post post--photo">
+      <div class="photo-placeholder"><span>imagem full-bleed</span></div>
+      <div class="post__scrim post__scrim--left"></div>
+      <div class="post__body">
+        <h1 class="headline" style="max-width:560px">Quem vive o Direito sabe: um bom argumento não nasce em minutos. Interpretação exige <b>estudo, comparação</b> e <b>critério.</b></h1>
+      </div>
+      <div class="post__logo"><img src="../assets/logo/ejup-horizontal-white.svg" alt="ejup"></div>
+    </div>
+
+    <!-- 7 · CTA final -->
+    <div class="post post--dark cta">
+      <img class="post__mark post__mark--right" src="../assets/logo/ejup-symbol-gold.svg" alt="" aria-hidden="true">
+      <div class="post__body cta">
+        <img class="cta__logo" src="../assets/logo/ejup-horizontal-white.svg" alt="ejup — Educação Jurídica">
+        <p class="cta__slogan">Alma clássica,<br><b>repertório contemporâneo.</b></p>
+      </div>
+      <div class="handle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>
+        <span>ejup.oficial</span>
+      </div>
+    </div>
+
+  </div></div></div>
+
+  <button class="nav prev" id="prev" aria-label="Anterior">&#8249;</button>
+  <button class="nav next" id="next" aria-label="Próximo">&#8250;</button>
+  <div class="count" id="count"></div>
+  <div class="dots" id="dots"></div>
+
+  <script>
+    const track = document.getElementById('track');
+    const slides = [...track.children];
+    const N = slides.length;
+    const frame = document.querySelector('.frame');
+    const KEY = 'ejup-carrossel-idx';
+    let i = Math.min(N-1, Math.max(0, parseInt(localStorage.getItem(KEY)||'0',10)||0));
+
+    function fit(){
+      const s = Math.min(window.innerWidth*0.9/1080, window.innerHeight*0.86/1440);
+      frame.style.transform = 'scale('+s+')';
+    }
+    const dots = document.getElementById('dots');
+    slides.forEach((_,k)=>{ const d=document.createElement('div'); d.className='dot'; d.onclick=()=>go(k); dots.appendChild(d); });
+    function render(){
+      track.style.transform = 'translateX('+(-i*1080)+'px)';
+      document.getElementById('count').textContent = (i+1)+' / '+N;
+      [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===i));
+      document.getElementById('prev').disabled = i===0;
+      document.getElementById('next').disabled = i===N-1;
+    }
+    function go(k){ i=Math.min(N-1,Math.max(0,k)); localStorage.setItem(KEY,i); render(); }
+    document.getElementById('prev').onclick=()=>go(i-1);
+    document.getElementById('next').onclick=()=>go(i+1);
+    addEventListener('keydown',e=>{ if(e.key==='ArrowRight')go(i+1); if(e.key==='ArrowLeft')go(i-1); });
+    addEventListener('resize',fit);
+    fit(); render();
+  </script>
+</body></html>

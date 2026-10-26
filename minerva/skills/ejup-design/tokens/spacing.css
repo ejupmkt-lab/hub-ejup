@@ -1,0 +1,41 @@
+/* EJUP — Spacing, radii, shadows, layout */
+:root {
+  /* Spacing (4px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-8: 3rem;
+  --space-10: 4rem;
+  --space-12: 6rem;
+  --space-16: 8rem;
+
+  /* Radii — restrained, institutional (not bubbly) */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 999px;
+
+  /* Borders */
+  --border-width: 1px;
+
+  /* Shadows — soft, cool-tinted toward navy */
+  --shadow-sm: 0 1px 2px rgba(3, 28, 55, 0.06), 0 1px 3px rgba(3, 28, 55, 0.08);
+  --shadow-md: 0 4px 12px rgba(3, 28, 55, 0.10), 0 2px 4px rgba(3, 28, 55, 0.06);
+  --shadow-lg: 0 12px 32px rgba(3, 28, 55, 0.14), 0 4px 8px rgba(3, 28, 55, 0.08);
+  --shadow-gold: 0 6px 20px rgba(240, 184, 85, 0.35);
+
+  /* Layout */
+  --container-max: 1200px;
+  --container-narrow: 720px;
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);   /* @kind other */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);       /* @kind other */
+  --dur-fast: 120ms;   /* @kind other */
+  --dur-base: 200ms;   /* @kind other */
+  --dur-slow: 360ms;   /* @kind other */
+}
