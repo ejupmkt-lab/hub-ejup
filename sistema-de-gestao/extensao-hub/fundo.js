@@ -684,12 +684,12 @@ async function textoDeTodosOsQuadros(tabId, passarMouse = false, sessao = null) 
 }
 
 // ─── Mouse de verdade (depurador do navegador) ────────────────────────────────
-// Opcional (permissão "debugger", pedida na janelinha): passa o mouse e clica como uma pessoa, o que acende balões feitos só com
+// Opcional (caixa "Mouse de verdade" na janelinha; usa a permissão "debugger", que o Chrome só aceita como obrigatória): passa o mouse e clica como uma pessoa, o que acende balões feitos só com
 // CSS e deixa o navegador dizer quais arquivos a página baixou. Enquanto lê, o navegador mostra o aviso de "depuração".
 
 async function modoReal() {
   const { opcoes } = await chrome.storage.local.get("opcoes");
-  return !!opcoes?.real && (await chrome.permissions.contains({ permissions: ["debugger"] }));
+  return !!opcoes?.real;
 }
 
 async function abrirSessao(tabId) {

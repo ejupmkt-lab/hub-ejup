@@ -180,21 +180,11 @@ const salvarOpcoes = async (mudanca) => {
   const { opcoes } = await chrome.storage.local.get("opcoes");
   await chrome.storage.local.set({ opcoes: { ...opcoes, ...mudanca } });
 };
-chrome.storage.local.get("opcoes").then(async ({ opcoes }) => {
+chrome.storage.local.get("opcoes").then(({ opcoes }) => {
   el("clicar").checked = opcoes?.clicar !== false;
-  el("real").checked = !!opcoes?.real && (await chrome.permissions.contains({ permissions: ["debugger"] }));
+  el("real").checked = !!opcoes?.real;
 });
 el("clicar").addEventListener("change", () => salvarOpcoes({ clicar: el("clicar").checked }));
-// Ligar o mouse de verdade pede uma permissão ao navegador (o clique na caixa é o gesto que ele exige)
-el("real").addEventListener("change", async () => {
-  if (el("real").checked) {
-    const deu = await chrome.permissions.request({ permissions: ["debugger"] });
-    el("real").checked = deu;
-    await salvarOpcoes({ real: deu });
-    if (!deu) dizer("A permissão não foi dada; o mouse de verdade continua desligado.", "erro");
-  } else {
-    await salvarOpcoes({ real: false });
-    await chrome.permissions.remove({ permissions: ["debugger"] }).catch(() => {});
-  }
-});
+// Mouse de verdade: só liga a opção (a permissão do depurador já vem com a extensão)
+el("real").addEventListener("change", () => salvarOpcoes({ real: el("real").checked }));
 preparar();
