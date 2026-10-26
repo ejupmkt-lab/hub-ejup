@@ -1,0 +1,13 @@
+{
+  "name": "ejup-minerva",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "dev": "node dev/server.mjs",
+    "dev:portal": "FAKE_SB=1 node dev/server.mjs"
+  }
+}

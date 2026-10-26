@@ -1,0 +1,123 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "headers": [
+    {
+      "source": "/(portal|prof|equipe|entrar|criar|recuperar)(/.*)?",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
+      "source": "/minerva(.*)",
+      "headers": [
+        {
+          "key": "Permissions-Policy",
+          "value": "microphone=(self)"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/minerva/(.*)\\.(js|jpg)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
+      "source": "/(favicon.svg|minerva/.*\\.jpg)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(img|vid)/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "api/minerva.js": {
+      "maxDuration": 30
+    },
+    "api/lead.js": {
+      "maxDuration": 10
+    },
+    "api/portal.js": {
+      "maxDuration": 30
+    },
+    "api/pagina.js": {
+      "maxDuration": 10,
+      "includeFiles": "app.html"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/minerva",
+      "destination": "/minerva/index.html"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/pagina?sitemap=1"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/api/pagina?robots=1"
+    },
+    {
+      "source": "/((?!api/|minerva/|assets/|img/|vid/|fonts/|favicon\\.svg).*)",
+      "destination": "/api/pagina?p=/$1"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/portal?r=cron",
+      "schedule": "0 11 * * *"
+    }
+  ]
+}
