@@ -6,7 +6,7 @@ Textos prontos para colar. ⚑ = depende do Roberto antes de publicar.
 
 ## Segunda 26/10 · Carrossel (7 telas)
 
-Artes: `carrossel-01-capa.png` a `carrossel-07-abertura.png`.
+Artes: `carrossel-01.png` a `carrossel-07.png` (linha das referências, ver `design-system/08-referencias.md`).
 
 **Legenda (Instagram)**
 
