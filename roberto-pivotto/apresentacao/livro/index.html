@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Livro de modelos · Roberto Pivotto</title>
+<meta name="description" content="Cada peça da marca pessoal de Roberto Pivotto renderizada no tamanho de publicação, ao lado da ficha de como é construída.">
+<meta property="og:title" content="Livro de modelos · Roberto Pivotto">
+<meta property="og:description" content="Cada peça da marca renderizada no tamanho de publicação, ao lado da ficha de como é construída.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Instrument+Sans:wght@400;500;600&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+:root{
+  --papel:#F1F0EA; --papel2:#E9E7DF; --tinta:#22252A; --caneta:#2B57A6;
+  --caneta-clara:#8FB0E6; --grafite:#6E7278; --fita:#D9CBA8; --linha:#C9C7BF;
+  --serif:"Newsreader",Georgia,serif; --sans:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"Courier Prime","Courier New",monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--papel);color:var(--tinta);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+  background-image:radial-gradient(rgba(34,37,42,.055) 1px,transparent 1px);background-size:3px 3px}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 28px}
+a{color:var(--caneta)}
+
+.capa{padding:96px 0 56px;border-bottom:1px solid var(--linha)}
+.voltar{display:inline-flex;align-items:center;gap:9px;text-decoration:none;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--grafite);margin-bottom:30px;padding-bottom:4px;border-bottom:1px solid transparent}
+.voltar::before{content:"";width:22px;height:2px;background:var(--caneta);border-radius:2px;display:inline-block}
+.voltar:hover{color:var(--tinta);border-bottom-color:var(--linha)}
+.capa__rot{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--grafite);margin:0 0 28px}
+.capa h1{font-family:var(--serif);font-weight:500;font-size:clamp(40px,6vw,74px);line-height:1;letter-spacing:-.02em;margin:0 0 22px;max-width:16ch}
+.capa__sub{font-family:var(--serif);font-size:clamp(19px,2.2vw,25px);line-height:1.42;max-width:56ch;margin:0 0 34px;color:#33373D}
+.capa__curva{margin:0 0 40px}
+.aviso{border-left:4px solid var(--caneta);background:var(--papel2);padding:20px 24px;max-width:62ch;font-size:15.5px;line-height:1.6}
+.aviso strong{font-weight:600}
+.aviso p{margin:0 0 10px}.aviso p:last-child{margin:0}
+
+.nav{position:sticky;top:0;z-index:5;background:rgba(241,240,234,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--linha);margin-top:48px}
+.nav__in{max-width:1180px;margin:0 auto;padding:12px 28px;display:flex;gap:22px;overflow-x:auto;scrollbar-width:none}
+.nav__in::-webkit-scrollbar{display:none}
+.nav a{white-space:nowrap;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--grafite);text-decoration:none;padding:4px 0;border-bottom:2px solid transparent}
+.nav a:hover,.nav a.on{color:var(--tinta);border-bottom-color:var(--caneta)}
+
+.grupo{padding:88px 0 24px;border-top:1px solid var(--linha);scroll-margin-top:56px}
+.grupo:first-of-type{border-top:0}
+.grupo__head{max-width:64ch;margin:0 0 56px}
+.grupo__n{font-family:var(--mono);font-size:12.5px;letter-spacing:.08em;color:var(--grafite);margin:0 0 12px}
+.grupo__head h2{font-family:var(--serif);font-weight:500;font-size:clamp(30px,3.6vw,44px);line-height:1.08;letter-spacing:-.015em;margin:0 0 16px}
+.grupo__intro{margin:0;font-size:17px;line-height:1.62;color:#3A3E44}
+
+.modelo{scroll-margin-top:72px;display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:52px;align-items:start;padding:0 0 76px}
+.modelo--vert{grid-template-columns:minmax(0,320px) minmax(0,1fr)}
+.modelo__art{margin:0;position:sticky;top:76px}
+.modelo__art img{display:block;width:100%;height:auto;border:1px solid var(--linha);box-shadow:0 1px 0 rgba(34,37,42,.06),0 18px 34px -26px rgba(34,37,42,.5)}
+.modelo__art figcaption{font-family:var(--mono);font-size:12px;color:var(--grafite);margin-top:10px;letter-spacing:.04em}
+.modelo__cod{font-family:var(--mono);font-size:12.5px;letter-spacing:.1em;color:var(--caneta);margin:0 0 8px}
+.modelo__nome{font-family:var(--serif);font-weight:500;font-size:clamp(24px,2.6vw,32px);line-height:1.12;letter-spacing:-.01em;margin:0 0 12px}
+.modelo__uso{margin:0 0 28px;font-size:16.5px;line-height:1.6;color:#3A3E44;max-width:52ch}
+.modelo__ficha h4{font-size:11.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--grafite);font-weight:500;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--linha)}
+.lista{list-style:none;margin:0 0 30px;padding:0;max-width:56ch}
+.lista li{position:relative;padding-left:22px;margin-bottom:9px;font-size:15.5px;line-height:1.58}
+.lista li::before{content:"";position:absolute;left:0;top:.72em;width:10px;height:2px;background:var(--linha)}
+.lista--regra li::before{background:var(--caneta);height:2px;width:10px}
+.specs{margin:0 0 30px;display:grid;grid-template-columns:1fr;border-top:1px solid var(--linha)}
+.specs>div{display:grid;grid-template-columns:minmax(120px,34%) 1fr;gap:16px;padding:9px 0;border-bottom:1px solid var(--linha)}
+.specs dt{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--grafite);margin:0}
+.specs dd{margin:0;font-family:var(--mono);font-size:14px;line-height:1.45}
+
+.circ{position:relative;display:inline-block;white-space:nowrap;margin:0 .1em}
+.circ svg{position:absolute;left:-.2em;top:calc(50% - .52em);width:calc(100% + .4em);height:1.02em;overflow:visible;pointer-events:none}
+.circ path{fill:none;stroke:var(--caneta);stroke-width:2px;stroke-linecap:round;stroke-linejoin:round;opacity:.9;vector-effect:none}
+
+.pe{padding:72px 0 110px;border-top:1px solid var(--linha);margin-top:40px}
+.pe p{max-width:60ch;font-size:15.5px;line-height:1.62;color:#3A3E44}
+.assin{display:flex;align-items:center;gap:14px;margin-top:36px}
+.assin i{display:block;width:44px;height:4px;background:var(--caneta)}
+.assin span{font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--grafite)}
+.assin em{margin-left:auto;font-family:var(--serif);font-style:italic;font-size:17px;color:var(--grafite)}
+
+@media (max-width:880px){
+  .modelo,.modelo--vert{grid-template-columns:1fr;gap:28px}
+  .modelo__art{position:static;max-width:440px}
+  .capa{padding:64px 0 40px}
+  .grupo{padding:60px 0 16px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="capa">
+    <a class="voltar" href="/">Apresentação</a>
+    <p class="capa__rot">Roberto Pivotto · marca pessoal</p>
+    <div class="capa__curva"><svg viewBox="0 0 300 120" width="200" style="display:block" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M 8 100 C 50 96, 104 92, 150 82" stroke="#6E7278" stroke-width="5"></path>
+  <path d="M 150 82 C 192 66, 232 40, 292 10" stroke="#2B57A6" stroke-width="6"></path>
+  <circle cx="150" cy="82" r="9" fill="#2B57A6"></circle>
+</svg></div>
+    <h1>Livro de <span class="circ">modelos<svg viewBox="0 0 100 60" preserveAspectRatio="none" aria-hidden="true"><path d="M 12 36 C 4 18, 30 2, 55 3 C 82 4, 100 18, 98 33 C 96 50, 72 59, 48 58 C 22 57, 2 48, 4 34 C 5 29, 6 27, 7 26"></path></svg></span></h1>
+    <p class="capa__sub">Cada peça do sistema renderizada no tamanho real, ao lado da ficha de como ela é construída: medidas, tipografia, marcas à mão e o que nunca pode entrar.</p>
+    <div class="aviso">
+      <p><strong>Esta página é só de visualização.</strong> Nada aqui é editável e não precisa ser. Ela existe para você ver o modelo visual de cada formato e saber como é feito.</p>
+      <p>Para pedir ajuste, use o código do modelo. Exemplo: <em>no M-07, tira uma seta e aumenta o respiro entre os blocos</em>. Volte com isso na conversa e a peça é refeita.</p>
+    </div>
+  </header>
+</div>
+<nav class="nav"><div class="nav__in"><a href="#base">Base</a><a href="#proposta">Os quadros da proposta</a><a href="#s1">Carrossel completo · sete slides</a><a href="#series">Séries curtas</a><a href="#dispositivos">Dispositivos gráficos</a><a href="#noticia">Notícia comentada</a><a href="#reels">Reels</a><a href="#apoio">Post único e imagens de apoio</a></div></nav>
+<div class="wrap">
+<section class="grupo" id="base">
+  <header class="grupo__head">
+    <p class="grupo__n">03 modelos</p>
+    <h2>Base</h2>
+    <p class="grupo__intro">O que sustenta todas as peças: paleta, tipografia, ritmo de densidade e o único sinal gráfico da marca.</p>
+  </header>
+  <article class="modelo" id="m-01">
+  <figure class="modelo__art">
+    <img src="/livro/img/Tokens.png" alt="Painel de tokens" loading="lazy" width="1080">
+    <figcaption>1080 × 1560 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-01</p>
+    <h3 class="modelo__nome">Painel de tokens</h3>
+    <p class="modelo__uso">Referência de cor e tipografia. Não vai para o feed.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Oito cores fixas em faixas de amostra, cada uma com nome, hex e função.</li><li>Escala tipográfica mostrada em tamanho real de 1080px, não em texto descritivo.</li><li>Kit de marcas à mão desenhado em SVG na própria arte, para servir de gabarito.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Fundo</dt><dd>Papel de planta #F1F0EA</dd></div><div><dt>Texto</dt><dd>Tinta #22252A</dd></div><div><dt>Acento</dt><dd>Caneta #2B57A6, único</dd></div><div><dt>Fontes</dt><dd>Newsreader · Instrument Sans · Courier Prime</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Nenhuma peça pode introduzir uma nona cor.</li><li>Nenhum gradiente, sombra projetada ou borda arredondada acima de 4px.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-02">
+  <figure class="modelo__art">
+    <img src="/livro/img/Ritmo.png" alt="Ritmo de densidade" loading="lazy" width="1080">
+    <figcaption>1080 × 1560 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-02</p>
+    <h3 class="modelo__nome">Ritmo de densidade</h3>
+    <p class="modelo__uso">Gabarito de montagem do carrossel. Mostra quanto texto cabe em cada posição.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Sete miniaturas na ordem do carrossel, cada uma com a densidade prevista.</li><li>A sequência alterna cheio e vazio: médio, denso, médio, muito denso, vazio, denso, leve.</li><li>O slide em Tinta aparece sempre no fecho, nunca na capa.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Slides</dt><dd>6 a 9, ideal 7</dd></div><div><dt>Palavras por slide interno</dt><dd>máximo 45</dd></div><div><dt>Slide escuro</dt><dd>1 por carrossel</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Dois slides densos seguidos deixam a peça com cara de template.</li><li>O slide de respiro é obrigatório em carrossel de 7.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-03">
+  <figure class="modelo__art">
+    <img src="/livro/img/Sinal.png" alt="A curva que pivota" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-03</p>
+    <h3 class="modelo__nome">A curva que pivota</h3>
+    <p class="modelo__uso">Único sinal gráfico da marca. Capa de apresentação, abertura de vídeo, separador de seção.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Uma linha em dois trechos. O primeiro segue a tendência em Grafite.</li><li>No ponto de pivô, um círculo cheio em Caneta, a linha muda de direção e sobe mais íngreme.</li><li>Proporção de referência: viewBox 300 × 120, pivô em (150, 82).</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Traço</dt><dd>6 a 7px em 1080, pontas redondas</dd></div><div><dt>Cores</dt><dd>Grafite antes do pivô, Caneta depois</dd></div><div><dt>Variante</dt><dd>ponto fora da curva: nuvem em Tinta, um ponto em Caneta circulado à mão</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Não é logo. Não entra em toda peça.</li><li>Sem gradiente, sem seta na ponta, sem terceira cor.</li></ul>
+  </div>
+</article>
+</section>
+<section class="grupo" id="proposta">
+  <header class="grupo__head">
+    <p class="grupo__n">08 modelos</p>
+    <h2>Os quadros da proposta</h2>
+    <p class="grupo__intro">O perfil pessoal tem dois quadros autorais, O outro lado da tese e Anatomia do caso, mais O Código, que é o programa da EJUP. O outro lado tem três entradas (tese, julgado, notícia), cada uma com seu dispositivo de abertura. Todos herdam a anatomia do carrossel.</p>
+  </header>
+  <article class="modelo" id="m-30">
+  <figure class="modelo__art">
+    <img src="/livro/img/Canais.png" alt="Fronteira de canais" loading="lazy" width="1080">
+    <figcaption>1080 × 1560 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-30</p>
+    <h3 class="modelo__nome">Fronteira de canais</h3>
+    <p class="modelo__uso">Referência de governança. Define quem é o emissor de cada peça. Não vai para o feed.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Duas colunas, @ejup.oficial e @robertopivotto, comparadas em quatro dimensões.</li><li>A regra de collab isolada em bloco de Papel manteiga com barra em Caneta.</li><li>No rodapé, a assinatura de peça em collab: EJUP, hairline vertical, Roberto.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Colunas</dt><dd>2</dd></div><div><dt>Dimensões comparadas</dt><dd>4</dd></div><div><dt>Divisor da assinatura</dt><dd>hairline 2px #C9C7BF</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Vertical de O Código nasce no institucional com Roberto em collab. Nunca o contrário.</li><li>A fronteira é de emissor, não de assunto. O mesmo tema vive nos dois canais com protagonistas diferentes.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-17">
+  <figure class="modelo__art">
+    <img src="/livro/img/Q-Codigo.png" alt="O Código · artigo" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-17</p>
+    <h3 class="modelo__nome">O Código · artigo</h3>
+    <p class="modelo__uso">A regra que o episódio destrinchou, escrita em peça estática. É o ativo que fica da semana.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Tudo em Courier Prime. O nome carrega duas leituras, código de lei e código de programação, e a mono resolve as duas sem ilustrar o trocadilho.</li><li>Numeração de linha em coluna fixa à esquerda, em Grafite, com tracejado entre as linhas.</li><li>Art. e § em Caneta, peso 700. O comentário // inteiro em Caneta, sempre na última linha.</li><li>Fita com O CÓDIGO · ART. N, para o quadro virar coleção.</li><li>A assinatura de rodapé troca caderno de obra por o código.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Fonte</dt><dd>Courier Prime 400 e 700</dd></div><div><dt>Corpo</dt><dd>40px em 1080, entrelinha 1,5</dd></div><div><dt>Numeração</dt><dd>Grafite, coluna de 60px</dd></div><div><dt>Linhas por slide</dt><dd>máximo 4</dd></div><div><dt>Comentário</dt><dd>Caneta, última linha</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Um artigo por peça. Dois artigos viram carrossel de dois slides.</li><li>O comentário é o que Roberto aprendeu operando. Se serve para qualquer advogado, é glosa.</li><li>A numeração de linha numera o que está visível. Nunca começa em 47 para fingir profundidade.</li><li>Sem sintaxe colorida, sem fundo de terminal, sem cursor piscando. A referência é papel, não IDE.</li></ul>
+  </div>
+</article>
+<article class="modelo modelo--vert" id="m-31">
+  <figure class="modelo__art">
+    <img src="/livro/img/Q-Codigo-Corte.png" alt="O Código · corte em collab" loading="lazy" width="1080">
+    <figcaption>1080 × 1920 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-31</p>
+    <h3 class="modelo__nome">O Código · corte em collab</h3>
+    <p class="modelo__uso">Trecho do episódio, de 45 a 90 segundos, recortado num raciocínio fechado.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Fita com CORTE · O CÓDIGO · EP N no topo, para o corte virar coleção.</li><li>Em cima, o artigo se escrevendo no ritmo da fala. A linha que ele ainda não disse fica a 28% de opacidade.</li><li>Legenda queimada montada exatamente sobre a emenda, em bloco Tinta.</li><li>Embaixo, a nota de captação e a silhueta de enquadramento.</li><li>Rodapé com as duas assinaturas: EJUP, hairline vertical, Roberto, e a palavra collab à direita.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Corte</dt><dd>55% em cima · 45% embaixo</dd></div><div><dt>Linha futura</dt><dd>opacidade 28%</dd></div><div><dt>Assinatura</dt><dd>dupla, EJUP + Roberto</dd></div><div><dt>Área segura</dt><dd>1080 × 1420 centrada</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Só leva o nome O Código se sair de episódio gravado.</li><li>A linha de comentário só aparece quando a fala chega nela.</li><li>Sem efeito de hacker, chuva de caracteres, glitch ou som de teclado exagerado.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-32">
+  <figure class="modelo__art">
+    <img src="/livro/img/Q-Tese.png" alt="O outro lado da tese" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-32</p>
+    <h3 class="modelo__nome">O outro lado da tese</h3>
+    <p class="modelo__uso">Desconstrução serena de uma tese jurídica frágil sobre sociedade, startup ou contrato.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>A cláusula citada num bloco de Papel manteiga girado, com a fonte identificada em Courier Prime.</li><li>Uma linha riscada à mão em Caneta, no meio do texto, não embaixo.</li><li>A correção na margem, em Newsreader itálico e em Caneta, como anotação de quem revisou o contrato.</li><li>Seta desenhada ligando a correção à linha riscada.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Bloco citado</dt><dd>Papel manteiga, rotação −1,2°</dd></div><div><dt>Risco</dt><dd>1 por peça</dd></div><div><dt>Correção</dt><dd>Newsreader itálico em Caneta</dd></div><div><dt>Assinatura verbal</dt><dd>No papel aceita-se qualquer tese</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Um risco por peça. Riscar duas linhas vira deboche, e a promessa do quadro é serenidade.</li><li>A tese citada precisa ser real. Tese inventada para ser derrubada é espantalho.</li></ul>
+  </div>
+</article>
+<article class="modelo modelo--vert" id="m-33">
+  <figure class="modelo__art">
+    <img src="/livro/img/Q-Tese-Split.png" alt="O outro lado da tese · terços" loading="lazy" width="1080">
+    <figcaption>1080 × 1920 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-33</p>
+    <h3 class="modelo__nome">O outro lado da tese · terços</h3>
+    <p class="modelo__uso">O formato em vídeo. Roberto no terço esquerdo, o conteúdo reagido no terço oposto.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Corte vertical: 360px para Roberto à esquerda, o resto para o conteúdo.</li><li>Hairline de 2px separando os dois lados.</li><li>A tese reagida num bloco de papel, e a correção logo abaixo em Caneta.</li><li>Legenda queimada na altura do peito, nunca sobre o rosto.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Faixa de Roberto</dt><dd>360px, terço esquerdo</dd></div><div><dt>Divisor</dt><dd>hairline 2px</dd></div><div><dt>Legenda</dt><dd>Instrument Sans 600, 44px caixa alta</dd></div><div><dt>Enquadramento</dt><dd>plano médio, altura dos olhos</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>O terço oposto abre para o vídeo reagido ou para o grafismo. Nunca para os dois ao mesmo tempo.</li><li>Quem grava precisa saber qual quadro está gravando, porque o lado livre muda.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-34">
+  <figure class="modelo__art">
+    <img src="/livro/img/Q-Giro.png" alt="O outro lado da tese · entrada notícia" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-34</p>
+    <h3 class="modelo__nome">O outro lado da tese · entrada notícia</h3>
+    <p class="modelo__uso">Quando o que circula é notícia de IA, regulação ou novo negócio. Absorveu o antigo Giro semanal de inovação.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Três a cinco recortes de manchete em tamanhos e rotações diferentes, cada um preso por duas fitas.</li><li>Veículo e data em Courier Prime no topo de cada recorte.</li><li>Um recorte circulado à mão: é o que muda alguma coisa na segunda-feira.</li><li>Fita de capa O OUTRO LADO · NOTÍCIA: a entrada muda, o quadro é o mesmo.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Recortes</dt><dd>3 a 5</dd></div><div><dt>Fitas por recorte</dt><dd>2, nos cantos opostos</dd></div><div><dt>Circulado</dt><dd>1</dd></div><div><dt>Crédito</dt><dd>veículo e data, obrigatórios</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Único formato em que o limite de duas fitas por carrossel não vale, porque a fita é o dispositivo.</li><li>Manchete sem veículo e data não entra.</li><li>A peça existe pela leitura de Roberto sobre o que muda na estrutura. Digest de manchetes sem leitura não publica.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-35">
+  <figure class="modelo__art">
+    <img src="/livro/img/Q-Voltagem.png" alt="O outro lado da tese · entrada julgado" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-35</p>
+    <h3 class="modelo__nome">O outro lado da tese · entrada julgado</h3>
+    <p class="modelo__uso">Quando o que circula é um julgado do STF ou do STJ, traduzido para risco e caixa. Absorveu o antigo Direito em alta voltagem.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>A curva que pivota em escala grande: o julgado é o ponto de pivô.</li><li>Antes do pivô, o traço em Grafite. Depois, em Caneta.</li><li>O número do processo em Courier Prime, alinhado à direita, antes do ponto.</li><li>Rótulos de antes e depois em Courier Prime, fora do caminho da curva.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Sinal</dt><dd>curva que pivota, escala grande</dd></div><div><dt>Número do processo</dt><dd>Courier Prime, obrigatório</dd></div><div><dt>Rótulos</dt><dd>2</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>O julgado entra pela consequência patrimonial, nunca pela ementa.</li><li>Julgado sem número de processo não publica.</li><li>Toda peça com entrada julgado passa por validação com Roberto.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-36">
+  <figure class="modelo__art">
+    <img src="/livro/img/Q-Anatomia.png" alt="Anatomia do caso" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-36</p>
+    <h3 class="modelo__nome">Anatomia do caso</h3>
+    <p class="modelo__uso">Dissecação de um caso em três atos. Caso de fora (disputa corporativa) ou de dentro (decisão da EJUP ou da EIX CORE, validada).</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Os três atos em faixa horizontal no topo, com o ato corrente destacado por regra em Caneta.</li><li>O diagrama desenhado à mão: as caixas são os ativos da empresa.</li><li>Uma junta do desenho aparece rompida, com o vão circulado em Caneta.</li><li>A nota da junta em Courier Prime, alinhada à direita, longe do círculo.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Atos</dt><dd>3, fixos: conflito, falha, lição</dd></div><div><dt>Caixas do diagrama</dt><dd>4</dd></div><div><dt>Junta rompida</dt><dd>1</dd></div><div><dt>Traço</dt><dd>3,2px, cantos abertos</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>A falha precisa ser de arquitetura, não de sorte nem de mercado.</li><li>Um caso por peça. O diagrama é o slide que a pessoa salva.</li></ul>
+  </div>
+</article>
+</section>
+<section class="grupo" id="s1">
+  <header class="grupo__head">
+    <p class="grupo__n">07 modelos</p>
+    <h2>Carrossel completo · sete slides</h2>
+    <p class="grupo__intro">O carrossel de referência, com a pauta "Se eu tivesse que construir isso do zero", que hoje roda como caso de dentro de Anatomia do caso. É o modelo de referência: a estrutura narrativa e o ritmo de densidade aparecem inteiros aqui.</p>
+  </header>
+  <article class="modelo" id="m-04">
+  <figure class="modelo__art">
+    <img src="/livro/img/Main.png" alt="Slide 1 · Capa" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-04</p>
+    <h3 class="modelo__nome">Slide 1 · Capa</h3>
+    <p class="modelo__uso">Tensão ou afirmação estrutural. 6 a 9 palavras.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Etiqueta de fita crepe rotacionada no topo esquerdo com o nome da série.</li><li>Frase em Newsreader 500, corpo entre 100 e 118px, entrelinha 1,0.</li><li>Uma palavra circulada à mão em Caneta. Só palavra única de até 8 letras.</li><li>Assinatura fixa no rodapé: traço de 44 × 5px em Caneta, nome em rótulo, série em itálico à direita.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Margem</dt><dd>90px</dd></div><div><dt>Rodapé livre</dt><dd>120px sem texto</dd></div><div><dt>Fita</dt><dd>rotação entre −4° e +3°</dd></div><div><dt>Marca de caneta</dt><dd>1 por slide</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Sem número de slide e sem rótulo de tema no topo.</li><li>Sem "arrasta pro lado" e sem seta na capa.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-05">
+  <figure class="modelo__art">
+    <img src="/livro/img/S1-02-Caso.png" alt="Slide 2 · O caso" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-05</p>
+    <h3 class="modelo__nome">Slide 2 · O caso</h3>
+    <p class="modelo__uso">O contexto concreto que originou o raciocínio. Um caso, uma decisão, um erro.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Layout Camada: título curto em Newsreader e corpo em Instrument Sans, alinhados à esquerda.</li><li>Topo do bloco a um terço da altura, densidade alta de propósito.</li><li>Uma expressão sublinhada à mão. Expressão longa nunca recebe círculo.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Título</dt><dd>Newsreader 500, 66 a 84px</dd></div><div><dt>Corpo</dt><dd>Instrument Sans 400, 36 a 44px, lh 1.42</dd></div><div><dt>Densidade</dt><dd>densa</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Nunca teoria. Se não houve caso real, o slide não existe.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-06">
+  <figure class="modelo__art">
+    <img src="/livro/img/S1-03-Camada.png" alt="Slide 3 · Camada" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-06</p>
+    <h3 class="modelo__nome">Slide 3 · Camada</h3>
+    <p class="modelo__uso">Uma ideia por slide. Título curto e duas ou três linhas.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Mesmo layout Camada do slide anterior, com metade do texto.</li><li>A queda de densidade cria o respiro entre dois slides pesados.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Densidade</dt><dd>média</dd></div><div><dt>Linhas de corpo</dt><dd>2 a 3</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Nada de parágrafo. Se precisou de quatro linhas, virou dois slides.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-07">
+  <figure class="modelo__art">
+    <img src="/livro/img/S1-04-Quadro.png" alt="Slide 4 · Quadro" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-07</p>
+    <h3 class="modelo__nome">Slide 4 · Quadro</h3>
+    <p class="modelo__uso">O slide mais denso do carrossel. Simula o quadro branco depois de uma reunião.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Cinco caixas desenhadas à mão em Caneta, com os cantos abertos, ligadas por setas curvas.</li><li>Rótulos das caixas em Instrument Sans 600 caixa alta, em Caneta.</li><li>Uma palavra solta fora do fluxo recebe círculo. Uma palavra da saída é riscada e corrigida ao lado, em Newsreader itálico.</li><li>Um asterisco desenhado abre a nota de rodapé do quadro, em Grafite.</li><li>Etiqueta funcional de fita no topo: a segunda e última do carrossel.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Caixas</dt><dd>5</dd></div><div><dt>Traço</dt><dd>6 a 7px, cantos abertos</dd></div><div><dt>Marcas de caneta</dt><dd>várias, exceção à regra</dd></div><div><dt>Densidade</dt><dd>muito densa</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Precisa continuar legível no feed em tela de celular.</li><li>O diagrama é desenhado, nunca um fluxograma de ferramenta.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-08">
+  <figure class="modelo__art">
+    <img src="/livro/img/S1-05-Respiro.png" alt="Slide 5 · Respiro" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-08</p>
+    <h3 class="modelo__nome">Slide 5 · Respiro</h3>
+    <p class="modelo__uso">O vazio depois do quadro. Uma frase de convicção.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Newsreader itálico 400, 92px, centro óptico acima do meio.</li><li>Nenhum outro elemento além da assinatura.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Densidade</dt><dd>vazia</dd></div><div><dt>Palavras</dt><dd>até 12</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Sem marca de caneta. O vazio é a marca.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-09">
+  <figure class="modelo__art">
+    <img src="/livro/img/S1-06-Estrutura.png" alt="Slide 6 · Estrutura" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-09</p>
+    <h3 class="modelo__nome">Slide 6 · Estrutura</h3>
+    <p class="modelo__uso">A síntese aplicável. É o slide que a pessoa salva.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Três ou quatro blocos empilhados, hairline de 2px em Linha entre eles.</li><li>Numeração em Courier Prime à esquerda, fora do bloco de texto.</li><li>Um único item recebe círculo à mão, o que a pessoa deve levar embora.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Blocos</dt><dd>3 a 4</dd></div><div><dt>Hairline</dt><dd>2px #C9C7BF</dd></div><div><dt>Numeração</dt><dd>Courier Prime</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Se a lista não for aplicável fora do contexto de Roberto, não é estrutura.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-10">
+  <figure class="modelo__art">
+    <img src="/livro/img/S1-07-Abertura.png" alt="Slide 7 · Abertura" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-10</p>
+    <h3 class="modelo__nome">Slide 7 · Abertura</h3>
+    <p class="modelo__uso">Convite à conversa. Pergunta real.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Fundo Tinta, o único slide escuro do carrossel.</li><li>Texto em Papel, acento em Caneta clara #8FB0E6.</li><li>Pergunta em Newsreader e assinatura invertida no rodapé.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Fundo</dt><dd>Tinta #22252A</dd></div><div><dt>Acento</dt><dd>Caneta clara #8FB0E6</dd></div><div><dt>Densidade</dt><dd>leve</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Nunca "curta, salve e compartilhe".</li><li>A pergunta precisa ser respondível em uma frase.</li></ul>
+  </div>
+</article>
+</section>
+<section class="grupo" id="series">
+  <header class="grupo__head">
+    <p class="grupo__n">06 modelos</p>
+    <h2>Séries curtas</h2>
+    <p class="grupo__intro">Carrosséis de três slides, para quando o raciocínio cabe em menos. Mesma anatomia, outro andamento.</p>
+  </header>
+  <article class="modelo" id="m-11">
+  <figure class="modelo__art">
+    <img src="/livro/img/S2-01-Capa.png" alt="Isso não é inovação ainda · capa" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-11</p>
+    <h3 class="modelo__nome">Isso não é inovação ainda · capa</h3>
+    <p class="modelo__uso">Série de recorte crítico sobre discurso de inovação.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Capa em layout Manifesto, frase única centralizada.</li><li>Uma palavra riscada à mão em Caneta, o gesto de correção.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Layout</dt><dd>Manifesto</dd></div><div><dt>Marca</dt><dd>riscado</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>O riscado só entra quando a peça de fato corrige um termo.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-12">
+  <figure class="modelo__art">
+    <img src="/livro/img/S2-02-Duas-colunas.png" alt="Duas colunas" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-12</p>
+    <h3 class="modelo__nome">Duas colunas</h3>
+    <p class="modelo__uso">Comparação entre o que dizem e o que sustenta.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Duas colunas separadas por hairline vertical de 2px.</li><li>Cabeçalho de coluna em rótulo caixa alta, ls 0.14em.</li><li>Colchete desenhado à mão marcando a coluna que importa.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Colunas</dt><dd>2, largura igual</dd></div><div><dt>Divisor</dt><dd>hairline 2px #C9C7BF</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Nunca vira tabela de "antes e depois" com ícone.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-13">
+  <figure class="modelo__art">
+    <img src="/livro/img/S2-03-Fecho.png" alt="Fecho" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-13</p>
+    <h3 class="modelo__nome">Fecho</h3>
+    <p class="modelo__uso">Fechamento da série de três.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Frase curta em Newsreader e assinatura.</li><li>Densidade leve, o oposto do slide anterior.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Densidade</dt><dd>leve</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Em série de três, o escuro é opcional.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-14">
+  <figure class="modelo__art">
+    <img src="/livro/img/S3-01-Capa.png" alt="Do rascunho à operação · capa" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-14</p>
+    <h3 class="modelo__nome">Do rascunho à operação · capa</h3>
+    <p class="modelo__uso">Série de processo: como uma ideia vira rotina.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Capa com a curva que pivota reduzida ao lado do título.</li><li>Fita crepe com o nome da série.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Sinal</dt><dd>curva em escala reduzida</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>A curva na capa dispensa marca de caneta no mesmo slide.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-15">
+  <figure class="modelo__art">
+    <img src="/livro/img/S3-02-Linha.png" alt="Linha do tempo" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-15</p>
+    <h3 class="modelo__nome">Linha do tempo</h3>
+    <p class="modelo__uso">Etapas em sequência, com o marco que muda tudo.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Linha horizontal em Linha com marcos em Tinta.</li><li>Um marco em Caneta, circulado, é o ponto de virada.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Marcos</dt><dd>4 a 6</dd></div><div><dt>Marco destacado</dt><dd>1</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Sem datas inventadas. Etapa sem data real fica sem data.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-16">
+  <figure class="modelo__art">
+    <img src="/livro/img/S3-03-Escuro.png" alt="Slide escuro" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-16</p>
+    <h3 class="modelo__nome">Slide escuro</h3>
+    <p class="modelo__uso">O fecho em Tinta desta série.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Fundo Tinta, texto em Papel, acento em Caneta clara.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Fundo</dt><dd>Tinta #22252A</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Um por carrossel, nunca na capa.</li></ul>
+  </div>
+</article>
+</section>
+<section class="grupo" id="dispositivos">
+  <header class="grupo__head">
+    <p class="grupo__n">02 modelos</p>
+    <h2>Dispositivos gráficos</h2>
+    <p class="grupo__intro">Não são quadros. São sinais que circulam dentro dos quadros e dão unidade ao conjunto. Quadro é o que tem nome, cadência e squad. Dispositivo é o que tem forma.</p>
+  </header>
+  <article class="modelo" id="m-18">
+  <figure class="modelo__art">
+    <img src="/livro/img/Q-Ponto.png" alt="Ponto fora da curva" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-18</p>
+    <h3 class="modelo__nome">Ponto fora da curva</h3>
+    <p class="modelo__uso">Caso, empresa ou decisão que escapa do padrão do mercado.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Grade de eixos em Linha, sem números: é um gráfico de raciocínio, não de dado.</li><li>Nuvem de pontos em Grafite subindo ao longo de uma tendência tracejada.</li><li>Um ponto em Caneta bem acima da nuvem, circulado à mão, com o nome do caso ao lado em Courier Prime.</li><li>A pergunta da peça em Newsreader, abaixo do gráfico.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Pontos na nuvem</dt><dd>19</dd></div><div><dt>Destaque</dt><dd>1, em Caneta</dd></div><div><dt>Tendência</dt><dd>tracejado em Linha</dd></div><div><dt>Rótulo do ponto</dt><dd>Courier Prime com &gt;</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>O ponto precisa ser um caso verificável.</li><li>Sem números nos eixos. O gráfico ilustra, não mede.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-19">
+  <figure class="modelo__art">
+    <img src="/livro/img/Q-Pivot.png" alt="Pivot" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-19</p>
+    <h3 class="modelo__nome">Pivot</h3>
+    <p class="modelo__uso">A decisão que mudou a direção de um negócio.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>A curva que pivota em escala grande, ocupando o terço central.</li><li>Rótulo antes e depois do pivô, em rótulo caixa alta.</li><li>O momento da virada nomeado em uma linha.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Sinal</dt><dd>curva em escala grande</dd></div><div><dt>Rótulos</dt><dd>2, antes e depois</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Sem seta na ponta da curva.</li><li>Um pivô por peça.</li></ul>
+  </div>
+</article>
+</section>
+<section class="grupo" id="noticia">
+  <header class="grupo__head">
+    <p class="grupo__n">04 modelos</p>
+    <h2>Notícia comentada</h2>
+    <p class="grupo__intro">A mecânica de recorte que alimenta O outro lado da tese quando a entrada é notícia. Roberto lê um portal e devolve leitura própria. O recorte nunca entra sozinho: a peça existe pelo comentário, não pela manchete.</p>
+  </header>
+  <article class="modelo" id="m-20">
+  <figure class="modelo__art">
+    <img src="/livro/img/N-01-Capa.png" alt="Capa com recorte" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-20</p>
+    <h3 class="modelo__nome">Capa com recorte</h3>
+    <p class="modelo__uso">Abertura do carrossel de notícia.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>O recorte da manchete aparece como papel colado, levemente rotacionado, com sombra de 1px.</li><li>A fonte e a data em Courier Prime abaixo do recorte.</li><li>A leitura de Roberto em Newsreader, maior que a manchete.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Recorte</dt><dd>rotação entre −3° e +2°</dd></div><div><dt>Crédito</dt><dd>Courier Prime, veículo e data</dd></div><div><dt>Hierarquia</dt><dd>a leitura é maior que a manchete</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Print de notícia sem comentário próprio não publica.</li><li>Veículo e data sempre visíveis.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-21">
+  <figure class="modelo__art">
+    <img src="/livro/img/N-02-Dado.png" alt="Dado em caneta" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-21</p>
+    <h3 class="modelo__nome">Dado em caneta</h3>
+    <p class="modelo__uso">O número da matéria, isolado e interpretado.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Número em corpo grande, com a unidade em tamanho menor ao lado.</li><li>Uma linha em Courier Prime com a fonte do dado.</li><li>Círculo ou colchete à mão no trecho que muda a leitura do número.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Número</dt><dd>Newsreader 500, 180 a 220px</dd></div><div><dt>Fonte do dado</dt><dd>obrigatória</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Número sem fonte não entra.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-22">
+  <figure class="modelo__art">
+    <img src="/livro/img/N-03-Leitura.png" alt="Leitura" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-22</p>
+    <h3 class="modelo__nome">Leitura</h3>
+    <p class="modelo__uso">O que a notícia significa para quem opera.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Layout Camada, três a quatro linhas.</li><li>Sem recorte, sem número: só o raciocínio.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Densidade</dt><dd>média</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Se a leitura for a mesma do texto original, a peça não existe.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-23">
+  <figure class="modelo__art">
+    <img src="/livro/img/Noticia-Post.png" alt="Post único de notícia" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-23</p>
+    <h3 class="modelo__nome">Post único de notícia</h3>
+    <p class="modelo__uso">Comentário rápido em uma imagem só, quando não vale carrossel.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Recorte da manchete no topo, comentário embaixo, assinatura no rodapé.</li><li>A imagem de apoio entra em sangria parcial na base, com faixa Tinta a 88% sobre ela.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Faixa</dt><dd>Tinta 88% de opacidade</dd></div><div><dt>Texto sobre faixa</dt><dd>Papel #F1F0EA</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Duas ideias no mesmo post viram carrossel.</li></ul>
+  </div>
+</article>
+</section>
+<section class="grupo" id="reels">
+  <header class="grupo__head">
+    <p class="grupo__n">04 modelos</p>
+    <h2>Reels</h2>
+    <p class="grupo__intro">Vertical 1080 × 1920, área segura de 1080 × 1420 centrada. A tela dividida é o formato de notícia em vídeo: apoio em cima, Roberto embaixo.</p>
+  </header>
+  <article class="modelo modelo--vert" id="m-24">
+  <figure class="modelo__art">
+    <img src="/livro/img/Reels-Capa.png" alt="Capa de Reels" loading="lazy" width="1080">
+    <figcaption>1080 × 1920 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-24</p>
+    <h3 class="modelo__nome">Capa de Reels</h3>
+    <p class="modelo__uso">Primeiro frame e capa na grade do perfil.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Frase curta em Newsreader sobre Papel, com uma palavra circulada.</li><li>Assinatura reduzida no rodapé, dentro da área segura.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Área segura</dt><dd>1080 × 1420 centrada</dd></div><div><dt>Palavras</dt><dd>até 8</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Nada de texto nos 250px superiores nem nos 250px inferiores.</li></ul>
+  </div>
+</article>
+<article class="modelo modelo--vert" id="m-25">
+  <figure class="modelo__art">
+    <img src="/livro/img/Reels-Split-Noticia.png" alt="Tela dividida · notícia" loading="lazy" width="1080">
+    <figcaption>1080 × 1920 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-25</p>
+    <h3 class="modelo__nome">Tela dividida · notícia</h3>
+    <p class="modelo__uso">Roberto comentando uma matéria com o portal aparecendo em cima.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Corte na altura de 55%: o apoio ocupa a metade de cima, Roberto a de baixo.</li><li>Em cima, o recorte do portal rotacionado sobre Papel, com veículo e data.</li><li>A nota de direção do b-roll aparece em rótulo caixa alta, em Grafite.</li><li>A legenda queimada senta exatamente na emenda, em bloco Tinta, texto em Papel.</li><li>Embaixo, a nota de enquadramento de Roberto e a assinatura no rodapé.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Corte</dt><dd>55% em cima · 45% embaixo</dd></div><div><dt>Legenda</dt><dd>Instrument Sans 600, 44px caixa alta</dd></div><div><dt>Bloco da legenda</dt><dd>Tinta, sobre a emenda</dd></div><div><dt>Área segura</dt><dd>1080 × 1420 centrada</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>A gravação de Roberto precisa ser enquadrada já sabendo que a metade de cima será ocupada.</li><li>Veículo e data ficam visíveis no recorte.</li></ul>
+  </div>
+</article>
+<article class="modelo modelo--vert" id="m-26">
+  <figure class="modelo__art">
+    <img src="/livro/img/Reels-Split-Explica.png" alt="Tela dividida · explicação" loading="lazy" width="1080">
+    <figcaption>1080 × 1920 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-26</p>
+    <h3 class="modelo__nome">Tela dividida · explicação</h3>
+    <p class="modelo__uso">Mesmo formato, com b-roll ou tela de produto no lugar do portal.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Mesma emenda, mas a metade de cima recebe b-roll em movimento no lugar do recorte.</li><li>Marca de caneta desenhada por cima do b-roll apontando o elemento citado na fala.</li><li>A legenda queimada continua na emenda, com a mesma especificação.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Corte</dt><dd>55% em cima · 45% embaixo</dd></div><div><dt>Marca sobre vídeo</dt><dd>Caneta, traço 7px</dd></div><div><dt>Corte de b-roll</dt><dd>a cada 2 a 4 segundos</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>A marca sobre o b-roll aparece no momento exato em que a fala cita o elemento.</li><li>A fala nunca para para o b-roll acontecer.</li></ul>
+  </div>
+</article>
+<article class="modelo modelo--vert" id="m-27">
+  <figure class="modelo__art">
+    <img src="/livro/img/Voz-Impacto.png" alt="Voz de impacto" loading="lazy" width="1080">
+    <figcaption>1080 × 1920 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-27</p>
+    <h3 class="modelo__nome">Voz de impacto</h3>
+    <p class="modelo__uso">Capa de Reels e frase de abertura de vídeo. A voz mais restrita do sistema.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Família Generic em caixa baixa, entrelinha 0,94, espaçamento −0,02em.</li><li>Texto em Papel sobre foto de bastidor escurecida com Tinta em multiply a 55%. No modelo aparece só o fundo escuro, sem foto.</li><li>A textura já vem da fonte. Não se aplica máscara de grão por cima.</li><li>Nota de direção em Courier Prime no topo e no rodapé, fora da área de leitura.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Fonte</dt><dd>Generic G80 RD Standard</dd></div><div><dt>Entrelinha</dt><dd>0,94</dd></div><div><dt>Escurecimento da foto</dt><dd>Tinta multiply 55%</dd></div><div><dt>Palavras</dt><dd>até 8</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Nunca sobre papel claro, nunca em caixa alta, nunca com contorno ou sombra.</li><li>Um slide por carrossel, no máximo.</li><li>Os arquivos atuais são DEMO e não desenham acento nas minúsculas. Comprar a licença na More! Etc. antes de publicar em português.</li></ul>
+  </div>
+</article>
+</section>
+<section class="grupo" id="apoio">
+  <header class="grupo__head">
+    <p class="grupo__n">02 modelos</p>
+    <h2>Post único e imagens de apoio</h2>
+    <p class="grupo__intro">Peças avulsas e o guia de enquadramento para foto e b-roll.</p>
+  </header>
+  <article class="modelo" id="m-28">
+  <figure class="modelo__art">
+    <img src="/livro/img/Post-Prova.png" alt="Post único · Prova" loading="lazy" width="1080">
+    <figcaption>1080 × 1350 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-28</p>
+    <h3 class="modelo__nome">Post único · Prova</h3>
+    <p class="modelo__uso">Bastidor com legenda curta. Layout Prova.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Foto em sangria total.</li><li>Faixa em Tinta a 88% de opacidade na base, com duas linhas de texto em Papel.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Faixa</dt><dd>Tinta 88%</dd></div><div><dt>Linhas</dt><dd>2</dd></div><div><dt>Foto</dt><dd>sangria total</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Foto de banco genérica não entra. O enquadramento precisa ser de uma cena real de trabalho.</li></ul>
+  </div>
+</article>
+<article class="modelo" id="m-29">
+  <figure class="modelo__art">
+    <img src="/livro/img/Broll-Guia.png" alt="Guia de imagens e b-roll" loading="lazy" width="1080">
+    <figcaption>1080 × 1560 px</figcaption>
+  </figure>
+  <div class="modelo__ficha">
+    <p class="modelo__cod">M-29</p>
+    <h3 class="modelo__nome">Guia de imagens e b-roll</h3>
+    <p class="modelo__uso">Referência de captação. Não vai para o feed.</p>
+    <h4>Como é feito</h4>
+    <ul class="lista"><li>Cinco pilares em linhas, cada um com quatro enquadramentos e a descrição da cena.</li><li>Abaixo, seis regras de captação: print de portal, tela dividida, foto da matéria, dado, cor e terceiros.</li><li>É o documento que a produção leva para a gravação.</li></ul>
+    <h4>Medidas</h4>
+    <dl class="specs"><div><dt>Pilares</dt><dd>5</dd></div><div><dt>Enquadramentos por pilar</dt><dd>4</dd></div><div><dt>Corte de b-roll</dt><dd>a cada 2 a 4 segundos</dd></div><div><dt>Cor</dt><dd>contraste médio, sombras abertas, leve calor</dd></div><div><dt>Print de portal</dt><dd>dessaturação de 20%</dd></div></dl>
+    <h4>Regras</h4>
+    <ul class="lista lista--regra"><li>Nada de banco de imagens genérico. Cada pilar tem banco próprio, filmado pela equipe.</li><li>Print cru colado na arte não entra. Sempre dentro de moldura de papel ou de celular, com fonte e data.</li><li>Número só entra com lastro validado por Roberto.</li><li>Rosto de terceiro só quando for figura pública e a matéria for sobre ela. Sem meme e sem print de rede social alheia.</li></ul>
+  </div>
+</article>
+</section>
+  <footer class="pe">
+    <p>São 36 modelos. As artes foram geradas em código, no tamanho de publicação, a partir dos mesmos tokens do design system. Trocar um valor de token muda todas as peças de uma vez.</p>
+    <p>Pendência aberta: a família Generic usada na voz de impacto está em versão DEMO e não desenha acento nas minúsculas. Antes de publicar qualquer peça em português com essa fonte, comprar a licença completa na More! Etc.</p>
+    <div class="assin"><i></i><span>Roberto Pivotto</span><em>caderno de obra</em></div>
+  </footer>
+</div>
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.nav a'));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'))});
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting)return;
+      var i=secs.indexOf(e.target);
+      links.forEach(function(a,j){a.classList.toggle('on',j===i)});
+    });
+  },{rootMargin:'-20% 0px -70% 0px'});
+  secs.forEach(function(s){if(s)io.observe(s)});
+})();
+</script>
+</body></html>

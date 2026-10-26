@@ -1,0 +1,339 @@
+{
+  "titulo": "Roteiros de vídeo · Roberto Pivotto",
+  "videos": [
+    {
+      "id": "3A",
+      "n": "3A",
+      "tema": "Estratégia · topo de funil",
+      "locacao": "Câmera aberta · tela dividida",
+      "titulo": "O produto que não precisa dar lucro",
+      "teleprompter": "N1",
+      "slug": "O-produto-que-nao-precisa-dar-lucro",
+      "dossie": {
+        "tese": "Nem todo investimento precisa se pagar no produto em que foi feito. Mas, quando o retorno é indireto, ele precisa ser nomeado e medido antes, ou vira justificativa para manter um custo.",
+        "empresario": "Dono de empresa que mantém um projeto, produto ou cliente que não se paga sozinho e não sabe se continua: um produto premium que vende pouco, um evento caro, um cliente de referência com margem baixa.",
+        "fatos": [
+          {
+            "t": "Em 15/10/2026 a Tesla mostrou o novo Roadster: andou de ponta-cabeça numa rampa e girou no ar com propulsores de gás frio feitos com a SpaceX. Produção prevista para 2028; o carro foi apresentado em 2017, com entrega prometida para 2020.",
+            "f": "Reuters, 16/10/2026 · Electrek, 13/10/2026"
+          },
+          {
+            "t": "A Reuters descreve o carro como o halo car da Tesla, num momento em que a empresa volta a atenção para direção autônoma e robótica.",
+            "f": "Reuters, 16/10/2026"
+          },
+          {
+            "t": "Musk chamou o Roadster de \"small potato situation\" para as finanças da empresa (2023). Analistas dizem que margem e caixa importam mais do que a demonstração.",
+            "f": "Reuters, 16/10/2026"
+          },
+          {
+            "t": "A Tesla faturou cerca de US$ 94,8 bilhões em 2025, 73% em carros. A receita de carros caiu 10%; a de energia subiu 27%.",
+            "f": "Tesla, 10-K 2025"
+          },
+          {
+            "t": "A Ford apostou no GT como carro vitrine nos anos 2000. O modelo foi elogiado e saiu de linha; o sucesso de vendas foi o Mustang, que não nasceu como vitrine.",
+            "f": "NBC News, 2006"
+          }
+        ],
+        "hipoteses": [
+          "O Roadster pode reforçar a percepção da marca num ano de queda nas vendas de carros. Não há dado que mostre esse efeito; na fala, entra como possibilidade.",
+          "O efeito halo depende de o resto da linha entregar o que a vitrine promete. É argumento de mercado, sem estudo quantitativo encontrado."
+        ],
+        "interpretacao": "Retorno indireto existe, mas é uma aposta. E aposta precisa de critério definido antes, não depois de o dinheiro ter sido gasto.",
+        "mecanismo": "Um produto vitrine transfere valor de três jeitos: prova competência para clientes e investidores, gera atenção que os outros produtos não conseguem gerar sozinhos e atrai gente (talento, parceiro, imprensa). Nenhum desses efeitos aparece na linha de receita do próprio produto, e por isso precisa de um indicador próprio.",
+        "limites": "Funciona quando existe uma linha de produtos para onde a atenção possa ir e quando a vitrine é coerente com ela. Falha quando o resto não entrega (o caso Ford) e quando ninguém definiu o que seria sucesso: aí o projeto continua por inércia. Na empresa menor, a vitrine pesa mais no caixa.",
+        "aprende": "Avaliar um projeto pelo que ele fortalece, e não só pelo que fatura, com três perguntas definidas antes: que ativo fortalece, como vai medir e até quando aceita pagar.",
+        "funil": "Topo de funil · cerca de 1min40",
+        "edicao": [
+          "Tela dividida: em cima, a reportagem ou imagens com licença; embaixo, Roberto, falando desde o primeiro segundo. Em \"o ponto que importa para você\", tela cheia.",
+          "⚑ Verificar as condições de uso das imagens da transmissão da Tesla. Alternativa: Roberto mostra a matéria da Reuters no celular."
+        ],
+        "fontes": [
+          {
+            "n": "Reuters, novo Roadster, 16/10/2026",
+            "url": "https://www.investing.com/news/stock-market-news/tesla-set-to-unveil-next-generation-roadster-sports-ev-after-years-of-delay-4951021"
+          },
+          {
+            "n": "Tesla, Form 10-K, exercício 2025 (SEC)",
+            "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026003952/tsla-20251231.htm"
+          },
+          {
+            "n": "Electrek, nove anos de atraso do Roadster, 13/10/2026",
+            "url": "https://electrek.co/2026/10/13/tesla-roadster-event-thursday-nine-years-delays/"
+          },
+          {
+            "n": "NBC News, \"'Halo' cars that shine\", 2006",
+            "url": "https://www.nbcnews.com/id/wbna13150972"
+          },
+          {
+            "n": "The Truth About Cars, \"Halo Effect\", 2002",
+            "url": "https://www.thetruthaboutcars.com/2002/05/halo-effect/"
+          }
+        ]
+      },
+      "nota": "Tese primeiro: a demonstração da Tesla é a evidência, não o assunto.",
+      "linhas": [
+        {
+          "img": "PP. Câmera aberta, olhar firme na lente. Em cima: o Roadster na rampa.",
+          "fala": "Uma empresa pode passar anos desenvolvendo um produto que talvez nunca pese no **faturamento**. Parece uma decisão ruim, não é?",
+          "let": "Um produto que não pesa no faturamento"
+        },
+        {
+          "img": "PM. Em cima: a matéria da Reuters.",
+          "fala": "Na semana passada, a Tesla mostrou o novo Roadster. Ele andou de ponta-cabeça numa rampa e girou no ar com propulsores desenvolvidos com a SpaceX. A produção, segundo a Reuters, só começa em **2028**.",
+          "let": "Reuters, 16/10/2026"
+        },
+        {
+          "img": "PP.",
+          "fala": "E o próprio Musk já disse que esse carro é pouco relevante para as finanças da empresa. Numa receita de quase 95 bilhões de dólares em 2025, ele não muda a **conta**.",
+          "let": "Receita da Tesla em 2025: US$ 94,8 bi · 10-K"
+        },
+        {
+          "img": "PM.",
+          "fala": "Então por que investir? A indústria tem um nome para isso: **halo car**. É o produto feito para mostrar do que a empresa é capaz, chamar atenção e atrair gente, e puxar a percepção dos outros produtos.",
+          "let": "Halo car: o produto vitrine"
+        },
+        {
+          "img": "Tela cheia. Pausa curta antes da frase.",
+          "fala": "O ponto que importa para você é este: retorno indireto existe, mas ele é uma **aposta**. E aposta precisa de critério antes.",
+          "let": "sem lettering"
+        },
+        {
+          "img": "PM.",
+          "fala": "A Ford fez isso nos anos 2000 com o GT. O carro foi elogiado e saiu de linha. O que vendeu de verdade foi o Mustang, que nem nasceu como vitrine. A vitrine só funciona se o resto da linha **entrega**.",
+          "let": "Ford GT e Mustang · NBC News, 2006"
+        },
+        {
+          "img": "PM. Contar as três perguntas com a mão.",
+          "fala": "Então, antes de manter um projeto que não se paga sozinho, responda três coisas: que ativo ele fortalece, como você vai medir se funcionou e até quando aceita **pagar** por ele.",
+          "let": "Que ativo fortalece · como medir · até quando"
+        },
+        {
+          "img": "PP. Olhar na lente até o fim.",
+          "fala": "Sem essas respostas, o produto vitrine vira só um produto caro. Tem algum projeto assim na sua empresa?",
+          "let": "sem lettering"
+        }
+      ]
+    },
+    {
+      "id": "3B",
+      "n": "3B",
+      "tema": "Negócios · aprofundamento",
+      "locacao": "Câmera aberta · sentado",
+      "titulo": "A tecnologia que nasce numa empresa e vai parar na outra",
+      "teleprompter": "N2",
+      "slug": "A-tecnologia-que-nasce-numa-empresa-e-vai-parar-na-outra",
+      "dossie": {
+        "tese": "Conhecimento desenvolvido num negócio só vira receita em outro quando quatro condições se cumprem: aplicação real, custo de adaptação que cabe, titularidade clara e alguém disposto a pagar. A titularidade é a que mais se esquece.",
+        "empresario": "Dono de consultoria, escritório, agência ou empresa de serviço que repete o mesmo trabalho para vários clientes e pensa em transformar isso num método, curso, software ou produto.",
+        "fatos": [
+          {
+            "t": "Os propulsores de gás frio do Roadster foram desenvolvidos com a SpaceX. O carro só deve entrar em produção em 2028.",
+            "f": "Reuters, 16/10/2026"
+          },
+          {
+            "t": "Tesla e SpaceX têm contratos comerciais, de licenciamento e de suporte, informados à SEC como transações com partes relacionadas.",
+            "f": "Tesla, 10-K/A, 30/04/2026"
+          },
+          {
+            "t": "No Brasil, o software desenvolvido durante um contrato de prestação de serviço pertence ao contratante, salvo estipulação em contrário.",
+            "f": "Lei 9.609/1998, art. 4º"
+          },
+          {
+            "t": "A transferência de direito autoral precisa ser feita por escrito, e a cessão se presume onerosa.",
+            "f": "Lei 9.610/1998, arts. 49 e 50"
+          },
+          {
+            "t": "A invenção feita por empregado contratado para pesquisar pertence ao empregador.",
+            "f": "Lei 9.279/1996, art. 88"
+          }
+        ],
+        "hipoteses": [
+          "A tecnologia dos propulsores pode ter outras aplicações comerciais. Ainda não há produto vendido; a demonstração não equivale a receita."
+        ],
+        "interpretacao": "O caso Tesla e SpaceX mostra que transferir tecnologia entre empresas, mesmo do mesmo dono, passa por contrato. Na empresa menor, o mesmo vale entre a empresa e o cliente que pagou pelo trabalho.",
+        "mecanismo": "O caminho tem quatro passos: identificar um processo que se repete em vários clientes; documentar esse processo como método, separando o que é genérico do que é do cliente; testar se outra pessoa ou outro cliente obtém o mesmo resultado sem você; e verificar se o contrato permite reutilizar o que foi feito.",
+        "limites": "A adaptação pode custar mais que fazer do zero. O cliente pode ser dono do entregável, do código ou do conteúdo, conforme o contrato. Pode haver cláusula de confidencialidade ou de exclusividade. E pode não existir demanda fora do cliente original.",
+        "aprende": "Separar know-how próprio de entregável do cliente, e revisar os contratos antes de transformar um trabalho em produto.",
+        "funil": "Aprofundamento · cerca de 2 min",
+        "edicao": [
+          "Plano médio fixo, ritmo de conversa. Lettering marca as quatro condições e as leis citadas.",
+          "Sem imagem da Tesla: basta Roberto citar o caso; o assunto é o mecanismo."
+        ],
+        "fontes": [
+          {
+            "n": "Reuters, novo Roadster, 16/10/2026",
+            "url": "https://www.investing.com/news/stock-market-news/tesla-set-to-unveil-next-generation-roadster-sports-ev-after-years-of-delay-4951021"
+          },
+          {
+            "n": "Tesla, Form 10-K/A, 30/04/2026 (SEC), transações com partes relacionadas",
+            "url": "https://www.sec.gov/Archives/edgar/data/1318605/000110465926053166/tm2611837d1_10ka.htm"
+          },
+          {
+            "n": "Lei 9.609/1998 (Software), art. 4º",
+            "url": "https://www.planalto.gov.br/ccivil_03/leis/l9609.htm"
+          },
+          {
+            "n": "Lei 9.610/1998 (Direitos Autorais), arts. 49 e 50",
+            "url": "https://www.planalto.gov.br/ccivil_03/leis/l9610.htm"
+          },
+          {
+            "n": "Lei 9.279/1996 (Propriedade Industrial), art. 88",
+            "url": "https://www.planalto.gov.br/ccivil_03/leis/l9279.htm"
+          }
+        ]
+      },
+      "nota": "Aprofundamento: o caso abre e o mecanismo ocupa o resto.",
+      "linhas": [
+        {
+          "img": "PP. Câmera aberta, olhar na lente.",
+          "fala": "O carro novo da Tesla usa propulsores que ela desenvolveu com a **SpaceX**. Duas empresas, o mesmo dono. E mesmo assim essa troca passa por contrato.",
+          "let": "Tesla e SpaceX: contratos de licenciamento e suporte · 10-K/A"
+        },
+        {
+          "img": "PM.",
+          "fala": "Isso diz muito sobre uma frase que eu escuto toda semana: \"o método que eu criei para um cliente pode virar produto\". Pode. Mas só quando quatro coisas acontecem **juntas**.",
+          "let": "Quando um método vira produto"
+        },
+        {
+          "img": "PM. Contar com a mão: um.",
+          "fala": "Primeira: o processo se repete. Você fez a mesma coisa para vários clientes, com o mesmo raciocínio, e não foi um projeto sob medida que só fez sentido uma **vez**.",
+          "let": "1 · o processo se repete"
+        },
+        {
+          "img": "PM. Dois.",
+          "fala": "Segunda: ele funciona sem você. Outra pessoa do time chega ao mesmo resultado seguindo o método. Se depende do seu olho em cada caso, ainda é **serviço**.",
+          "let": "2 · funciona sem você"
+        },
+        {
+          "img": "PM. Três.",
+          "fala": "Terceira: a adaptação cabe no bolso. Às vezes transformar um trabalho em produto custa mais do que começar do **zero**.",
+          "let": "3 · a adaptação cabe no bolso"
+        },
+        {
+          "img": "PP. Pausa curta antes. Quatro.",
+          "fala": "E a quarta, que quase todo mundo esquece: de quem é o que você fez? Pela lei brasileira, software feito dentro de um contrato de serviço é do contratante, se o contrato não disser outra coisa. E cessão de direito autoral só vale por **escrito**.",
+          "let": "4 · de quem é · Lei 9.609, art. 4º · Lei 9.610, arts. 49 e 50"
+        },
+        {
+          "img": "PM.",
+          "fala": "Então a pergunta não é só se dá para vender. É o que é seu e o que é do cliente: o método e o know-how podem ser seus; o entregável, o código, o relatório com os dados dele podem não **ser**.",
+          "let": "Know-how próprio · entregável do cliente"
+        },
+        {
+          "img": "PM. Tom de conversa.",
+          "fala": "Na prática, antes de empacotar, eu olho o contrato com o cliente, o de confidencialidade e o de quem ajudou a construir. A resposta está ali. ⚑",
+          "let": "Contrato · confidencialidade · quem construiu"
+        },
+        {
+          "img": "PP. Olhar na lente até o fim.",
+          "fala": "Você já parou para ver de quem é o trabalho que você quer transformar em **produto**?",
+          "let": "sem lettering"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "n": "4",
+      "tema": "Growth para escritórios · fundo de funil",
+      "locacao": "Câmera aberta · tela dividida",
+      "titulo": "Como escritórios aparecem na resposta da IA",
+      "teleprompter": "G1",
+      "slug": "Como-escritorios-aparecem-na-resposta-da-IA",
+      "dossie": {
+        "tese": "A IA monta a resposta com fontes que respondem direto à pergunta, com dado e com autoria clara. O escritório já tem a matéria-prima: as perguntas que o cliente faz no atendimento. Organizar isso é marketing de conteúdo, dentro da regra da OAB.",
+        "empresario": "Sócio de escritório que percebe menos contato pelo site, ouve falar de GEO e não sabe se é moda, se funciona ou se a OAB permite.",
+        "fatos": [
+          {
+            "t": "No Brasil, a fatia da busca orgânica no tráfego dos sites caiu de 41,5% em 2024 para 27,9% em 2026.",
+            "f": "Leadster, Panorama PRO 2026 (via Locaweb)"
+          },
+          {
+            "t": "Um estudo publicado na KDD 2024 testou como os motores generativos escolhem fontes. Estratégias de conteúdo aumentaram a visibilidade nas respostas em até 40%, com variação conforme o domínio.",
+            "f": "Aggarwal et al., KDD 2024"
+          },
+          {
+            "t": "Segundo o Escavador, o Jusbrasil incluiu no seu llms.txt instruções para a IA dizer que concorrentes tinham dados ruins. Liminar da 1ª Vara Empresarial de SP mandou parar, com base na Lei de Propriedade Industrial, arts. 195 e 209.",
+            "f": "Brasil Inovador, 16/10/2026"
+          },
+          {
+            "t": "A OAB admite marketing de conteúdo (art. 4º) e veda captação de clientela, mercantilização e meios que alterem de forma fraudulenta o alcance (art. 3º e § 5º).",
+            "f": "Provimento 205/2021"
+          }
+        ],
+        "hipoteses": [
+          "O ganho de até 40% foi medido em ambiente de teste e é um teto, não uma média; no Direito, o efeito pode ser diferente."
+        ],
+        "interpretacao": "Para escritório, GEO bem feito é o marketing de conteúdo que a OAB já permite, com um leitor novo: a IA. O risco está em tentar manipular a resposta.",
+        "mecanismo": "O motor generativo busca fontes, lê e monta uma resposta citando algumas. Tende a escolher a que responde direto à pergunta, traz fundamento e deixa claro quem escreveu. O escritório tem essas perguntas no atendimento: cada uma vira uma página com resposta, fundamento e autor, e o perfil do escritório fica igual em todo lugar.",
+        "limites": "Não há garantia de aparecer, e o resultado varia por área. Prometer resultado ao cliente é vedado. Manipular a resposta, como no caso Escavador x Jusbrasil, gera risco concorrencial e ético.",
+        "aprende": "Que o conteúdo-base já existe no escritório, e que o caminho permitido é organizá-lo, sem manipular.",
+        "funil": "Fundo de funil · cerca de 90 s · fecha com convite para o direct",
+        "edicao": [
+          "Tela dividida: em cima, uma resposta de IA citando fontes (gravação de tela própria), a página do estudo e a reportagem; embaixo, Roberto.",
+          "⚑ Definir quem atende o direct e qual serviço é oferecido."
+        ],
+        "fontes": [
+          {
+            "n": "Locaweb, busca sem clique e GEO (cita Leadster Panorama PRO 2026)",
+            "url": "https://www.locaweb.com.br/blog/temas/marketing-e-seo/busca-sem-clique-geo-2026/"
+          },
+          {
+            "n": "Aggarwal et al., \"GEO: Generative Engine Optimization\", KDD 2024 (arXiv 2311.09735)",
+            "url": "https://arxiv.org/abs/2311.09735"
+          },
+          {
+            "n": "Brasil Inovador, Escavador x Jusbrasil, 16/10/2026",
+            "url": "https://brasilinovador.com.br/disputa-judicial-entre-escavador-e-jusbrasil-estabelece-precedente-pioneiro-sobre-concorrencia-desleal-em-inteligencia-artificial/"
+          },
+          {
+            "n": "Provimento 205/2021 do Conselho Federal da OAB",
+            "url": "https://www.oab.org.br/leisnormas/legislacao/provimentos/205-2021"
+          }
+        ]
+      },
+      "nota": "Fundo de funil. O argumento se sustenta sozinho antes do convite.",
+      "linhas": [
+        {
+          "img": "PP. Câmera aberta. Em cima: alguém digitando para uma IA \"qual advogado procurar para...\".",
+          "fala": "Seu próximo cliente talvez nem passe pelo Google. Ele vai perguntar para a IA qual advogado **procurar**.",
+          "let": "O cliente pergunta para a IA"
+        },
+        {
+          "img": "PM. Em cima: o dado em gráfico simples.",
+          "fala": "No Brasil, a busca orgânica caiu de 41% para 28% do tráfego dos sites entre 2024 e 2026. O cliente está chegando por outro **caminho**.",
+          "let": "Busca orgânica: 41,5% → 27,9% · Leadster 2026"
+        },
+        {
+          "img": "PM.",
+          "fala": "A IA monta a resposta com algumas fontes. A pergunta que importa é: o que faz uma fonte ser **escolhida**?",
+          "let": "sem lettering"
+        },
+        {
+          "img": "PM. Em cima: a página do estudo.",
+          "fala": "Pesquisadores testaram isso num estudo publicado em 2024. Conteúdo que responde direto, cita fontes e traz dado ganhou até 40% mais visibilidade nas respostas. Até 40%, num teste, e variando por **área**.",
+          "let": "Até 40% · KDD 2024 · arXiv 2311.09735"
+        },
+        {
+          "img": "PM. Em cima: a reportagem.",
+          "fala": "E o jeito errado também já apareceu. Segundo o Escavador, o Jusbrasil escreveu para as ferramentas de IA que os concorrentes tinham dados ruins. A Justiça mandou **parar**.",
+          "let": "Escavador x Jusbrasil · liminar · LPI, arts. 195 e 209"
+        },
+        {
+          "img": "Tela cheia. Tom de conversa.",
+          "fala": "Para escritório, o material já existe: as perguntas que seus clientes fazem toda semana. Cada uma vira uma resposta escrita, com fundamento, assinada por quem entende do **assunto**.",
+          "let": "Pergunta real · fundamento · autoria"
+        },
+        {
+          "img": "PP.",
+          "fala": "E isso é marketing de conteúdo, que a OAB permite. O que ela proíbe é captar cliente, prometer resultado e manipular **alcance**.",
+          "let": "Provimento 205/2021, arts. 3º e 4º"
+        },
+        {
+          "img": "PM. Olhar na lente até o fim.",
+          "fala": "Se você quer aplicar essa estratégia no seu escritório, para os clientes encontrarem você quando perguntarem para a IA, me manda um **direct** que eu te ajudo. ⚑",
+          "let": "Manda um direct · GEO para escritórios"
+        }
+      ]
+    }
+  ]
+}

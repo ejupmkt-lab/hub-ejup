@@ -7,6 +7,7 @@ Repositório principal da EJUP. Cada projeto vive na sua própria pasta, com o h
 | [`sistema-de-gestao/`](sistema-de-gestao) | Sistema de gestão (Next.js + Supabase) | `ejupmkt-lab/sistema-de-gest-o` |
 | [`ejup-site/`](ejup-site) | Site da EJUP (projeto `ejup-site` na Vercel) | `victorbarrosoc-hub/EJUPMinerva`, pasta `site/` da branch `claude/tender-allen-jzf0ro` |
 | [`minerva/`](minerva) | EJUP Minerva (peças, skills e conteúdo) | `victorbarrosoc-hub/EJUPMinerva`, branch `claude/ejupminerva-repo-setup-j1rhgg` |
+| [`roberto-pivotto/`](roberto-pivotto) | Marca pessoal do Roberto Pivotto (método, planner, pautas e roteiros) | `victorbarrosoc-hub/RobertoPivotto`, recuperado do site publicado |
 
 O projeto **Experts** continua no seu próprio repositório: [`ejupmkt-lab/experts`](https://github.com/ejupmkt-lab/experts).
 

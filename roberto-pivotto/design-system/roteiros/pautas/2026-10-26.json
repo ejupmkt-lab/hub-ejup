@@ -1,0 +1,140 @@
+{
+ "semana": "26 de outubro a 1º de novembro de 2026",
+ "slug": "2026-10-26",
+ "nota": "Sem quadros: cada peça é um tema avulso do eixo jurídico e de negócios. Vídeos caseiros, gravados no celular, sem lettering e sem produção. Cada peça abre com a investigação (método do doc 07).",
+ "pecas": [
+  {
+   "dia": "Segunda · 26/10", "formato": "Carrossel · 7 telas", "eixo": "Proteção de dados",
+   "titulo": "Como uma multa com teto de R$ 50 milhões chegou a R$ 153,7 milhões",
+   "tese": "O teto da multa da LGPD vale por infração, e uma mesma prática pode gerar várias infrações ao mesmo tempo. Para a empresa, a pergunta útil é quantas regras uma prática dela toca.",
+   "empresario": "Dono de app, escola, e-commerce ou plataforma que trata dado de criança, adolescente ou cliente final e acha que a ANPD só olha para empresa gigante.",
+   "fatos": [
+    {"t": "A ANPD multou a ByteDance, dona do TikTok, em R$ 153,7 milhões, a maior sanção da sua história. A decisão saiu no Diário Oficial em 25/08/2026.", "f": "Tecnoblog, 25/08/2026"},
+    {"t": "Foram cinco infrações aos arts. 6º e 7º da LGPD, entre elas tratar dados de crianças e adolescentes sem base legal e não adotar medidas para impedir esse tratamento.", "f": "Tecnoblog, 25/08/2026"},
+    {"t": "A ANPD mandou eliminar os dados coletados de forma irregular e aprovou um plano de conformidade: configurações mais restritas para menores de 16 anos e, na versão sem cadastro, limite de 12 horas de uso e fim dos anúncios no Brasil.", "f": "Tecnoblog, 25/08/2026"},
+    {"t": "O TikTok afirma que a decisão se refere a um período anterior (2021) e que avalia as medidas cabíveis.", "f": "Tecnoblog, 25/08/2026"},
+    {"t": "A multa simples da LGPD vai até 2% do faturamento no Brasil, limitada a R$ 50 milhões por infração.", "f": "LGPD, art. 52, II"},
+    {"t": "Desde fevereiro de 2026, a ANPD é autarquia de natureza especial, com autonomia decisória e financeira, e passou a fiscalizar também o ECA Digital.", "f": "Lei 15.352/2026 · Capital Aberto"}
+   ],
+   "hipoteses": ["Não encontrei a divisão do valor entre as cinco infrações. Na peça, a soma aparece como explicação possível do valor acima do teto. ⚑ Conferir a decisão no Diário Oficial."],
+   "interpretacao": "As ordens de mudança no produto (apagar dados, mudar configurações, tirar anúncio) tendem a pesar mais na operação do que a própria multa.",
+   "mecanismo": "A ANPD calcula a sanção por infração, considerando gravidade, faturamento, reincidência e cooperação. Uma mesma prática, como deixar menor usar o serviço sem verificar idade, pode violar ao mesmo tempo a regra da base legal, o dever de prevenção e o dever de provar conformidade. Cada uma conta separadamente.",
+   "limites": "Para empresa menor, o limite de 2% do faturamento reduz o valor, e a ANPD tem regras próprias para agentes de pequeno porte. ⚑ Conferir a Resolução CD/ANPD 2/2022. A decisão ainda admite discussão pela empresa.",
+   "aprende": "Mapear onde uma mesma prática com dados toca mais de uma obrigação, começando pelo dado de criança e adolescente.",
+   "peca": {"tipo": "carrossel", "itens": [
+     "Capa: A multa da LGPD tem teto de R$ 50 milhões. O TikTok levou R$ 153,7 milhões.",
+     "Em agosto, a ANPD aplicou à dona do TikTok a maior multa da sua história, por tratar dados de crianças e adolescentes sem base legal. Rodapé: Diário Oficial, 25/08/2026",
+     "A conta fecha porque o teto vale por infração. A LGPD limita a multa a 2% do faturamento no Brasil, até R$ 50 milhões para cada infração. Rodapé: LGPD, art. 52, II",
+     "Foram cinco infrações. Uma mesma prática pode violar várias regras de uma vez: tratar dado sem base legal, não impedir que isso aconteça e não conseguir provar que cumpre a lei.",
+     "Respiro: A multa foi só uma parte.",
+     "A ANPD também mandou apagar os dados e aprovou mudanças no produto: configurações mais restritas para menores de 16 anos e, para quem usa sem cadastro, limite de uso e fim dos anúncios no Brasil.",
+     "Escura, fecho: Desde fevereiro, a ANPD é autarquia com autonomia e fiscaliza também o ECA Digital. Na sua empresa, qual prática com dados tocaria mais de uma regra ao mesmo tempo?"
+   ]},
+   "legenda": "A LGPD limita a multa a R$ 50 milhões por infração. Em agosto, a ANPD multou a dona do TikTok em R$ 153,7 milhões.\n\nA conta fecha porque foram cinco infrações. Uma mesma prática, tratar dado de criança e adolescente sem base legal, violou mais de uma regra ao mesmo tempo.\n\nE a multa foi só uma parte. A ANPD mandou apagar os dados e aprovou mudanças no próprio produto.\n\nNa sua empresa, qual prática com dados tocaria mais de uma regra ao mesmo tempo?",
+   "extras": ["LinkedIn: o carrossel em PDF, com as duas primeiras frases da legenda.", "Story: print da capa com a pergunta em caixa."],
+   "fontes": [
+    {"n": "Tecnoblog, ANPD multa TikTok em R$ 153,7 milhões, 25/08/2026", "url": "https://tecnoblog.net/noticias/anpd-multa-tiktok-em-r-1573-milhoes/"},
+    {"n": "Lei 13.709/2018 (LGPD), art. 52", "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"},
+    {"n": "Lei 15.352/2026", "url": "https://www.lex.com.br/lei-no-15-352-de-25-de-fevereiro-de-2026/"},
+    {"n": "Capital Aberto, ANPD vira agência", "url": "https://legislacaoemercados.capitalaberto.com.br/senado-aprova-transformacao-da-anpd-em-agencia-reguladora/"}
+   ]
+  },
+  {
+   "dia": "Quarta · 28/10", "formato": "Reels caseiro · topo de funil · cerca de 70 s", "eixo": "IA na advocacia",
+   "titulo": "A IA erra, e quem paga é quem assina",
+   "tese": "Os tribunais já decidiram que usar IA não transfere a responsabilidade. O que está sendo punido é assinar sem conferir, e isso vale para qualquer documento que sai com o nome de alguém.",
+   "empresario": "Advogado, gestor jurídico ou dono de empresa que já usa IA para escrever petição, contrato, parecer ou relatório.",
+   "fatos": [
+    {"t": "TJMG, 4ª Câmara Cível Especializada, 13/08/2026 (Ap. 5002055-65.2023.8.13.0074): o advogado citou julgados do STJ e do STF que não existem. Multa de 2% do valor da causa por litigância de má-fé, ofício à OAB-MG, cópia ao Ministério Público e aviso aos autores cujas obras foram deturpadas.", "f": "Lawletter, 20/08/2026"},
+    {"t": "O advogado atribuiu o erro a um lapso do programa de busca. O tribunal entendeu que isso não atenua a conduta e registrou que o uso de IA exige supervisão humana e responsabilidade do profissional.", "f": "Lawletter, 20/08/2026"},
+    {"t": "No TST, a 6ª Turma aplicou multa de 1% do valor da causa à empresa e ao advogado por precedentes falsos, possivelmente gerados por IA.", "f": "TST · ConJur, 13/03/2026 ⚑ conferir o número do processo"},
+    {"t": "A Fenalaw acontece de 27 a 29 de outubro, em São Paulo, com IA no centro da programação.", "f": "Brasil Inovador"}
+   ],
+   "hipoteses": ["Pesquisas de mercado falam que a maioria dos advogados já usa IA com frequência. Não encontrei a metodologia; o dado fica fora da fala."],
+   "interpretacao": "A discussão útil sobre IA na advocacia está menos na ferramenta e mais no processo de conferência de quem usa.",
+   "mecanismo": "Um modelo de linguagem escreve o texto mais provável a partir do que aprendeu. Quando não está ligado a uma base oficial de decisões, ele monta ementa, número de processo e relator plausíveis, sem avisar que inventou. Quem assina responde pelo conteúdo, pelo CPC (litigância de má-fé, art. 80) e pelo dever ético do advogado.",
+   "limites": "Há divergência: parte da doutrina sustenta que a multa por má-fé recai sobre a parte, e que o advogado responde pela via disciplinar da OAB. Usar IA não é proibido. Ferramentas ligadas a bases oficiais reduzem o risco, sem eliminar a conferência.",
+   "aprende": "Usar IA para organizar e escrever, e conferir toda citação na fonte oficial antes de assinar.",
+   "gravacao": "Celular na vertical, apoiado na mesa do escritório, luz da janela de frente. Um take só, falando direto para a câmera. Sem lettering e sem cortes de efeito.",
+   "peca": {"tipo": "fala", "itens": [
+     "Essa semana tem Fenalaw em São Paulo, e o assunto de todo painel é inteligência artificial na advocacia. Só que os tribunais já decidiram uma parte dessa conversa.",
+     "Em agosto, o Tribunal de Justiça de Minas multou um advogado que citou decisões do STJ e do STF que não existem. E mandou ofício para a OAB e cópia para o Ministério Público.",
+     "A defesa dele foi que o erro veio do programa de busca. O tribunal respondeu que IA pode ser usada, mas exige supervisão humana e responsabilidade de quem assina.",
+     "E por que a IA inventa uma decisão? Porque ela escreve o texto mais provável. Se não está ligada a uma base oficial, ela monta uma ementa com número, relator e data que parecem verdadeiros. E não avisa.",
+     "Isso vale para qualquer documento que sai com o seu nome: contrato, parecer, relatório para o sócio.",
+     "No meu dia a dia, a IA ajuda a organizar e a escrever. Toda citação eu confiro na fonte oficial antes de assinar. ⚑",
+     "E você, já pegou a IA inventando alguma coisa no seu trabalho?"
+   ]},
+   "legenda": "Em agosto, o TJMG multou um advogado por citar decisões do STJ e do STF que não existem. A defesa dele foi que o erro veio do programa de busca.\n\nO tribunal respondeu que a IA pode ser usada, mas exige supervisão humana e responsabilidade de quem assina.\n\nA IA escreve o texto mais provável. Sem uma base oficial por trás, ela monta uma decisão com cara de verdadeira e não avisa.\n\nVocê já pegou a IA inventando alguma coisa no seu trabalho?",
+   "extras": ["Story: repost do vídeo com a pergunta."],
+   "fontes": [
+    {"n": "Lawletter, TJMG pune advogado por jurisprudência inventada por IA, 20/08/2026", "url": "https://lawletter.com.br/exclusiva/tjmg-jurisprudencia-inventada-ia-doutrinadores"},
+    {"n": "TST, empresa e advogado condenados por citações falsas", "url": "https://www.tst.jus.br/en/-/empresa-e-advogado-sao-condenados-por-possivel-uso-de-ia-com-citacoes-falsas-de-jurisprudencia"},
+    {"n": "ConJur, precedentes inventados por IA geram multa, 13/03/2026", "url": "https://conjur.com.br/2026-mar-13/jurisprudencia-falsa-gerada-por-ia-geram-multa-por-litigancia-de-ma-fe/"},
+    {"n": "Migalhas, o advogado pode ser multado por um erro da IA?", "url": "https://www.migalhas.com.br/depeso/461358/o-advogado-pode-ser-multado-por-um-erro-da-inteligencia-artificial"},
+    {"n": "Brasil Inovador, IA pauta a Fenalaw 2026", "url": "https://brasilinovador.com.br/inteligencia-artificial-no-setor-juridico-pauta-debates-e-lancamentos-na-fenalaw-2026/"}
+   ]
+  },
+  {
+   "dia": "Quinta · 29/10", "formato": "Post estático · collab com @ejup.oficial (a do mês)", "eixo": "Quem é Roberto",
+   "titulo": "De onde veio a EJUP",
+   "tese": "A história de como a EJUP começou, contada pelo Roberto, para quem chega ao perfil saber quem ele é e de onde vem o que ele fala.",
+   "empresario": "Quem chegou ao perfil pelos vídeos e ainda não sabe quem é o Roberto nem o que é a EJUP.",
+   "fatos": [
+    {"t": "Roberto é sócio e CEO da EJUP e sócio da EIX CORE.", "f": "base de conhecimento da EJUP"},
+    {"t": "Os fatos da origem (ano, lugar, quem estava, o primeiro problema) vêm das respostas do Roberto às perguntas abaixo. ⚑", "f": "entrevista com o Roberto"}
+   ],
+   "hipoteses": [],
+   "interpretacao": "Peça institucional: a voz é do Roberto e a EJUP aparece como parte da história dele, sem anúncio.",
+   "mecanismo": "Perguntas para o Roberto responder por áudio, em uma frase cada: 1. Em que ano e onde a EJUP começou, e com quem? 2. Que problema vocês queriam resolver? 3. Qual foi a decisão mais difícil do começo? 4. O que você faria diferente hoje? 5. O que a EJUP faz hoje, em uma frase?",
+   "limites": "Nenhum dado da origem entra sem vir da resposta dele. Foto real do acervo, nunca gerada por IA.",
+   "aprende": "Quem é o Roberto e por que ele fala de negócios e Direito com propriedade.",
+   "peca": {"tipo": "estatico", "itens": [
+     "Arte: foto real do Roberto no começo da EJUP (acervo), em papel de planta.",
+     "Frase da arte: a resposta dele à pergunta 2, em uma linha. ⚑",
+     "Rodapé em Courier Prime: EJUP · [ano de fundação] ⚑"
+   ]},
+   "legenda": "A EJUP começou em [ano], em [lugar], com [quem]. ⚑\n\nA gente queria resolver [o problema, nas palavras dele]. ⚑\n\nA decisão mais difícil do começo foi [a resposta 3]. Hoje eu faria [a resposta 4]. ⚑\n\nHoje a EJUP [a resposta 5]. ⚑\n\nQual problema da sua área você já pensou em resolver por conta própria?",
+   "extras": ["Publicado em collab com @ejup.oficial.", "LinkedIn: a mesma história em texto, com a foto."],
+   "fontes": []
+  },
+  {
+   "dia": "Sexta · 30/10", "formato": "Reels caseiro · fundo de funil · cerca de 75 s", "eixo": "IA e proteção de dados na empresa",
+   "titulo": "Seu time já está colando dado de cliente no ChatGPT",
+   "tese": "O uso de IA na empresa já acontece, autorizado ou não, e a empresa continua responsável pelo dado que sai. A saída é uma política de uso de IA curta, que define ferramenta, conta e o que pode entrar.",
+   "empresario": "Dono de empresa de serviço com equipe que usa IA para escrever, resumir e atender, sem regra definida.",
+   "fatos": [
+    {"t": "No Brasil, o uso ativo de IA generativa nas empresas passou de 50% para 71% em um ano. 52% dos usuários ainda usam aplicativos pessoais no trabalho, e 64% das violações de política de dados ligadas à IA envolvem informação sensível ou regulada.", "f": "Netskope Threat Labs, dados de 2025, via Sindpd, 20/05/2026 ⚑ conferir o relatório original"},
+    {"t": "A Samsung proibiu o uso de ChatGPT e ferramentas parecidas por funcionários em 2023, depois que engenheiros enviaram código interno para a ferramenta.", "f": "Bloomberg, 02/05/2023"},
+    {"t": "O controlador deve adotar medidas de segurança para proteger dados pessoais de acesso não autorizado e de tratamento inadequado, e responde pelos danos.", "f": "LGPD, arts. 42 e 46"}
+   ],
+   "hipoteses": ["Em contas pessoais e versões gratuitas, o conteúdo pode ser usado para treinar o modelo, conforme os termos de cada fornecedor. Na fala, fica como risco, sem afirmar sobre uma ferramenta específica."],
+   "interpretacao": "Proibir sem oferecer ferramenta aprovada tende a empurrar o uso para o celular pessoal, onde a empresa não vê nada.",
+   "mecanismo": "O dado colado numa conta pessoal sai do ambiente da empresa: fica com o fornecedor, sob termos que a empresa não negociou, sem registro de quem enviou. Para a LGPD, a empresa segue como controladora desse dado. A política resolve quando define as ferramentas contratadas em conta corporativa, o que nunca pode entrar nelas e quem responde por isso, com treinamento do time.",
+   "limites": "Política sem ferramenta aprovada vira papel. O contrato com o fornecedor precisa tratar uso de dados para treino, confidencialidade e armazenamento. Nenhuma regra zera o risco.",
+   "aprende": "Que IA na empresa é decisão de governança, com regra escrita e ferramenta contratada.",
+   "gravacao": "Celular na vertical, na mão ou apoiado, no escritório ou em casa. Um take só, tom de conversa. Sem lettering.",
+   "peca": {"tipo": "fala", "itens": [
+     "Tem alguém na sua empresa colando dado de cliente no ChatGPT agora. E é bem provável que seja na conta pessoal.",
+     "Um levantamento da Netskope com empresas brasileiras mostrou que o uso de IA generativa no trabalho passou de 50% para 71% em um ano. E metade dos usuários ainda usa aplicativo pessoal.",
+     "O problema começa aí. O dado colado numa conta pessoal sai da empresa: fica com o fornecedor, sob termos que você não negociou, sem registro de quem mandou.",
+     "E para a LGPD, quem responde por esse dado continua sendo a sua empresa.",
+     "Proibir costuma não resolver. A Samsung proibiu em 2023, depois que engenheiros colaram código interno no ChatGPT. Quando a ferramenta é útil e proibida, o uso vai para o celular pessoal.",
+     "O que resolve é uma política curta: quais ferramentas a empresa contrata, com conta corporativa, e o que nunca pode entrar nelas, como dado de cliente e segredo comercial.",
+     "Se você quer montar essa política na sua empresa antes de o problema aparecer, me manda um direct que eu te ajudo. ⚑"
+   ]},
+   "legenda": "O uso de IA generativa nas empresas brasileiras passou de 50% para 71% em um ano, segundo a Netskope. E metade dos usuários ainda usa aplicativo pessoal no trabalho.\n\nO dado colado numa conta pessoal sai da empresa. Para a LGPD, a responsabilidade continua com ela.\n\nProibir costuma empurrar o uso para o celular. Uma política curta, com ferramenta contratada e regra do que pode entrar, resolve melhor.\n\nSe você quer montar essa política na sua empresa, me manda um direct.",
+   "extras": ["LinkedIn: o mesmo vídeo.", "⚑ Definir quem atende o direct e qual serviço é oferecido."],
+   "fontes": [
+    {"n": "Sindpd, uso de IA generativa no trabalho amplia risco de vazamento (Netskope), 20/05/2026", "url": "https://sindpd.org.br/2026/05/20/uso-de-ia-generativa-no-trabalho-risco-vazamento-dados/"},
+    {"n": "Bloomberg, Samsung bans ChatGPT after leak, 02/05/2023", "url": "https://www.bloomberg.com/news/articles/2023-05-02/samsung-bans-chatgpt-and-other-generative-ai-use-by-staff-after-leak"},
+    {"n": "Lei 13.709/2018 (LGPD), arts. 42 e 46", "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm"}
+   ]
+  }
+ ],
+ "rotina": [
+  ["Terça · 27/10", "Gravar os dois Reels da semana (quarta e sexta), em casa ou no escritório. Stories de bastidor."],
+  ["Sábado · 31/10", "Stories de vida e uma leitura da semana sobre negócios e tecnologia."],
+  ["Domingo · 1º/11", "Sem postagem. Pesquisa e pautas da semana seguinte."]
+ ]
+}

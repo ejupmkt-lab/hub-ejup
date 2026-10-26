@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roberto Pivotto · Caderno de obra</title>
+<meta name="description" content="Manual da marca pessoal de Roberto Pivotto apresentado como um caderno de obra: quem é, o que defende, como aparece.">
+<meta property="og:title" content="Roberto Pivotto · Caderno de obra">
+<meta property="og:description" content="Uma marca que ainda está sendo construída. De propósito.">
+<meta name="theme-color" content="#F1F0EA">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Instrument+Sans:wght@400;500;600&family=Courier+Prime:wght@400;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23F1F0EA'/%3E%3Cpath d='M10 40 C8 18 50 12 56 26 C62 40 30 56 12 48 C6 44 8 34 18 30' fill='none' stroke='%232B57A6' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="paper" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .18 0" result="g"/><feComposite in="g" in2="SourceGraphic" operator="in" result="gi"/><feBlend in="SourceGraphic" in2="gi" mode="multiply"/></filter>
+    <filter id="cut" x="-10%" y="-10%" width="125%" height="125%"><feDropShadow dx="3" dy="5" stdDeviation="3" flood-color="#22252A" flood-opacity=".22"/></filter>
+    <filter id="ink" x="-2%" y="-5%" width="104%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".6" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#22252A" stroke-width="1" opacity=".18"/></pattern>
+    <pattern id="hatchBlue" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#2B57A6" stroke-width="1.2" opacity=".35"/></pattern>
+  </defs>
+</svg>
+
+<!-- ===== medidor da obra ===== -->
+<header class="obra" id="obra">
+  <div class="obra__brand"><span class="obra__dash"></span>Roberto Pivotto</div>
+  <nav class="obra__nav" aria-label="Capítulos">
+    <ol id="obraNav"></ol>
+  </nav>
+  <div class="obra__meter" aria-label="Progresso da apresentação">
+    <span class="obra__label">obra</span>
+    <span class="obra__bar"><i id="obraFill"></i></span>
+    <span class="obra__pct" id="obraPct">0%</span>
+  </div>
+  <button class="obra__stamps" id="stampsBtn" type="button" aria-label="Carimbos conquistados">
+    <span class="stamp" data-stamp="1" title="Estrutura conectada"></span>
+    <span class="stamp" data-stamp="2" title="Palavra certa"></span>
+    <span class="stamp" data-stamp="3" title="Protocolo"></span>
+    <span class="obra__stampsTxt"><b id="stampCount">0</b>/3</span>
+  </button>
+</header>
+
+<main id="main">
+
+<!-- ===== 00 capa ===== -->
+<section class="cap cap--hero" id="capa" data-title="Capa">
+  <div class="marquee" aria-hidden="true"><div class="marquee__track"><span>Roberto Pivotto · caderno de obra · </span><span>Roberto Pivotto · caderno de obra · </span><span>Roberto Pivotto · caderno de obra · </span><span>Roberto Pivotto · caderno de obra · </span></div></div>
+  <figure class="illo illo--hero" data-parallax="0.12" aria-hidden="true">
+    <svg viewBox="0 0 640 720" preserveAspectRatio="xMaxYMax meet">
+      <g filter="url(#cut)" transform="translate(0 -110)">
+        <!-- post-it de trás -->
+        <g transform="rotate(-7 470 200)"><rect x="380" y="120" width="180" height="180" fill="#D9CBA8" filter="url(#paper)"/><rect x="380" y="120" width="180" height="180" fill="url(#hatch)" opacity=".5"/><path d="M405 175 c30 -12 60 10 90 -4 M405 205 c40 -10 70 8 110 -2 M405 235 c25 -8 55 6 80 -1" fill="none" stroke="#22252A" stroke-width="3" stroke-linecap="round" opacity=".55"/></g>
+        <!-- post-it da frente -->
+        <g transform="rotate(5 300 420)"><rect x="210" y="330" width="190" height="190" fill="#F1F0EA" stroke="#22252A" stroke-width="2" filter="url(#paper)"/><rect x="210" y="330" width="190" height="26" fill="#2B57A6"/><path d="M240 400 h130 M240 430 h95 M240 460 h115" stroke="#22252A" stroke-width="3" stroke-linecap="round" opacity=".8"/><path d="M300 490 c-20 -30 40 -40 46 -12 c4 20 -30 30 -46 12z" fill="none" stroke="#2B57A6" stroke-width="4" stroke-linecap="round"/></g>
+        <!-- caneta de quadro -->
+        <g transform="rotate(-32 420 520)">
+          <rect x="300" y="480" width="330" height="86" rx="8" fill="#F7F5EE" stroke="#22252A" stroke-width="2.5" filter="url(#paper)"/>
+          <rect x="300" y="480" width="330" height="86" rx="8" fill="url(#hatch)" opacity=".35"/>
+          <rect x="560" y="474" width="92" height="98" rx="10" fill="#2B57A6" stroke="#22252A" stroke-width="2.5"/>
+          <rect x="575" y="490" width="10" height="66" rx="4" fill="#F1F0EA" opacity=".45"/>
+          <path d="M300 500 l-40 14 v18 l40 14z" fill="#22252A"/>
+          <path d="M260 512 l-28 6 v6 l28 6z" fill="#2B57A6"/>
+          <text x="345" y="532" font-family="Courier Prime, Courier New, monospace" font-size="22" letter-spacing="3" fill="#22252A">CANETA DE QUADRO</text>
+        </g>
+        <!-- seta desenhada -->
+        <path d="M60 600 C 160 560, 240 640, 330 590" fill="none" stroke="#2B57A6" stroke-width="6" stroke-linecap="round"/>
+        <path d="M300 572 C 312 582, 322 588, 332 590 C 320 596, 310 606, 304 618" fill="none" stroke="#2B57A6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- quadradinho de pontuação -->
+        <rect x="40" y="120" width="44" height="44" fill="#2B57A6"/>
+      </g>
+    </svg>
+  </figure>
+  <div class="hero__inner">
+    <div class="tape tape--hero">Manual da marca pessoal</div>
+    <h1 class="hero__title">
+      <span class="hero__line">Transformar possibilidades</span>
+      <span class="hero__line">dispersas em <span class="under" data-draw>estruturas</span></span>
+      <span class="hero__line">que podem existir.</span>
+    </h1>
+    <p class="hero__sub">Este é o caderno de obra da marca de Roberto Pivotto: advogado, mestre em Ciência, Tecnologia e Inovação, sócio da EJUP e da EIX CORE. Uma marca que ainda está sendo construída. De propósito.</p>
+    <div class="hero__sign"><svg class="sign" viewBox="0 0 300 120" aria-hidden="true"><path class="sign__a" d="M 4 100 C 60 98, 115 92, 150 82" pathLength="1"/><path class="sign__b" d="M 150 82 C 178 74, 206 44, 226 28 C 246 12, 270 6, 296 4" pathLength="1"/><circle class="sign__p" cx="150" cy="82" r="7"/></svg><span class="hero__signTxt">Pivotto: o ponto onde a curva muda de direção.</span></div>
+    <div class="hero__cta">
+      <a class="btn" href="#diagnostico">Começar a obra <span class="btn__arrow" aria-hidden="true">↓</span></a>
+      <span class="hero__hint">setas do teclado mudam de capítulo</span>
+    </div>
+  </div>
+  <div class="hero__foot">
+    <span>caderno de obra · v1</span>
+    <span>3 desafios, 3 carimbos</span>
+  </div>
+</section>
+
+<!-- ===== 01 diagnóstico ===== -->
+<section class="cap" id="diagnostico" data-title="Quem é">
+  <div class="cap__head">
+    <span class="cap__num cap__num--tag">capítulo 1</span>
+    <h2 class="cap__title">Quem é Roberto antes da estratégia</h2>
+  </div>
+  <div class="grid grid--2">
+    <div class="col">
+      <p class="lead">A identidade não veio pronta. Foi construída em mudanças de rota: universidade pública por esforço próprio, o Direito como busca de segurança, a EJUP como entrada no empreendedorismo, a EIX CORE como fronteira tecnológica, o mestrado como método.</p>
+      <dl class="kv" data-stagger>
+        <div><dt>Essência</dt><dd>Transformar possibilidades dispersas em estruturas que podem existir.</dd></div>
+        <div><dt>Motor</dt><dd>Autonomia: ampliar poder de decisão sobre tempo, trabalho, recursos e direção de vida.</dd></div>
+        <div><dt>Talento distintivo</dt><dd>Imaginar, conectar, estruturar, prototipar e colocar de pé negócios a partir de competências complementares.</dd></div>
+        <div><dt>Princípio biográfico</dt><dd class="serif-it">Se eu não encontro o caminho, eu mesmo o faço.</dd></div>
+      </dl>
+    </div>
+    <div class="col">
+      <p class="eyebrow">Arquétipos · clique para virar</p>
+      <div class="cards" data-stagger>
+        <button class="card" type="button" aria-pressed="false">
+          <span class="card__face card__front"><svg class="card__ic" viewBox="0 0 64 64" aria-hidden="true"><path d="M 10 52 L 40 22 L 48 30 L 18 60 Z M 40 22 L 46 16 L 54 24 L 48 30 M 10 52 L 8 62 L 18 60" /><path d="M 26 40 L 34 48" /></svg><span class="card__k">dominante</span><span class="card__t">Criador</span><span class="card__d">Imaginação aplicada. O prazer de partir de uma possibilidade e dar forma concreta.</span></span>
+          <span class="card__face card__back"><span class="card__k">luz · sombra</span><span class="card__d"><b>Luz:</b> inventividade com aplicação, reconstrução quando a estrutura deixa de funcionar.<br><b>Sombra:</b> querer acelerar o que ainda precisa de maturação.</span></span>
+        </button>
+        <button class="card" type="button" aria-pressed="false">
+          <span class="card__face card__front"><svg class="card__ic" viewBox="0 0 64 64" aria-hidden="true"><path d="M 8 56 H 56 M 12 56 V 26 H 52 V 56 M 22 56 V 40 H 42 V 56 M 12 26 L 32 10 L 52 26" /><path d="M 32 10 V 4" /></svg><span class="card__k">secundário</span><span class="card__t">Governante<br>Estrategista</span><span class="card__d">Busca por poder de decisão, estrutura e coordenação. A versão saudável é governança.</span></span>
+          <span class="card__face card__back"><span class="card__k">luz · sombra</span><span class="card__d"><b>Luz:</b> capacidade de organizar sistemas e enxergar complementaridade.<br><b>Sombra:</b> centralização e controle nas fases críticas.</span></span>
+        </button>
+        <button class="card" type="button" aria-pressed="false">
+          <span class="card__face card__front"><svg class="card__ic" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24" /><path d="M 32 8 V 14 M 32 50 V 56 M 8 32 H 14 M 50 32 H 56" /><path d="M 42 22 L 36 36 L 22 42 L 28 28 Z" fill="currentColor" fill-opacity=".25" /></svg><span class="card__k">complementar</span><span class="card__t">Explorador</span><span class="card__d">Desconforto com caminhos prescritos. Curiosidade por ambientes novos e fronteiras profissionais.</span></span>
+          <span class="card__face card__back"><span class="card__k">luz · sombra</span><span class="card__d"><b>Luz:</b> flexibilidade entre Direito, educação, inovação e negócios.<br><b>Sombra:</b> impaciência com quem avança em ritmo menor.</span></span>
+        </button>
+      </div>
+      <p class="note">Evitar como código dominante: o Herói performático, o Rebelde, o Mago e o Governante rígido.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 02 inimigo cultural (escuro) ===== -->
+<section class="cap cap--dark" id="inimigo" data-title="Inimigo">
+  <div class="cap__head">
+    <span class="cap__num cap__num--tag">capítulo 2</span>
+    <h2 class="cap__title">O inimigo cultural</h2>
+  </div>
+  <div class="grid grid--2">
+    <div class="col">
+      <p class="big">A cultura de escassez que transforma carreira em <span class="nowrap"><span class="strike" data-draw>disputa por vaga</span>,</span> relação em <span class="nowrap"><span class="strike" data-draw>oportunismo</span> e</span> conhecimento em <span class="nowrap"><span class="strike" data-draw>território</span>.</span></p>
+      <p class="lead lead--dim">Roberto reconhece competição. A diferença está em recusar que toda competição exija isolamento. Colaboração deixa de ser gentileza e vira infraestrutura econômica.</p>
+    </div>
+    <div class="col">
+      <p class="eyebrow eyebrow--dim">Entre dois extremos</p>
+      <div class="poles" data-stagger>
+        <div class="pole"><span class="pole__k">rejeita</span><span class="pole__t">O formalismo que usa tradição como argumento para não mudar.</span></div>
+        <div class="pole pole--mid"><span class="pole__k">ocupa</span><span class="pole__t">Respeitar fundamento e testar caminhos. Admirar tecnologia e exigir aplicação. Valorizar relações sem instrumentalizar.</span></div>
+        <div class="pole"><span class="pole__k">rejeita</span><span class="pole__t">A inovação performática que celebra novidade sem construir valor.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 03 grande visão ===== -->
+<section class="cap" id="visao" data-title="Visão">
+  <div class="cap__head">
+    <span class="cap__num cap__num--tag">capítulo 3</span>
+    <h2 class="cap__title">A Grande Visão e a regra que a protege</h2>
+  </div>
+  <p class="lead lead--wide">Construir um ecossistema empresarial capaz de transformar conhecimento, talentos, capital, relações e oportunidades em negócios que se fortalecem reciprocamente. Em 2040, Roberto coordena uma arquitetura de quinze a vinte negócios conectados, e já saiu do centro operacional.</p>
+  <figure class="illo illo--blocks" aria-hidden="true">
+    <svg viewBox="0 0 520 300" preserveAspectRatio="xMinYMax meet">
+      <g filter="url(#cut)">
+        <g filter="url(#paper)">
+          <rect x="20" y="150" width="90" height="130" fill="#E9E7DF" stroke="#22252A" stroke-width="2"/>
+          <rect x="130" y="90" width="110" height="190" fill="#F1F0EA" stroke="#22252A" stroke-width="2"/>
+          <rect x="260" y="170" width="80" height="110" fill="#D9CBA8" stroke="#22252A" stroke-width="2"/>
+          <rect x="360" y="60" width="130" height="220" fill="#E9E7DF" stroke="#22252A" stroke-width="2"/>
+        </g>
+        <rect x="130" y="90" width="110" height="190" fill="url(#hatch)" opacity=".6"/>
+        <rect x="360" y="60" width="130" height="220" fill="url(#hatch)" opacity=".4"/>
+        <g fill="#22252A" opacity=".75">
+          <rect x="36" y="170" width="14" height="18"/><rect x="60" y="170" width="14" height="18"/><rect x="84" y="170" width="14" height="18"/><rect x="36" y="200" width="14" height="18"/><rect x="60" y="200" width="14" height="18"/><rect x="84" y="200" width="14" height="18"/>
+          <rect x="150" y="110" width="16" height="22"/><rect x="178" y="110" width="16" height="22"/><rect x="206" y="110" width="16" height="22"/><rect x="150" y="150" width="16" height="22"/><rect x="178" y="150" width="16" height="22"/><rect x="206" y="150" width="16" height="22"/><rect x="150" y="190" width="16" height="22"/><rect x="178" y="190" width="16" height="22"/>
+          <rect x="276" y="190" width="14" height="18"/><rect x="302" y="190" width="14" height="18"/><rect x="276" y="222" width="14" height="18"/><rect x="302" y="222" width="14" height="18"/>
+          <rect x="380" y="82" width="18" height="24"/><rect x="412" y="82" width="18" height="24"/><rect x="444" y="82" width="18" height="24"/><rect x="380" y="126" width="18" height="24"/><rect x="412" y="126" width="18" height="24"/><rect x="444" y="126" width="18" height="24"/><rect x="380" y="170" width="18" height="24"/><rect x="444" y="170" width="18" height="24"/>
+        </g>
+        <rect x="380" y="214" width="82" height="66" fill="#2B57A6"/>
+        <path d="M65 150 C 80 60, 160 40, 185 90 M185 90 C 230 20, 330 30, 300 170 M300 170 C 330 110, 400 90, 425 60" fill="none" stroke="#2B57A6" stroke-width="3" stroke-dasharray="8 8" stroke-linecap="round"/>
+        <g fill="#2B57A6"><circle cx="65" cy="150" r="7"/><circle cx="185" cy="90" r="7"/><circle cx="300" cy="170" r="7"/><circle cx="425" cy="60" r="7"/></g>
+        <g><rect x="470" y="252" width="26" height="28" fill="#D9CBA8" stroke="#22252A" stroke-width="2"/><path d="M483 252 c-14 -18 -6 -38 4 -44 c10 8 16 28 -4 44 M483 252 c-2 -14 -20 -22 -30 -18 c6 10 16 18 30 18 M483 252 c4 -12 22 -18 30 -14 c-6 10 -16 16 -30 14" fill="#8FB0E6" stroke="#22252A" stroke-width="1.5"/></g>
+        <line x1="0" y1="281" x2="520" y2="281" stroke="#22252A" stroke-width="2.5"/>
+      </g>
+    </svg>
+  </figure>
+  <div class="timeline" id="timeline">
+    <svg class="timeline__line" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M 4 50 C 240 30, 480 64, 720 40 S 1100 30, 1196 44" pathLength="1" data-path></path>
+    </svg>
+    <div class="timeline__stops">
+      <div class="stop"><span class="stop__y">hoje</span><span class="stop__t">EJUP e EIX CORE como prova. Founder operador.</span></div>
+      <div class="stop"><span class="stop__y">fase I a IV</span><span class="stop__t">Lastro, fronteira, articulação, direção. Doze meses de percepção.</span></div>
+      <div class="stop"><span class="stop__y">2030</span><span class="stop__t">Estrutura de venture builder organiza novos projetos.</span></div>
+      <div class="stop"><span class="stop__y">2040</span><span class="stop__t">Quinze a vinte negócios interdependentes. Coordenador, e não operador.</span></div>
+    </div>
+  </div>
+  <div class="rule">
+    <span class="rule__k">Regra de reputação</span>
+    <p class="rule__t"><span class="under" data-draw>Provar</span> antes de proclamar.</p>
+    <p class="rule__d">Quanto maior a ambição declarada, maior a proporção de provas, negócios, pessoas e resultados visíveis capazes de sustentá-la. A palavra “ecossistema” como projeto próprio só entra na fase IV.</p>
+  </div>
+</section>
+
+<!-- ===== 04 desafio 1: conecte a estrutura ===== -->
+<section class="cap cap--game" id="arquiteto" data-title="Desafio 1">
+  <div class="cap__head">
+    <span class="cap__num cap__num--tag">desafio 1</span>
+    <h2 class="cap__title">Conecte a estrutura</h2>
+    <p class="cap__sub">O lugar simbólico de Roberto: o profissional que enxerga estruturas antes de elas estarem prontas. Clique nos quatro elementos soltos e veja o que aparece.</p>
+  </div>
+  <figure class="rec rec--side" style="--r:2deg"><img src="assets/foto-estrutura.jpg" alt="Estrutura de madeira de uma casa antes do acabamento" loading="lazy"><figcaption><b>Lugar simbólico</b>a estrutura antes de estar pronta</figcaption></figure>
+  <div class="board" id="board">
+    <svg class="board__lines" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+      <path id="l1" d="" pathLength="1"></path><path id="l2" d="" pathLength="1"></path>
+      <path id="l3" d="" pathLength="1"></path><path id="l4" d="" pathLength="1"></path>
+    </svg>
+    <button class="node" type="button" style="--x:14%;--y:22%" data-node>Conhecimento</button>
+    <button class="node" type="button" style="--x:58%;--y:20%" data-node>Pessoas</button>
+    <button class="node" type="button" style="--x:20%;--y:76%" data-node>Capital</button>
+    <button class="node" type="button" style="--x:66%;--y:76%" data-node>Oportunidades</button>
+    <div class="board__center" id="boardCenter">
+      <span class="board__k">síntese identitária</span>
+      <span class="board__t">Arquiteto de Negócios</span>
+      <span class="board__d">Uma chave estratégica, e não um cargo. Descreve a capacidade de imaginar estrutura, combinar elementos e desenhar relações.</span>
+    </div>
+    <div class="board__hint" id="boardHint">0 de 4 conectados</div>
+  </div>
+</section>
+
+<!-- ===== 05 direção visual ===== -->
+<section class="cap" id="direcao" data-title="Direção">
+  <div class="cap__head">
+    <span class="cap__num cap__num--tag">capítulo 4</span>
+    <h2 class="cap__title">Direção visual: caderno de obra</h2>
+    <p class="cap__sub">Um laboratório de negócios com textura de vida real. A marca vive onde a ideia ainda está sendo desenhada: quadro, vidro, caneta, papel. Tudo parece anotado por quem está construindo.</p>
+  </div>
+  <div class="swatches" data-stagger>
+    <div class="sw"><i style="background:#F1F0EA;border:1px solid var(--linha)"></i><b>Papel de planta</b><span>#F1F0EA</span></div>
+    <div class="sw"><i style="background:#E9E7DF"></i><b>Papel manteiga</b><span>#E9E7DF</span></div>
+    <div class="sw"><i style="background:#22252A"></i><b>Tinta</b><span>#22252A</span></div>
+    <div class="sw"><i style="background:#2B57A6"></i><b>Caneta de quadro</b><span>#2B57A6 · acento único</span></div>
+    <div class="sw"><i style="background:#6E7278"></i><b>Grafite</b><span>#6E7278</span></div>
+    <div class="sw"><i style="background:#D9CBA8"></i><b>Fita crepe</b><span>#D9CBA8</span></div>
+  </div>
+  <div class="grid grid--2 grid--top">
+    <div class="col">
+      <p class="eyebrow">Tipografia</p>
+      <p class="spec spec--display">Newsreader para títulos e capas</p>
+      <p class="spec spec--it">Newsreader itálico, só na frase de convicção</p>
+      <p class="spec spec--body">Instrument Sans no corpo, na legenda e no slide. Máximo de 65 caracteres por linha. Rótulos em caixa alta com espaçamento aberto.</p>
+      <p class="spec spec--mono">Courier Prime nas tags, na faixa e no quadro O Código.</p>
+      <div class="impact">
+        <img src="assets/foto-obra-sala.jpg" alt="" loading="lazy">
+        <p class="impact__t">quem vende hora perde com isso.</p>
+        <span class="impact__k">voz de impacto · Generic G80 (More! Etc.) · só em capa de Reels e slide escuro com foto</span>
+      </div>
+    </div>
+    <div class="col">
+      <p class="eyebrow">Kit de anotações à mão · passe o mouse</p>
+      <ul class="kit" data-stagger>
+        <li><span class="kit__demo circ circ--hover">círculo</span><span class="kit__d">a palavra que muda o sentido</span></li>
+        <li><span class="kit__demo under under--hover">sublinhado</span><span class="kit__d">ênfase sem drama</span></li>
+        <li><span class="kit__demo strike strike--hover">riscado</span><span class="kit__d">o que a marca rejeita</span></li>
+        <li><span class="kit__demo kit__arrow" aria-hidden="true"><svg viewBox="0 0 220 60"><path d="M 4 40 C 60 22, 120 44, 208 26" pathLength="1"></path><path d="M 182 10 C 194 18, 202 22, 210 26 C 200 30, 190 38, 184 48" pathLength="1"></path></svg></span><span class="kit__d">causa e consequência</span></li>
+        <li><span class="kit__demo tape">fita crepe</span><span class="kit__d">etiqueta rotacionada, no máximo duas por carrossel</span></li>
+      </ul>
+      <p class="note">Regra da caneta: uma marca por slide. Exceções: o slide-quadro e um círculo no slide de estrutura.</p>
+    </div>
+  </div>
+
+  <!-- desafio 2 -->
+  <div class="challenge" id="challenge2">
+    <span class="cap__num cap__num--tag">desafio 2</span>
+    <h3 class="challenge__title">Circule a palavra certa</h3>
+    <p class="challenge__sub">Na capa do carrossel, só uma palavra recebe a caneta: a que muda o sentido da frase. Clique nela.</p>
+    <p class="sentence" id="sentence">
+      <button type="button" data-w>Uma</button> <button type="button" data-w>boa</button> <button type="button" data-w>ideia</button> <button type="button" data-w>ainda</button> <button type="button" data-w data-right>não</button> <button type="button" data-w>é</button> <button type="button" data-w>um</button> <button type="button" data-w>negócio</button>
+    </p>
+    <p class="challenge__feedback" id="sentenceFeedback" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- ===== 06 carrossel ===== -->
+<section class="cap cap--carousel" id="carrossel" data-title="Carrossel">
+  <div class="cap__head">
+    <span class="cap__num cap__num--tag">capítulo 5</span>
+    <h2 class="cap__title">O carrossel, slide a slide</h2>
+    <p class="cap__sub">Série “Se eu tivesse que construir isso do zero”. O que evita cara de template é a variação de densidade: denso, depois ar. Arraste ou use as setas do trilho.</p>
+  </div>
+  <div class="track-wrap">
+    <button class="track__btn track__btn--prev" id="prevSlide" type="button" aria-label="Slide anterior">←</button>
+    <div class="track" id="track">
+      <article class="slide" data-dens="médio">
+        <span class="tape tape--sl">Se eu tivesse que construir isso do zero</span>
+        <h3 class="sl__cap">Uma boa ideia ainda <span class="circ" data-draw>não</span> é um negócio</h3>
+        <footer class="sl__foot"><span><i></i>Roberto Pivotto</span><em>caderno de obra</em></footer>
+      </article>
+      <article class="slide" data-dens="denso">
+        <h3 class="sl__h">Na EJUP, já tivemos no mesmo mês:</h3>
+        <p class="sl__list">serviço bem entregue,<br>cliente satisfeito,<br><span class="under" data-draw>caixa apertado.</span></p>
+        <p class="sl__p sl__p--arrow"><svg viewBox="0 0 220 60" aria-hidden="true"><path d="M 4 40 C 60 22, 120 44, 208 26"></path><path d="M 182 10 C 194 18, 202 22, 210 26 C 200 30, 190 38, 184 48"></path></svg>A conta não fechava por causa do <b>modelo</b>. O trabalho seguia bom.</p>
+        <footer class="sl__foot"><span><i></i>Roberto Pivotto</span><em>caderno de obra</em></footer>
+      </article>
+      <article class="slide" data-dens="médio">
+        <h3 class="sl__h sl__h--lg">Preço é só a <span class="under" data-draw>última</span> linha do modelo</h3>
+        <p class="sl__p">Modelo é como o dinheiro entra, quando entra e do que ele depende.</p>
+        <p class="sl__p sl__p--ink">Se depende da sua hora, mudar o preço só adia o problema.</p>
+        <footer class="sl__foot"><span><i></i>Roberto Pivotto</span><em>caderno de obra</em></footer>
+      </article>
+      <article class="slide slide--board" data-dens="muito denso">
+        <span class="tape tape--sl">o que desenhamos no quadro</span>
+        <div class="qb">
+          <span class="qb__box" style="--x:0%;--y:8%">Ideia</span>
+          <span class="qb__box" style="--x:46%;--y:8%">Modelo</span>
+          <span class="qb__box" style="--x:46%;--y:38%">Operação</span>
+          <span class="qb__box qb__box--sm" style="--x:82%;--y:38%">Caixa</span>
+          <span class="qb__circ" style="--x:2%;--y:40%"><span class="circ circ--on">Gente</span></span>
+          <span class="qb__box qb__box--wide" style="--x:36%;--y:68%">Mercado paga?</span>
+          <span class="qb__note" style="--x:78%;--y:71%">sim → cresce</span>
+          <span class="qb__note" style="--x:36%;--y:84%">não → <s>insiste</s> redesenha</span>
+          <svg class="qb__arrows" viewBox="0 0 1000 800" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M 250 70 C 330 60, 380 80, 450 70"></path>
+            <path d="M 560 150 C 552 200, 566 250, 558 300"></path>
+            <path d="M 690 380 C 740 372, 780 386, 815 380"></path>
+            <path d="M 150 350 C 240 300, 330 230, 440 150"></path>
+            <path d="M 560 460 C 552 500, 566 520, 558 560"></path>
+          </svg>
+        </div>
+        <p class="sl__note"><svg class="ast" viewBox="0 0 64 64" aria-hidden="true"><path d="M 32 6 C 31 20, 33 44, 32 58 M 8 20 C 20 26, 44 40, 56 46 M 56 20 C 44 27, 20 40, 8 46" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg>nenhuma das caixas é “ter uma boa ideia”</p>
+        <footer class="sl__foot"><span><i></i>Roberto Pivotto</span><em>caderno de obra</em></footer>
+      </article>
+      <article class="slide" data-dens="vazio">
+        <svg class="ast ast--big" viewBox="0 0 64 64" aria-hidden="true"><path d="M 32 6 C 31 20, 33 44, 32 58 M 8 20 C 20 26, 44 40, 56 46 M 56 20 C 44 27, 20 40, 8 46" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg>
+        <p class="sl__quote">A parte bonita de empreender quase nunca é a parte que mantém a empresa viva.</p>
+        <footer class="sl__foot"><span><i></i>Roberto Pivotto</span><em>caderno de obra</em></footer>
+      </article>
+      <article class="slide" data-dens="denso">
+        <h3 class="sl__h">Antes de chamar de negócio</h3>
+        <ol class="sl__struct">
+          <li><b>Modelo</b><span>como o dinheiro entra e do que depende</span></li>
+          <li><b>Gente</b><span>quem executa quando você não está</span></li>
+          <li><b><span class="circ" data-draw>Caixa</span></b><span>quantos meses a decisão aguenta</span></li>
+          <li><b>Mercado</b><span>quem já paga por isso hoje</span></li>
+        </ol>
+        <footer class="sl__foot"><span><i></i>Roberto Pivotto</span><em>caderno de obra</em></footer>
+      </article>
+      <article class="slide slide--dark" data-dens="leve">
+        <h3 class="sl__cap sl__cap--sm">Qual dos quatro está travando o <span class="circ circ--light" data-draw>seu</span>?</h3>
+        <p class="sl__p sl__p--dim">Me conta nos comentários. Eu respondo com o que faria no seu lugar.</p>
+        <footer class="sl__foot"><span><i></i>Roberto Pivotto</span><em>caderno de obra</em></footer>
+      </article>
+    </div>
+    <button class="track__btn track__btn--next" id="nextSlide" type="button" aria-label="Próximo slide">→</button>
+  </div>
+  <div class="dens" id="dens" aria-label="Densidade por slide">
+    <span data-h="3">capa</span><span data-h="4">o caso</span><span data-h="3">camada</span><span data-h="5">quadro</span><span data-h="1">respiro</span><span data-h="4">estrutura</span><span data-h="2">fecho</span>
+  </div>
+</section>
+
+<!-- ===== quadros ===== -->
+<section class="cap" id="quadros" data-title="Quadros">
+  <div class="cap__head">
+    <span class="cap__num cap__num--tag">capítulo 6</span>
+    <h2 class="cap__title">Os quadros e quem assina cada um</h2>
+    <p class="cap__sub">Antes de desenhar peça, é preciso saber de quem é a voz. A proposta de conteúdo separa dois emissores e fica com três formatos com nome, cadência e squad: O Código, da EJUP, e dois quadros de Roberto. O que circula entre eles são dispositivos gráficos, não quadros.</p>
+  </div>
+
+  <div class="subhead"><h3>A fronteira de canais</h3><p>emissor, não assunto</p></div>
+  <div class="canais">
+    <div class="canais__row canais__row--head"><div class="canais__dim"></div><div class="canais__a">@ejup.oficial</div><div class="canais__b">@robertopivotto</div></div>
+    <div class="canais__row"><div class="canais__dim">Emissor</div><div class="canais__a">Escola de Negócios e Direito. Marca-mãe, estável.</div><div class="canais__b">Marca pessoal, flexível. Arquiteto de Negócios.</div></div>
+    <div class="canais__row"><div class="canais__dim">Protagonista</div><div class="canais__a">O aluno e o jurista são o herói. A EJUP é o guia.</div><div class="canais__b">Roberto, na jornada real de construção.</div></div>
+    <div class="canais__row"><div class="canais__dim">Formato âncora</div><div class="canais__a">O programa O Código, gravado às terças no estúdio.</div><div class="canais__b">Dois quadros autorais: O outro lado da tese e Anatomia do caso.</div></div>
+    <div class="canais__row"><div class="canais__dim">Collab</div><div class="canais__a">Canal-mãe dos verticais, em collab com Roberto.</div><div class="canais__b">Coautor nos cortes. Autor dos quadros.</div></div>
+  </div>
+  <div class="regra"><span>A regra</span><p>Vertical de O Código nasce no institucional com Roberto em collab. Nunca o contrário.</p></div>
+
+  <div class="subhead"><h3>Os dois quadros autorais</h3><p>perfil pessoal</p></div>
+  <div class="qlist">
+    <article class="ql">
+      <p class="ql__n">01 · semanal</p>
+      <h4 class="ql__t">O outro lado da tese</h4>
+      <p class="ql__d">A leitura do que está circulando. Três entradas com a mesma mecânica: a tese frágil sobre sociedade, startup ou contrato; o julgado do STF ou do STJ; a notícia de IA, regulação ou novo negócio.</p>
+      <p class="ql__q">"No papel aceita-se qualquer tese, mas o mercado real cobra a conta da estrutura."</p>
+      <p class="ql__dev">Dispositivo por entrada: o riscado com a correção na margem · a curva que pivota · o recorte preso com fita</p>
+    </article>
+    <article class="ql">
+      <p class="ql__n">02 · quinzenal</p>
+      <h4 class="ql__t">Anatomia do caso</h4>
+      <p class="ql__d">Um caso em três atos: conflito, arquitetura, lição. Alterna o caso de fora, uma disputa corporativa, com o caso de dentro, uma decisão real da EJUP ou da EIX CORE.</p>
+      <p class="ql__q">"As maiores empresas não quebram por falta de ideia, mas por falhas na arquitetura dos seus ativos."</p>
+      <p class="ql__dev">Dispositivo: o diagrama à mão, com a junta rompida circulada ou refeita</p>
+    </article>
+  </div>
+
+  <div class="subhead"><h3>O Código e os dispositivos</h3><p>o programa e os sinais que circulam</p></div>
+  <div class="qgrid">
+    <article class="quadro">
+      <div class="qcard qcard--code">
+        <span class="tape tape--q">O Código</span>
+        <ol class="code">
+          <li><b>Art. 12</b> Toda ideia precisa de modelo antes de precisar de marca.</li>
+          <li><span class="code__par">§ 1º</span> Modelo é como o dinheiro entra, quando entra e do que depende.</li>
+          <li><span class="code__par">§ 2º</span> Se depende da sua hora, a IA não resolve. Só encurta o prazo.</li>
+          <li><i>// sem caixa, não existe § 3º</i></li>
+        </ol>
+        <footer class="qcard__foot"><span><i></i>Roberto Pivotto</span><em>o código</em></footer>
+      </div>
+      <h3 class="quadro__t">O Código</h3>
+      <p class="quadro__d">O programa da EJUP, gravado às terças. Cada episódio é um artigo: a regra por trás de um negócio, de uma tecnologia ou de uma decisão, escrita como lei e comentada como código. Courier Prime é máquina de escrever e é editor de texto, então resolve as duas leituras sem ilustrar nenhuma.</p>
+      <p class="quadro__d">No perfil pessoal ele aparece de três maneiras, e só dessas três: o corte em collab, o artigo estático e o bastidor do que ficou fora.</p>
+      <p class="quadro__m">Semanal · artigo é o ativo que fica · collab EJUP + Roberto</p>
+    </article>
+    <article class="quadro">
+      <div class="qcard qcard--dot">
+        <span class="tape tape--q">Ponto fora da curva</span>
+        <svg class="scatter" viewBox="0 0 360 300" aria-hidden="true">
+          <g class="scatter__grid"><path d="M 30 20 V 270 H 340"/><path d="M 30 210 H 340 M 30 150 H 340 M 30 90 H 340 M 110 20 V 270 M 190 20 V 270 M 270 20 V 270"/></g>
+          <g class="scatter__dots">
+            <circle cx="58" cy="238" r="4"/><circle cx="74" cy="226" r="4"/><circle cx="90" cy="232" r="4"/><circle cx="104" cy="214" r="4"/><circle cx="118" cy="220" r="4"/><circle cx="132" cy="204" r="4"/><circle cx="146" cy="196" r="4"/><circle cx="160" cy="202" r="4"/><circle cx="174" cy="186" r="4"/><circle cx="188" cy="178" r="4"/><circle cx="202" cy="184" r="4"/><circle cx="216" cy="170" r="4"/><circle cx="230" cy="160" r="4"/><circle cx="244" cy="166" r="4"/><circle cx="258" cy="150" r="4"/><circle cx="272" cy="144" r="4"/><circle cx="286" cy="148" r="4"/><circle cx="300" cy="134" r="4"/><circle cx="314" cy="128" r="4"/>
+          </g>
+          <path class="scatter__trend" d="M 46 246 C 140 214, 240 170, 326 122" pathLength="1"/>
+          <circle class="scatter__out" cx="112" cy="76" r="6"/>
+          <path class="scatter__circ" d="M 96 78 C 92 60, 118 50, 132 62 C 142 72, 132 96, 112 96 C 96 96, 90 84, 98 74" pathLength="1"/>
+          <text class="scatter__lbl" x="146" y="70">&gt; fora da curva</text>
+        </svg>
+        <footer class="qcard__foot"><span><i></i>Roberto Pivotto</span><em>ponto fora da curva</em></footer>
+      </div>
+      <h3 class="quadro__t">Ponto fora da curva</h3>
+      <p class="quadro__d">Dispositivo, não quadro. O caso que escapou do padrão do setor. Vive dentro da Anatomia do caso e de O outro lado da tese, quando a pauta é o desvio e não a falha.</p>
+      <p class="quadro__m">Dispositivo gráfico · nuvem em Grafite, um ponto em Caneta, circulado</p>
+    </article>
+    <article class="quadro">
+      <div class="qcard qcard--pivot">
+        <span class="tape tape--q">A curva que pivota</span>
+        <svg class="pivotbig" viewBox="0 0 360 300" aria-hidden="true">
+          <path class="pivotbig__a" d="M 20 250 C 90 246, 150 236, 190 214" pathLength="1"/>
+          <path class="pivotbig__b" d="M 190 214 C 230 192, 262 130, 284 92 C 302 60, 322 40, 344 30" pathLength="1"/>
+          <circle class="pivotbig__p" cx="190" cy="214" r="9"/>
+          <text class="pivotbig__lbl" x="120" y="286">&gt; a rota que era</text>
+          <text class="pivotbig__lbl" x="212" y="150">&gt; a rota que ficou</text>
+        </svg>
+        <footer class="qcard__foot"><span><i></i>Roberto Pivotto</span><em>pivot</em></footer>
+      </div>
+      <h3 class="quadro__t">A curva que pivota</h3>
+      <p class="quadro__d">Dispositivo, não quadro. O momento em que a direção muda. É o sinal gráfico da marca e o motivo de ele existir: Pivotto é quase pivotar. Em O outro lado da tese com entrada julgado, o julgado é o pivô.</p>
+      <p class="quadro__m">Dispositivo gráfico · Grafite antes, Caneta depois, pivô em círculo cheio</p>
+    </article>
+  </div>
+  <p class="note">Giro semanal e Direito em alta voltagem viraram entradas de O outro lado da tese. As séries Se eu tivesse que construir isso do zero, Do rascunho à operação e Quando reconstruir é melhor que insistir viraram o caso de dentro de Anatomia do caso. O resto é pauta, sem nome fixo.</p>
+</section>
+
+<!-- ===== IA e presença digital ===== -->
+<section class="cap cap--dark" id="ia" data-title="IA e digital">
+  <div class="cap__head">
+    <span class="cap__num cap__num--tag">capítulo 7</span>
+    <h2 class="cap__title">Como a marca fala de IA, inovação e presença digital</h2>
+    <p class="cap__sub cap__sub--dim">Tecnologia aparece como ferramenta de transformação aplicada, nunca como identidade vazia. A regra vale para o discurso e para a própria produção do conteúdo.</p>
+  </div>
+  <div class="grid grid--2 grid--top">
+    <div class="col">
+      <ol class="code code--dark">
+        <li><b>Art. 1º</b> Inovação é o que chega à realidade. Novidade é o que fica na apresentação.</li>
+        <li><b>Art. 2º</b> Roberto usa e constrói com IA. Não é engenheiro, e diz isso.</li>
+        <li><span class="code__par">§ único</span> Experiência prática nunca se apresenta como autoridade técnica.</li>
+        <li><b>Art. 3º</b> Todo conteúdo sobre IA responde a uma pergunta: o que isso muda no caixa, no cliente ou na operação?</li>
+        <li><b>Art. 4º</b> A IA rascunha, organiza e edita a produção da marca. Ela não opina por Roberto.</li>
+        <li><i>// "a IA vai acabar com todas as profissões" não passa por aqui</i></li>
+        <li><b>Art. 5º</b> Presença digital forte é frequência com lastro: aparecer sempre, prometer pouco, mostrar obra.</li>
+      </ol>
+    </div>
+    <div class="col">
+      <p class="eyebrow eyebrow--dim">Sistema de presença</p>
+      <dl class="kv kv--dark" data-stagger>
+        <div><dt>Instagram</dt><dd>Descoberta e proximidade. Reels em tela dividida, carrosséis dos quadros, bastidor nos stories.</dd></div>
+        <div><dt>LinkedIn</dt><dd>Autoridade institucional. O Código em texto longo, decisões de negócio, interlocução com founders, investidores e gestores públicos.</dd></div>
+        <div><dt>YouTube</dt><dd>Profundidade e memória. Ponto fora da curva, séries de construção, aulas abertas.</dd></div>
+        <div><dt>Newsletter e site</dt><dd>Base própria, fora do algoritmo. Um artigo do Código por edição e o arquivo de tudo.</dd></div>
+        <div><dt>EJUP e EIX CORE</dt><dd>A prova. Toda afirmação sobre inovação aponta para algo que existe nas duas empresas.</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 07 notícia e reels ===== -->
+<section class="cap cap--dark" id="noticia" data-title="Notícia">
+  <div class="cap__head">
+    <span class="cap__num cap__num--tag">capítulo 8</span>
+    <h2 class="cap__title">A entrada notícia e o Reels em tela dividida</h2>
+    <p class="cap__sub cap__sub--dim">Roberto comenta o tema do dia. A manchete entra como recorte de papel, o dado é redesenhado em caneta, a leitura dele fecha. No Reels, o b-roll fica em cima, ele embaixo, e a legenda queimada senta na emenda.</p>
+  </div>
+  <div class="grid grid--phone">
+    <div class="phone" aria-label="Simulação de Reels em tela dividida">
+      <div class="phone__top">
+        <div class="portal" id="portal">
+          <div class="portal__bar"><span>portal de exemplo</span><span>3 set</span></div>
+          <h4>Escritórios aceleram uso de IA e reduzem horas faturáveis</h4>
+          <div class="portal__img"></div>
+          <div class="portal__lines"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="portal__bars">
+            <div class="pb"><b>40h</b><i style="--h:100%"></i><span>2023</span></div>
+            <div class="pb"><b>31h</b><i style="--h:78%"></i><span>2024</span></div>
+            <div class="pb pb--hi"><b>22h</b><i style="--h:55%"></i><span>2025</span></div>
+            <div class="pb"><b>?</b><i style="--h:35%"></i><span>2026</span></div>
+          </div>
+          <div class="portal__lines"><i></i><i></i><i></i><i></i></div>
+        </div>
+        <span class="tape tape--phone">O outro lado · notícia</span>
+      </div>
+      <div class="phone__seam"></div>
+      <div class="phone__caption" id="caption">quem vende hora perde com isso</div>
+      <div class="phone__bottom">
+        <svg viewBox="0 0 400 360" aria-hidden="true"><path d="M 200 40 C 150 40, 130 80, 132 120 C 134 170, 160 200, 200 200 C 240 200, 266 170, 268 120 C 270 80, 250 40, 200 40 Z"></path><path d="M 60 360 C 70 260, 130 226, 200 226 C 270 226, 330 260, 340 360"></path></svg>
+        <span class="phone__who">Roberto · câmera frontal · luz de janela</span>
+      </div>
+    </div>
+    <div class="col">
+      <div class="clip" data-tilt>
+        <span class="tape tape--clip">recorte</span>
+        <span class="clip__src">Portal de exemplo · 3 set 2026</span>
+        <h4 class="clip__h">Escritórios aceleram uso de IA e reduzem horas faturáveis em contratos padrão</h4>
+        <div class="clip__lines"><i></i><i></i><i></i><i></i></div>
+      </div>
+      <ul class="rules" data-stagger>
+        <li><b>Print nunca cru.</b> Sempre em moldura de papel ou celular, levemente girado, com fonte e data.</li>
+        <li><b>Dado em caneta.</b> Gráfico da matéria é redesenhado, com fonte embaixo. Número só com lastro validado.</li>
+        <li><b>Corte de b-roll a cada 2 a 4 s.</b> A fala nunca para. Mesma grade de cor no b-roll e no talking head.</li>
+        <li><b>Terceiros.</b> Rosto de pessoa citada só quando figura pública e a matéria for o assunto. Sem meme, sem print de rede alheia.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 08 caderno de campo ===== -->
+<section class="cap" id="broll" data-title="Caderno de campo">
+  <div class="cap__head">
+    <span class="cap__num cap__num--tag">capítulo 9</span>
+    <h2 class="cap__title">O que aparece quando ele fala</h2>
+    <p class="cap__sub">Banco de imagens por pilar, filmado por nós. As fotos abaixo são referência de enquadramento, luz e assunto, coladas aqui como num caderno de campo.</p>
+  </div>
+  <div class="scrap">
+    <figure class="rec rec--a" style="--r:-2.4deg"><img src="assets/foto-quadro.jpg" alt="Mão desenhando um gráfico no quadro branco com caneta azul" loading="lazy"><figcaption><b>Arquitetura</b>mão no quadro, plano fechado, 3 s</figcaption></figure>
+    <figure class="rec rec--b" style="--r:1.8deg"><img src="assets/foto-planta.jpg" alt="Esboços, planta e compasso sobre a mesa" loading="lazy"><figcaption><b>Arquitetura</b>a planta em cima da mesa</figcaption></figure>
+    <figure class="rec rec--c" style="--r:-1.2deg"><img src="assets/foto-obra-sala.jpg" alt="Sala em obra com betoneira e luz de janela" loading="lazy"><figcaption><b>Bastidor</b>a obra antes de virar escritório</figcaption></figure>
+    <figure class="rec rec--d" style="--r:2.6deg"><img src="assets/foto-mesa-documentos.jpg" alt="Duas pessoas revisando documentos em uma mesa de madeira" loading="lazy"><figcaption><b>Ecossistema</b>conversa de mesa, sem pose</figcaption></figure>
+    <figure class="rec rec--e" style="--r:-3deg"><img src="assets/foto-livros.jpg" alt="Pilha de livros sobre prateleira de madeira" loading="lazy"><figcaption><b>Repertório</b>o que foi lido de verdade</figcaption></figure>
+    <figure class="rec rec--f" style="--r:1.4deg"><img src="assets/foto-massa.jpg" alt="Mãos sovando massa de pão" loading="lazy"><figcaption><b>Vida</b>pão, processo e pausa</figcaption></figure>
+    <figure class="rec rec--g" style="--r:-1.6deg"><img src="assets/foto-sombra-janela.jpg" alt="Sombra da janela e de uma planta na parede" loading="lazy"><figcaption><b>Vida</b>luz de janela, fim de tarde</figcaption></figure>
+    <figure class="rec rec--h" style="--r:2.2deg"><img src="assets/foto-vidro-caneta.jpg" alt="Mão escrevendo no vidro com caneta de quadro" loading="lazy"><figcaption><b>Arquitetura</b>vidro, caneta, contraluz</figcaption></figure>
+    <svg class="scrap__note scrap__note--1" viewBox="0 0 220 90" aria-hidden="true"><path d="M 6 70 C 60 20, 120 80, 210 30" pathLength="1"></path><path d="M 186 16 C 196 24, 204 28, 212 30 C 202 36, 194 44, 188 54" pathLength="1"></path></svg>
+    <span class="scrap__txt scrap__txt--1">corte de 2 a 4 s, a fala nunca para</span>
+    <span class="scrap__txt scrap__txt--2">mesma grade de cor no b-roll e no rosto</span>
+    <svg class="scrap__note scrap__note--2" viewBox="0 0 64 64" aria-hidden="true"><path d="M 32 6 C 31 20, 33 44, 32 58 M 8 20 C 20 26, 44 40, 56 46 M 56 20 C 44 27, 20 40, 8 46"></path></svg>
+  </div>
+  <p class="note">Nada de banco genérico: luz real, sombra, matéria em processo, ninguém posando. Fotos de referência via Pexels, créditos no fim.</p>
+</section>
+
+<!-- ===== 09 editorial ===== -->
+<section class="cap" id="editorial" data-title="Editorial">
+  <div class="cap__head">
+    <span class="cap__num cap__num--tag">capítulo 10</span>
+    <h2 class="cap__title">Sete pilares, um mix</h2>
+    <p class="cap__sub">Cada pilar constrói um atributo de percepção. Arquitetura e Bastidor somam metade do volume: são eles que provam “pensa estrutura e coloca de pé”. Vida nunca domina.</p>
+  </div>
+  <div class="pillars" data-bars>
+    <div class="pil"><span class="pil__n">Arquitetura</span><span class="pil__a">capacidade de estruturar</span><span class="pil__b"><i style="--w:100%"></i></span><b>30%</b></div>
+    <div class="pil"><span class="pil__n">Bastidor</span><span class="pil__a">materialização e humanidade</span><span class="pil__b"><i style="--w:67%"></i></span><b>20%</b></div>
+    <div class="pil"><span class="pil__n">Direito, IA e novos caminhos</span><span class="pil__a">repertório multidisciplinar</span><span class="pil__b"><i style="--w:50%"></i></span><b>15%</b></div>
+    <div class="pil"><span class="pil__n">Ecossistema</span><span class="pil__a">articulação</span><span class="pil__b"><i style="--w:50%"></i></span><b>15%</b></div>
+    <div class="pil"><span class="pil__n">Repertório</span><span class="pil__a">aprendizagem</span><span class="pil__b"><i style="--w:33%"></i></span><b>10%</b></div>
+    <div class="pil"><span class="pil__n">Reconstrução</span><span class="pil__a">maturidade</span><span class="pil__b"><i style="--w:17%"></i></span><b>5%</b></div>
+    <div class="pil"><span class="pil__n">Vida</span><span class="pil__a">humanidade</span><span class="pil__b"><i style="--w:17%"></i></span><b>5%</b></div>
+  </div>
+  <figure class="illo illo--desk" aria-hidden="true">
+    <svg viewBox="0 0 560 260" preserveAspectRatio="xMaxYMax meet">
+      <g filter="url(#cut)">
+        <line x1="0" y1="236" x2="560" y2="236" stroke="#22252A" stroke-width="3"/>
+        <!-- luminária -->
+        <path d="M60 236 l0 -150 l90 60" fill="none" stroke="#22252A" stroke-width="5" stroke-linecap="round"/>
+        <rect x="30" y="228" width="60" height="10" fill="#22252A"/>
+        <path d="M130 130 l60 -30 l30 50 l-70 30z" fill="#22252A"/>
+        <path d="M150 180 l70 -30 l10 18 l-72 34z" fill="#2B57A6" opacity=".9"/>
+        <path d="M150 182 l-30 54 M220 150 l30 38" stroke="#2B57A6" stroke-width="1.5" stroke-dasharray="3 5" opacity=".7"/>
+        <!-- caderno -->
+        <g transform="rotate(-4 330 200)"><rect x="240" y="150" width="180" height="86" fill="#F1F0EA" stroke="#22252A" stroke-width="2" filter="url(#paper)"/><rect x="240" y="150" width="180" height="86" fill="url(#hatch)" opacity=".3"/><line x1="330" y1="150" x2="330" y2="236" stroke="#22252A" stroke-width="2"/><path d="M256 172 h54 M256 190 h40 M256 208 h50 M346 172 h54 M346 190 h34" stroke="#22252A" stroke-width="2.5" stroke-linecap="round" opacity=".7"/><path d="M350 214 c8 -12 26 -10 26 2 c0 10 -20 12 -26 -2z" fill="none" stroke="#2B57A6" stroke-width="3"/></g>
+        <!-- xícara -->
+        <path d="M440 236 l8 -46 h64 l8 46z" fill="#F7F5EE" stroke="#22252A" stroke-width="2" filter="url(#paper)"/>
+        <path d="M520 200 c22 0 22 26 0 26" fill="none" stroke="#22252A" stroke-width="2.5"/>
+        <path d="M466 176 c-6 -10 6 -14 0 -24 M486 176 c-6 -10 6 -14 0 -24" fill="none" stroke="#6E7278" stroke-width="2" stroke-linecap="round"/>
+        <!-- régua -->
+        <g transform="rotate(12 300 60)"><rect x="200" y="44" width="240" height="26" fill="#D9CBA8" stroke="#22252A" stroke-width="2"/><g stroke="#22252A" stroke-width="1.5"><line x1="212" y1="44" x2="212" y2="54"/><line x1="224" y1="44" x2="224" y2="54"/><line x1="236" y1="44" x2="236" y2="54"/><line x1="248" y1="44" x2="248" y2="54"/><line x1="260" y1="44" x2="260" y2="60"/><line x1="272" y1="44" x2="272" y2="54"/><line x1="284" y1="44" x2="284" y2="54"/><line x1="296" y1="44" x2="296" y2="54"/><line x1="308" y1="44" x2="308" y2="54"/><line x1="320" y1="44" x2="320" y2="60"/><line x1="332" y1="44" x2="332" y2="54"/><line x1="344" y1="44" x2="344" y2="54"/><line x1="356" y1="44" x2="356" y2="54"/><line x1="368" y1="44" x2="368" y2="54"/><line x1="380" y1="44" x2="380" y2="60"/><line x1="392" y1="44" x2="392" y2="54"/><line x1="404" y1="44" x2="404" y2="54"/><line x1="416" y1="44" x2="416" y2="54"/><line x1="428" y1="44" x2="428" y2="54"/></g></g>
+        <rect x="500" y="40" width="30" height="30" fill="#2B57A6"/>
+      </g>
+    </svg>
+  </figure>
+  <div class="week" data-stagger>
+    <div><b>seg</b><span>Anatomia do caso, carrossel (semanas 1 e 3) · post estático (semanas 2 e 4)</span></div>
+    <div><b>ter</b><span>gravação, stories de bastidor</span></div>
+    <div><b>qua</b><span>corte de O Código, Reels em collab</span></div>
+    <div><b>sex</b><span>O outro lado da tese, em ciclo: post estático, carrossel, Reels</span></div>
+    <div><b>fds</b><span>stories orgânicos</span></div>
+  </div>
+  <div class="formats">
+    <p class="eyebrow">Quadros com nome</p>
+    <ul data-stagger>
+      <li>O Código</li><li>O outro lado da tese</li><li>Anatomia do caso</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 10 desafio 3: protocolo ===== -->
+<section class="cap cap--game" id="protocolo" data-title="Desafio 3">
+  <div class="cap__head">
+    <span class="cap__num cap__num--tag">desafio 3</span>
+    <h2 class="cap__title">Pode publicar?</h2>
+    <p class="cap__sub">Sete rascunhos de legenda. Decida se saem como estão ou se voltam para a mesa. As regras vêm do manual: provar antes de proclamar, vida pessoal só quando ilumina, sem juridiquês, sem frase de coach.</p>
+  </div>
+  <div class="quiz" id="quiz">
+    <div class="quiz__card is-active" data-answer="nao" data-why="Reivindica autoridade futura como presente. O ecossistema é horizonte, e a palavra só entra na fase IV.">
+      <p class="quiz__q">“Como construtor de ecossistemas, aprendi que toda parceria começa com generosidade.”</p>
+    </div>
+    <div class="quiz__card" data-answer="sim" data-why="Tem caso concreto, admite erro já elaborado e fecha com estrutura aplicável.">
+      <p class="quiz__q">“Gastamos três meses produzindo aulas para um formato que ninguém tinha pedido. A conversa com doze alunos antigos custou uma tarde. Hoje a gente vende a turma antes de gravar.”</p>
+    </div>
+    <div class="quiz__card" data-answer="nao" data-why="Frase de coach, sem experiência concreta. Está na lista do que a marca evita.">
+      <p class="quiz__q">“Qualquer pessoa consegue empreender se quiser. O segredo é começar.”</p>
+    </div>
+    <div class="quiz__card" data-answer="nao" data-why="Expõe terceiro e conflito interno. Informação societária só vira conteúdo com razão específica e autorização.">
+      <p class="quiz__q">“Meu ex-sócio nunca entendeu caixa. Foi por isso que a primeira sociedade acabou.”</p>
+    </div>
+    <div class="quiz__card" data-answer="sim" data-why="Precisão jurídica onde o tema pede, traduzida para negócio, com pergunta aberta no fim.">
+      <p class="quiz__q">“Edital de spin-off com participação de pesquisador muda uma coisa que a universidade não tinha: sociedade no resultado. Quem no seu ecossistema já testou isso?”</p>
+    </div>
+    <div class="quiz__card" data-answer="nao" data-why="Número de resultado sem fonte e sem validação. Todo número entra com lastro aprovado por Roberto.">
+      <p class="quiz__q">“Crescemos 300% em um ano com uma equipe de quatro pessoas.”</p>
+    </div>
+    <div class="quiz__card" data-answer="sim" data-why="Fala de IA pelo efeito no caixa e na operação, admite o limite técnico e aponta para algo que existe na EJUP.">
+      <p class="quiz__q">“Na EJUP, a IA cortou pela metade o tempo de montar uma aula. Não sei explicar o modelo por dentro. Sei dizer o que mudou no custo.”</p>
+    </div>
+    <div class="quiz__result" id="quizResult"></div>
+  </div>
+  <div class="quiz__ctl">
+    <button class="btn btn--ghost" id="ansNo" type="button">Volta pra mesa</button>
+    <button class="btn" id="ansYes" type="button">Pode publicar</button>
+    <span class="quiz__count" id="quizCount">1 / 7</span>
+  </div>
+  <p class="quiz__why" id="quizWhy" aria-live="polite"></p>
+</section>
+
+<!-- ===== 11 manifesto ===== -->
+<section class="cap cap--dark cap--end" id="manifesto" data-title="Manifesto">
+  <div class="marquee marquee--dark" aria-hidden="true"><div class="marquee__track"><span>Se eu não encontro o caminho, eu mesmo o faço · </span><span>Se eu não encontro o caminho, eu mesmo o faço · </span><span>Se eu não encontro o caminho, eu mesmo o faço · </span></div></div>
+  <svg class="manif__path" viewBox="0 0 1200 220" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M 0 190 C 160 186, 320 176, 440 150" pathLength="1" data-path></path>
+    <path d="M 440 150 C 560 124, 700 60, 820 36" pathLength="1" data-path></path>
+    <path d="M 820 36 C 940 12, 1080 8, 1200 6" pathLength="1" data-path></path>
+    <circle cx="440" cy="150" r="9"></circle>
+  </svg>
+  <div class="manif">
+    <p class="manif__l">Eu não acredito que todo caminho precise ser encontrado pronto.</p>
+    <p class="manif__l">Aprendi que insistir nem sempre é o mesmo que persistir. Às vezes, persistir significa redesenhar.</p>
+    <p class="manif__l">Também aprendi que construir não significa fazer sozinho.</p>
+    <p class="manif__l">Eu não quero parecer alguém que construiu um grande ecossistema antes de construí-lo.</p>
+    <p class="manif__big">Se eu não encontro o caminho, eu mesmo o <span class="nowrap"><span class="circ circ--light" data-draw>faço</span>.</span></p>
+    <p class="manif__l manif__l--dim">Não para caminhar sozinho. Mas para construir caminhos em que outras pessoas também possam avançar.</p>
+  </div>
+  <div class="done" id="done">
+    <div class="done__head"><span class="cap__num cap__num--tag">status da obra</span><h3 id="doneTitle">Obra em andamento</h3></div>
+    <div class="done__stamps">
+      <div class="dstamp" data-stamp="1"><i></i><span>Estrutura conectada</span></div>
+      <div class="dstamp" data-stamp="2"><i></i><span>Palavra certa</span></div>
+      <div class="dstamp" data-stamp="3"><i></i><span>Protocolo</span></div>
+    </div>
+    <p class="done__d" id="doneText">Volte aos três desafios para carimbar o caderno.</p>
+    <div class="done__links">
+      <a class="btn btn--ghost btn--light" href="/livro">Livro de modelos</a>
+      <a class="btn btn--ghost btn--light" href="https://github.com/victorbarrosoc-hub/RobertoPivotto" target="_blank" rel="noopener">Documentos do sistema</a>
+      <a class="btn btn--light" href="#capa">Voltar ao início</a>
+    </div>
+  </div>
+  <footer class="credits">
+    <p>Marca pessoal de Roberto Pivotto · manual estruturado na metodologia de marca pessoal (Diagnóstico do Eu, Inimigo Cultural, Grande Visão, Lugar Simbólico, Arquétipos, Manifesto) · direção visual “caderno de obra”.</p>
+    <p>Fotos de referência via Pexels, licença Pexels: 7173040 (vidro e caneta), 6803528 (quadro), 6615235 (plantas, Tima Miroshnichenko), 15798784 (sala em obra, Francesco Ungaro), 4756489 (estrutura de madeira, Monica Silvestre), 9870132 (mesa e documentos, Ron Lach), 6963779 (livros), 5903446 (massa, Roman Odintsov), 4284574 (sombra de janela, Inga Seliverstova).</p>
+  </footer>
+</section>
+
+</main>
+
+<div class="pen" id="pen" aria-hidden="true"></div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

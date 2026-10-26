@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Proposta v2 de quadros de conteúdo do perfil pessoal de Roberto Pivotto.">
+<title>Quadros Roberto Pivotto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Instrument+Sans:wght@400;500;600&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--papel:#F1F0EA;--papel-2:#E9E7DF;--tinta:#22252A;--caneta:#2B57A6;--grafite:#6E7278;--fita:#D9CBA8;--linha:#C9C7BF}
+  @page{size:A4;margin:0}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--papel);color:var(--tinta);font-family:'Instrument Sans',sans-serif;font-size:9.4pt;line-height:1.46;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pg{width:210mm;height:297mm;overflow:hidden;padding:16mm 18mm 20mm;position:relative;page-break-after:always;background:var(--papel)}
+  .pg:last-child{page-break-after:auto}
+  .run{display:flex;justify-content:space-between;font-size:7.5pt;letter-spacing:.14em;text-transform:uppercase;color:var(--grafite);border-bottom:1px solid var(--linha);padding-bottom:3mm;margin-bottom:7mm}
+  .foot{position:absolute;left:18mm;right:18mm;bottom:10mm;display:flex;justify-content:space-between;align-items:center;font-size:7.5pt;letter-spacing:.14em;text-transform:uppercase;color:var(--grafite)}
+  .foot span:first-child{display:flex;align-items:center;gap:3mm}
+  .foot span:first-child::before{content:"";width:9mm;height:1.2mm;background:var(--caneta);border-radius:1mm}
+  .foot em{font-family:Newsreader,serif;font-style:italic;text-transform:none;letter-spacing:0;font-size:9pt}
+  .tape{display:inline-block;background:var(--fita);padding:1.6mm 4mm;font-size:7.5pt;letter-spacing:.16em;text-transform:uppercase;font-weight:500;transform:rotate(-2deg)}
+  h1{font-family:Newsreader,serif;font-weight:500;font-size:31pt;line-height:1.02;letter-spacing:-.02em;margin:6mm 0 3mm}
+  h2{font-family:Newsreader,serif;font-weight:500;font-size:17pt;line-height:1.1;letter-spacing:-.01em;margin:7mm 0 2.5mm}
+  h3{font-family:Newsreader,serif;font-weight:500;font-size:13pt;margin:5mm 0 2mm}
+  .lede{font-family:Newsreader,serif;font-size:12pt;line-height:1.4;max-width:150mm;margin:0}
+  .kicker{font-size:7.5pt;letter-spacing:.14em;text-transform:uppercase;color:var(--grafite);font-weight:500;margin:0}
+  p{margin:0 0 2.5mm}
+  ul{margin:0 0 3mm;padding-left:4.5mm}
+  li{margin-bottom:1.3mm}
+  table{width:100%;border-collapse:collapse;margin:2mm 0 4mm;font-size:8.8pt}
+  th{text-align:left;font-weight:500;font-size:7pt;letter-spacing:.12em;text-transform:uppercase;color:var(--grafite);border-bottom:1.5px solid var(--tinta);padding:1.6mm 2mm 1.6mm 0}
+  td{border-bottom:1px solid var(--linha);padding:1.6mm 2.5mm 1.6mm 0;vertical-align:top}
+  td b{font-weight:600}
+  .mono{font-family:'Courier Prime',monospace;font-size:8.5pt}
+  .sig{font-family:Newsreader,serif;font-style:italic;color:var(--caneta);font-size:10.5pt;line-height:1.35;margin:1.5mm 0 2mm}
+  .antes-depois{display:grid;grid-template-columns:1fr 12mm 1fr;align-items:start;gap:0;margin:5mm 0 0}
+  .col{border-top:3px solid var(--grafite);padding-top:3mm}
+  .col.nova{border-color:var(--caneta)}
+  .col .n{font-family:Newsreader,serif;font-size:34pt;line-height:1;font-weight:500}
+  .col.nova .n{color:var(--caneta)}
+  .col ul{list-style:none;padding:0;margin-top:3mm}
+  .col li{border-bottom:1px solid var(--linha);padding:1.3mm 0;margin:0}
+  .col li s{color:var(--grafite);text-decoration-color:var(--caneta);text-decoration-thickness:1.5px}
+  .arrow{display:flex;justify-content:center;padding-top:26mm}
+  .quadro{border-top:3px solid var(--caneta);padding-top:3.5mm;margin-top:5.5mm}
+  .quadro .top{display:flex;justify-content:space-between;align-items:baseline}
+  .quadro h2{margin:1mm 0 1mm;font-size:19pt}
+  .meta{font-size:7.5pt;letter-spacing:.14em;text-transform:uppercase;color:var(--grafite);font-weight:500}
+  .dois{display:grid;grid-template-columns:1fr 1fr;gap:7mm}
+  .regra{background:var(--tinta);color:var(--papel);padding:4.5mm 6mm;margin:4mm 0 0}
+  .regra .kicker{color:#8FB0E6;font-family:'Instrument Sans',sans-serif;font-size:7.5pt;margin:0}
+  .regra p{font-family:Newsreader,serif;font-size:11.5pt;line-height:1.35;margin:1.5mm 0 0}
+  .check li{list-style:none;position:relative;padding-left:6mm}
+  .check{padding-left:0}
+  .check li::before{content:"";position:absolute;left:0;top:1.4mm;width:3mm;height:3mm;border:1.2px solid var(--tinta)}
+  .small{font-size:8.5pt;color:#3A3E44}
+  .arte{display:block;width:100%;height:auto;border:1px solid var(--linha)}
+  .legenda{font-size:7pt;letter-spacing:.12em;text-transform:uppercase;color:var(--grafite);margin-top:1.5mm}
+  .ancora{display:grid;grid-template-columns:1fr 23mm;gap:8mm;align-items:start}
+  .entradas{display:grid;grid-template-columns:repeat(3,1fr);gap:6mm;margin:2mm 0 2mm}
+  .entrada .arte{width:44mm}
+  .entrada .t{font-family:Newsreader,serif;font-size:13pt;font-weight:500;margin:2mm 0 1mm}
+  .fmt{font-family:'Instrument Sans',sans-serif;font-size:6.8pt;letter-spacing:.12em;text-transform:uppercase;color:var(--caneta);font-weight:500;margin-left:1.5mm;vertical-align:middle}
+  .entrada p{font-size:8.6pt;line-height:1.4;margin:0 0 1mm}
+  .entrada .era{font-size:7.8pt;color:var(--grafite)}
+  .roteiro{display:grid;grid-template-columns:1fr 21mm;gap:7mm;align-items:start}
+  .anat{display:grid;grid-template-columns:52mm 1fr;gap:7mm;align-items:start;margin-top:2mm}
+
+  /* ---- tela: as folhas do PDF, uma embaixo da outra ---- */
+  @media screen{
+    html,body{background:#DEDCD4;font-size:10.5pt}
+    body{padding:24px 16px 48px}
+    .baixar{max-width:210mm;margin:0 auto 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:8pt;letter-spacing:.14em;text-transform:uppercase;color:#4A4E54}
+    .baixar a{color:var(--caneta);font-weight:600;text-decoration:none;border-bottom:1.5px solid var(--caneta)}
+    .baixar a:focus-visible{outline:2px solid var(--caneta);outline-offset:3px}
+    .pg{width:auto;max-width:210mm;height:auto;min-height:297mm;overflow:visible;margin:0 auto 16px;border:1px solid var(--linha);padding:16mm 18mm 24mm}
+    .tabela{overflow-x:auto}
+  }
+  @media screen and (max-width:760px){
+    html,body{font-size:10pt}
+    .pg{min-height:0;padding:28px 20px 72px}
+    .foot{left:20px;right:20px;bottom:22px}
+    .run{flex-direction:column;gap:4px}
+    h1{font-size:28pt}
+    .antes-depois{grid-template-columns:1fr;gap:24px}
+    .arrow{display:none}
+    .dois{grid-template-columns:1fr;gap:0}
+    .dois h2{margin-top:7mm !important}
+    .quadro .top{flex-direction:column;gap:2px}
+    .ancora,.roteiro{grid-template-columns:1fr 90px;gap:16px}
+    .entradas{grid-template-columns:1fr;gap:22px}
+    .entrada .arte{width:100%;max-width:260px}
+    .anat{grid-template-columns:1fr;gap:12px}
+    .anat .arte{max-width:260px}
+    td.mono{word-break:break-all}
+  }
+  @media print{ .baixar{display:none} }
+</style>
+</head>
+<body>
+<div class="baixar"><span>Proposta de quadros · versão 2 · 4 páginas</span><a href="/proposta/Proposta-de-quadros-de-conteudo-v2.pdf">Baixar o PDF</a></div>
+
+<!-- ============ PÁGINA 1 ============ -->
+<section class="pg">
+  <div class="run"><span>Roberto Pivotto · Marca pessoal e redes sociais</span><span>Versão 2 · setembro 2026</span></div>
+  <span class="tape">Proposta de quadros · v2</span>
+  <h1>Uma âncora e dois quadros.</h1>
+  <p class="lede">A primeira versão tinha quatro quadros autorais, mais O Código, mais sete séries de carrossel no manual. Você disse que eram quadros demais. Esta versão fica com três nomes, dos quais só dois são seus, e não perde nenhum assunto no caminho.</p>
+
+  <div class="antes-depois">
+    <div class="col">
+      <p class="kicker">Versão 1</p>
+      <div class="n">5 + 7</div>
+      <ul>
+        <li>O Código</li>
+        <li><s>Giro semanal de inovação</s></li>
+        <li><s>Direito em alta voltagem</s></li>
+        <li>O outro lado da tese</li>
+        <li>Anatomia do caso</li>
+        <li class="small">+ 7 séries de carrossel com nome próprio</li>
+      </ul>
+    </div>
+    <div class="arrow">
+      <svg width="30" height="16" viewBox="0 0 30 16" aria-hidden="true"><path d="M2 9 C 10 7, 18 9, 26 8 M20 3 L 27 8 L 20 13" fill="none" stroke="#2B57A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="col nova">
+      <p class="kicker">Versão 2</p>
+      <div class="n">1 + 2</div>
+      <ul>
+        <li><b>O Código</b> · Reels, em collab com a EJUP</li>
+        <li><b>O outro lado da tese</b> · gira entre estático, carrossel e Reels</li>
+        <li><b>Anatomia do caso</b> · carrossel, quinzenal</li>
+        <li class="small">o resto vira pauta, sem nome fixo</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Por que dois</h2>
+  <ul>
+    <li><b>Quadro só existe se a pessoa reconhece.</b> Com quatro nomes em rodízio, cada um aparecia duas vezes por mês, no máximo. Dois quadros aparecem toda semana ou a cada quinze dias, e isso vira coleção.</li>
+    <li><b>Três dos quatro eram jurídicos.</b> Tese, julgado e disputa societária. O manual pede Direito como lastro, não como destino, e a régua de percepção quer que as pessoas digam "ele estrutura negócios", não "ele comenta tribunal".</li>
+    <li><b>Faltava a sua obra.</b> Arquitetura e bastidor somam metade do mix editorial e não tinham quadro. Agora a Anatomia do caso recebe decisões reais da EJUP e da EIX CORE. É onde "provar antes de proclamar" aparece no feed.</li>
+    <li><b>Cabe numa terça.</b> Episódio de O Código e, uma vez a cada três semanas, um O outro lado em vídeo. Estáticos e carrosséis não pedem gravação.</li>
+  </ul>
+
+  <div class="regra">
+    <p class="kicker">A lógica da fusão</p>
+    <p>Giro semanal e Direito em alta voltagem faziam o mesmo movimento de O outro lado da tese: reagir ao que está circulando. Mudava só o objeto. Viraram entradas de um quadro só.</p>
+  </div>
+
+  <p class="small" style="margin-top:4mm"><b>O que não é quadro, e está bem assim.</b> Ecossistema, vida, reconstrução e o bastidor do dia a dia seguem sem nome fixo, em stories e post avulso. "Uma coisa que a EJUP me ensinou", "O que esse ecossistema faz diferente" e "Conexões que criam negócios" continuam como pauta, sem cadência nem fita de série. Bastidor com nome e cadência vira encenação.</p>
+
+  <div class="foot"><span>Roberto Pivotto</span><em>caderno de obra · 1</em></div>
+</section>
+
+<!-- ============ PÁGINA 2 ============ -->
+<section class="pg">
+  <div class="run"><span>Proposta de quadros · v2</span><span>A âncora e o quadro 1</span></div>
+
+  <div class="ancora">
+    <div>
+      <p class="kicker">Âncora · não é quadro do perfil</p>
+      <h2 style="margin-top:2mm">O Código</h2>
+      <p>Continua como está: programa da EJUP, gravado às terças. O vertical nasce no <span class="mono">@ejup.oficial</span> com você em collab. É o Reels fixo da semana. No perfil pessoal entra como corte e bastidor; o artigo sai como post estático, numa imagem, quando o episódio rende uma regra que se sustenta sozinha.</p>
+    </div>
+    <div><img class="arte" loading="lazy" src="/livro/img/Q-Codigo-Corte.png" alt="Modelo do corte de O Código em collab"><p class="legenda">Corte em collab</p></div>
+  </div>
+
+  <div class="quadro">
+    <div class="top"><span class="meta">Quadro 01</span><span class="meta">Semanal · gira entre post estático, carrossel e Reels</span></div>
+    <h2>O outro lado da tese</h2>
+    <p>A leitura do que está circulando. Você pega o que o mercado está dizendo e mostra a estrutura que a manchete não mostra. Rápido, sereno e técnico.</p>
+    <p class="sig">"No papel aceita-se qualquer tese, mas o mercado real cobra a conta da estrutura."</p>
+    <div class="entradas">
+      <div class="entrada">
+        <img class="arte" loading="lazy" src="/livro/img/Q-Tese.png" alt="Modelo com entrada tese">
+        <p class="t">Tese <span class="fmt">post estático</span></p>
+        <p>Tese frágil sobre sociedade, startup ou contrato. Na peça, o trecho citado, uma linha riscada à mão e a correção na margem.</p>
+      </div>
+      <div class="entrada">
+        <img class="arte" loading="lazy" src="/livro/img/Q-Voltagem.png" alt="Modelo com entrada julgado">
+        <p class="t">Julgado <span class="fmt">carrossel</span></p>
+        <p>Decisão do STF ou do STJ com efeito em risco e caixa. Na peça, a curva que pivota, com o número do processo.</p>
+        <p class="era">Era o Direito em alta voltagem</p>
+      </div>
+      <div class="entrada">
+        <img class="arte" loading="lazy" src="/livro/img/Q-Giro.png" alt="Modelo com entrada notícia">
+        <p class="t">Notícia <span class="fmt">Reels</span></p>
+        <p>IA, regulação tecnológica, novo negócio. Na peça, recortes de manchete presos com fita, um deles circulado.</p>
+        <p class="era">Era o Giro semanal de inovação</p>
+      </div>
+    </div>
+    <div class="roteiro">
+      <div>
+        <p><b>Roteiro fixo em três movimentos:</b> o que estão dizendo → o que a estrutura mostra → o que isso muda no contrato, no caixa ou na operação. O terceiro movimento é o quadro.</p>
+        <p class="small">O formato gira em ciclo, uma edição por semana: post estático, carrossel, Reels. A pauta sai do que está circulando, e o formato da vez sugere a entrada que combina; qualquer entrada sai em qualquer formato quando precisar. Julgado entra no máximo duas vezes por mês, porque passa por você antes de sair. O Reels é em terços, de 60 a 90 s.</p>
+      </div>
+      <div><img class="arte" loading="lazy" src="/livro/img/Q-Tese-Split.png" alt="Modelo do vídeo em terços"><p class="legenda">Reels em terços</p></div>
+    </div>
+  </div>
+
+  <div class="foot"><span>Roberto Pivotto</span><em>caderno de obra · 2</em></div>
+</section>
+
+<!-- ============ PÁGINA 3 ============ -->
+<section class="pg">
+  <div class="run"><span>Proposta de quadros · v2</span><span>O quadro 2 e o formato</span></div>
+
+  <div class="quadro" style="margin-top:0">
+    <div class="top"><span class="meta">Quadro 02</span><span class="meta">Quinzenal · carrossel executivo</span></div>
+    <h2>Anatomia do caso</h2>
+    <p>Um caso real em três atos, dissecado até a arquitetura que explica o desfecho: <b>conflito → arquitetura → lição de negócio.</b> Alterna dois tipos de caso.</p>
+    <p class="sig">"As maiores empresas do mundo não quebram por falta de ideia, mas por falhas na arquitetura dos seus ativos."</p>
+    <div class="anat">
+      <div><img class="arte" loading="lazy" src="/livro/img/Q-Anatomia.png" alt="Modelo de Anatomia do caso com a junta rompida circulada"><p class="legenda">O diagrama da junta rompida</p></div>
+      <div>
+    <div class="tabela"><table>
+      <tr><th style="width:18%">Caso</th><th style="width:40%">O que entra</th><th>O que absorveu</th></tr>
+      <tr><td><b>De fora</b></td><td>Disputa contratual ou societária, nacional ou global. No segundo ato, a falha</td><td>A versão original do quadro</td></tr>
+      <tr><td><b>De dentro</b></td><td>Decisão real da EJUP ou da EIX CORE: o modelo que mudou, o que seria refeito do zero. No segundo ato, a decisão</td><td>Do rascunho à operação · Se eu tivesse que construir isso do zero · Quando reconstruir é melhor que insistir</td></tr>
+    </table></div>
+      </div>
+    </div>
+    <p class="small">Sai em carrossel: os três atos pedem várias telas e o diagrama se lê parado. O diagrama à mão é o slide que a pessoa salva: uma junta rompida e circulada (de fora) ou refeita (de dentro). Caso de dentro sempre passa por você e nunca expõe número, sócio ou cliente sem autorização.</p>
+  </div>
+
+
+  <h2 style="margin-top:5mm">Formato e calendário do mês</h2>
+  <p class="small">O perfil varia entre três formatos: post estático, carrossel e Reels. No mês, 5 Reels, 4 posts estáticos e 3 carrosséis, e nenhum formato aparece três vezes seguidas na grade.</p>
+  <div class="tabela"><table>
+    <tr><th style="width:16mm">Semana</th><th>Segunda</th><th>Quarta</th><th>Sexta</th></tr>
+    <tr><td>1</td><td><b>Anatomia do caso</b> · carrossel</td><td><b>O Código</b> · Reels</td><td><b>O outro lado</b> · post estático</td></tr>
+    <tr><td>2</td><td>Artigo de O Código ou avulso · post estático</td><td><b>O Código</b> · Reels</td><td><b>O outro lado</b> · carrossel</td></tr>
+    <tr><td>3</td><td><b>Anatomia do caso</b> · carrossel</td><td><b>O Código</b> · Reels</td><td><b>O outro lado</b> · Reels</td></tr>
+    <tr><td>4</td><td>Avulso · post estático</td><td><b>O Código</b> · Reels</td><td><b>O outro lado</b> · post estático</td></tr>
+  </table></div>
+  <p class="small">Terça: gravação e stories de bastidor. Fim de semana: stories orgânicos. O ciclo de O outro lado continua no mês seguinte, a partir do carrossel.</p>
+
+  <div class="foot"><span>Roberto Pivotto</span><em>caderno de obra · 3</em></div>
+</section>
+
+<!-- ============ PÁGINA 4 ============ -->
+<section class="pg">
+  <div class="run"><span>Proposta de quadros · v2</span><span>Rotina, referências e decisões</span></div>
+
+  <div class="dois" style="margin-bottom:6mm">
+    <div>
+      <h3 style="margin-top:0">A tarde de terça</h3>
+      <div class="tabela"><table>
+        <tr><th>Bloco</th><th>O que grava</th><th>Quando</th></tr>
+        <tr><td>1</td><td>Episódio de O Código</td><td>toda semana</td></tr>
+        <tr><td>2</td><td>O outro lado da tese, em terços, 20 min</td><td>quando sai em Reels</td></tr>
+      </table></div>
+      <p class="small">Estáticos e carrosséis pedem, no máximo, uma foto do quadro branco.</p>
+    </div>
+    <div>
+      <h3 style="margin-top:0">No mês</h3>
+      <div class="tabela"><table>
+        <tr><td style="width:14mm"><b>5</b></td><td>Reels · 4 cortes de O Código e 1 O outro lado</td></tr>
+        <tr><td><b>4</b></td><td>posts estáticos · 2 O outro lado e 2 de segunda (artigo ou avulso)</td></tr>
+        <tr><td><b>3</b></td><td>carrosséis · 2 Anatomia do caso e 1 O outro lado</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <h2>As oito referências de formato, por quadro</h2>
+  <p class="small">Só como forma: enquadramento, ritmo de corte, texto em tela, estrutura de carrossel. Produção, luz, áudio e squad seguem o manual técnico da versão 1.</p>
+  <div class="tabela"><table>
+    <tr><th style="width:30%">Quadro</th><th style="width:36%">Formato de referência</th><th>Link</th></tr>
+    <tr><td rowspan="4"><b>O outro lado da tese</b></td><td>Vídeo vertical / reação</td><td class="mono">instagram.com/p/Dcl4-fOREsH</td></tr>
+    <tr><td>React tela dividida</td><td class="mono">instagram.com/p/Dc60DoNnd2k</td></tr>
+    <tr><td>Análise de cenário em tela</td><td class="mono">instagram.com/p/Dc4oKBGN-Mh</td></tr>
+    <tr><td>Fala direta / opinião</td><td class="mono">instagram.com/p/DdERJkuxLOR</td></tr>
+    <tr><td rowspan="3"><b>Anatomia do caso</b></td><td>Análise de caso / gancho</td><td class="mono">instagram.com/p/DdJb3RFlJKp</td></tr>
+    <tr><td>Carrossel narrativo</td><td class="mono">instagram.com/p/DcOkdzRoHeJ</td></tr>
+    <tr><td>Carrossel executivo / dados</td><td class="mono">instagram.com/p/DcTaj6BRmh5</td></tr>
+    <tr><td><b>O Código</b> (artigo)</td><td>Carrossel visual / síntese</td><td class="mono">instagram.com/p/DcwZKnFAZLV</td></tr>
+  </table></div>
+
+  <h2>Para você decidir</h2>
+  <ul class="check">
+    <li>Aprova ficar com dois quadros seus mais O Código em collab?</li>
+    <li>Giro semanal e Direito em alta voltagem podem deixar de existir como nome e virar entradas de O outro lado da tese?</li>
+    <li>Topa abrir decisões da EJUP e da EIX CORE no caso de dentro da Anatomia, sempre com a sua validação antes?</li>
+  </ul>
+
+  <div class="foot"><span>Roberto Pivotto</span><em>caderno de obra · 4</em></div>
+</section>
+</body>
+</html>

@@ -1,0 +1,17 @@
+O carro novo da Tesla usa propulsores que ela desenvolveu com a SpaceX. Duas empresas, o mesmo dono. E mesmo assim essa troca passa por contrato.
+
+Isso diz muito sobre uma frase que eu escuto toda semana: "o método que eu criei para um cliente pode virar produto". Pode. Mas só quando quatro coisas acontecem juntas.
+
+Primeira: o processo se repete. Você fez a mesma coisa para vários clientes, com o mesmo raciocínio, e não foi um projeto sob medida que só fez sentido uma vez.
+
+Segunda: ele funciona sem você. Outra pessoa do time chega ao mesmo resultado seguindo o método. Se depende do seu olho em cada caso, ainda é serviço.
+
+Terceira: a adaptação cabe no bolso. Às vezes transformar um trabalho em produto custa mais do que começar do zero.
+
+E a quarta, que quase todo mundo esquece: de quem é o que você fez? Pela lei brasileira, software feito dentro de um contrato de serviço é do contratante, se o contrato não disser outra coisa. E cessão de direito autoral só vale por escrito.
+
+Então a pergunta não é só se dá para vender. É o que é seu e o que é do cliente: o método e o know-how podem ser seus; o entregável, o código, o relatório com os dados dele podem não ser.
+
+Na prática, antes de empacotar, eu olho o contrato com o cliente, o de confidencialidade e o de quem ajudou a construir. A resposta está ali.
+
+Você já parou para ver de quem é o trabalho que você quer transformar em produto?
