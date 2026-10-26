@@ -1,6 +1,7 @@
 import type { Cliente, PassoHub, Projeto } from "./dados/tipos";
 import type { AcaoIA } from "./conversa";
 import { antesDaContratacao, ordemPassos, passoHubDoProjeto } from "./fase";
+import { diferencaDias, somarDias } from "./datas";
 
 // Importar do HUB: o consultor cola o texto (ou manda print/PDF) da página do
 // pedido no HUB e a IA lê o que está lá. Aqui ficam as conferências que o
@@ -209,10 +210,32 @@ export function efetivosDoHub(r: RespostaImportacao, projeto: Projeto | null, c:
   const envios: Efetivos["envios"] = {};
   const conhecidas = pend.etapasEnviadas.map((e) => (dataIso(c.envios[e.etapa]) ? c.envios[e.etapa] : e.dataDaIA)).filter(dataIso).sort();
   const estimativa = passos.concluido ?? conhecidas.at(-1) ?? "";
+  const total = projeto ? projeto.etapas.length : totalEtapas ?? 0;
+  // Etapa sem data própria: não repete a data da conclusão em todas; distribui entre o pagamento e a conclusão, na ordem das etapas,
+  // sem passar das datas que já se conhecem (a etapa anterior não vem depois da seguinte)
+  const conhecida = (n: number) => {
+    const e = pend.etapasEnviadas.find((x) => x.etapa === n);
+    if (!e) return "";
+    if (dataIso(c.envios[n])) return c.envios[n];
+    return e.dataDaIA && dataIso(e.dataDaIA) ? e.dataDaIA : "";
+  };
+  const distribuida = (n: number) => {
+    const ini = passos.execucao ?? "";
+    if (!dataIso(ini) || !dataIso(estimativa) || estimativa <= ini || !total) return estimativa;
+    const dias = diferencaDias(ini, estimativa);
+    let d = somarDias(ini, Math.round((dias * Math.min(n, total)) / total));
+    // Entre as datas conhecidas das etapas vizinhas
+    for (let k = n - 1; k >= 1; k--) if (conhecida(k)) { if (d < conhecida(k)) d = conhecida(k); break; }
+    for (let k = n + 1; k <= total; k++) if (conhecida(k)) { if (d > conhecida(k)) d = conhecida(k); break; }
+    return d > estimativa ? estimativa : d;
+  };
   for (const e of pend.etapasEnviadas) {
     if (dataIso(c.envios[e.etapa])) envios[e.etapa] = { data: c.envios[e.etapa], origem: "consultor" };
     else if (e.dataDaIA) envios[e.etapa] = { data: e.dataDaIA, origem: e.dataDoRelatorio ? "relatorio" : "hub" };
-    else envios[e.etapa] = { data: estimativa, origem: estimativa ? "estimativa" : "" };
+    else {
+      const data = distribuida(e.etapa);
+      envios[e.etapa] = { data, origem: data ? "estimativa" : "" };
+    }
   }
   // Plano de trabalho: do consultor, ou estimado do pagamento até a conclusão
   let planoInicio = "";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { rotuloDoPasso, type Completar, type Efetivos, type DocumentoDoHub, type LeituraRelatorio, type LeiturasDosRelatorios, type Pendencias, type RespostaImportacao } from "@/lib/hub-importar";
+import { type Completar, type Efetivos, type DocumentoDoHub, type LeituraRelatorio, type LeiturasDosRelatorios, type Pendencias, type RespostaImportacao } from "@/lib/hub-importar";
 import { formatarData } from "@/lib/datas";
 import { itensDosDocumentos } from "@/lib/hub-documentos";
 import {
@@ -460,21 +460,22 @@ export function relatoriosDasEtapas(materiais: Material[]) {
 // O que a página do HUB não mostra: o consultor completa as datas que souber. Onde falta, vai uma estimativa
 // (pagamento e conclusão provados pelos documentos), marcada, para o projeto não ficar parado.
 export function CompletarDados({ pend, ef, c, setC, relatorios }: { pend: Pendencias; ef: Efetivos; c: Completar; setC: (c: Completar) => void; relatorios: Record<number, File> }) {
-  const [mesma, setMesma] = useState("");
-  if (!pend.passosSemData.length && !pend.pedePlano && !pend.etapasEnviadas.length) return null;
+  // Os passos do HUB sem data (pedido aberto, aceite do gestor…) não são perguntados: servem de contexto para a IA, e o que ela
+  // não encontra fica sem registro. Aqui só o plano e o envio de cada etapa, e fechado: o normal é a leitura dos relatórios trazer as datas.
+  if (!pend.pedePlano && !pend.etapasEnviadas.length) return null;
   const campo = (rotulo: string, valor: string, aoMudar: (v: string) => void, dica?: string) => (
     <Campo key={rotulo} rotulo={rotulo} dica={dica}>
       <input type="date" className="campo num" value={valor} onChange={(e) => aoMudar(e.target.value)} />
     </Campo>
   );
-  const semData = pend.etapasEnviadas.filter((e) => !ef.envios[e.etapa] || ef.envios[e.etapa].origem === "estimativa" || ef.envios[e.etapa].origem === "");
+  const estimadas = pend.etapasEnviadas.filter((e) => ef.envios[e.etapa]?.origem === "estimativa" || ef.envios[e.etapa]?.origem === "").length;
   return (
-    <div className="space-y-3 rounded-[var(--radius-campo)] border border-laranja/30 bg-laranja-claro p-3">
-      <div>
-        <h3 className="text-[13px] font-semibold text-laranja">O HUB não mostra estas datas</h3>
-        <p className="text-[13px] text-tinta-2">Onde não achei, usei uma estimativa (marcada). Corrija o que souber; o que ficar em branco não é registrado.</p>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2">
+    <details className="rounded-[var(--radius-campo)] border border-linha bg-folha p-3">
+      <summary className="cursor-pointer text-[13px] font-semibold text-tinta">
+        O HUB não mostra estas datas: conferir (opcional){estimadas ? ` · ${estimadas} ${estimadas === 1 ? "estimada" : "estimadas"}` : ""}
+      </summary>
+      <p className="mt-2 text-[13px] text-tinta-2">Onde não achei, usei uma estimativa (marcada); com os relatórios lidos, as datas vêm deles. Corrija o que souber; o que ficar em branco não é registrado.</p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
         {pend.pedePlano && (
           <>
             {campo(
@@ -491,38 +492,20 @@ export function CompletarDados({ pend, ef, c, setC, relatorios }: { pend: Penden
             )}
           </>
         )}
-        {pend.passosSemData.map((p) => campo(rotuloDoPasso[p], c.passos[p] ?? "", (v) => setC({ ...c, passos: { ...c.passos, [p]: v } })))}
-        {pend.etapasEnviadas.length > 1 && semData.length > 0 && (
-          <Campo rotulo="Usar a mesma data para as etapas sem data" dica="Preenche de uma vez as etapas que estão só com estimativa.">
-            <input
-              type="date"
-              className="campo num"
-              value={mesma}
-              onChange={(e) => {
-                const v = e.target.value;
-                setMesma(v);
-                if (!v) return;
-                const envios = { ...c.envios };
-                for (const x of semData) envios[x.etapa] = v;
-                setC({ ...c, envios });
-              }}
-            />
-          </Campo>
-        )}
         {pend.etapasEnviadas.map((e) => {
           const v = ef.envios[e.etapa];
           const dica =
             v?.origem === "relatorio"
               ? `Data tirada do relatório “${relatorios[e.etapa]?.name ?? ""}” (a mais recente entre o fechamento e as assinaturas). Confira.`
               : v?.origem === "estimativa"
-                ? "Estimativa: a data da conclusão (atesto final). Corrija se souber."
+                ? "Estimativa: distribuída entre o pagamento e a conclusão. Corrija se souber."
                 : relatorios[e.etapa]
                   ? `O relatório “${relatorios[e.etapa].name}” vai para Entregas.`
                   : "O HUB não tinha o relatório para baixar: anexe o PDF depois em Entregas.";
           return campo(`Etapa ${String(e.etapa).padStart(2, "0")} enviada no HUB em`, c.envios[e.etapa] ?? v?.data ?? "", (d) => setC({ ...c, envios: { ...c.envios, [e.etapa]: d } }), dica);
         })}
       </div>
-    </div>
+    </details>
   );
 }
 

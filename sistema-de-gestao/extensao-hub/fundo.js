@@ -763,7 +763,7 @@ const nomeDaDisposicao = (disp) => {
 };
 
 // Clica de verdade no botão marcado e junta o que o navegador viu a página baixar (resposta de rede com arquivo, ou download)
-async function cliqueReal(tabId, sessao, i, limite) {
+async function cliqueReal(tabId, sessao, i, limite, vigia = null) {
   const [pos] = await chrome.scripting.executeScript({ target: { tabId }, func: posicionarMarcado, args: ["data-blimp-dl", i] });
   const ponto = pos?.result;
   if (!ponto) return { ok: false, motivo: "o botão não está mais na página" };
@@ -783,6 +783,11 @@ async function cliqueReal(tabId, sessao, i, limite) {
     await esperar(200);
     const tem = sessao.eventos.some((e) => (e.metodo === "Network.responseReceived" && ehArquivo(e.params.response)) || e.metodo === "Page.downloadWillBegin");
     if (tem && !achouEm) achouEm = Date.now();
+    // A página abriu o arquivo numa aba nova: já dá para seguir por lá
+    if (!tem && vigia && [...vigia.achadas.values()].some((a) => /^(https?:|blob:)/i.test(a.url))) {
+      await esperar(400);
+      break;
+    }
     // Dá um tempo para o arquivo terminar de chegar
     if (achouEm && Date.now() - achouEm > 1200) break;
   }
@@ -855,6 +860,73 @@ async function progresso(passo) {
 
 // Lê uma página de pedido do HUB: o texto, os balões, o que o botão de situação mostra, e os anexos (por link e
 // clicando nos botões de download). Devolve o que a extensão guarda para o Blimp pedir.
+// Baixa um endereço com a sessão do HUB: pela própria página (mesmo site, ou blob: criado por ela) ou, se for de outro site que a
+// pessoa já permitiu, pela extensão. Devolve também o site, para pedir a permissão quando o navegador bloqueia.
+async function baixarEndereco(tabId, hubOrigem, permitidas, url) {
+  let origem = "";
+  try {
+    origem = new URL(url).origin;
+  } catch {
+    return { ok: false, motivo: "endereço inválido", origem: "" };
+  }
+  const mesmoSite = origem === hubOrigem || /^blob:/i.test(url);
+  let r;
+  if (!mesmoSite && permitidas.some((o) => padraoCasa(o, url))) {
+    try {
+      const resp = await fetch(url, { credentials: "include" });
+      const tipo = (resp.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
+      if (!resp.ok) r = { ok: false, motivo: `respondeu ${resp.status}` };
+      else if (tipo === "text/html") r = { ok: false, motivo: "veio uma página no lugar do arquivo (sessão vencida?)" };
+      else {
+        const buf = new Uint8Array(await resp.arrayBuffer());
+        if (buf.length > MAX_ARQUIVO) r = { ok: false, motivo: "passa de 10 MB" };
+        else {
+          let bin = "";
+          for (let k = 0; k < buf.length; k += 0x8000) bin += String.fromCharCode(...buf.subarray(k, k + 0x8000));
+          r = { ok: true, tipo, tamanho: buf.length, disposicao: resp.headers.get("content-disposition") || "", base64: btoa(bin) };
+        }
+      }
+    } catch {
+      r = { ok: false, motivo: "bloqueado", bloqueado: true };
+    }
+  } else {
+    const [exec] = await chrome.scripting.executeScript({ target: { tabId }, func: baixarNaPagina, args: [url, MAX_ARQUIVO] });
+    r = exec?.result ?? { ok: false, motivo: "sem resposta" };
+  }
+  return { ...r, origem, mesmoSite };
+}
+
+// Abas que a página abre sozinha (o botão de baixar costuma abrir o PDF numa aba nova): anota o endereço de cada uma enquanto o clique acontece
+function vigiarAbas() {
+  const achadas = new Map();
+  const criada = (t) => achadas.set(t.id, { id: t.id, url: t.pendingUrl || t.url || "" });
+  const atualizada = (id, info, t) => {
+    const a = achadas.get(id);
+    const u = info.url || t.url || t.pendingUrl;
+    if (a && u && !/^(about:blank|chrome:\/\/newtab)/i.test(u)) a.url = u;
+  };
+  chrome.tabs.onCreated.addListener(criada);
+  chrome.tabs.onUpdated.addListener(atualizada);
+  return {
+    achadas,
+    // Espera os endereços aparecerem, devolve os que servem para baixar e fecha as abas que a página abriu
+    async recolher(espera) {
+      const fim = Date.now() + espera;
+      const util = (u) => /^(https?:|blob:)/i.test(u);
+      while (Date.now() < fim && ![...achadas.values()].some((a) => util(a.url))) await esperar(250);
+      const urls = [...new Set([...achadas.values()].map((a) => a.url).filter(util))];
+      const ids = [...achadas.keys()];
+      achadas.clear();
+      if (ids.length) await chrome.tabs.remove(ids).catch(() => {});
+      return urls;
+    },
+    parar() {
+      chrome.tabs.onCreated.removeListener(criada);
+      chrome.tabs.onUpdated.removeListener(atualizada);
+    },
+  };
+}
+
 async function lerDetalhe(tabId, prefixo = "") {
   let sessao = null;
   const mouseReal = { pedido: false, usado: false, motivo: "" };
@@ -910,31 +982,8 @@ async function lerDetalheCom(tabId, prefixo, sessao) {
     for (const [i, link] of candidatos.entries()) {
       const rotulo = link.rotulo || baseDe(link.url) || link.url;
       await progresso({ etapa: "baixando", texto: `${prefixo}Baixando ${i + 1} de ${candidatos.length}: ${rotulo.slice(0, 60)}`, atual: i + 1, de: candidatos.length });
-      let r;
-      const mesmoSite = new URL(link.url).origin === hub.origin;
-      // Outro endereço (ex.: armazenamento de arquivos): só com permissão dada antes
-      if (!mesmoSite && permitidas.some((o) => padraoCasa(o, link.url))) {
-        try {
-          const resp = await fetch(link.url, { credentials: "include" });
-          const tipo = (resp.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
-          if (!resp.ok) r = { ok: false, motivo: `respondeu ${resp.status}` };
-          else if (tipo === "text/html") r = { ok: false, motivo: "veio uma página no lugar do arquivo (sessão vencida?)" };
-          else {
-            const buf = new Uint8Array(await resp.arrayBuffer());
-            if (buf.length > MAX_ARQUIVO) r = { ok: false, motivo: "passa de 10 MB" };
-            else {
-              let bin = "";
-              for (let k = 0; k < buf.length; k += 0x8000) bin += String.fromCharCode(...buf.subarray(k, k + 0x8000));
-              r = { ok: true, tipo, tamanho: buf.length, disposicao: resp.headers.get("content-disposition") || "", base64: btoa(bin) };
-            }
-          }
-        } catch {
-          r = { ok: false, motivo: "bloqueado", bloqueado: true };
-        }
-      } else {
-        const [exec] = await chrome.scripting.executeScript({ target: { tabId }, func: baixarNaPagina, args: [link.url, MAX_ARQUIVO] });
-        r = exec?.result ?? { ok: false, motivo: "sem resposta" };
-      }
+      const r = await baixarEndereco(tabId, hub.origin, permitidas, link.url);
+      const mesmoSite = r.mesmoSite;
       if (!r.ok) {
         const outro = !mesmoSite ? new URL(link.url).origin : "";
         falhas.push({ nome: rotulo, url: link.url, motivo: r.bloqueado && outro ? "está em outro endereço, que o navegador bloqueia sem permissão" : r.motivo, origemBloqueada: r.bloqueado && outro ? outro : "" });
@@ -968,13 +1017,31 @@ async function lerDetalheCom(tabId, prefixo, sessao) {
           continue;
         }
         await progresso({ etapa: "clicando", texto: `${prefixo}Baixando ${n + 1} de ${botoes.length}: ${b.etapa ? `etapa ${String(b.etapa).padStart(2, "0")}` : b.rotulo.slice(0, 50)}`, atual: n + 1, de: botoes.length });
-        let r = sessao ? await cliqueReal(tabId, sessao, b.i, MAX_ARQUIVO).catch((e) => ({ ok: false, motivo: String(e?.message ?? e).slice(0, 80) })) : { ok: false };
-        // Sem mouse de verdade (ou ele não pegou nada): o clique da página, com a captura do arquivo que ela gera
-        if (!r.ok) {
-          const [exec] = await chrome.scripting.executeScript({ target: { tabId }, world: "MAIN", func: clicarECapturar, args: [b.i, 7000, MAX_ARQUIVO] });
-          r = exec?.result ?? { ok: false, motivo: "sem resposta" };
+        // O botão pode baixar na hora ou abrir o PDF numa aba nova: a extensão vigia as abas que a página abrir e usa o endereço delas
+        const vigia = vigiarAbas();
+        let r;
+        let abasDoClique = [];
+        try {
+          r = sessao ? await cliqueReal(tabId, sessao, b.i, MAX_ARQUIVO, vigia).catch((e) => ({ ok: false, motivo: String(e?.message ?? e).slice(0, 80) })) : { ok: false };
+          if (!r.ok) {
+            abasDoClique = await vigia.recolher(sessao ? 3000 : 0);
+            if (abasDoClique.length) r = { ok: true, itens: abasDoClique.map((href) => ({ tipo: "href", href, nome: "" })) };
+          }
+          // Sem mouse de verdade (ou ele não pegou nada): o clique da página, com a captura do arquivo que ela gera
+          if (!r.ok) {
+            const [exec] = await chrome.scripting.executeScript({ target: { tabId }, world: "MAIN", func: clicarECapturar, args: [b.i, 7000, MAX_ARQUIVO] });
+            r = exec?.result ?? { ok: false, motivo: "sem resposta" };
+            if (!r.ok) {
+              abasDoClique = await vigia.recolher(3000);
+              if (abasDoClique.length) r = { ok: true, itens: abasDoClique.map((href) => ({ tipo: "href", href, nome: "" })) };
+            }
+          }
+        } finally {
+          // Abas que sobraram (o clique deu certo por outro caminho): fecha, o conteúdo já veio
+          await vigia.recolher(0);
+          vigia.parar();
         }
-        const registro = { etapa: b.etapa, rotulo: b.rotulo, motivo: b.motivo, gerou: 0, erro: "" };
+        const registro = { etapa: b.etapa, rotulo: b.rotulo, motivo: b.motivo, gerou: 0, erro: "", abas: abasDoClique.map((u) => u.replace(/[?#].*$/, "")) };
         if (!r.ok) {
           registro.erro = r.motivo;
           cliques.push(registro);
@@ -988,10 +1055,16 @@ async function lerDetalheCom(tabId, prefixo, sessao) {
           }
           if (item.tipo === "blob") dados = { tipo: item.mime, tamanho: item.tamanho, base64: item.base64, disposicao: "" };
           else {
-            const [ex2] = await chrome.scripting.executeScript({ target: { tabId }, func: baixarNaPagina, args: [item.href, MAX_ARQUIVO] });
-            const x = ex2?.result;
-            if (!x?.ok) {
-              falhas.push({ nome: b.rotulo || `etapa ${b.etapa}`, url: item.href, motivo: x?.motivo ?? "sem resposta" });
+            const x = await baixarEndereco(tabId, hub.origin, permitidas, item.href);
+            if (!x.ok) {
+              const outro = !x.mesmoSite ? x.origem : "";
+              falhas.push({
+                nome: b.rotulo || `etapa ${b.etapa}`,
+                url: item.href,
+                motivo: x.bloqueado && outro ? "está em outro endereço, que o navegador bloqueia sem permissão" : (x.motivo ?? "sem resposta"),
+                origemBloqueada: x.bloqueado && outro ? outro : "",
+              });
+              registro.erro = x.motivo ?? "sem resposta";
               continue;
             }
             dados = x;

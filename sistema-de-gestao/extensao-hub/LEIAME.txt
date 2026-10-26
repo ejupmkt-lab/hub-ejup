@@ -9,6 +9,7 @@ vai mudar; só vale quando você confirma. Os PDFs e imagens baixados ficam guar
 Envolvidos e botão "Baixar" (1.7.0): a extensão passa o mouse na foto e nas iniciais de cada envolvido (cliente, gestor do
 SEBRAE, consultor) e lê o balão de cada um; em cada etapa do Plano de Entrega ela passa o mouse nos três ícones, lê o balão
 ("Informações", "Enviar", "Baixar") e clica só no de baixar. Botão de baixar desligado (etapa ainda sem relatório) é pulado.
+Quando o botão de baixar abre o PDF numa aba nova, a extensão vê o endereço da aba, baixa o arquivo com a sua sessão e fecha a aba.
 Se mesmo assim algum nome ou relatório não vier, marque na janelinha "Mouse de verdade": a extensão passa o mouse e clica como
 uma pessoa, pelo depurador do navegador (o navegador mostra o aviso "depurando" durante a leitura).
 
