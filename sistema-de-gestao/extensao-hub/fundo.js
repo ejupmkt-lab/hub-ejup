@@ -623,7 +623,12 @@ async function origensPermitidas() {
 
 function padraoCasa(padrao, url) {
   try {
-    return new URL(padrao.replace(/\/\*$/, "")).origin === new URL(url).origin;
+    const p = padrao.replace(/\/\*$/, "");
+    const u = new URL(url);
+    // "https://*/*" (qualquer site seguro), "http://*/*" ou "*://*/*"
+    const curinga = /^(\*|https?):\/\/\*$/.exec(p);
+    if (curinga) return curinga[1] === "*" ? /^https?:$/.test(u.protocol) : u.protocol === `${curinga[1]}:`;
+    return new URL(p).origin === u.origin;
   } catch {
     return false;
   }

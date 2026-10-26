@@ -98,6 +98,9 @@ export type LeituraRelatorio = {
   // De que etapa a IA diz que o PDF é (0 = não é relatório técnico de etapa)
   etapa?: number;
   eh_relatorio_tecnico?: boolean;
+  // A empresa atendida, como está na identificação do relatório
+  cnpj?: string;
+  empresa?: string;
   resumo: string;
 };
 export type LeiturasDosRelatorios = Record<number, LeituraRelatorio | { erro: string }>;
@@ -306,4 +309,34 @@ export function montarAcoes(
         envios.push({ tipo: "registrar_envio_etapa", etapa: e.ordem, data: e.enviadaEm, relatorio: rel, ...datasDoRelatorio(comLeitura(leituras, e.ordem)) });
     }
   return [...dados, ...definir, ...plano, ...antes, ...envios.sort((a, b) => (a.tipo === "registrar_envio_etapa" && b.tipo === "registrar_envio_etapa" ? a.etapa - b.etapa : 0)), ...depois, ...situacao];
+}
+
+// CNPJ válido (dígitos verificadores), para não aceitar número qualquer lido do texto da página
+export function cnpjValido(texto: string) {
+  const d = (texto ?? "").replace(/\D/g, "");
+  if (d.length !== 14 || /^(\d)\1+$/.test(d)) return false;
+  const dv = (base: string, pesos: number[]) => {
+    const soma = base.split("").reduce((a, n, i) => a + Number(n) * pesos[i], 0) % 11;
+    return soma < 2 ? 0 : 11 - soma;
+  };
+  return dv(d.slice(0, 12), [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]) === Number(d[12]) && dv(d.slice(0, 13), [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]) === Number(d[13]);
+}
+
+// O CNPJ do cliente no que a extensão leu: o balão do envolvido que se diz "Cliente" (ex.: "[AR] Cliente: Orb … | CNPJ: 11.222.333/0001-81 | …")
+export function cnpjDoCliente(texto: string) {
+  const re = /\d{2}[.\s]?\d{3}[.\s]?\d{3}[\/\s]?\d{4}[-\s]?\d{2}/g;
+  for (const linha of (texto ?? "").split("\n")) {
+    if (!/cliente/i.test(linha) || !/cnpj/i.test(linha)) continue;
+    for (const m of linha.matchAll(re)) if (cnpjValido(m[0])) return m[0].replace(/\D/g, "");
+  }
+  return "";
+}
+
+// O CNPJ lido nos relatórios das etapas (a IA o copia da identificação de cada um)
+export function cnpjDosRelatorios(leituras: LeiturasDosRelatorios | undefined) {
+  for (const l of Object.values(leituras ?? {})) {
+    const d = ("cnpj" in l ? l.cnpj ?? "" : "").replace(/\D/g, "");
+    if (d.length === 14) return d;
+  }
+  return "";
 }

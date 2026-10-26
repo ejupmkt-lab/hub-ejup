@@ -97,10 +97,22 @@ function item(texto) {
   el("detalhes").append(li);
 }
 
+// O arquivo do relatório costuma estar em outro endereço (armazenamento de arquivos): uma vez só, o navegador pergunta se a extensão
+// pode baixar de qualquer site https com a sua sessão. Sem isso, só baixa o que for do próprio HUB.
+async function permitirDownloads() {
+  const todos = { origins: ["https://*/*"] };
+  try {
+    return (await chrome.permissions.contains(todos)) || (await chrome.permissions.request(todos));
+  } catch {
+    return false;
+  }
+}
+
 async function iniciar() {
   botao.disabled = true;
   el("detalhes").replaceChildren();
   el("acoes").replaceChildren();
+  await permitirDownloads();
   dizer("Lendo…");
   acompanhar();
   try {
@@ -121,10 +133,9 @@ async function iniciarLote() {
   el("detalhes").replaceChildren();
   el("acoes").replaceChildren();
   try {
-    // O navegador pede a permissão uma vez: com ela, a extensão abre cada pedido sem perder o acesso à página
-    const origem = `${new URL(abaHub.url).origin}/*`;
-    if (!(await chrome.permissions.contains({ origins: [origem] })) && !(await chrome.permissions.request({ origins: [origem] }))) {
-      return dizer("Sem a permissão para este endereço do HUB não consigo abrir um pedido depois do outro.", "erro");
+    // O navegador pede a permissão uma vez: com ela, a extensão abre cada pedido e baixa os arquivos de onde estiverem
+    if (!(await permitirDownloads())) {
+      return dizer("Sem a permissão para baixar os arquivos não consigo ler os pedidos da lista. Marque “Permitir” quando o navegador perguntar.", "erro");
     }
     dizer("Procurando os pedidos da lista…");
     acompanhar();

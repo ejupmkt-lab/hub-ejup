@@ -7,7 +7,7 @@ import type { Cliente, EmpresaSlug } from "@/lib/dados/tipos";
 import { novoId, registrarEvento, useEstado, useUsuario } from "@/lib/dados/store";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { aplicarAcoes, type AcaoIA } from "@/lib/conversa";
-import { completarVazio, efetivosDoHub, montarAcoes, pendenciasDoHub, type Completar, type RespostaImportacao } from "@/lib/hub-importar";
+import { cnpjDoCliente, cnpjDosRelatorios, completarVazio, efetivosDoHub, montarAcoes, pendenciasDoHub, type Completar, type RespostaImportacao } from "@/lib/hub-importar";
 import { carimbarInicios, reencadearExecucao } from "@/lib/fase";
 import { montarProjeto } from "@/lib/projeto-novo";
 import { servicosDaEmpresa } from "@/lib/servicos";
@@ -95,7 +95,10 @@ export function ImportarHubNovo({
   const modelo = modelos.find((m) => m.id === modeloId);
 
   // Cliente: o do CNPJ lido; sem CNPJ válido, o consultor escolhe um já cadastrado
-  const cnpjDoHub = digitos(ident?.cnpj ?? "");
+  // O CNPJ vem da leitura da página; se a IA não o achou lá, dos relatórios das etapas ou do balão do cliente nos envolvidos
+  const cnpjDaIA = digitos(ident?.cnpj ?? "");
+  const empresaLida = ident?.empresa?.trim() || Object.values(leituras).map((l) => ("empresa" in l ? l.empresa?.trim() : "") ?? "").find(Boolean) || "";
+  const cnpjDoHub = cnpjDaIA.length === 14 ? cnpjDaIA : cnpjDosRelatorios(leituras) || cnpjDoCliente(h.texto) || cnpjDaIA;
   const cnpjLido = cnpjDoHub.length === 14 ? cnpjDoHub : digitos(cnpjDigitado);
   const cnpjValido = cnpjLido.length === 14;
   const clienteDoCnpj = cnpjValido ? clientes.find((c) => digitos(c.cnpj) === cnpjLido) : undefined;
@@ -179,7 +182,7 @@ export function ImportarHubNovo({
         } catch {
           avisosFinais.push("a consulta do CNPJ na Receita falhou; o cadastro do cliente ficou só com o que veio do HUB");
         }
-        const nomeHub = ident?.empresa?.trim() ?? "";
+        const nomeHub = empresaLida;
         clienteId = novoId("cli");
         cliente = {
           ...(vazioCliente as unknown as Cliente),
@@ -287,10 +290,10 @@ export function ImportarHubNovo({
                 </>
               ) : cadastrarCliente ? (
                 <>
-                  {ident?.empresa || "Empresa do pedido"} · {formatarCnpj(cnpjLido)} <span className="text-tinta-2">(será cadastrado com os dados da Receita Federal)</span>
+                  {empresaLida || "Empresa do pedido"} · {formatarCnpj(cnpjLido)} <span className="text-tinta-2">(será cadastrado com os dados da Receita Federal)</span>
                 </>
               ) : (
-                <span className="text-laranja">não encontrei o CNPJ no conteúdo{ident?.empresa ? ` (empresa: ${ident.empresa})` : ""}. Digite o CNPJ para cadastrar{clientes.length ? " ou escolha um cliente já cadastrado" : ""}:</span>
+                <span className="text-laranja">não encontrei o CNPJ no conteúdo{empresaLida ? ` (empresa: ${empresaLida})` : ""}. Digite o CNPJ para cadastrar{clientes.length ? " ou escolha um cliente já cadastrado" : ""}:</span>
               )}
             </p>
             {cnpjDoHub.length !== 14 && !clienteDoCnpj && (

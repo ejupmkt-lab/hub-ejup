@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Blimp: importar do HUB SEBRAE",
   "description": "Com um clique na extensão, lê a página do HUB que você está vendo, baixa os anexos e leva tudo para o projeto aberto no Blimp.",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAl574x6wIZo09V3TTZrbz2s4hnWp7b49f7UmKJHl3+Fcg/FvPqyIDt3OiTYb45QkgBee4UBphsEdcCf9edaNzvfmy5lhyjmH+QKqpee0WKXOilzABkvxf915lhAVV2G5bF4ToDOdKXKKxvQG3dRdHnSPZzAJ/NduRIuV7fgp3IxVtLzyvsrw+KiYEad7fcwoSMap5jEG6GXa1VhhFpe4PUrWsiJaaNTf0DihM1QMBT1ZyvXn8Tj+y+GwvBMgMLa2Z4kMMBB+PxXvoKQqf6RddIx0yDie3M7/JNEyyyZiutbrvJ4riuUjuoIr5Aucr8yNUeIjDf80mKBTThKtcUPTWzQIDAQAB",
   "minimum_chrome_version": "111",
   "permissions": [
