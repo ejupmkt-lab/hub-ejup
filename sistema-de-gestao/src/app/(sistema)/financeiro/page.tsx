@@ -34,15 +34,11 @@ export default function Financeiro() {
         }
       />
       <div className="space-y-4">
-        <p className="rounded-[var(--radius-bloco)] border border-laranja/30 bg-laranja-claro/70 px-4 py-3 text-sm text-tinta">
-          Esta área ainda está em desenvolvimento. Por enquanto: o que cai em cada mês, na ordem em que entra, o imposto pela faixa do faturamento e o que dá para garantir até
-          o próximo dia 20. O valor de cada projeto e as parcelas ficam em “Dados do projeto”; o teto e o valor da hora, na ficha de cada serviço.
-        </p>
         <Cartao className="p-4 sm:p-5">
-          <h2 className="text-[17px] font-bold">A receber</h2>
+          <h2 className="text-[17px] font-bold">Recebimentos</h2>
           <p className="mt-0.5 text-sm text-tinta-2">
             O SEBRAE paga até o dia 5 o que ficou pronto até o dia 20 do mês anterior: 30% quando o Relatório 1 sai e o restante quando o projeto é finalizado.
-            Antes disso, a data é estimada pelo plano de trabalho (ou a que você combinar em “Dados do projeto”).
+            Antes disso a data é estimada pelo plano; corrija qualquer data, valor ou recebimento em “Editar”.
           </p>
           <div className="mt-4">
             <AReceber projetos={projetos} />

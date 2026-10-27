@@ -31,6 +31,7 @@ export type FinProjeto = {
   percFuncern: number | null;
   recebidos: Record<string, string>;
   previsoes: Record<string, string>; // data combinada de cada parcela, no lugar da estimada
+  valores: Record<string, number>; // valor de cada parcela ajustado à mão, no lugar do calculado
 };
 export type FinEmpresa = ConfigImposto & { empresa: string };
 
@@ -80,14 +81,19 @@ export function dataFinalizacao(p: Projeto): string | null {
 export type OrigemDaData = "hub" | "plano" | "manual";
 
 export type Parcela = {
-  chave: "30" | "70" | "100";
+  chave: "30" | "70";
+  ordem: 1 | 2;
   percentual: number;
   valor: number;
+  valorCalculado: number;
   previsao: string | null; // dia 5 previsto
   origem: OrigemDaData | null;
   condicao: string;
   recebidaEm: string | null;
 };
+
+// Projetos antigos guardaram o pagamento único como "100": vale para as duas parcelas
+const lerMapa = <T,>(mapa: Record<string, T> | undefined, chave: string): T | undefined => mapa?.[chave] ?? mapa?.["100"];
 
 export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje = hojeIso()) {
   const valorHora = fp?.valorHora ?? fs?.valorHora ?? VALOR_HORA_PADRAO;
@@ -106,39 +112,37 @@ export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje =
   const data1 = envio1 ?? planoEnvio1;
   const dataFim = fim ?? (planoFim && data1 && planoFim < data1 ? data1 : planoFim);
   const ciclo1 = data1 ? diaDoPagamento(data1) : null;
-  const juntosDeVerdade = !!envio1 && !!fim; // as duas datas são do HUB: dá para saber se caem no mesmo pagamento
   let cicloFim = dataFim ? diaDoPagamento(dataFim) : null;
   // Estimativa: o restante só é pago depois da finalização, então nunca no mesmo pagamento dos 30% (a menos que o HUB mostre o contrário)
-  if (!juntosDeVerdade && cicloFim && ciclo1 && cicloFim <= ciclo1) cicloFim = proximoPagamento(ciclo1);
-  const recebidos = fp?.recebidos ?? {};
-  const previsoes = fp?.previsoes ?? {};
-  const condicaoFim = fim ? `Finalizado no HUB em ${formatarData(fim)}` : "Quando o projeto for finalizado no HUB (último relatório e avaliação do cliente)";
-  const parcela = (chave: Parcela["chave"], percentual: number, previsao: string | null, doHub: boolean, condicao: string): Parcela => ({
-    chave,
-    percentual,
-    valor: (liquido * percentual) / 100,
-    previsao: previsoes[chave] ?? previsao,
-    origem: previsoes[chave] ? "manual" : previsao ? (doHub ? "hub" : "plano") : null,
-    condicao,
-    recebidaEm: recebidos[chave] ?? null,
-  });
-  // Tudo no mesmo pagamento: o Relatório 1 e a finalização no mesmo ciclo (a menos que os 30% já tenham sido pagos)
-  const juntos = juntosDeVerdade && !!ciclo1 && !!cicloFim && ciclo1 >= cicloFim && !recebidos["30"] && !recebidos["70"];
-  const parcelas = juntos
-    ? [parcela("100", 100, cicloFim, true, condicaoFim)]
-    : [
-        parcela("30", 30, ciclo1, !!envio1, envio1 ? `Relatório 1 enviado em ${formatarData(envio1)}` : "Quando o Relatório 1 for enviado no HUB"),
-        parcela("70", 70, cicloFim, !!fim, condicaoFim),
-      ];
-  // Na ordem em que o dinheiro entra; as sem data ficam no fim
-  parcelas.sort((a, b) => (a.previsao ?? "9999").localeCompare(b.previsao ?? "9999"));
+  if (!(envio1 && fim) && cicloFim && ciclo1 && cicloFim <= ciclo1) cicloFim = proximoPagamento(ciclo1);
+  const condicaoFim = fim ? `Finalizado no HUB em ${formatarData(fim)}` : "Quando o projeto for finalizado no HUB";
+  const parcela = (chave: Parcela["chave"], ordem: 1 | 2, percentual: number, previsao: string | null, doHub: boolean, condicao: string): Parcela => {
+    const manual = lerMapa(fp?.previsoes, chave);
+    const valorCalculado = (liquido * percentual) / 100;
+    return {
+      chave,
+      ordem,
+      percentual,
+      valor: lerMapa(fp?.valores, chave) ?? valorCalculado,
+      valorCalculado,
+      previsao: manual ?? previsao,
+      origem: manual ? "manual" : previsao ? (doHub ? "hub" : "plano") : null,
+      condicao,
+      recebidaEm: lerMapa(fp?.recebidos, chave) ?? null,
+    };
+  };
+  // Sempre duas parcelas, na ordem em que o dinheiro entra (mesmo que caiam no mesmo dia 5)
+  const parcelas = [
+    parcela("30", 1, 30, ciclo1, !!envio1, envio1 ? `Relatório 1 enviado em ${formatarData(envio1)}` : "Quando o Relatório 1 for enviado no HUB"),
+    parcela("70", 2, 70, cicloFim, !!fim, condicaoFim),
+  ];
   return { horas, valorHora, percFuncern, bruto, funcern, liquido, parcelas };
 }
 
 export type Entrada = {
   projeto: Projeto;
   parcela: Parcela;
-  mes: string | null; // AAAA-MM do pagamento
+  mes: string | null; // AAAA-MM em que o dinheiro entrou (ou entra)
   aliquota: number | null; // % de imposto do mês do pagamento
   imposto: number;
   aposImposto: number;
@@ -154,11 +158,13 @@ export function entradasDeRecebimento(
 ): Entrada[] {
   const lista = projetos.flatMap((p) =>
     recebimento(p, servicos[p.modeloId], fps[p.id], hoje).parcelas.map((parcela): Entrada => {
-      const mes = parcela.previsao ? parcela.previsao.slice(0, 7) : null;
+      const dia = parcela.recebidaEm ?? parcela.previsao;
+      const mes = dia ? dia.slice(0, 7) : null;
       const aliquota = mes ? aliquotaNoMes(empresas[p.empresa], mes) : null;
       const imp = aliquota === null ? 0 : imposto(parcela.valor, aliquota);
       return { projeto: p, parcela, mes, aliquota, imposto: imp, aposImposto: parcela.valor - imp };
     }),
   );
-  return lista.sort((a, b) => (a.parcela.previsao ?? "9999").localeCompare(b.parcela.previsao ?? "9999") || a.projeto.id.localeCompare(b.projeto.id) || a.parcela.chave.localeCompare(b.parcela.chave));
+  const dataDe = (e: Entrada) => e.parcela.recebidaEm ?? e.parcela.previsao ?? "9999";
+  return lista.sort((a, b) => dataDe(a).localeCompare(dataDe(b)) || a.projeto.id.localeCompare(b.projeto.id) || a.parcela.chave.localeCompare(b.parcela.chave));
 }

@@ -7,6 +7,9 @@ import type { MudancaDeAliquota } from "@/lib/imposto";
 import { traduzirErro } from "@/lib/erros";
 import { useUsuario } from "./store";
 
+export type AjusteDeParcela = { previsao?: string | null; valor?: number | null; recebidaEm?: string | null };
+export type Financeiro = NonNullable<ReturnType<typeof useFinanceiro>>;
+
 // Valores e recebimentos, carregados só para quem tem a permissão (o banco
 // não entrega nada aos demais). Devolve null para quem não vê o financeiro.
 export function useFinanceiro() {
@@ -22,7 +25,7 @@ export function useFinanceiro() {
     const sb = supabaseNavegador();
     const [s, p, e] = await Promise.all([
       sb.from("financeiro_servicos").select("servico_id, empresa, teto, valor_hora, perc_funcern"),
-      sb.from("financeiro_projetos").select("projeto_id, empresa, valor_hora, perc_funcern, recebidos, previsoes"),
+      sb.from("financeiro_projetos").select("projeto_id, empresa, valor_hora, perc_funcern, recebidos, previsoes, valores"),
       sb.from("financeiro_empresas").select("empresa, faturamento_12m, aliquota_fixa, mudancas"),
     ]);
     setServicos(
@@ -44,6 +47,7 @@ export function useFinanceiro() {
             percFuncern: x.perc_funcern === null ? null : Number(x.perc_funcern),
             recebidos: (x.recebidos ?? {}) as Record<string, string>,
             previsoes: (x.previsoes ?? {}) as Record<string, string>,
+            valores: (x.valores ?? {}) as Record<string, number>,
           },
         ]),
       ),
@@ -87,6 +91,7 @@ export function useFinanceiro() {
         perc_funcern: f.percFuncern,
         recebidos: f.recebidos,
         previsoes: f.previsoes,
+        valores: f.valores,
         updated_at: new Date().toISOString(),
       });
     if (error) {
@@ -100,6 +105,29 @@ export function useFinanceiro() {
     }
   };
 
+  // Muda uma parcela: data prevista, valor e/ou dia em que foi recebida (null apaga e volta ao calculado)
+  const ajustarParcela = (p: { id: string; empresa: string }, chave: "30" | "70", a: AjusteDeParcela) => {
+    const base: FinProjeto = projetos[p.id] ?? { projetoId: p.id, empresa: p.empresa, valorHora: null, percFuncern: null, recebidos: {}, previsoes: {}, valores: {} };
+    // O pagamento único antigo ("100") vira as duas parcelas, para poder mexer em cada uma
+    const abrir = <T,>(m: Record<string, T>) => {
+      const { "100": unico, ...resto } = m;
+      return unico === undefined ? resto : { "30": unico, "70": unico, ...resto };
+    };
+    const troca = <T,>(m: Record<string, T>, v: T | null | undefined) => {
+      const y = abrir(m);
+      if (v === undefined) return y;
+      if (v === null) delete y[chave];
+      else y[chave] = v;
+      return y;
+    };
+    return salvarProjeto({
+      ...base,
+      recebidos: troca(base.recebidos, a.recebidaEm),
+      previsoes: troca(base.previsoes, a.previsao),
+      valores: troca(base.valores, a.valor),
+    });
+  };
+
   const salvarEmpresa = async (f: FinEmpresa) => {
     const { error } = await supabaseNavegador()
       .from("financeiro_empresas")
@@ -109,5 +137,5 @@ export function useFinanceiro() {
   };
 
   if (!pode) return null;
-  return { servicos, projetos, empresas, carregado, salvarServico, salvarProjeto, salvarEmpresa, recarregar: carregar };
+  return { servicos, projetos, empresas, carregado, salvarServico, salvarProjeto, ajustarParcela, salvarEmpresa, recarregar: carregar };
 }
