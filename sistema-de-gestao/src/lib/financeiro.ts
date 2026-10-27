@@ -2,6 +2,7 @@ import type { Etapa, Projeto } from "./dados/tipos";
 import { formatarData, hojeIso } from "./datas";
 import { hubDoProjeto, ordemPassos } from "./fase";
 import { etapaConcluida } from "./projeto";
+import { projetarEnvios, type EnvioProjetado } from "./projecao";
 import { aliquotaNoMes, imposto, type ConfigImposto } from "./imposto";
 
 // Valores e recebimento de cada projeto. Só quem tem a permissão de ver o
@@ -83,6 +84,7 @@ export type OrigemDaData = "hub" | "plano" | "manual";
 export type Parcela = {
   chave: "30" | "70";
   ordem: 1 | 2;
+  explicacao: string | null; // de onde vem a data, quando é uma projeção
   percentual: number;
   valor: number;
   valorCalculado: number;
@@ -104,11 +106,16 @@ export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje =
   const liquido = bruto - funcern;
   const envio1 = p.etapas[0] ? dataDeEnvio(p, p.etapas[0]) : null;
   const fim = dataFinalizacao(p);
-  // Sem relatório ou finalização, o fim previsto no plano (o que já passou vira "hoje")
+  // Sem relatório ou finalização, a projeção pelo andamento do projeto (ver projecao.ts)
   const noPlano = !!p.planoFechadoEm && p.status !== "encerrado";
-  const naoAntesDeHoje = (d: string | null | undefined) => (d ? (d < hoje ? hoje : d) : null);
-  const planoEnvio1 = noPlano ? naoAntesDeHoje(p.etapas[0]?.dataFim) : null;
-  const planoFim = noPlano ? naoAntesDeHoje(p.etapas.reduce<string | null>((m, e) => (e.dataFim && (!m || e.dataFim > m) ? e.dataFim : m), null)) : null;
+  const projecao = noPlano ? projetarEnvios(p, hoje) : new Map<number, EnvioProjetado>();
+  const primeira = p.etapas[0];
+  const ultima = p.etapas[p.etapas.length - 1];
+  const todasEnviadas = noPlano && p.etapas.length > 0 && p.etapas.every(etapaConcluida);
+  const planoEnvio1 = primeira ? (projecao.get(primeira.ordem)?.fim ?? null) : null;
+  const planoFim = ultima ? (projecao.get(ultima.ordem)?.fim ?? (todasEnviadas ? hoje : null)) : null;
+  const porque1 = primeira ? (projecao.get(primeira.ordem)?.texto ?? null) : null;
+  const porqueFim = ultima ? (projecao.get(ultima.ordem)?.texto ?? (todasEnviadas ? "Todas as etapas foram enviadas: falta o cliente avaliar a consultoria no HUB" : null)) : null;
   const data1 = envio1 ?? planoEnvio1;
   const dataFim = fim ?? (planoFim && data1 && planoFim < data1 ? data1 : planoFim);
   const ciclo1 = data1 ? diaDoPagamento(data1) : null;
@@ -116,7 +123,7 @@ export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje =
   // Estimativa: o restante só é pago depois da finalização, então nunca no mesmo pagamento dos 30% (a menos que o HUB mostre o contrário)
   if (!(envio1 && fim) && cicloFim && ciclo1 && cicloFim <= ciclo1) cicloFim = proximoPagamento(ciclo1);
   const condicaoFim = fim ? `Finalizado no HUB em ${formatarData(fim)}` : "Quando o projeto for finalizado no HUB";
-  const parcela = (chave: Parcela["chave"], ordem: 1 | 2, percentual: number, previsao: string | null, doHub: boolean, condicao: string): Parcela => {
+  const parcela = (chave: Parcela["chave"], ordem: 1 | 2, percentual: number, previsao: string | null, doHub: boolean, condicao: string, porque: string | null, base: string | null): Parcela => {
     const manual = lerMapa(fp?.previsoes, chave);
     const valorCalculado = (liquido * percentual) / 100;
     return {
@@ -127,14 +134,15 @@ export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje =
       valorCalculado,
       previsao: manual ?? previsao,
       origem: manual ? "manual" : previsao ? (doHub ? "hub" : "plano") : null,
+      explicacao: manual ? "Data combinada por você" : previsao && !doHub && porque ? `${porque}.${base && Number(base.slice(8)) > 20 ? " Passando do dia 20, o pagamento fica para o mês seguinte." : ""}` : null,
       condicao,
       recebidaEm: lerMapa(fp?.recebidos, chave) ?? null,
     };
   };
   // Sempre duas parcelas, na ordem em que o dinheiro entra (mesmo que caiam no mesmo dia 5)
   const parcelas = [
-    parcela("30", 1, 30, ciclo1, !!envio1, envio1 ? `Relatório 1 enviado em ${formatarData(envio1)}` : "Quando o Relatório 1 for enviado no HUB"),
-    parcela("70", 2, 70, cicloFim, !!fim, condicaoFim),
+    parcela("30", 1, 30, ciclo1, !!envio1, envio1 ? `Relatório 1 enviado em ${formatarData(envio1)}` : "Quando o Relatório 1 for enviado no HUB", porque1, data1),
+    parcela("70", 2, 70, cicloFim, !!fim, condicaoFim, porqueFim, dataFim),
   ];
   return { horas, valorHora, percFuncern, bruto, funcern, liquido, parcelas };
 }

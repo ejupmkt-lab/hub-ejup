@@ -76,16 +76,21 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   Relatório 1 foi enviado e o projeto ainda não foi finalizado, o restante (70%, ou 100% no mesmo mês)
   quando o projeto é finalizado no HUB (último relatório e avaliação do cliente). A área **Financeiro** (menu
   lateral, abaixo de Tarefas, só para o gestor master; marcada como em desenvolvimento) mostra o que cai em
-  cada mês, **na ordem em que o dinheiro entra**, em três visões (**Por mês**, **Por projeto** e **Recebidos**),
-  com um resumo no topo (a receber, próximo pagamento, recebido no mês, imposto previsto) e o que ainda dá para
-  garantir até o próximo dia 20. Cada projeto tem **sempre duas parcelas** (30% e 70% do que fica depois da
-  FUNCERN), mesmo que o HUB as coloque no mesmo pagamento; o pagamento único antigo ("100") vale para as duas.
-  Cada parcela (`LinhaDeParcela`, na página do Financeiro e em "Dados do projeto") se corrige ali mesmo:
-  "Recebi" marca com a data de hoje; "Editar" muda a **data prevista** (`financeiro_projetos.previsoes`), o
-  **valor** (`valores`, para o que o SEBRAE realmente pagou) e o **dia em que entrou** (`recebidos`); "Voltar à
-  estimativa" apaga a data e o valor combinados. Antes do relatório ou da finalização, a data é **estimada pelo
-  plano de trabalho** (fim da etapa 1 e da última etapa, nunca antes de hoje; os 70% nunca no mesmo pagamento
-  dos 30% enquanto não houver as duas datas do HUB) e marcada como "Estimada pelo plano"; combinada à mão, "Combinada".
+  cada mês, **na ordem em que o dinheiro entra**: um resumo no topo (a receber, próximo pagamento, recebido no
+  mês, imposto previsto), uma pílula por mês (e "Todos os meses" e "Sem data") e, embaixo, **por cliente** e, em
+  cada cliente, **por projeto**, com dois **balões** (`BalaoDeParcela`): **1ª parcela · 30%** e **2ª parcela ·
+  70%** (sobre o que fica depois da FUNCERN), cada um com o valor, "Previsto até dd/mm/aaaa", de onde vem a data
+  (Projetada, Data do HUB ou Combinada) e o imposto do mês. Cada projeto tem sempre as duas parcelas, mesmo que
+  caiam no mesmo dia 5; o pagamento único antigo ("100") vale para as duas. Em cada balão, "Recebi" marca com a
+  data de hoje; "Editar" muda a **data prevista** (`financeiro_projetos.previsoes`), o **valor** (`valores`, o que
+  o SEBRAE realmente pagou) e o **dia em que entrou** (`recebidos`); "Voltar à projeção" apaga a data e o valor
+  combinados. Os mesmos balões estão em "Dados do projeto".
+  A **projeção das datas** (`src/lib/projecao.ts`) vem do andamento do projeto: etapa em curso termina em
+  duração × o que falta (`avancoEtapa`); etapa que não começou começa quando a anterior termina (ou na data do
+  plano, se for depois) e dura o que o plano previa. O fim da etapa 1 dá a 1ª parcela e o da última etapa, a
+  2ª (nunca no mesmo pagamento da 1ª enquanto não houver as duas datas do HUB); relatório enviado e projeto
+  finalizado no HUB passam a valer no lugar da projeção. O balão explica a projeção ("Etapa 2 em andamento (40%
+  feita): termina por volta de…") e avisa quando passar do dia 20 empurra o pagamento para o mês seguinte.
 - **Imposto** (`src/lib/imposto.ts`, tabela `financeiro_empresas`, cartão no Financeiro, uma configuração por
   empresa): a alíquota do Simples Nacional (serviços, Anexo III) cresce com o faturamento dos últimos 12 meses
   (6% → 11,2% → 13,5% → 16% → 21% → 33%). A pessoa informa o faturamento; o sistema mostra a faixa, a alíquota

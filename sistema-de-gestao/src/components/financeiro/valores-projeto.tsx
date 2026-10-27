@@ -3,7 +3,7 @@
 import type { Projeto } from "@/lib/dados/tipos";
 import { useFinanceiro } from "@/lib/dados/financeiro";
 import { entradasDeRecebimento, moeda, recebimento } from "@/lib/financeiro";
-import { LinhaDeParcela } from "./parcela-linha";
+import { BalaoDeParcela } from "./balao-parcela";
 
 // Valor do projeto e as parcelas do recebimento (só para quem vê o financeiro)
 export function ValoresProjeto({ projeto: p }: { projeto: Projeto }) {
@@ -33,9 +33,9 @@ export function ValoresProjeto({ projeto: p }: { projeto: Projeto }) {
           <dd className="font-semibold text-verde">{moeda(r.liquido)}</dd>
         </div>
       </dl>
-      <ul className="mt-3 space-y-2">
+      <ul className="mt-3 grid gap-3 sm:grid-cols-2">
         {entradas.map((e) => (
-          <LinhaDeParcela key={e.parcela.chave} fin={fin} entrada={e} nome="Este projeto" comProjeto={false} />
+          <BalaoDeParcela key={e.parcela.chave} fin={fin} entrada={e} nome="Este projeto" />
         ))}
       </ul>
     </section>

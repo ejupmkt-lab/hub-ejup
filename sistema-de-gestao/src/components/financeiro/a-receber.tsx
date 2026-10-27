@@ -4,24 +4,20 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Projeto } from "@/lib/dados/tipos";
 import { useEstado } from "@/lib/dados/store";
-import { useFinanceiro, type Financeiro } from "@/lib/dados/financeiro";
+import { useFinanceiro } from "@/lib/dados/financeiro";
 import { dataDeEnvio, dataFinalizacao, diaDoPagamento, entradasDeRecebimento, moeda, proximoCorte, recebimento, type Entrada } from "@/lib/financeiro";
 import { etapasTodasEnviadas, faseDoProjeto } from "@/lib/fase";
+import { codigoHub, servicoDoProjeto } from "@/lib/projeto";
 import { diferencaDias, formatarData, hojeIso, mesPorExtenso } from "@/lib/datas";
 import { nomeDoCliente } from "@/lib/campos-cliente";
-import { LinhaDeParcela } from "./parcela-linha";
+import { BalaoDeParcela } from "./balao-parcela";
 
 const pct = (n: number) => `${String(n).replace(".", ",")}%`;
 const maiuscula = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
 const soma = (l: Entrada[], f: (e: Entrada) => number) => l.reduce((a, e) => a + f(e), 0);
 const valorDe = (e: Entrada) => e.parcela.valor;
-
-type Visao = "mes" | "projeto" | "recebidos";
-const visoes: { chave: Visao; rotulo: string }[] = [
-  { chave: "mes", rotulo: "Por mês" },
-  { chave: "projeto", rotulo: "Por projeto" },
-  { chave: "recebidos", rotulo: "Recebidos" },
-];
+const MESES_CURTOS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+const mesCurto = (ym: string) => `${MESES_CURTOS[Number(ym.slice(5, 7)) - 1]}/${ym.slice(2, 4)}`;
 
 function Numero({ rotulo, valor, detalhe, tom = "" }: { rotulo: string; valor: string; detalhe?: string; tom?: string }) {
   return (
@@ -33,51 +29,41 @@ function Numero({ rotulo, valor, detalhe, tom = "" }: { rotulo: string; valor: s
   );
 }
 
-// Um mês de recebimentos: total, imposto e as parcelas, cada uma editável
-function Mes({ fin, mes, lista, nome }: { fin: Financeiro; mes: string; lista: Entrada[]; nome: (p: Projeto) => string }) {
-  const aliquota = lista[0]?.aliquota;
-  return (
-    <section aria-label={maiuscula(mesPorExtenso(mes))} className="space-y-2">
-      <header className="flex flex-wrap items-baseline justify-between gap-x-3">
-        <h3 className="text-[16px] font-bold text-tinta">{maiuscula(mesPorExtenso(mes))}</h3>
-        <p className="num text-[16px] font-bold text-verde">{moeda(soma(lista, valorDe))}</p>
-      </header>
-      {aliquota !== null && aliquota !== undefined && (
-        <p className="num -mt-1 text-[13px] text-tinta-2">
-          Imposto de {pct(aliquota)}: {moeda(soma(lista, (e) => e.imposto))} · fica {moeda(soma(lista, (e) => e.aposImposto))}
-        </p>
-      )}
-      <ul className="space-y-2">
-        {lista.map((e) => (
-          <LinhaDeParcela key={`${e.projeto.id}-${e.parcela.chave}`} fin={fin} entrada={e} nome={nome(e.projeto)} />
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-// Financeiro (só para quem vê o financeiro): o que entra, mês a mês e projeto a projeto, na ordem em que o dinheiro cai,
-// com o imposto do mês. Cada parcela se corrige ali mesmo (data, valor, recebido).
+// Financeiro (só para quem vê o financeiro): o que entra, por mês e, em cada mês, por cliente e projeto. Cada projeto tem
+// dois balões (1ª parcela 30%, 2ª parcela 70%) com a data prevista, projetada pelo andamento do projeto; tudo se corrige ali.
 export function AReceber({ projetos }: { projetos: Projeto[] }) {
   const fin = useFinanceiro();
   const { estado } = useEstado();
-  const [visao, setVisao] = useState<Visao>("mes");
+  const [escolha, setEscolha] = useState<string>("todos"); // "todos", "sem" ou AAAA-MM
   if (!fin || !fin.carregado) return null;
   const hoje = hojeIso();
   const corte = proximoCorte(hoje);
-  const nome = (p: Projeto) => nomeDoCliente(estado.clientes.find((x) => x.id === p.clienteId));
+  const clienteDe = (p: Projeto) => estado.clientes.find((x) => x.id === p.clienteId);
+  const nome = (p: Projeto) => nomeDoCliente(clienteDe(p));
 
   const entradas = entradasDeRecebimento(projetos, fin.servicos, fin.projetos, fin.empresas);
   const pendentes = entradas.filter((e) => !e.parcela.recebidaEm);
-  const recebidas = entradas.filter((e) => e.parcela.recebidaEm);
   const comData = pendentes.filter((e) => e.mes);
   const semData = pendentes.filter((e) => !e.mes);
-  const meses = [...new Set(comData.map((e) => e.mes!))].sort();
-  const mesesRecebidos = [...new Set(recebidas.map((e) => e.mes!))].sort().reverse();
+  const meses = [...new Set(entradas.filter((e) => e.mes).map((e) => e.mes!))].sort();
+  const mesAtual = hoje.slice(0, 7);
+  const recebidoNoMes = entradas.filter((e) => e.parcela.recebidaEm && e.mes === mesAtual);
   const proximoDia = comData[0]?.parcela.previsao ?? null;
   const doProximo = comData.filter((e) => e.parcela.previsao === proximoDia);
-  const mesAtual = hoje.slice(0, 7);
-  const recebidoNoMes = recebidas.filter((e) => e.mes === mesAtual);
+
+  // O que a escolha mostra: um mês (as parcelas que caem nele), as sem data ou tudo o que tem data
+  const noFiltro = (e: Entrada) => (escolha === "todos" ? !!e.mes : escolha === "sem" ? !e.mes : e.mes === escolha);
+  const doMes = entradas.filter(noFiltro);
+  const projetosDaEscolha = [...new Set(doMes.map((e) => e.projeto.id))].map((id) => projetos.find((p) => p.id === id)!);
+  const clientes = [...new Set(projetosDaEscolha.map((p) => p.clienteId))]
+    .map((id) => {
+      const ps = projetosDaEscolha.filter((p) => p.clienteId === id);
+      const todas = entradas.filter((e) => ps.some((p) => p.id === e.projeto.id));
+      const proxima = todas.filter((e) => !e.parcela.recebidaEm && e.parcela.previsao).map((e) => e.parcela.previsao!).sort()[0] ?? "9999";
+      return { id, ps, todas, proxima, cliente: clienteDe(ps[0]) };
+    })
+    .sort((a, b) => a.proxima.localeCompare(b.proxima) || nomeDoCliente(a.cliente).localeCompare(nomeDoCliente(b.cliente)));
+  const mesEscolhido = /^\d{4}-\d{2}$/.test(escolha) ? escolha : null;
 
   // O que ainda dá para garantir no pagamento do próximo dia 5
   const oportunidades = projetos.flatMap((p) => {
@@ -91,11 +77,20 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
     return lista;
   });
 
-  // Por projeto: só os que já têm alguma data ou algum recebimento
-  const porProjeto = projetos
-    .map((p) => ({ p, lista: entradas.filter((e) => e.projeto.id === p.id) }))
-    .filter((g) => g.lista.some((e) => e.parcela.previsao || e.parcela.recebidaEm))
-    .sort((a, b) => (a.lista.find((e) => !e.parcela.recebidaEm)?.parcela.previsao ?? "9999").localeCompare(b.lista.find((e) => !e.parcela.recebidaEm)?.parcela.previsao ?? "9999"));
+  const pilula = (chave: string, rotulo: string, valor?: string) => (
+    <button
+      key={chave}
+      role="tab"
+      aria-selected={escolha === chave}
+      onClick={() => setEscolha(chave)}
+      className={`shrink-0 rounded-[var(--radius-campo)] border px-3.5 py-2 text-left transition-colors ${
+        escolha === chave ? "border-azul bg-azul-claro text-azul" : "border-linha bg-folha text-tinta hover:border-linha-forte"
+      }`}
+    >
+      <span className="block text-[14px] font-semibold">{rotulo}</span>
+      {valor && <span className="num block text-[12px] text-tinta-2">{valor}</span>}
+    </button>
+  );
 
   return (
     <div className="space-y-5">
@@ -130,85 +125,69 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
         </div>
       )}
 
-      <div role="tablist" aria-label="Como ver os recebimentos" className="inline-flex w-full gap-1 rounded-[var(--radius-bloco)] bg-pedra/70 p-1 sm:w-auto">
-        {visoes.map((v) => (
-          <button
-            key={v.chave}
-            role="tab"
-            aria-selected={visao === v.chave}
-            onClick={() => setVisao(v.chave)}
-            className={`min-h-10 flex-1 rounded-[var(--radius-campo)] px-4 py-2 text-[14px] font-semibold transition-colors sm:flex-none ${
-              visao === v.chave ? "bg-folha text-tinta shadow-[var(--shadow-cartao)]" : "text-tinta-2 hover:text-tinta"
-            }`}
-          >
-            {v.rotulo}
-            {v.chave === "recebidos" && recebidas.length > 0 && <span className="num ml-1.5 text-[12px] font-medium text-tinta-2">{recebidas.length}</span>}
-          </button>
-        ))}
+      <div role="tablist" aria-label="Mês de recebimento" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+        {pilula("todos", "Todos os meses", moeda(soma(entradas.filter((e) => e.mes), valorDe)))}
+        {meses.map((m) => {
+          const l = entradas.filter((e) => e.mes === m);
+          return pilula(m, maiuscula(mesCurto(m)), moeda(soma(l, valorDe)));
+        })}
+        {semData.length > 0 && pilula("sem", "Sem data", `${semData.length} ${semData.length === 1 ? "parcela" : "parcelas"}`)}
       </div>
 
-      {visao === "mes" && (
-        <div className="space-y-6">
-          {meses.length === 0 && semData.length === 0 && <p className="text-sm text-tinta-2">Nada a receber por enquanto.</p>}
-          {meses.map((m) => (
-            <Mes key={m} fin={fin} mes={m} lista={comData.filter((e) => e.mes === m)} nome={nome} />
-          ))}
-          {semData.length > 0 && (
-            <details className="rounded-[var(--radius-campo)] border border-linha p-3">
-              <summary className="num flex cursor-pointer flex-wrap justify-between gap-x-3 text-[14px] font-semibold text-tinta">
-                <span>Sem data ainda</span>
-                <span className="text-tinta-2">
-                  {semData.length} {semData.length === 1 ? "parcela" : "parcelas"} · {moeda(soma(semData, valorDe))}
-                </span>
-              </summary>
-              <p className="mt-1 text-[13px] text-tinta-2">Projetos sem plano de trabalho. Em “Editar”, combine uma data para a parcela entrar na conta.</p>
-              <ul className="mt-2 space-y-2">
-                {semData.map((e) => (
-                  <LinhaDeParcela key={`${e.projeto.id}-${e.parcela.chave}`} fin={fin} entrada={e} nome={nome(e.projeto)} />
-                ))}
-              </ul>
-            </details>
+      {mesEscolhido && doMes.length > 0 && (
+        <p className="num text-[14px] text-tinta">
+          <strong>{maiuscula(mesPorExtenso(mesEscolhido))}:</strong> {moeda(soma(doMes, valorDe))}
+          {doMes[0].aliquota !== null && (
+            <span className="text-tinta-2">
+              {" "}
+              · imposto de {pct(doMes[0].aliquota)}: {moeda(soma(doMes, (e) => e.imposto))} · fica {moeda(soma(doMes, (e) => e.aposImposto))}
+            </span>
           )}
-        </div>
+        </p>
       )}
+      {escolha === "sem" && <p className="text-[13px] text-tinta-2">Projetos sem plano de trabalho. Em “Editar”, combine uma data para a parcela entrar na conta.</p>}
 
-      {visao === "projeto" && (
-        <ul className="space-y-4">
-          {porProjeto.length === 0 && <p className="text-sm text-tinta-2">Nenhum projeto com data de recebimento.</p>}
-          {porProjeto.map(({ p, lista }) => {
-            const total = soma(lista, valorDe);
-            const entrou = soma(lista.filter((e) => e.parcela.recebidaEm), valorDe);
+      {clientes.length === 0 ? (
+        <p className="text-sm text-tinta-2">{escolha === "todos" ? "Nada a receber por enquanto." : "Nada neste período."}</p>
+      ) : (
+        <ul className="space-y-5">
+          {clientes.map((c) => {
+            const aReceber = soma(c.todas.filter((e) => !e.parcela.recebidaEm), valorDe);
+            const recebido = soma(c.todas.filter((e) => e.parcela.recebidaEm), valorDe);
+            const doClienteNoMes = doMes.filter((e) => c.ps.some((p) => p.id === e.projeto.id));
             return (
-              <li key={p.id} aria-label={nome(p)} className="space-y-2 rounded-[var(--radius-bloco)] border border-linha p-3">
-                <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                  <Link href={`/${p.empresa}/projetos/${p.id}#ficha`} className="text-[16px] font-bold text-tinta hover:text-azul">
-                    {nome(p)}
-                  </Link>
-                  <span className="num text-[13px] text-tinta-2">
-                    {moeda(entrou)} de {moeda(total)} recebidos
-                  </span>
+              <li key={c.id} aria-label={nomeDoCliente(c.cliente)} className="rounded-[var(--radius-bloco)] border border-linha p-3.5 sm:p-4">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                  <h3 className="text-[17px] font-bold text-tinta">{nomeDoCliente(c.cliente)}</h3>
+                  <p className="num text-[13px] text-tinta-2">
+                    {mesEscolhido ? <>Neste mês: <strong className="text-tinta">{moeda(soma(doClienteNoMes, valorDe))}</strong></> : <>A receber <strong className="text-tinta">{moeda(aReceber)}</strong></>}
+                    {recebido > 0 && <> · recebido <strong className="text-verde">{moeda(recebido)}</strong></>}
+                  </p>
                 </div>
-                <div className="h-1.5 overflow-hidden rounded-full bg-pedra" aria-hidden>
-                  <div className="h-full rounded-full bg-verde-vivo" style={{ width: `${total ? Math.round((entrou / total) * 100) : 0}%` }} />
-                </div>
-                <ul className="space-y-2">
-                  {lista.map((e) => (
-                    <LinhaDeParcela key={e.parcela.chave} fin={fin} entrada={e} nome={nome(p)} comProjeto={false} />
-                  ))}
+                <ul className="mt-3 space-y-4">
+                  {c.ps.map((p) => {
+                    const meus = c.todas.filter((e) => e.projeto.id === p.id).sort((a, b) => a.parcela.ordem - b.parcela.ordem);
+                    return (
+                      <li key={p.id} aria-label={`Projeto ${servicoDoProjeto(p)}`}>
+                        <p className="mb-2 text-[14px] font-semibold text-tinta-2">
+                          <Link href={`/${p.empresa}/projetos/${p.id}#ficha`} className="hover:text-azul">
+                            {servicoDoProjeto(p)}
+                          </Link>
+                          {codigoHub(p) && <span className="num font-normal"> · HUB {codigoHub(p)}</span>}
+                        </p>
+                        <ul className="grid gap-3 sm:grid-cols-2">
+                          {meus.map((e) => (
+                            <BalaoDeParcela key={e.parcela.chave} fin={fin} entrada={e} nome={`${nome(p)} · ${servicoDoProjeto(p)}`} destaque={!!mesEscolhido && e.mes === mesEscolhido} />
+                          ))}
+                        </ul>
+                      </li>
+                    );
+                  })}
                 </ul>
               </li>
             );
           })}
         </ul>
-      )}
-
-      {visao === "recebidos" && (
-        <div className="space-y-6">
-          {recebidas.length === 0 && <p className="text-sm text-tinta-2">Nada marcado como recebido ainda. Use “Recebi” na parcela quando o dinheiro entrar.</p>}
-          {mesesRecebidos.map((m) => (
-            <Mes key={m} fin={fin} mes={m} lista={recebidas.filter((e) => e.mes === m)} nome={nome} />
-          ))}
-        </div>
       )}
     </div>
   );
