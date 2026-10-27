@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
-import type { FinProjeto, FinServico } from "@/lib/financeiro";
+import type { FinEmpresa, FinProjeto, FinServico } from "@/lib/financeiro";
+import type { MudancaDeAliquota } from "@/lib/imposto";
 import { traduzirErro } from "@/lib/erros";
 import { useUsuario } from "./store";
 
@@ -13,14 +14,16 @@ export function useFinanceiro() {
   const pode = !!usuario.veFinanceiro;
   const [servicos, setServicos] = useState<Record<string, FinServico>>({});
   const [projetos, setProjetos] = useState<Record<string, FinProjeto>>({});
+  const [empresas, setEmpresas] = useState<Record<string, FinEmpresa>>({});
   const [carregado, setCarregado] = useState(false);
 
   const carregar = useCallback(async () => {
     if (!pode) return;
     const sb = supabaseNavegador();
-    const [s, p] = await Promise.all([
+    const [s, p, e] = await Promise.all([
       sb.from("financeiro_servicos").select("servico_id, empresa, teto, valor_hora, perc_funcern"),
-      sb.from("financeiro_projetos").select("projeto_id, empresa, valor_hora, perc_funcern, recebidos"),
+      sb.from("financeiro_projetos").select("projeto_id, empresa, valor_hora, perc_funcern, recebidos, previsoes"),
+      sb.from("financeiro_empresas").select("empresa, faturamento_12m, aliquota_fixa, mudancas"),
     ]);
     setServicos(
       Object.fromEntries(
@@ -40,6 +43,20 @@ export function useFinanceiro() {
             valorHora: x.valor_hora === null ? null : Number(x.valor_hora),
             percFuncern: x.perc_funcern === null ? null : Number(x.perc_funcern),
             recebidos: (x.recebidos ?? {}) as Record<string, string>,
+            previsoes: (x.previsoes ?? {}) as Record<string, string>,
+          },
+        ]),
+      ),
+    );
+    setEmpresas(
+      Object.fromEntries(
+        (e.data ?? []).map((x) => [
+          x.empresa,
+          {
+            empresa: x.empresa,
+            faturamento12m: Number(x.faturamento_12m),
+            aliquotaFixa: x.aliquota_fixa === null ? null : Number(x.aliquota_fixa),
+            mudancas: (Array.isArray(x.mudancas) ? x.mudancas : []) as MudancaDeAliquota[],
           },
         ]),
       ),
@@ -69,6 +86,7 @@ export function useFinanceiro() {
         valor_hora: f.valorHora,
         perc_funcern: f.percFuncern,
         recebidos: f.recebidos,
+        previsoes: f.previsoes,
         updated_at: new Date().toISOString(),
       });
     if (error) {
@@ -82,6 +100,14 @@ export function useFinanceiro() {
     }
   };
 
+  const salvarEmpresa = async (f: FinEmpresa) => {
+    const { error } = await supabaseNavegador()
+      .from("financeiro_empresas")
+      .upsert({ empresa: f.empresa, faturamento_12m: f.faturamento12m, aliquota_fixa: f.aliquotaFixa, mudancas: f.mudancas, updated_at: new Date().toISOString() });
+    if (error) throw new Error(traduzirErro(error));
+    setEmpresas((x) => ({ ...x, [f.empresa]: f }));
+  };
+
   if (!pode) return null;
-  return { servicos, projetos, carregado, salvarServico, salvarProjeto, recarregar: carregar };
+  return { servicos, projetos, empresas, carregado, salvarServico, salvarProjeto, salvarEmpresa, recarregar: carregar };
 }

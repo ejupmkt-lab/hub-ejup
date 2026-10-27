@@ -25,6 +25,12 @@ export function formatarData(iso?: string | null) {
 
 const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
 
+// "2026-11" → "novembro de 2026"
+export function mesPorExtenso(ym: string) {
+  const [a, m] = ym.split("-").map(Number);
+  return `${meses[m - 1]} de ${a}`;
+}
+
 export function dataPorExtenso(iso: string) {
   const [a, m, d] = iso.split("-").map(Number);
   return `${String(d).padStart(2, "0")} de ${meses[m - 1]} de ${a}`;

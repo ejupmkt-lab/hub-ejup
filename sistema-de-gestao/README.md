@@ -76,7 +76,20 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   Relatório 1 foi enviado e o projeto ainda não foi finalizado, o restante (70%, ou 100% no mesmo mês)
   quando o projeto é finalizado no HUB (último relatório e avaliação do cliente). A área **Financeiro** (menu
   lateral, abaixo de Tarefas, só para o gestor master; marcada como em desenvolvimento) mostra o que cai em
-  cada dia 5 e o que ainda dá para garantir até o próximo dia 20.
+  cada mês e dia 5, **na ordem em que o dinheiro entra**, e o que ainda dá para garantir até o próximo dia 20.
+  Antes do relatório ou da finalização, a data é **estimada pelo plano de trabalho** (fim da etapa 1 e da
+  última etapa, nunca antes de hoje; o restante nunca no mesmo pagamento dos 30% enquanto o HUB não mostrar o
+  contrário) e marcada como tal; dá para registrar a **data combinada** com o SEBRAE em cada parcela
+  (`financeiro_projetos.previsoes`). Parcela marcada como "Recebi" sai de "A receber" e vai para "Já recebido"
+  (se os 30% já foram pagos, o restante continua como 70%, nunca vira 100%).
+- **Imposto** (`src/lib/imposto.ts`, tabela `financeiro_empresas`, cartão no Financeiro, uma configuração por
+  empresa): a alíquota do Simples Nacional (serviços, Anexo III) cresce com o faturamento dos últimos 12 meses
+  (6% → 11,2% → 13,5% → 16% → 21% → 33%). A pessoa informa o faturamento; o sistema mostra a faixa, a alíquota
+  efetiva (fórmula do Simples: (RBT12 × alíquota da faixa − parcela a deduzir) ÷ RBT12), quanto falta para a
+  próxima faixa e avisa quando o que está previsto receber já a ultrapassa. Dá para fixar uma alíquota própria
+  e programar **mudanças a partir de um mês** ("a partir de 12/2026 é 11%"). O imposto é descontado de cada
+  recebimento pela alíquota do mês do pagamento e aparece por parcela (em "Dados do projeto") e por mês (em
+  "A receber"). É uma estimativa para planejamento: confirme faixa, anexo e fator R com o contador.
 - **Projeto novo**: escolhe o serviço, o cliente, o consultor e onde o projeto está no HUB (começa no
   diagnóstico); as horas de cada etapa vêm da ficha ou da proposta (editáveis também no plano de trabalho); o código do pedido no HUB é um campo só (o
   mesmo número do projeto no HUB); o número de visitas é o de etapas do serviço (uma por etapa); o gestor

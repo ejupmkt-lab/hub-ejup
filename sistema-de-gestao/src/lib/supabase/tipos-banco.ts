@@ -103,16 +103,36 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
-                },"financeiro_projetos": {
+                },"financeiro_empresas": {
                   Row: {
-                    "empresa": string,"perc_funcern": number | null,"projeto_id": string,"recebidos": NonNullable<Json>,"updated_at": string,"valor_hora": number | null
+                    "aliquota_fixa": number | null,"empresa": string,"faturamento_12m": number,"mudancas": NonNullable<Json>,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "empresa": string,"perc_funcern"?: number | null,"projeto_id": string,"recebidos"?: NonNullable<Json>,"updated_at"?: string,"valor_hora"?: number | null
+                    "aliquota_fixa"?: number | null,"empresa": string,"faturamento_12m"?: number,"mudancas"?: NonNullable<Json>,"updated_at"?: string
                   }
                   Update: {
-                    "empresa"?: string,"perc_funcern"?: number | null,"projeto_id"?: string,"recebidos"?: NonNullable<Json>,"updated_at"?: string,"valor_hora"?: number | null
+                    "aliquota_fixa"?: number | null,"empresa"?: string,"faturamento_12m"?: number,"mudancas"?: NonNullable<Json>,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "financeiro_empresas_empresa_fkey"
+      columns: ["empresa"]
+isOneToOne: true
+      referencedRelation: "empresas"
+      referencedColumns: ["slug"]
+    }
+                  ]
+                },"financeiro_projetos": {
+                  Row: {
+                    "empresa": string,"perc_funcern": number | null,"previsoes": NonNullable<Json>,"projeto_id": string,"recebidos": NonNullable<Json>,"updated_at": string,"valor_hora": number | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "empresa": string,"perc_funcern"?: number | null,"previsoes"?: NonNullable<Json>,"projeto_id": string,"recebidos"?: NonNullable<Json>,"updated_at"?: string,"valor_hora"?: number | null
+                  }
+                  Update: {
+                    "empresa"?: string,"perc_funcern"?: number | null,"previsoes"?: NonNullable<Json>,"projeto_id"?: string,"recebidos"?: NonNullable<Json>,"updated_at"?: string,"valor_hora"?: number | null
                   }
                   Relationships: [
                     {
