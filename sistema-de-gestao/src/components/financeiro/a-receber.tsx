@@ -1,22 +1,27 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import type { Projeto } from "@/lib/dados/tipos";
 import { useEstado } from "@/lib/dados/store";
 import { useFinanceiro } from "@/lib/dados/financeiro";
-import { dataDeEnvio, dataFinalizacao, diaDoPagamento, entradasDeRecebimento, moeda, proximoCorte, recebimento, type Entrada } from "@/lib/financeiro";
-import { etapasTodasEnviadas, faseDoProjeto } from "@/lib/fase";
-import { diferencaDias, formatarData, hojeIso, mesPorExtenso } from "@/lib/datas";
+import { entradasDeRecebimento, moeda, type Entrada } from "@/lib/financeiro";
+import { intervaloDoPeriodo, passoDoModo, somarMeses, type ModoDePeriodo } from "@/lib/periodo";
+import { formatarData, hojeIso, mesPorExtenso } from "@/lib/datas";
 import { nomeDoCliente } from "@/lib/campos-cliente";
+import { Botao, Campo } from "@/components/ui";
 import { ProjetosDoRecebimento, type LinhaDeProjeto } from "./projetos-recebimento";
 
 const pct = (n: number) => `${String(n).replace(".", ",")}%`;
-const maiuscula = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
 const soma = (l: Entrada[], f: (e: Entrada) => number) => l.reduce((a, e) => a + f(e), 0);
 const valorDe = (e: Entrada) => e.parcela.valor;
-const MESES_CURTOS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
-const mesCurto = (ym: string) => `${MESES_CURTOS[Number(ym.slice(5, 7)) - 1]}/${ym.slice(2, 4)}`;
+const diaDe = (e: Entrada) => e.parcela.recebidaEm ?? e.parcela.previsao;
+const modos: { chave: ModoDePeriodo; rotulo: string }[] = [
+  { chave: "mes", rotulo: "Mês" },
+  { chave: "trimestre", rotulo: "Trimestre" },
+  { chave: "ano", rotulo: "Ano" },
+  { chave: "tudo", rotulo: "Tudo" },
+  { chave: "personalizado", rotulo: "Personalizado" },
+];
 
 function Numero({ rotulo, valor, detalhe, tom = "" }: { rotulo: string; valor: string; detalhe?: string; tom?: string }) {
   return (
@@ -28,41 +33,43 @@ function Numero({ rotulo, valor, detalhe, tom = "" }: { rotulo: string; valor: s
   );
 }
 
-// Financeiro (só para quem vê o financeiro): o que entra, por mês e, em cada mês, por cliente e projeto. Cada projeto tem
-// dois balões (1ª parcela 30%, 2ª parcela 70%) com a data prevista, projetada pelo andamento do projeto; tudo se corrige ali.
+// Financeiro (só para quem vê o financeiro): o que entra no período escolhido (abre no mês corrente), por cliente e projeto,
+// com as duas parcelas de cada um, a data prevista (projetada pelo andamento do projeto) e a nota fiscal; tudo se corrige ali.
 export function AReceber({ projetos }: { projetos: Projeto[] }) {
   const fin = useFinanceiro();
   const { estado } = useEstado();
-  const [escolha, setEscolha] = useState<string>("todos"); // "todos", "sem" ou AAAA-MM
+  // O período abre no mês corrente; dá para andar por mês, trimestre ou ano, ver tudo ou escolher um intervalo
+  const [modo, setModo] = useState<ModoDePeriodo>("mes");
+  const [ref, setRef] = useState(() => hojeIso().slice(0, 7));
+  const [de, setDe] = useState("");
+  const [ate, setAte] = useState("");
+  const [semDataAberto, setSemDataAberto] = useState(false);
   if (!fin || !fin.carregado) return null;
   const hoje = hojeIso();
-  const corte = proximoCorte(hoje);
+  const mesAtual = hoje.slice(0, 7);
   const clienteDe = (p: Projeto) => estado.clientes.find((x) => x.id === p.clienteId);
-  const nome = (p: Projeto) => nomeDoCliente(clienteDe(p));
 
   const entradas = entradasDeRecebimento(projetos, fin.servicos, fin.projetos, fin.empresas);
   const pendentes = entradas.filter((e) => !e.parcela.recebidaEm);
   const comData = pendentes.filter((e) => e.mes);
-  const semData = pendentes.filter((e) => !e.mes);
-  const meses = [...new Set(entradas.filter((e) => e.mes).map((e) => e.mes!))].sort();
-  const mesAtual = hoje.slice(0, 7);
+  const semData = entradas.filter((e) => !diaDe(e));
   const recebidoNoMes = entradas.filter((e) => e.parcela.recebidaEm && e.mes === mesAtual);
   const proximoDia = comData[0]?.parcela.previsao ?? null;
   const doProximo = comData.filter((e) => e.parcela.previsao === proximoDia);
 
-  // O que a escolha mostra: um mês (as parcelas que caem nele), as sem data ou tudo o que tem data
-  const noFiltro = (e: Entrada) => (escolha === "todos" ? !!e.mes : escolha === "sem" ? !e.mes : e.mes === escolha);
-  const doMes = entradas.filter(noFiltro);
-  const projetosDaEscolha = [...new Set(doMes.map((e) => e.projeto.id))].map((id) => projetos.find((p) => p.id === id)!);
-  const clientes = [...new Set(projetosDaEscolha.map((p) => p.clienteId))]
+  // O que o período mostra: as parcelas cujo dia (recebimento ou previsão) cai nele, ou as sem data
+  const { inicio, fim, rotulo } = intervaloDoPeriodo(modo, ref, de, ate);
+  const doPeriodo = semDataAberto ? semData : entradas.filter((e) => { const d = diaDe(e); return !!d && d >= inicio && d <= fim; });
+  const projetosDoPeriodo = [...new Set(doPeriodo.map((e) => e.projeto.id))].map((id) => projetos.find((p) => p.id === id)!);
+  const clientes = [...new Set(projetosDoPeriodo.map((p) => p.clienteId))]
     .map((id) => {
-      const ps = projetosDaEscolha.filter((p) => p.clienteId === id);
+      const ps = projetosDoPeriodo.filter((p) => p.clienteId === id);
       const todas = entradas.filter((e) => ps.some((p) => p.id === e.projeto.id));
       const proxima = todas.filter((e) => !e.parcela.recebidaEm && e.parcela.previsao).map((e) => e.parcela.previsao!).sort()[0] ?? "9999";
       return { id, ps, todas, proxima, cliente: clienteDe(ps[0]) };
     })
     .sort((a, b) => a.proxima.localeCompare(b.proxima) || nomeDoCliente(a.cliente).localeCompare(nomeDoCliente(b.cliente)));
-  const mesEscolhido = /^\d{4}-\d{2}$/.test(escolha) ? escolha : null;
+  const mesEscolhido = modo === "mes" && !semDataAberto ? ref : null;
   // Uma linha por projeto, agrupadas por cliente, na ordem do próximo pagamento
   const linhas: LinhaDeProjeto[] = clientes.flatMap((c) =>
     c.ps.map((p) => ({
@@ -71,33 +78,9 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
       entradas: c.todas.filter((e) => e.projeto.id === p.id).sort((a, b) => a.parcela.ordem - b.parcela.ordem),
     })),
   );
-
-  // O que ainda dá para garantir no pagamento do próximo dia 5
-  const oportunidades = projetos.flatMap((p) => {
-    if (p.status === "encerrado" || ["solicitacao", "diagnostico", "proposta"].includes(faseDoProjeto(p))) return [];
-    const r = recebimento(p, fin.servicos[p.modeloId], fin.projetos[p.id]);
-    if (dataFinalizacao(p)) return [];
-    const lista: { texto: string; valor: number; projeto: Projeto }[] = [];
-    const primeira = r.parcelas.find((x) => x.chave === "30");
-    if (p.etapas[0] && !dataDeEnvio(p, p.etapas[0]) && primeira && !primeira.recebidaEm) lista.push({ projeto: p, texto: "envie o Relatório 1 no HUB", valor: primeira.valor });
-    else if (etapasTodasEnviadas(p)) lista.push({ projeto: p, texto: "falta o cliente avaliar a consultoria no HUB", valor: r.parcelas.find((x) => x.chave === "70")?.valor ?? 0 });
-    return lista;
-  });
-
-  const pilula = (chave: string, rotulo: string, valor?: string) => (
-    <button
-      key={chave}
-      role="tab"
-      aria-selected={escolha === chave}
-      onClick={() => setEscolha(chave)}
-      className={`shrink-0 rounded-[var(--radius-campo)] border px-3.5 py-2 text-left transition-colors ${
-        escolha === chave ? "border-azul bg-azul-claro text-azul" : "border-linha bg-folha text-tinta hover:border-linha-forte"
-      }`}
-    >
-      <span className="block text-[14px] font-semibold">{rotulo}</span>
-      {valor && <span className="num block text-[12px] text-tinta-2">{valor}</span>}
-    </button>
-  );
+  const totalPeriodo = soma(doPeriodo, valorDe);
+  const aliquotas = [...new Set(doPeriodo.map((e) => e.aliquota).filter((a): a is number => a !== null))];
+  const andar = (n: number) => setRef(somarMeses(ref, n * passoDoModo[modo]));
 
   return (
     <div className="space-y-5">
@@ -113,49 +96,79 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
         <Numero rotulo="Imposto previsto" valor={moeda(soma(comData, (e) => e.imposto))} detalhe="sobre o que tem data" />
       </dl>
 
-      {oportunidades.length > 0 && (
-        <div className="rounded-[var(--radius-campo)] border border-laranja/30 bg-laranja-claro/70 p-3">
-          <p className="text-[13px] font-semibold text-laranja">
-            Até {formatarData(corte)} ({diferencaDias(hoje, corte) === 0 ? "hoje" : `faltam ${diferencaDias(hoje, corte)} dias`}) para entrar no pagamento de{" "}
-            {formatarData(diaDoPagamento(corte))}:
-          </p>
-          <ul className="mt-1 space-y-0.5 text-[13px] text-tinta">
-            {oportunidades.map((o) => (
-              <li key={o.projeto.id} className="num flex justify-between gap-3">
-                <Link href={`/${o.projeto.empresa}/projetos/${o.projeto.id}`} className="min-w-0 hover:text-azul">
-                  {nome(o.projeto)}: {o.texto}
-                </Link>
-                <span className="shrink-0">{moeda(o.valor)}</span>
-              </li>
-            ))}
-          </ul>
+      <div className="space-y-3 rounded-[var(--radius-bloco)] border border-linha bg-folha p-3.5 shadow-[var(--shadow-cartao)]">
+        <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
+          <Campo rotulo="Período">
+            <select className="campo" value={modo} onChange={(ev) => { setModo(ev.target.value as ModoDePeriodo); setSemDataAberto(false); }}>
+              {modos.map((m) => (
+                <option key={m.chave} value={m.chave}>
+                  {m.rotulo}
+                </option>
+              ))}
+            </select>
+          </Campo>
+          {(modo === "mes" || modo === "trimestre" || modo === "ano") && (
+            <div className="flex items-end gap-2">
+              <button type="button" aria-label="Período anterior" onClick={() => { andar(-1); setSemDataAberto(false); }} className="min-h-11 rounded-[var(--radius-campo)] border border-linha-forte bg-folha px-3.5 text-lg font-semibold hover:bg-pedra">
+                ‹
+              </button>
+              <Campo rotulo="Ir para o mês">
+                <input type="month" className="campo num" value={ref} onChange={(ev) => ev.target.value && (setRef(ev.target.value), setSemDataAberto(false))} />
+              </Campo>
+              <button type="button" aria-label="Próximo período" onClick={() => { andar(1); setSemDataAberto(false); }} className="min-h-11 rounded-[var(--radius-campo)] border border-linha-forte bg-folha px-3.5 text-lg font-semibold hover:bg-pedra">
+                ›
+              </button>
+            </div>
+          )}
+          {modo === "personalizado" && (
+            <>
+              <Campo rotulo="De">
+                <input type="date" className="campo num" value={de} onChange={(ev) => setDe(ev.target.value)} />
+              </Campo>
+              <Campo rotulo="Até">
+                <input type="date" className="campo num" value={ate} onChange={(ev) => setAte(ev.target.value)} />
+              </Campo>
+            </>
+          )}
+          {(modo !== "mes" || ref !== mesAtual || semDataAberto) && (
+            <Botao
+              variante="secundario"
+              onClick={() => {
+                setModo("mes");
+                setRef(mesAtual);
+                setSemDataAberto(false);
+              }}
+            >
+              Mês atual
+            </Botao>
+          )}
+          {semData.length > 0 && (
+            <Botao variante={semDataAberto ? "primario" : "secundario"} aria-pressed={semDataAberto} onClick={() => setSemDataAberto(!semDataAberto)}>
+              Sem data ({semData.length})
+            </Botao>
+          )}
         </div>
-      )}
-
-      <div role="tablist" aria-label="Mês de recebimento" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-        {pilula("todos", "Todos os meses", moeda(soma(entradas.filter((e) => e.mes), valorDe)))}
-        {meses.map((m) => {
-          const l = entradas.filter((e) => e.mes === m);
-          return pilula(m, maiuscula(mesCurto(m)), moeda(soma(l, valorDe)));
-        })}
-        {semData.length > 0 && pilula("sem", "Sem data", `${semData.length} ${semData.length === 1 ? "parcela" : "parcelas"}`)}
-      </div>
-
-      {mesEscolhido && doMes.length > 0 && (
         <p className="num text-[14px] text-tinta">
-          <strong>{maiuscula(mesPorExtenso(mesEscolhido))}:</strong> {moeda(soma(doMes, valorDe))}
-          {doMes[0].aliquota !== null && (
+          <strong>{semDataAberto ? "Parcelas sem data" : rotulo}:</strong> {moeda(totalPeriodo)}
+          {!semDataAberto && doPeriodo.length > 0 && (
             <span className="text-tinta-2">
               {" "}
-              · imposto de {pct(doMes[0].aliquota)}: {moeda(soma(doMes, (e) => e.imposto))} · fica {moeda(soma(doMes, (e) => e.aposImposto))}
+              · a receber {moeda(soma(doPeriodo.filter((e) => !e.parcela.recebidaEm), valorDe))} · recebido {moeda(soma(doPeriodo.filter((e) => e.parcela.recebidaEm), valorDe))}
+              {aliquotas.length > 0 && (
+                <>
+                  {" "}
+                  · imposto {aliquotas.length === 1 ? `de ${pct(aliquotas[0])}: ` : ""}
+                  {moeda(soma(doPeriodo, (e) => e.imposto))} · fica {moeda(soma(doPeriodo, (e) => e.aposImposto))}
+                </>
+              )}
             </span>
           )}
         </p>
-      )}
-      {escolha === "sem" && <p className="text-[13px] text-tinta-2">Projetos sem plano de trabalho. Em “Editar”, combine uma data para a parcela entrar na conta.</p>}
+        {semDataAberto && <p className="text-[13px] text-tinta-2">Projetos sem plano de trabalho. Em “Editar”, combine uma data para a parcela entrar na conta.</p>}
+      </div>
 
       {linhas.length === 0 ? (
-        <p className="text-sm text-tinta-2">{escolha === "todos" ? "Nada a receber por enquanto." : "Nada neste período."}</p>
+        <p className="text-sm text-tinta-2">Nada neste período.</p>
       ) : (
         <ProjetosDoRecebimento fin={fin} linhas={linhas} mesEscolhido={mesEscolhido} />
       )}

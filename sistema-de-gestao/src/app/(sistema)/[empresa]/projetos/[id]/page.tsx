@@ -15,7 +15,8 @@ import { LinhaDoHub } from "@/components/projeto/linha-hub";
 import { guardarProjetoNaBiblioteca, useAcoesEtapa } from "@/components/projeto/acoes-etapa";
 import { antesDaContratacao, avisoFinalizarAntecipado, faseDoProjeto, fases, mudarHub, passoHubDoProjeto, passosHub, registroHub, textoPlanoAjustado } from "@/lib/fase";
 import type { PassoHub } from "@/lib/dados/tipos";
-import { registrarEvento } from "@/lib/dados/store";
+import { registrarEvento, useAcesso } from "@/lib/dados/store";
+import { FinanceiroDoProjeto } from "@/components/financeiro/financeiro-projeto";
 import { formatarData, diferencaDias, hojeIso } from "@/lib/datas";
 import {
   codigoHub,
@@ -41,17 +42,21 @@ import { nomeDoCliente } from "@/lib/campos-cliente";
 
 // Dados (o projeto no HUB, as etapas e a ficha) abre primeiro; o Desenvolvimento é a conversa com a IA.
 // O processo (ficha, textos, referências) fica no serviço; aqui, só o que é do projeto.
-const abas = ["Dados", "Desenvolvimento", "Plano de trabalho", "Entregas", "Histórico"] as const;
-type Aba = (typeof abas)[number];
+const abasComuns = ["Dados", "Desenvolvimento", "Plano de trabalho", "Entregas", "Histórico"] as const;
+const abasComFinanceiro = ["Dados", "Desenvolvimento", "Plano de trabalho", "Entregas", "Financeiro", "Histórico"] as const;
+type Aba = (typeof abasComFinanceiro)[number];
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
 export default function PaginaProjeto() {
   const { projeto, cliente, consultor, alterar } = useProjeto();
+  const { usuario } = useAcesso();
+  const abas = usuario.veFinanceiro ? abasComFinanceiro : abasComuns;
   const { mudarStatus } = useAcoesEtapa();
   const { excluirProjeto, excluindo, podeExcluir } = useExcluirProjeto(projeto);
   const { empresa: slug } = useParams<{ empresa: string }>();
   // O projeto abre sempre nos Dados
   const [aba, setAba] = useState<Aba>("Dados");
+  const abaVista: Aba = aba === "Financeiro" && !usuario.veFinanceiro ? "Dados" : aba;
   // Entrega (etapa) que um atalho pediu para abrir: #etapa-2, "Resolver" no próximo passo…
   const [entregaAberta, setEntregaAberta] = useState<number | undefined>(undefined);
   // "Ler agora" na extensão com outra aba aberta: volta aos Dados, onde o painel de importar do HUB abre sozinho
@@ -272,7 +277,7 @@ export default function PaginaProjeto() {
               </div>
             </Cartao>
             <div className="relative mt-5" data-faixa-abas>
-              <Abas abas={abas} atual={aba} aoTrocar={(a) => irPara(a)} naFaixa gradeNoCelular />
+              <Abas abas={abas} atual={abaVista} aoTrocar={(a) => irPara(a)} naFaixa gradeNoCelular />
             </div>
           </>
         }
@@ -285,16 +290,16 @@ export default function PaginaProjeto() {
         )}
       </Cabecalho>
 
-      {aba === "Dados" && (
+      {abaVista === "Dados" && (
         <div className="space-y-6">
           <LinhaDoHub projeto={projeto} aoAbrirPlano={abrirPlano} abrirImportacao={chegouDoHub} />
           <DadosProjeto projeto={projeto} />
         </div>
       )}
 
-      {aba === "Desenvolvimento" && <Conversa projeto={projeto} passo={passo?.texto} focar={focar} />}
+      {abaVista === "Desenvolvimento" && <Conversa projeto={projeto} passo={passo?.texto} focar={focar} />}
 
-      {aba === "Plano de trabalho" && (
+      {abaVista === "Plano de trabalho" && (
         <div className="space-y-4">
           {!projeto.planoFechadoEm && projeto.status !== "encerrado" && (
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-[var(--radius-bloco)] border border-azul/20 bg-azul-claro px-4 py-4 sm:px-5">
@@ -313,13 +318,14 @@ export default function PaginaProjeto() {
           </div>
         </div>
       )}
-      {aba === "Entregas" && (
+      {abaVista === "Entregas" && (
         <div className="space-y-4">
           {proximoPasso}
           <Relatorios projeto={projeto} aoDesenvolver={desenvolver} abrirOrdem={entregaAberta} />
         </div>
       )}
-      {aba === "Histórico" && (
+      {abaVista === "Financeiro" && usuario.veFinanceiro && <FinanceiroDoProjeto projeto={projeto} nomeCliente={nomeCliente} />}
+      {abaVista === "Histórico" && (
         <Cartao className="px-4 py-1 sm:px-6">
           <ol className="max-w-3xl">
             {projeto.historico.map((h, i) => (

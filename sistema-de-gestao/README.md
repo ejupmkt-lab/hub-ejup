@@ -66,40 +66,42 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   responsável é sempre o consultor do projeto; não há responsável por etapa. Projetos do formato antigo (`contratacao`) são
   lidos como o passo equivalente. Em Tarefas, "Aguardando outros" junta o que está com terceiros, com a
   mensagem pronta para cobrar (`src/lib/cobranca.ts`); o quadro de projetos tem uma coluna por etapa do HUB.
-- **Valores e recebimento** (`src/lib/financeiro.ts`, tabelas `financeiro_servicos` e
-  `financeiro_projetos`): só quem tem a permissão "vê o financeiro" (`perfis.ve_financeiro`, função
-  `privado.ve_financeiro`) lê ou altera; os demais não recebem nada do banco. A permissão é só do gestor
-  master (Roberto Pivotto) e não pode ser dada pelo sistema: muda apenas direto no banco. No serviço: teto, valor da hora (R$ 90) e a parte da
-  FUNCERN (10%); as horas são as que cabem no teto (R$ 30.000 ÷ 90 = 333 h) e podem ser distribuídas nas
-  etapas pela complexidade. No projeto ("Dados do projeto"): valor, FUNCERN, o que fica para o consultor e
-  as parcelas: o SEBRAE paga até o dia 5 o que ficou pronto até o dia 20 do mês anterior; 30% quando o
-  Relatório 1 foi enviado e o projeto ainda não foi finalizado, o restante (70%, ou 100% no mesmo mês)
-  quando o projeto é finalizado no HUB (último relatório e avaliação do cliente). A área **Financeiro** (menu
-  lateral, abaixo de Tarefas, só para o gestor master; marcada como em desenvolvimento) mostra o que cai em
-  cada mês, **na ordem em que o dinheiro entra**: um resumo no topo (a receber, próximo pagamento, recebido no
-  mês, imposto previsto), uma pílula por mês (e "Todos os meses" e "Sem data") e, embaixo, os projetos **no mesmo
-  padrão da lista da aba Projetos** (`ProjetosDoRecebimento`): tabela nas telas largas (Cliente / projeto, Etapa
-  atual, Progresso e as duas parcelas) e cartões nas menores. Cada projeto tem sempre as duas parcelas, **1ª ·
-  30%** e **2ª · 70%** (sobre o que fica depois da FUNCERN), com o valor, "Previsto até dd/mm/aaaa" (ou
-  "Recebida em"), a situação (Projetada, Data do HUB, Combinada, Atrasada, Recebida) e os botões **Recebi** e
-  **Editar**; o pagamento único antigo ("100") vale para as duas. "Editar" abre uma faixa embaixo da linha com a
-  **data prevista** (`financeiro_projetos.previsoes`), o **valor** (`valores`, o que o SEBRAE realmente pagou), o
-  **dia em que entrou** (`recebidos`), a explicação da projeção, o imposto do mês e "Voltar à projeção". Os mesmos
-  balões (`BalaoDeParcela`) estão em "Dados do projeto" e nos cartões do celular.
-  A **projeção das datas** (`src/lib/projecao.ts`) vem do andamento do projeto: etapa em curso termina em
-  duração × o que falta (`avancoEtapa`); etapa que não começou começa quando a anterior termina (ou na data do
-  plano, se for depois) e dura o que o plano previa. O fim da etapa 1 dá a 1ª parcela e o da última etapa, a
-  2ª (nunca no mesmo pagamento da 1ª enquanto não houver as duas datas do HUB); relatório enviado e projeto
-  finalizado no HUB passam a valer no lugar da projeção. O balão explica a projeção ("Etapa 2 em andamento (40%
-  feita): termina por volta de…") e avisa quando passar do dia 20 empurra o pagamento para o mês seguinte.
-- **Imposto** (`src/lib/imposto.ts`, tabela `financeiro_empresas`, cartão no Financeiro, uma configuração por
-  empresa): a alíquota do Simples Nacional (serviços, Anexo III) cresce com o faturamento dos últimos 12 meses
-  (6% → 11,2% → 13,5% → 16% → 21% → 33%). A pessoa informa o faturamento; o sistema mostra a faixa, a alíquota
-  efetiva (fórmula do Simples: (RBT12 × alíquota da faixa − parcela a deduzir) ÷ RBT12), quanto falta para a
-  próxima faixa e avisa quando o que está previsto receber já a ultrapassa. Dá para fixar uma alíquota própria
-  e programar **mudanças a partir de um mês** ("a partir de 12/2026 é 11%"). O imposto é descontado de cada
-  recebimento pela alíquota do mês em que o dinheiro entra (ou entra, se ainda previsto) e aparece por parcela (em "Dados do projeto") e por mês (em
-  "A receber"). É uma estimativa para planejamento: confirme faixa, anexo e fator R com o contador.
+- **Financeiro** (`src/lib/financeiro.ts`, tabelas `financeiro_servicos`, `financeiro_projetos`, `financeiro_empresas`):
+  só quem tem a permissão "vê o financeiro" (`perfis.ve_financeiro`, função `privado.ve_financeiro`) lê ou altera;
+  os demais não recebem nada do banco. A permissão é só do gestor master (Roberto Pivotto) e não pode ser dada pelo
+  sistema: muda apenas direto no banco. No serviço: teto, valor da hora (R$ 90) e a parte da FUNCERN (10%); as horas
+  são as que cabem no teto (R$ 30.000 ÷ 90 = 333 h) e podem ser distribuídas nas etapas pela complexidade. O SEBRAE
+  paga até o dia 5 o que ficou pronto até o dia 20 do mês anterior: **30%** quando o Relatório 1 foi enviado e o
+  restante (**70%**) quando o projeto é finalizado no HUB (último relatório e avaliação do cliente).
+  - **Aba "Financeiro" de cada projeto** (`FinanceiroDoProjeto`; só aparece para quem vê o financeiro; antes ficava em
+    "Dados"): valor do projeto, FUNCERN, o que fica para o consultor e o recebido até agora; a **contrapartida do
+    cliente** (valor opcional que vira uma terceira entrada, com data, "Recebi" e nota); e as parcelas em balões
+    (`BalaoDeParcela`), cada uma com **nota fiscal** (número, data de emissão, valor se for outro, arquivo PDF/XML/imagem
+    no bucket privado `notas-fiscais`, caminho `<projeto>/<arquivo>`, regra por empresa atual do projeto; lê e apaga só
+    quem vê o financeiro). Mostra "NF emitida · nº …" ou "NF pendente" e quantas notas já saíram.
+  - **Página Financeiro** (menu lateral, só gestor master; em desenvolvimento), com duas abas:
+    - **Recebimentos**: resumo no topo (a receber, próximo pagamento, recebido no mês, imposto previsto), o seletor de
+      **período** (Mês, Trimestre, Ano, Tudo ou Personalizado; abre no mês corrente, com setas e um seletor de mês;
+      `src/lib/periodo.ts`) e, embaixo, os projetos no padrão da lista de Projetos (`ProjetosDoRecebimento`: tabela nas
+      telas largas, cartões nas menores) com Cliente / projeto, Etapa atual, Progresso e as duas parcelas. Cada
+      parcela tem valor, "Previsto até" (ou "Recebida em"), situação (Projetada, Data do HUB, Combinada, Atrasada,
+      Recebida), selo da nota fiscal e **Recebi** / **Editar** (data prevista em `previsoes`, valor em `valores`, dia
+      em `recebidos`, nota em `notas`, "Voltar à projeção"). A contrapartida aparece numa faixa na linha do projeto.
+      "Sem data (n)" lista as parcelas de projetos sem plano de trabalho. O pagamento único antigo ("100") vale para
+      as duas parcelas.
+    - **Configurações**: o imposto da empresa (abaixo).
+  - **Projeção das datas** (`src/lib/projecao.ts`): vem do andamento do projeto. Etapa em curso termina em duração × o
+    que falta (`avancoEtapa`); etapa que não começou começa quando a anterior termina (ou na data do plano, se for
+    depois) e dura o que o plano previa. O fim da etapa 1 dá a 1ª parcela e o da última etapa, a 2ª (nunca no mesmo
+    pagamento da 1ª enquanto não houver as duas datas do HUB); relatório enviado e projeto finalizado no HUB passam a
+    valer no lugar da projeção. O balão explica a conta e avisa quando passar do dia 20 empurra o pagamento.
+  - **Imposto** (`src/lib/imposto.ts`, tabela `financeiro_empresas`, em Configurações, uma configuração por empresa): a
+    alíquota do Simples Nacional (serviços, Anexo III) cresce com o faturamento dos últimos 12 meses (6% → 11,2% →
+    13,5% → 16% → 21% → 33%). A pessoa informa o faturamento; o sistema mostra a faixa, a alíquota efetiva (fórmula do
+    Simples), quanto falta para a próxima faixa e avisa quando o que está previsto receber já a ultrapassa. Dá para
+    fixar uma alíquota própria e programar **mudanças a partir de um mês** ("a partir de 12/2026 é 11%"). O imposto é
+    descontado de cada entrada pela alíquota do mês em que o dinheiro entra (ou entra, se ainda previsto). É uma
+    estimativa para planejamento: confirme faixa, anexo e fator R com o contador.
 - **Projeto novo**: escolhe o serviço, o cliente, o consultor e onde o projeto está no HUB (começa no
   diagnóstico); as horas de cada etapa vêm da ficha ou da proposta (editáveis também no plano de trabalho); o código do pedido no HUB é um campo só (o
   mesmo número do projeto no HUB); o número de visitas é o de etapas do serviço (uma por etapa); o gestor

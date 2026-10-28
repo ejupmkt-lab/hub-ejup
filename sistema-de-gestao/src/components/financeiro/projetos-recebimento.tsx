@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Projeto } from "@/lib/dados/tipos";
 import type { Financeiro } from "@/lib/dados/financeiro";
-import { moeda, type Entrada } from "@/lib/financeiro";
+import { moeda, type ChaveDeParcela, type Entrada } from "@/lib/financeiro";
 import { formatarData } from "@/lib/datas";
 import { avancoProjeto, codigoHub, entregaFinal, etapaAtual, etapasAtrasadas, previstoProjeto, servicoDoProjeto, situacaoProjeto } from "@/lib/projeto";
 import { faseDoProjeto, fases } from "@/lib/fase";
 import { doisDigitos } from "@/lib/rotulos";
 import { Barra, Cartao, Status, corTom } from "@/components/ui";
-import { BalaoDeParcela, EditorDeParcela, pct, situacaoDaParcela, useAjusteDeParcela } from "./balao-parcela";
+import { BalaoDeParcela, EditorDeParcela, SeloDaNota, rotuloAcessivel, situacaoDaParcela, tituloDaParcela, useAjusteDeParcela } from "./balao-parcela";
 
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 const colunas = "grid grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_8.5rem_minmax(0,1.1fr)_minmax(0,1.1fr)] items-start gap-5";
@@ -32,13 +32,14 @@ function CelulaDeParcela({ fin, entrada: e, nome, aberta, aoEditar }: { fin: Fin
   const sit = situacaoDaParcela(e);
   const { recebi, desfazer } = useAjusteDeParcela(fin, e);
   return (
-    <div role="group" aria-label={`${nome}, ${x.percentual}%`} className="min-w-0">
+    <div role="group" aria-label={rotuloAcessivel(nome, x)} className="min-w-0">
       <p className="num text-[15px] font-bold text-tinta">{moeda(x.valor)}</p>
       <p className={`num text-[13px] ${x.recebidaEm ? "font-semibold text-verde" : sit.atrasada ? "font-semibold text-laranja" : "text-tinta-2"}`}>
         {x.recebidaEm ? `Recebida em ${formatarData(x.recebidaEm)}` : x.previsao ? `Previsto até ${formatarData(x.previsao)}` : "Sem data prevista"}
       </p>
-      <div className="mt-1.5">
+      <div className="mt-1.5 flex flex-wrap gap-1.5">
         <Status tom={sit.tom}>{sit.texto}</Status>
+        <SeloDaNota entrada={e} />
       </div>
       <div className="relative z-10 mt-2 flex gap-1.5">
         <button
@@ -64,7 +65,7 @@ function CelulaDeParcela({ fin, entrada: e, nome, aberta, aoEditar }: { fin: Fin
 // Os projetos de um período, com o mesmo desenho da lista de projetos: tabela nas telas largas (cliente e projeto, etapa,
 // progresso e as duas parcelas) e cartões nas menores. A edição de uma parcela abre numa faixa embaixo da linha.
 export function ProjetosDoRecebimento({ fin, linhas, mesEscolhido }: { fin: Financeiro; linhas: LinhaDeProjeto[]; mesEscolhido: string | null }) {
-  const [edicao, setEdicao] = useState<{ id: string; chave: "30" | "70" } | null>(null);
+  const [edicao, setEdicao] = useState<{ id: string; chave: ChaveDeParcela } | null>(null);
   return (
     <>
       <div className="grid gap-4 md:grid-cols-2 xl:hidden">
@@ -120,6 +121,7 @@ export function ProjetosDoRecebimento({ fin, linhas, mesEscolhido }: { fin: Fina
             const nome = `${nomeCliente} · ${servicoDoProjeto(p)}`;
             const editando = edicao?.id === p.id ? entradas.find((e) => e.parcela.chave === edicao.chave) : undefined;
             const entrega = entregaFinal(p);
+            const contrapartida = entradas.find((e) => e.parcela.chave === "contrapartida");
             return (
               <li key={p.id} aria-label={nome} className="relative">
                 <div className={`px-5 py-4 hover:bg-pedra/40 ${colunas}`}>
@@ -147,7 +149,7 @@ export function ProjetosDoRecebimento({ fin, linhas, mesEscolhido }: { fin: Fina
                     </div>
                     <p className="num mt-1 text-[12px] text-tinta-2">entrega {entrega ? formatarData(entrega) : "—"}</p>
                   </div>
-                  {entradas.map((e) => (
+                  {entradas.filter((e) => e.parcela.ordem < 3).map((e) => (
                     <CelulaDeParcela
                       key={e.parcela.chave}
                       fin={fin}
@@ -158,10 +160,24 @@ export function ProjetosDoRecebimento({ fin, linhas, mesEscolhido }: { fin: Fina
                     />
                   ))}
                 </div>
+                {contrapartida && (
+                  <div className="relative z-10 grid grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_8.5rem_minmax(0,1.1fr)_minmax(0,1.1fr)] items-start gap-5 border-t border-dashed border-linha px-5 py-3">
+                    <p className="text-[13px] font-semibold text-tinta-2">Contrapartida do cliente</p>
+                    <span />
+                    <span />
+                    <CelulaDeParcela
+                      fin={fin}
+                      entrada={contrapartida}
+                      nome={nome}
+                      aberta={edicao?.id === p.id && edicao.chave === "contrapartida"}
+                      aoEditar={() => setEdicao(edicao?.id === p.id && edicao.chave === "contrapartida" ? null : { id: p.id, chave: "contrapartida" })}
+                    />
+                  </div>
+                )}
                 {editando && (
                   <div className="relative z-10 border-t border-linha bg-pedra/40 px-5 py-4">
                     <p className="mb-3 text-[13px] font-bold uppercase tracking-wide text-tinta-2">
-                      Editando a {editando.parcela.ordem}ª parcela · {pct(editando.parcela.percentual)} · {nome}
+                      Editando: {tituloDaParcela(editando.parcela)} · {nome}
                     </p>
                     <EditorDeParcela fin={fin} entrada={editando} />
                   </div>

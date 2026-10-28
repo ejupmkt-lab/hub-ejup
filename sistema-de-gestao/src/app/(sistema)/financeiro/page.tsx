@@ -1,21 +1,24 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAcesso, useEstado } from "@/lib/dados/store";
 import { useEmpresaAtual } from "@/lib/dados/empresa-atual";
 import { Cabecalho, Cartao, Chip } from "@/components/ui";
 import { AReceber } from "@/components/financeiro/a-receber";
 import { ImpostoEmpresa } from "@/components/financeiro/imposto";
 
-// Financeiro (só o gestor master): em desenvolvimento. O que cai em cada mês e
-// dia 5, na ordem de recebimento, e o imposto da empresa pela faixa do
-// faturamento; os valores de cada serviço e projeto ficam neles.
+// Financeiro (só o gestor master): em desenvolvimento. Recebimentos do período (abre no mês corrente), por cliente e
+// projeto; em Configurações, o imposto da empresa pela faixa do faturamento. O valor, as parcelas, a contrapartida e as
+// notas fiscais de cada projeto ficam na aba Financeiro do próprio projeto; o teto e o valor da hora, na ficha do serviço.
+const abas = ["Recebimentos", "Configurações"] as const;
+
 export default function Financeiro() {
   const { usuario } = useAcesso();
   const { estado } = useEstado();
   const { empresa } = useEmpresaAtual();
   const router = useRouter();
+  const [aba, setAba] = useState<(typeof abas)[number]>("Recebimentos");
   useEffect(() => {
     if (!usuario.veFinanceiro) router.replace("/");
   }, [usuario.veFinanceiro, router]);
@@ -34,21 +37,38 @@ export default function Financeiro() {
         }
       />
       <div className="space-y-4">
-        <section className="space-y-4" aria-label="Recebimentos">
-          <div>
-            <h2 className="text-[17px] font-bold">Recebimentos</h2>
-            <p className="mt-0.5 text-sm text-tinta-2">
+        <div role="tablist" aria-label="Seções do financeiro" className="inline-flex gap-1 rounded-[var(--radius-bloco)] bg-pedra/70 p-1">
+          {abas.map((a) => (
+            <button
+              key={a}
+              role="tab"
+              aria-selected={aba === a}
+              onClick={() => setAba(a)}
+              className={`min-h-10 rounded-[var(--radius-campo)] px-4 py-2 text-[14px] font-semibold transition-colors ${aba === a ? "bg-folha text-tinta shadow-[var(--shadow-cartao)]" : "text-tinta-2 hover:text-tinta"}`}
+            >
+              {a}
+            </button>
+          ))}
+        </div>
+
+        {aba === "Recebimentos" && (
+          <section className="space-y-4" aria-label="Recebimentos">
+            <p className="text-sm text-tinta-2">
               O SEBRAE paga até o dia 5 o que ficou pronto até o dia 20 do mês anterior: 30% quando o Relatório 1 sai e o restante quando o projeto é finalizado.
               Antes disso o sistema projeta a data pelo andamento do projeto; corrija qualquer data, valor ou recebimento em “Editar”.
             </p>
-          </div>
-          <AReceber projetos={projetos} />
-        </section>
-        {empresa && (
-          <Cartao className="p-4 sm:p-5">
-            <ImpostoEmpresa empresa={empresa.slug} nome={empresa.nome} />
-          </Cartao>
+            <AReceber projetos={projetos} />
+          </section>
         )}
+
+        {aba === "Configurações" &&
+          (empresa ? (
+            <Cartao className="p-4 sm:p-5">
+              <ImpostoEmpresa empresa={empresa.slug} nome={empresa.nome} />
+            </Cartao>
+          ) : (
+            <p className="text-sm text-tinta-2">Escolha uma empresa no menu para configurar o imposto.</p>
+          ))}
       </div>
     </>
   );

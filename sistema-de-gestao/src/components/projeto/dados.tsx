@@ -8,7 +8,6 @@ import { useEstado } from "@/lib/dados/store";
 import { Campo, Cartao } from "@/components/ui";
 import { useProjeto } from "./use-projeto";
 import { EscolherGestorSebrae } from "./gestor-sebrae";
-import { ValoresProjeto } from "@/components/financeiro/valores-projeto";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { formatarData } from "@/lib/datas";
 
@@ -182,7 +181,6 @@ export function DadosProjeto({ projeto }: { projeto: Projeto }) {
             </Campo>
           ))}
         </div>
-        <ValoresProjeto projeto={projeto} />
         <MateriaisDoHub projeto={projeto} />
       </Cartao>
     </>

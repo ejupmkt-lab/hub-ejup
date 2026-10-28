@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
-import type { FinEmpresa, FinProjeto, FinServico } from "@/lib/financeiro";
+import type { ChaveDeParcela, FinEmpresa, FinProjeto, FinServico, NotaFiscal } from "@/lib/financeiro";
 import type { MudancaDeAliquota } from "@/lib/imposto";
 import { traduzirErro } from "@/lib/erros";
 import { useUsuario } from "./store";
 
-export type AjusteDeParcela = { previsao?: string | null; valor?: number | null; recebidaEm?: string | null };
+export type AjusteDeParcela = { previsao?: string | null; valor?: number | null; recebidaEm?: string | null; nota?: NotaFiscal | null };
 export type Financeiro = NonNullable<ReturnType<typeof useFinanceiro>>;
 
 // Valores e recebimentos, carregados só para quem tem a permissão (o banco
@@ -25,7 +25,7 @@ export function useFinanceiro() {
     const sb = supabaseNavegador();
     const [s, p, e] = await Promise.all([
       sb.from("financeiro_servicos").select("servico_id, empresa, teto, valor_hora, perc_funcern"),
-      sb.from("financeiro_projetos").select("projeto_id, empresa, valor_hora, perc_funcern, recebidos, previsoes, valores"),
+      sb.from("financeiro_projetos").select("projeto_id, empresa, valor_hora, perc_funcern, recebidos, previsoes, valores, notas"),
       sb.from("financeiro_empresas").select("empresa, faturamento_12m, aliquota_fixa, mudancas"),
     ]);
     setServicos(
@@ -48,6 +48,7 @@ export function useFinanceiro() {
             recebidos: (x.recebidos ?? {}) as Record<string, string>,
             previsoes: (x.previsoes ?? {}) as Record<string, string>,
             valores: (x.valores ?? {}) as Record<string, number>,
+            notas: (x.notas ?? {}) as Record<string, NotaFiscal>,
           },
         ]),
       ),
@@ -92,6 +93,7 @@ export function useFinanceiro() {
         recebidos: f.recebidos,
         previsoes: f.previsoes,
         valores: f.valores,
+        notas: f.notas,
         updated_at: new Date().toISOString(),
       });
     if (error) {
@@ -106,8 +108,8 @@ export function useFinanceiro() {
   };
 
   // Muda uma parcela: data prevista, valor e/ou dia em que foi recebida (null apaga e volta ao calculado)
-  const ajustarParcela = (p: { id: string; empresa: string }, chave: "30" | "70", a: AjusteDeParcela) => {
-    const base: FinProjeto = projetos[p.id] ?? { projetoId: p.id, empresa: p.empresa, valorHora: null, percFuncern: null, recebidos: {}, previsoes: {}, valores: {} };
+  const ajustarParcela = (p: { id: string; empresa: string }, chave: ChaveDeParcela, a: AjusteDeParcela) => {
+    const base: FinProjeto = projetos[p.id] ?? { projetoId: p.id, empresa: p.empresa, valorHora: null, percFuncern: null, recebidos: {}, previsoes: {}, valores: {}, notas: {} };
     // O pagamento único antigo ("100") vira as duas parcelas, para poder mexer em cada uma
     const abrir = <T,>(m: Record<string, T>) => {
       const { "100": unico, ...resto } = m;
@@ -125,7 +127,34 @@ export function useFinanceiro() {
       recebidos: troca(base.recebidos, a.recebidaEm),
       previsoes: troca(base.previsoes, a.previsao),
       valores: troca(base.valores, a.valor),
+      notas: troca(base.notas, a.nota),
     });
+  };
+
+  // Arquivo da nota fiscal (PDF, XML ou imagem) guardado no bucket privado "notas-fiscais", em "<projeto>/<arquivo>".
+  // A linha do projeto no financeiro precisa existir antes (a regra do bucket olha o projeto), por isso o upsert antes.
+  const anexarNota = async (p: { id: string; empresa: string }, chave: ChaveDeParcela, arquivo: File) => {
+    const antiga = (projetos[p.id]?.notas ?? {})[chave];
+    const nome = arquivo.name.replace(/[^\w.\-]+/g, "_").slice(-80) || "nota";
+    const caminho = `${p.id}/${crypto.randomUUID()}-${nome}`;
+    const sb = supabaseNavegador();
+    if (!projetos[p.id]) await ajustarParcela(p, chave, {});
+    const { error } = await sb.storage.from("notas-fiscais").upload(caminho, arquivo, { contentType: arquivo.type || undefined });
+    if (error) throw new Error(traduzirErro(error, "Não foi possível enviar o arquivo."));
+    const nota: NotaFiscal = { numero: antiga?.numero ?? "", emitidaEm: antiga?.emitidaEm ?? null, valor: antiga?.valor ?? null, arquivo: { caminho, nome: arquivo.name } };
+    await ajustarParcela(p, chave, { nota });
+    if (antiga?.arquivo) await sb.storage.from("notas-fiscais").remove([antiga.arquivo.caminho]);
+  };
+  const removerArquivoDaNota = async (p: { id: string; empresa: string }, chave: ChaveDeParcela) => {
+    const nota = (projetos[p.id]?.notas ?? {})[chave];
+    if (!nota?.arquivo) return;
+    await ajustarParcela(p, chave, { nota: { ...nota, arquivo: null } });
+    await supabaseNavegador().storage.from("notas-fiscais").remove([nota.arquivo.caminho]);
+  };
+  const abrirArquivoDaNota = async (caminho: string) => {
+    const { data, error } = await supabaseNavegador().storage.from("notas-fiscais").createSignedUrl(caminho, 120);
+    if (error || !data) throw new Error(traduzirErro(error, "Não foi possível abrir o arquivo."));
+    window.open(data.signedUrl, "_blank", "noopener");
   };
 
   const salvarEmpresa = async (f: FinEmpresa) => {
@@ -137,5 +166,5 @@ export function useFinanceiro() {
   };
 
   if (!pode) return null;
-  return { servicos, projetos, empresas, carregado, salvarServico, salvarProjeto, ajustarParcela, salvarEmpresa, recarregar: carregar };
+  return { servicos, projetos, empresas, carregado, salvarServico, salvarProjeto, ajustarParcela, anexarNota, removerArquivoDaNota, abrirArquivoDaNota, salvarEmpresa, recarregar: carregar };
 }

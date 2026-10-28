@@ -23,6 +23,7 @@ export const ancoraAbaProjeto = {
   entregas: "Entregas",
   relatorios: "Entregas",
   historico: "Histórico",
+  financeiro: "Financeiro",
 } as const;
 
 export type Passo = {

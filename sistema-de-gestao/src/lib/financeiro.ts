@@ -33,7 +33,20 @@ export type FinProjeto = {
   recebidos: Record<string, string>;
   previsoes: Record<string, string>; // data combinada de cada parcela, no lugar da estimada
   valores: Record<string, number>; // valor de cada parcela ajustado à mão, no lugar do calculado
+  notas: Record<string, NotaFiscal>; // nota fiscal de cada parcela
 };
+
+// Nota fiscal de uma parcela: emitida quando tem a data de emissão (ou o número)
+export type NotaFiscal = {
+  numero: string;
+  emitidaEm: string | null;
+  valor: number | null; // quando a nota sai por outro valor que o da parcela
+  arquivo: { caminho: string; nome: string } | null;
+};
+export const notaEmitida = (n: NotaFiscal | undefined | null) => !!n && (!!n.emitidaEm || !!n.numero.trim());
+
+// A contrapartida do cliente (quando há) é uma terceira entrada, além das duas parcelas do SEBRAE
+export type ChaveDeParcela = "30" | "70" | "contrapartida";
 export type FinEmpresa = ConfigImposto & { empresa: string };
 
 export const moeda = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -82,8 +95,8 @@ export function dataFinalizacao(p: Projeto): string | null {
 export type OrigemDaData = "hub" | "plano" | "manual";
 
 export type Parcela = {
-  chave: "30" | "70";
-  ordem: 1 | 2;
+  chave: ChaveDeParcela;
+  ordem: 1 | 2 | 3;
   explicacao: string | null; // de onde vem a data, quando é uma projeção
   percentual: number;
   valor: number;
@@ -95,7 +108,7 @@ export type Parcela = {
 };
 
 // Projetos antigos guardaram o pagamento único como "100": vale para as duas parcelas
-const lerMapa = <T,>(mapa: Record<string, T> | undefined, chave: string): T | undefined => mapa?.[chave] ?? mapa?.["100"];
+const lerMapa = <T,>(mapa: Record<string, T> | undefined, chave: string): T | undefined => mapa?.[chave] ?? (chave === "contrapartida" ? undefined : mapa?.["100"]);
 
 export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje = hojeIso()) {
   const valorHora = fp?.valorHora ?? fs?.valorHora ?? VALOR_HORA_PADRAO;
@@ -123,7 +136,7 @@ export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje =
   // Estimativa: o restante só é pago depois da finalização, então nunca no mesmo pagamento dos 30% (a menos que o HUB mostre o contrário)
   if (!(envio1 && fim) && cicloFim && ciclo1 && cicloFim <= ciclo1) cicloFim = proximoPagamento(ciclo1);
   const condicaoFim = fim ? `Finalizado no HUB em ${formatarData(fim)}` : "Quando o projeto for finalizado no HUB";
-  const parcela = (chave: Parcela["chave"], ordem: 1 | 2, percentual: number, previsao: string | null, doHub: boolean, condicao: string, porque: string | null, base: string | null): Parcela => {
+  const parcela = (chave: "30" | "70", ordem: 1 | 2, percentual: number, previsao: string | null, doHub: boolean, condicao: string, porque: string | null, base: string | null): Parcela => {
     const manual = lerMapa(fp?.previsoes, chave);
     const valorCalculado = (liquido * percentual) / 100;
     return {
@@ -144,12 +157,30 @@ export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje =
     parcela("30", 1, 30, ciclo1, !!envio1, envio1 ? `Relatório 1 enviado em ${formatarData(envio1)}` : "Quando o Relatório 1 for enviado no HUB", porque1, data1),
     parcela("70", 2, 70, cicloFim, !!fim, condicaoFim, porqueFim, dataFim),
   ];
+  // Contrapartida do cliente: só existe se o valor foi informado; a data e o "recebi" são combinados à mão
+  const valorContrapartida = fp?.valores?.contrapartida ?? 0;
+  if (valorContrapartida > 0) {
+    const manual = fp?.previsoes?.contrapartida;
+    parcelas.push({
+      chave: "contrapartida",
+      ordem: 3,
+      explicacao: manual ? "Data combinada por você" : null,
+      percentual: 0,
+      valor: valorContrapartida,
+      valorCalculado: 0,
+      previsao: manual ?? null,
+      origem: manual ? "manual" : null,
+      condicao: "Contrapartida paga pelo cliente",
+      recebidaEm: fp?.recebidos?.contrapartida ?? null,
+    });
+  }
   return { horas, valorHora, percFuncern, bruto, funcern, liquido, parcelas };
 }
 
 export type Entrada = {
   projeto: Projeto;
   parcela: Parcela;
+  nota: NotaFiscal | null;
   mes: string | null; // AAAA-MM em que o dinheiro entrou (ou entra)
   aliquota: number | null; // % de imposto do mês do pagamento
   imposto: number;
@@ -170,7 +201,7 @@ export function entradasDeRecebimento(
       const mes = dia ? dia.slice(0, 7) : null;
       const aliquota = mes ? aliquotaNoMes(empresas[p.empresa], mes) : null;
       const imp = aliquota === null ? 0 : imposto(parcela.valor, aliquota);
-      return { projeto: p, parcela, mes, aliquota, imposto: imp, aposImposto: parcela.valor - imp };
+      return { projeto: p, parcela, nota: fps[p.id]?.notas?.[parcela.chave] ?? null, mes, aliquota, imposto: imp, aposImposto: parcela.valor - imp };
     }),
   );
   const dataDe = (e: Entrada) => e.parcela.recebidaEm ?? e.parcela.previsao ?? "9999";

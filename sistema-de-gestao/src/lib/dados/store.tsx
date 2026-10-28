@@ -247,6 +247,9 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
           arquivos.push(...(daConversa ?? []).map((f) => `${pasta}/${f.name}`));
         }
         if (arquivos.length) await sb.storage.from("evidencias").remove([...new Set(arquivos)]);
+        // Notas fiscais: só quem vê o financeiro lista e apaga (para os demais, a lista vem vazia)
+        const { data: notas } = await sb.storage.from("notas-fiscais").list(id, { limit: 1000 });
+        if (notas?.length) await sb.storage.from("notas-fiscais").remove(notas.map((f) => `${id}/${f.name}`));
       }
       gravado.current.delete(chave);
       versoes.delete(id);
