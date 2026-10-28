@@ -11,7 +11,7 @@
    Componentes: .lead (linha pequena em serifa itálica), .big (título pesado em caixa alta),
    .mk (marca-texto), .card, .chip, .tag (etiqueta com miras), .input (caixa de prompt/comentário),
    .lista, .riscado, .num, .estrela. Troque --acento para mudar a cor do tema. */
-:root{--fundo:#EEEEEC;--branco:#FFFFFF;--tinta:#151515;--cinza:#6B6B6B;--cinza2:#A7A7A7;--linha:#E2E2DF;--acento:#8FB8FF;--azul:#2B57A6;
+:root{--fundo:#EEEEEC;--branco:#FFFFFF;--tinta:#151515;--cinza:#6B6B6B;--cinza2:#A7A7A7;--linha:#E2E2DF;--acento:#2B57A6;--azul:#2B57A6;
 --serif:'Instrument Serif',Georgia,serif;--sans:'Inter Tight',system-ui,sans-serif;--mono:'JetBrains Mono',monospace}
 *{box-sizing:border-box;margin:0}
 body{background:#888;padding:40px;display:flex;flex-wrap:wrap;gap:40px}
@@ -110,6 +110,9 @@ svg.ligas{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-eve
 .avatar{display:flex;align-items:center;gap:16px;background:var(--branco);border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.08);padding:14px 22px 14px 14px;text-align:left}
 .avatar .f{width:56px;height:56px;border-radius:50%;background:var(--tinta);color:#fff;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center}
 .avatar b{display:block;font-size:22px} .avatar span{font-size:18px;color:var(--cinza)}
+/* azul forte: texto branco sobre o destaque */
+.mk,.chip.a,.tag,.rot.az,.lista .q,.risc.ok span{color:#fff}
+.tag::before,.tag::after{border-color:var(--tinta)}
 </style>
 </head>
 <body>
@@ -172,7 +175,7 @@ svg.ligas{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-eve
 <!-- 5 · respiro com a curva que pivota -->
 <section class="s" data-out="carrossel-05">
   <div class="topo" style="top:360px"><p class="lead">e a multa</p><p class="big g"><span class="mk">foi só</span></p><p class="big g">uma parte</p></div>
-  <svg style="position:absolute;left:190px;top:880px;width:700px;height:240px;z-index:2" viewBox="0 0 700 240"><path d="M10 200 C 170 190, 280 170, 350 150" stroke="#A7A7A7" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M350 150 C 450 120, 560 60, 690 20" stroke="#151515" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="350" cy="150" r="16" fill="#8FB8FF" stroke="#151515" stroke-width="4"/></svg>
+  <svg style="position:absolute;left:190px;top:880px;width:700px;height:240px;z-index:2" viewBox="0 0 700 240"><path d="M10 200 C 170 190, 280 170, 350 150" stroke="#A7A7A7" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M350 150 C 450 120, 560 60, 690 20" stroke="#151515" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="350" cy="150" r="16" fill="#2B57A6" stroke="#151515" stroke-width="4"/></svg>
   <span class="rot" style="left:190px;top:1140px;color:#6B6B6B">multa</span><span class="rot ch" style="left:760px;top:860px">o produto muda</span>
   <i class="estrela" style="left:850px;top:340px"></i><i class="cruz" style="left:150px;top:520px"></i>
   <div class="pe">@robertopivotto</div>
