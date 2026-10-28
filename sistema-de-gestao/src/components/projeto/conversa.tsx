@@ -5,6 +5,7 @@ import type { Projeto } from "@/lib/dados/tipos";
 import { useEstado } from "@/lib/dados/store";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { traduzirErro } from "@/lib/erros";
+import { lerFluxoDaIA } from "@/lib/ia/fluxo";
 import { aplicarAcoes, desfazerAcoes, sugestoesConversa, type AcaoIA, type Anexo, type Desfazer, type ItemAcao } from "@/lib/conversa";
 import { Botao, Cartao } from "@/components/ui";
 import { IconeAnexo, IconeCheck, IconeEnviar, IconeFechar, IconeIA, IconeMicrofone, IconeRelatorio } from "@/components/icones";
@@ -37,6 +38,7 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
   const [ocupado, setOcupado] = useState<null | "enviando" | "pensando">(null);
   const [falha, setFalha] = useState<{ mensagem: Mensagem; erro: string } | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [escrevendo, setEscrevendo] = useState(0); // caracteres que a IA já escreveu na resposta em andamento
   const [urls, setUrls] = useState<Record<string, string>>({});
   const caixa = useRef<HTMLTextAreaElement>(null);
   const rodape = useRef<HTMLDivElement>(null);
@@ -109,6 +111,7 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
 
   const pedirIA = async (m: Mensagem) => {
     setOcupado("pensando");
+    setEscrevendo(0);
     setFalha(null);
     try {
       const r = await fetch("/api/conversa", {
@@ -116,8 +119,10 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ projetoId: projeto.id, mensagemId: m.id }),
       });
-      const d = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(d.erro ?? "Não foi possível falar com a IA agora.");
+      // Respostas de erro antes de a IA começar vêm em JSON; a da IA vem em fluxo (uma linha por evento)
+      const ehFluxo = (r.headers.get("content-type") ?? "").includes("ndjson") && !!r.body;
+      const d = ehFluxo ? await lerFluxoDaIA(r.body!, setEscrevendo) : await r.json().catch(() => ({}));
+      if (!ehFluxo && !r.ok) throw new Error(d.erro ?? "Não foi possível falar com a IA agora.");
       const acoes = ((d.acoes ?? []) as AcaoIA[]).filter((a) => a && typeof a === "object" && "tipo" in a);
       // Calcula sobre uma cópia o que vai mudar (e como desfazer), depois aplica de verdade
       const { itens, desfazer } = aplicarAcoes(structuredClone(projetoAtual.current), acoes, m.anexos, m.id, usuario.nome);
@@ -125,7 +130,7 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
       if (feitos.length)
         alterar((p) => void aplicarAcoes(p, acoes, m.anexos, m.id, usuario.nome), {
           acao: "Desenvolvimento: projeto organizado pela IA",
-          detalhe: feitos.map((x) => x.descricao).join("; "),
+          detalhe: feitos.map((x) => x.descricao).join("\n"),
         });
       const { data, error } = await supabaseNavegador()
         .from("mensagens_projeto")
@@ -185,7 +190,7 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
       detalhe: m.acoes
         .filter((a) => !a.aviso)
         .map((a) => a.descricao)
-        .join("; "),
+        .join("\n"),
     });
     setMensagens((l) => (l ?? []).map((x) => (x.id === m.id ? { ...x, desfeita: true } : x)));
     await supabaseNavegador().from("mensagens_projeto").update({ desfeita: true }).eq("id", m.id);
@@ -252,7 +257,8 @@ export function Conversa({ projeto, passo, focar = 0 }: { projeto: Projeto; pass
         <div className="space-y-3 px-3 pb-4 sm:px-6">
           {ocupado === "pensando" && (
             <div className="mr-auto flex w-fit max-w-[90%] items-center gap-3 rounded-2xl rounded-bl-md bg-pedra px-4 py-3 text-sm text-tinta-2">
-              <IconeIA className="h-5 w-5 shrink-0 animate-pulse text-azul" />A IA está lendo e organizando o projeto…
+              <IconeIA className="h-5 w-5 shrink-0 animate-pulse text-azul" />
+              {escrevendo > 0 ? `A IA está escrevendo (${Math.round(escrevendo / 1000)} mil caracteres até agora)…` : "A IA está lendo e organizando o projeto…"}
             </div>
           )}
           {falha && (

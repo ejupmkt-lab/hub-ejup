@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useProjeto } from "@/components/projeto/use-projeto";
 import { useExcluirProjeto } from "@/components/projeto/excluir-projeto";
 import { MoverProjeto } from "@/components/projeto/mover-projeto";
+import { ModalExclusao } from "@/components/projeto/modal-exclusao";
 import { PlanoTrabalho } from "@/components/projeto/plano-trabalho";
 import { DadosProjeto } from "@/components/projeto/dados";
 import { CronogramaProjeto } from "@/components/projeto/cronograma-projeto";
@@ -52,7 +53,7 @@ export default function PaginaProjeto() {
   const { usuario } = useAcesso();
   const abas = usuario.veFinanceiro ? abasComFinanceiro : abasComuns;
   const { mudarStatus } = useAcoesEtapa();
-  const { excluirProjeto, excluindo, podeExcluir } = useExcluirProjeto(projeto);
+  const { excluirProjeto, excluindo, confirmando, cancelarExclusao, confirmarExclusao, aviso: avisoExclusao, podeExcluir } = useExcluirProjeto(projeto);
   const { empresa: slug } = useParams<{ empresa: string }>();
   // O projeto abre sempre nos Dados
   const [aba, setAba] = useState<Aba>("Dados");
@@ -284,11 +285,13 @@ export default function PaginaProjeto() {
       >
         <MoverProjeto projeto={projeto} />
         {podeExcluir && (
-          <Botao variante="perigo" tamanho="pequeno" onClick={() => void excluirProjeto()} disabled={excluindo}>
+          <Botao variante="perigo" tamanho="pequeno" onClick={excluirProjeto} disabled={excluindo}>
             {excluindo ? "Excluindo…" : "Excluir projeto"}
           </Botao>
         )}
       </Cabecalho>
+
+      {confirmando && <ModalExclusao titulo="Excluir projeto" aviso={avisoExclusao} excluindo={excluindo} aoConfirmar={() => void confirmarExclusao()} aoCancelar={cancelarExclusao} />}
 
       {abaVista === "Dados" && (
         <div className="space-y-6">
@@ -340,7 +343,13 @@ export default function PaginaProjeto() {
                 <span className="min-w-0 break-words">
                   <span className="text-tinta">{h.acao}</span>
                   <span className="text-tinta-2">, por {h.usuario}</span>
-                  {h.detalhe && <span className="mt-1 block text-sm text-tinta-2">{h.detalhe}</span>}
+                  {h.detalhe && (
+                    <ul className="mt-1 space-y-0.5 text-sm text-tinta-2">
+                      {h.detalhe.split("\n").filter((l) => l.trim()).map((l, j) => (
+                        <li key={j}>{l}</li>
+                      ))}
+                    </ul>
+                  )}
                 </span>
               </li>
             ))}

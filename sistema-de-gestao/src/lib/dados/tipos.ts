@@ -84,6 +84,7 @@ export type Etapa = {
   entregaveis: Entregavel[];
   secoes: Record<string, string>;
   dataRelatorio: string | null;
+  dataLimiteInformacoes?: string | null; // até quando as informações do relatório valem (a data de fechamento pode ser posterior)
   assinaturaConsultor: string | null;
   assinaturaCliente: string | null;
   evidencias?: Evidencia[];

@@ -100,7 +100,7 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
           // A linha do tempo como realmente foi: cada passo e cada envio com a data de verdade
           registrarLinhaDoTempoDoHub(p, usuario.nome, acoesFinais, leituras);
         },
-        { acao: "HUB: dados importados da página do pedido", detalhe: [...efetivos, ...dosMateriais].map((x) => x.descricao).join("; ") },
+        { acao: "HUB: dados importados da página do pedido", detalhe: [...efetivos, ...dosMateriais].map((x) => x.descricao).join("\n") },
       );
       // Fica na conversa do projeto, com o botão de desfazer
       const base = { projeto_id: projeto.id, empresa: projeto.empresa };

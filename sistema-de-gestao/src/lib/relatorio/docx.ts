@@ -3,7 +3,8 @@ import type { Cliente, Etapa, Projeto, Usuario } from "../dados/tipos";
 import { tipoRegistro } from "../registros";
 import { dataPorExtenso, formatarData } from "../datas";
 import { doisDigitos, ordinalFeminino } from "../rotulos";
-import { secoesAntes, secoesDepois, type DefSecao } from "./secoes";
+import { ehUltimaEtapa, secoesAntes, secoesDepois, type DefSecao } from "./secoes";
+import { dataLimiteInformacoes } from "./padroes";
 
 // O corpo do modelo Word é substituído; cabeçalho (papel timbrado), rodapé com
 // número de página, margens e estilos do modelo são mantidos como estão.
@@ -18,15 +19,33 @@ const FONTE = "Times New Roman";
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-type Run = { t: string; b?: boolean; i?: boolean; cor?: string; tam?: number };
+type Run = { t: string; b?: boolean; i?: boolean; cor?: string; tam?: number; realce?: boolean };
 
-function run({ t, b, i, cor, tam = 24 }: Run) {
+// Marcadores que o consultor precisa resolver antes de enviar: [completar: …] e [a confirmar: …]
+export const MARCADOR_NO_WORD = /\[(?:completar|a confirmar)[^\]]*\]/gi;
+
+// Divide o trecho em partes comuns e partes de marcador (estas com realce amarelo)
+function comRealce(r: Run): Run[] {
+  if (r.realce !== undefined) return [r];
+  const partes: Run[] = [];
+  let fim = 0;
+  for (const m of r.t.matchAll(MARCADOR_NO_WORD)) {
+    if (m.index > fim) partes.push({ ...r, t: r.t.slice(fim, m.index), realce: false });
+    partes.push({ ...r, t: m[0], realce: true });
+    fim = m.index + m[0].length;
+  }
+  if (fim < r.t.length) partes.push({ ...r, t: r.t.slice(fim), realce: false });
+  return partes.length ? partes : [{ ...r, realce: false }];
+}
+
+function run({ t, b, i, cor, tam = 24, realce }: Run) {
   const rpr =
     `<w:rFonts w:ascii="${FONTE}" w:hAnsi="${FONTE}" w:cs="${FONTE}"/>` +
     (b ? "<w:b/><w:bCs/>" : "") +
     (i ? "<w:i/><w:iCs/>" : "") +
     (cor ? `<w:color w:val="${cor}"/>` : "") +
-    `<w:sz w:val="${tam}"/><w:szCs w:val="${tam}"/>`;
+    `<w:sz w:val="${tam}"/><w:szCs w:val="${tam}"/>` +
+    (realce ? '<w:highlight w:val="yellow"/>' : "");
   return `<w:r><w:rPr>${rpr}</w:rPr><w:t xml:space="preserve">${esc(t)}</w:t></w:r>`;
 }
 
@@ -49,7 +68,7 @@ function par(runs: Run[] | string, o: OpP = {}) {
       ? `<w:ind w:left="${o.recuoEsq ?? 0}" w:firstLine="${o.recuoPrimeira ?? 0}"/>`
       : "") +
     `<w:jc w:val="${o.alinhar ?? "both"}"/>`;
-  return `<w:p><w:pPr>${ppr}</w:pPr>${rs.map(run).join("")}</w:p>`;
+  return `<w:p><w:pPr>${ppr}</w:pPr>${rs.flatMap(comRealce).map(run).join("")}</w:p>`;
 }
 
 function celula(conteudo: string, largura: number, o: { fundo?: string; vAlign?: string } = {}) {
@@ -273,6 +292,9 @@ function figuraXml(img: ImagemRelatorio, n: number) {
   );
 }
 
+// Quantos marcadores [completar] e [a confirmar] o texto do corpo ainda tem
+export const contarMarcadoresNoCorpo = (xml: string) => (xml.match(MARCADOR_NO_WORD) ?? []).length;
+
 export function corpoRelatorio({ projeto, etapa, cliente, consultor, imagens = [] }: DadosRelatorio) {
   const partes: string[] = [];
   const ordinal = ordinalFeminino[etapa.ordem];
@@ -295,15 +317,14 @@ export function corpoRelatorio({ projeto, etapa, cliente, consultor, imagens = [
     ["Segmento", projeto.segmento],
     ["Área de atuação da consultoria", projeto.areaAtuacao],
   ];
-  if (etapa.ordem > 1) {
-    ficha.push([`Período da Etapa ${doisDigitos(etapa.ordem)}`, `${formatarData(etapa.dataInicio)} a ${formatarData(etapa.dataFim)}`]);
-    ficha.push(["Carga horária prevista", `${etapa.horasPrevistas} horas`]);
-  }
+  // Período e carga horária entram em todas as etapas; sem plano de trabalho, "A definir"
+  ficha.push([`Período da Etapa ${doisDigitos(etapa.ordem)}`, etapa.dataInicio && etapa.dataFim ? `${formatarData(etapa.dataInicio)} a ${formatarData(etapa.dataFim)}` : "A definir"]);
+  ficha.push(["Carga horária prevista", etapa.horasPrevistas > 0 ? `${etapa.horasPrevistas} horas` : "A definir"]);
   // Como nos relatórios: rótulo em faixa azul à esquerda, valor em cinza-claro à direita,
   // linhas separadas por branco. Campo em branco não entra na ficha.
   const lf = [4100, LARGURA - 4100];
   const celulaFicha = (t: string, opc: Parameters<typeof textoCelula>[1]) =>
-    `<w:p><w:pPr><w:spacing w:before="40" w:after="40" w:line="252" w:lineRule="auto"/><w:jc w:val="${opc?.alinhar ?? "left"}"/></w:pPr>${run({ t, b: opc?.b, cor: opc?.cor, tam: 24 })}</w:p>`;
+    `<w:p><w:pPr><w:spacing w:before="40" w:after="40" w:line="252" w:lineRule="auto"/><w:jc w:val="${opc?.alinhar ?? "left"}"/></w:pPr>${comRealce({ t, b: opc?.b, cor: opc?.cor, tam: 24 }).map(run).join("")}</w:p>`;
   partes.push(
     tabela(
       ficha
@@ -319,19 +340,21 @@ export function corpoRelatorio({ projeto, etapa, cliente, consultor, imagens = [
       12,
     ),
   );
+  const aposACapa = partes.length;
   partes.push(faixa(["Detalhes", `${ordinal} entrega - ${etapaNome}`]));
 
   let num = 0;
   const figura = { n: 0 };
+  const ultima = ehUltimaEtapa(projeto.etapas, etapa);
   const secao = (def: DefSecao) => {
     const texto = (etapa.secoes[def.chave] ?? "").trim();
     if (!texto && !(def.chave === "evidencias" && imagens.length)) return;
     if (def.quadro) {
-      partes.push(quadro(def.titulo(etapa), texto, "azul"));
+      partes.push(quadro(def.titulo(etapa, ultima), texto, "azul"));
       return;
     }
     num += 1;
-    partes.push(titulo(`${num}.`, def.titulo(etapa)));
+    partes.push(titulo(`${num}.`, def.titulo(etapa, ultima)));
     partes.push(blocos(texto, projeto, `${num}.`, { sub: 0, figura }));
     // As imagens de evidência entram logo depois do texto da seção de evidências
     if (def.chave === "evidencias") imagens.forEach((img) => partes.push(figuraXml(img, ++figura.n)));
@@ -356,18 +379,21 @@ export function corpoRelatorio({ projeto, etapa, cliente, consultor, imagens = [
 
   secoesDepois.forEach(secao);
 
+  // A data de consulta das referências é a data-limite das informações do relatório (a do modelo só vale sem ela)
+  const limite = dataLimiteInformacoes(etapa);
   if (projeto.referencias.length) {
     num += 1;
     partes.push(titulo(`${num}.`, "Referências normativas e técnicas"));
     projeto.referencias.forEach((r, i) => {
-      const consulta = r.consultadoEm ? ` Consulta em ${formatarData(r.consultadoEm)}.` : "";
+      const dataConsulta = limite ?? r.consultadoEm;
+      const consulta = dataConsulta ? ` Consulta em ${formatarData(dataConsulta)}.` : "";
       partes.push(par([{ t: `[${i + 1}] ${r.texto}${consulta} ${r.url}`.trim(), tam: 22 }], { alinhar: "left", depois: 60, linha: 276 }));
     });
-    const ultima = projeto.referencias.map((r) => r.consultadoEm).filter(Boolean).sort().pop();
+    const ultimaConsulta = limite ?? projeto.referencias.map((r) => r.consultadoEm).filter(Boolean).sort().pop();
     partes.push(
       quadro(
         "Atualização regulatória",
-        `Normas, guias, políticas e contratos de fornecedores devem ser monitorados continuamente. A lista reflete a consulta realizada em ${formatarData(ultima ?? etapa.dataRelatorio)} e deverá ser atualizada sempre que houver mudança normativa, contratual, tecnológica ou de fornecedor.`,
+        `Normas, guias, políticas e contratos de fornecedores devem ser monitorados continuamente. A lista reflete a consulta realizada em ${formatarData(ultimaConsulta ?? etapa.dataRelatorio)} e deverá ser atualizada sempre que houver mudança normativa, contratual, tecnológica ou de fornecedor.`,
         "azul",
       ),
     );
@@ -386,14 +412,36 @@ export function corpoRelatorio({ projeto, etapa, cliente, consultor, imagens = [
   partes.push(assinatura(consultor?.nomeCompleto ?? "Consultor", "Consultor Responsável", false));
   partes.push(assinatura(cliente.responsavel || "Responsável", "Responsável pela Empresa Demandante", true));
 
+  // Caixa logo após a capa, que o usuário apaga ao concluir; a contagem vem do próprio corpo
+  const pendentes = contarMarcadoresNoCorpo(partes.join(""));
+  if (pendentes > 0)
+    partes.splice(
+      aposACapa,
+      0,
+      quadro(
+        "Pendências antes do envio",
+        `Este documento tem ${pendentes} ${pendentes === 1 ? "marcador" : "marcadores"} a completar, destacados em amarelo. Resolva cada um, remova o realce e apague esta caixa antes de assinar e enviar.`,
+        "alerta",
+      ),
+    );
+
   return partes.join("");
+}
+
+// A miniatura do modelo (docProps/thumbnail.emf, 4,6 MB) é só uma prévia do Word: sai do arquivo e da relação que a cita
+export function tirarMiniatura(zip: PizZip) {
+  if (!zip.file("docProps/thumbnail.emf")) return;
+  zip.remove("docProps/thumbnail.emf");
+  const rels = zip.file("_rels/.rels");
+  if (rels) zip.file("_rels/.rels", rels.asText().replace(/<Relationship\b[^>]*thumbnail[^>]*\/>/gi, ""));
 }
 
 export type ArquivoImagem = { dados: ArrayBuffer; tipo: string; legenda: string; largura: number; altura: number };
 
-export async function gerarDocx(dados: Omit<DadosRelatorio, "imagens">, arquivos: ArquivoImagem[] = []): Promise<Blob> {
-  const base = await fetch("/modelos/relatorio-base.docx").then((r) => r.arrayBuffer());
+export async function gerarDocx(dados: Omit<DadosRelatorio, "imagens">, arquivos: ArquivoImagem[] = [], modelo?: ArrayBuffer): Promise<Blob> {
+  const base: ArrayBuffer = modelo ?? (await fetch("/modelos/relatorio-base.docx").then((r) => r.arrayBuffer()));
   const zip = new PizZip(base);
+  tirarMiniatura(zip);
 
   // Imagens: arquivo em word/media, relação no document.xml.rels e tipo no [Content_Types].xml
   const imagens: ImagemRelatorio[] = [];

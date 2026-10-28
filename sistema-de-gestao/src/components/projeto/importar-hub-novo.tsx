@@ -13,7 +13,7 @@ import { montarProjeto } from "@/lib/projeto-novo";
 import { servicosDaEmpresa } from "@/lib/servicos";
 import { LIMITE_PROJETOS_CLIENTE } from "@/lib/projeto";
 import { camposCliente, nomeDoCliente } from "@/lib/campos-cliente";
-import { dadosParaFormulario, formatarCnpj, type DadosCnpj } from "@/lib/cnpj";
+import { dadosDaEmpresa, formatarCnpj, type DadosCnpj } from "@/lib/cnpj";
 import { traduzirErro } from "@/lib/erros";
 import { Botao, Campo } from "@/components/ui";
 import { registrarDocumentosNoHistorico } from "@/lib/hub-documentos";
@@ -177,7 +177,7 @@ export function ImportarHubNovo({
         let receita: Record<string, string> = {};
         try {
           const r = await fetch(`/api/cnpj/${cnpjLido}`);
-          if (r.ok) receita = dadosParaFormulario((await r.json()) as DadosCnpj);
+          if (r.ok) receita = dadosDaEmpresa((await r.json()) as DadosCnpj);
           else avisosFinais.push("a consulta do CNPJ na Receita falhou; o cadastro do cliente ficou só com o que veio do HUB");
         } catch {
           avisosFinais.push("a consulta do CNPJ na Receita falhou; o cadastro do cliente ficou só com o que veio do HUB");
@@ -191,11 +191,12 @@ export function ImportarHubNovo({
           empresa: slug,
           cnpj: formatarCnpj(cnpjLido),
           razaoSocial: receita.razaoSocial || nomeHub || "Cliente do HUB",
-          responsavel: ident?.contato_nome?.trim() || receita.responsavel || "A definir",
-          email: ident?.contato_email?.trim() || receita.email || "",
-          telefone: ident?.contato_telefone?.trim() || receita.telefone || "",
+          // Responsável e contato só vêm do HUB ou do que a pessoa informar; os da Receita são dado pessoal a conferir
+          responsavel: ident?.contato_nome?.trim() || "A definir",
+          email: ident?.contato_email?.trim() || "",
+          telefone: ident?.contato_telefone?.trim() || "",
         };
-        if (!ident?.contato_nome?.trim() && !receita.responsavel) avisosFinais.push("o responsável do cliente não veio do HUB: complete em Clientes");
+        if (!ident?.contato_nome?.trim()) avisosFinais.push("o responsável do cliente não veio do HUB: complete em Clientes (a Receita Federal traz só sugestões, que precisam ser conferidas com o cliente)");
       }
       const id = novoId("prj");
       // 2. Relatórios das etapas, direto em Entregas, e os demais arquivos baixados do HUB

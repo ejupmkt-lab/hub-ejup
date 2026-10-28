@@ -119,7 +119,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
         e.horasPrevistas !== numero(linhas[i].horas) ? `Etapa ${doisDigitos(e.ordem)}: ${e.horasPrevistas} h → ${numero(linhas[i].horas)} h` : null,
       ])
       .filter(Boolean)
-      .join("; ");
+      .join("\n");
     alterar(
       (p) => {
         if (algumPlanoMudou) {
@@ -144,7 +144,7 @@ export function PlanoTrabalho({ projeto }: { projeto: Projeto }) {
           }
         });
       },
-      { acao: "Datas do plano alteradas", detalhe: `${mudancas}. Justificativa: ${justificativa}` },
+      { acao: "Datas do plano alteradas", detalhe: `${mudancas}\nJustificativa: ${justificativa}` },
     );
     setJustificativa("");
     setEditando(false);

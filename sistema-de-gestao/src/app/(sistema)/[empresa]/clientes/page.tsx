@@ -6,7 +6,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { novoId, useAcesso, useEstado } from "@/lib/dados/store";
 import type { Cliente, EmpresaSlug } from "@/lib/dados/tipos";
 import { camposCliente, gruposCliente, nomeDoCliente } from "@/lib/campos-cliente";
-import { dadosParaFormulario, formatarCnpj, soSeVazio, type DadosCnpj } from "@/lib/cnpj";
+import { dadosDaEmpresa, formatarCnpj, sugestoesDeContato, type DadosCnpj, type SugestaoDeContato } from "@/lib/cnpj";
 import Link from "next/link";
 import { servicoDoProjeto } from "@/lib/projeto";
 import { Botao, Cabecalho, Campo, Cartao, Chip, Vazio } from "@/components/ui";
@@ -25,6 +25,7 @@ function Conteudo() {
   const [form, setForm] = useState<Record<string, string>>(vazio);
   const [busca, setBusca] = useState("");
   const [consulta, setConsulta] = useState<{ estado: "buscando" | "ok" | "erro"; texto: string } | null>(null);
+  const [sugestoes, setSugestoes] = useState<SugestaoDeContato[]>([]); // contatos da Receita, a conferir (não entram sozinhos)
   const ultimoCnpj = useRef("");
   const voltarParaProjeto = busca_.get("voltar") === "novo-projeto";
   // Veio de um projeto ("Dados do cliente"): salvar ou cancelar volta para ele
@@ -34,6 +35,7 @@ function Conteudo() {
     setEditando(c ? c.id : "novo");
     setForm(c ? { ...vazio, ...(c as unknown as Record<string, string>) } : vazio);
     setConsulta(null);
+    setSugestoes([]);
     ultimoCnpj.current = c?.cnpj.replace(/\D/g, "") ?? "";
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -58,16 +60,18 @@ function Conteudo() {
       const r = await fetch(`/api/cnpj/${digitos}`);
       const d = await r.json();
       if (!r.ok) throw new Error(d.erro);
-      const novos = dadosParaFormulario(d as DadosCnpj);
+      // Só dados da empresa preenchem o cadastro; contato e responsável da Receita vão como sugestão a conferir
+      const novos = dadosDaEmpresa(d as DadosCnpj);
       setForm((f) => {
         const out = { ...f };
         for (const [k, v] of Object.entries(novos)) {
           if (!v) continue;
-          if (sobrescrever ? !soSeVazio.has(k) || !f[k]?.trim() : !f[k]?.trim()) out[k] = v;
+          if (sobrescrever || !f[k]?.trim()) out[k] = v;
         }
         return out;
       });
-      setConsulta({ estado: "ok", texto: "Dados preenchidos a partir da Receita Federal. Confira e ajuste o que precisar." });
+      setSugestoes(sugestoesDeContato(d as DadosCnpj));
+      setConsulta({ estado: "ok", texto: "Dados da empresa preenchidos a partir da Receita Federal. Confira e ajuste o que precisar. Responsável, e-mail e telefone não são preenchidos sozinhos." });
     } catch (e) {
       setConsulta({ estado: "erro", texto: e instanceof Error && e.message ? e.message : "Não foi possível consultar o CNPJ agora." });
     }
@@ -171,6 +175,33 @@ function Conteudo() {
                           <p className={`mt-1.5 text-[13px] ${consulta.estado === "erro" ? "text-vermelho" : consulta.estado === "ok" ? "text-verde" : "text-tinta-2"}`}>
                             {consulta.texto}
                           </p>
+                        )}
+                        {sugestoes.length > 0 && !duplicado && (
+                          <div className="mt-2 rounded-[var(--radius-campo)] border border-laranja/30 bg-laranja-claro/70 p-3 text-[13px] text-tinta" role="note" aria-label="Contato sugerido pela Receita Federal">
+                            <p className="font-semibold text-laranja">Contato público da Receita Federal: dado pessoal, a conferir</p>
+                            <p className="mt-0.5 text-tinta-2">
+                              São dados de sócios ou do contador que constam no cadastro público. Não foram preenchidos. Confirme com o cliente quem é o responsável e qual contato usar.
+                            </p>
+                            <ul className="mt-1.5 space-y-1">
+                              {sugestoes.map((sg) => (
+                                <li key={sg.chave} className="flex flex-wrap items-center justify-between gap-2">
+                                  <span className="min-w-0 break-words">
+                                    <span className="text-tinta-2">{sg.rotulo}:</span> {sg.valor}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    className="rounded-md border border-linha-forte bg-folha px-2.5 py-1 font-semibold hover:bg-pedra"
+                                    onClick={() => {
+                                      setForm((f) => ({ ...f, ...sg.extra }));
+                                      setSugestoes((l) => l.filter((x) => x.chave !== sg.chave));
+                                    }}
+                                  >
+                                    Usar depois de conferir
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                         )}
                       </div>
                     ) : (

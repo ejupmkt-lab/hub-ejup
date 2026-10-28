@@ -1,12 +1,16 @@
 import type { Atividade, Etapa, Projeto } from "./dados/tipos";
 import type { StatusEtapa } from "./rotulos";
-import { verificarCompletude } from "./relatorio/secoes";
+import { relatorioFeitoFora, verificarCompletude } from "./relatorio/secoes";
+import { contarAConfirmar, contarMarcadores } from "./relatorio/padroes";
 
 // Regras de status da etapa, num só lugar: o que o sistema avança sozinho e o
 // que impede cada status. Usadas pela etapa, pelo plano e pelo próximo passo.
 
 export const fluxoEtapa: StatusEtapa[] = ["nao_iniciada", "em_levantamento", "em_redacao", "em_revisao", "aguardando_assinaturas", "a_enviar", "enviada", "aprovada"];
 const exigemRelatorioPronto: StatusEtapa[] = ["a_enviar", "enviada", "aprovada"];
+
+// Marcadores [completar] e [a confirmar] ainda abertos no relatório da etapa
+export const marcadoresEmAberto = (e: Etapa) => contarMarcadores(e) + contarAConfirmar(e);
 
 export const assinada = (e: Etapa) => !!(e.assinaturaConsultor && e.assinaturaCliente);
 
@@ -26,6 +30,8 @@ export function bloqueioStatus(p: Projeto, e: Etapa, s: StatusEtapa): string | n
   if (p.status === "encerrado") return "O projeto está encerrado. Reabra para mudar o status";
   if (!p.planoFechadoEm && s !== "nao_iniciada") return "Feche o plano de trabalho primeiro";
   if (exigemRelatorioPronto.includes(s)) {
+    const abertos = marcadoresEmAberto(e);
+    if (abertos && !relatorioFeitoFora(e)) return `O relatório tem ${abertos} ${abertos === 1 ? "marcador" : "marcadores"} em aberto ([completar] ou [a confirmar]); resolva-os antes de enviar`;
     const n = verificarCompletude(p, e).length;
     if (n) return n === 1 ? "Há 1 pendência no relatório" : `Há ${n} pendências no relatório`;
     if (!assinada(e)) return "Registre as datas das duas assinaturas";

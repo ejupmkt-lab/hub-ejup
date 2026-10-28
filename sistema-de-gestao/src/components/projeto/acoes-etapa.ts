@@ -7,7 +7,7 @@ import { hojeIso } from "@/lib/datas";
 import { textosParaBiblioteca } from "@/lib/biblioteca";
 import { traduzirErro } from "@/lib/erros";
 import { avisoEnvioAntecipado } from "@/lib/fase";
-import { automatizarEtapa, bloqueioStatus } from "@/lib/regras-etapa";
+import { automatizarEtapa, bloqueioStatus, marcadoresEmAberto } from "@/lib/regras-etapa";
 import { gerarDocx } from "@/lib/relatorio/docx";
 import { relatorioFeitoFora } from "@/lib/relatorio/secoes";
 import { doisDigitos, statusEtapa, type StatusEtapa } from "@/lib/rotulos";
@@ -90,6 +90,14 @@ export function useAcoesEtapa() {
   const baixar = async (ordem: number) => {
     if (!projeto || !cliente) return;
     const etapa = projeto.etapas.find((e) => e.ordem === ordem)!;
+    const abertos = marcadoresEmAberto(etapa);
+    if (
+      abertos &&
+      !confirm(
+        `Este relatório tem ${abertos} ${abertos === 1 ? "marcador" : "marcadores"} a completar ou confirmar. No Word, eles saem destacados em amarelo e há uma caixa "Pendências antes do envio" logo depois da capa, que você apaga ao concluir.\n\nBaixar mesmo assim?`,
+      )
+    )
+      return;
     setGerando(ordem);
     try {
       const imagens = await baixarImagens(etapa.evidencias ?? []);

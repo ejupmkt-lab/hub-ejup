@@ -170,8 +170,17 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 - **Relatório Técnico em Word (.docx)** no papel timbrado do modelo (`public/modelos/relatorio-base.docx`).
   No texto: `## ` subtítulo, `a) ` alínea, `!QUADRO`/`!ALERTA` quadro, `[[tabela:x]]` tabela de registro e
   linhas `| A | B |` para tabelas avulsas (resumo, fluxo, metas). As colunas se ajustam ao conteúdo, e
-  coluna vazia em todas as linhas não entra. O estilo que a IA segue (`src/lib/ia/estilo.ts`) inclui o
-  padrão do Relatório 01 assinado da NOV4.
+  coluna vazia em todas as linhas não entra. O estilo que a IA segue (`src/lib/ia/estilo.ts`, em blocos:
+  estilo, padrão, fidelidade aos fatos, RIPD, conclusão e matriz, parecer conclusivo e conteúdo) inclui o
+  padrão do Relatório 01 assinado da NOV4. A capa leva as 14 linhas em todas as etapas (Período e Carga
+  horária também na Etapa 01; sem plano, "A definir"). Marcadores `[completar: …]` e `[a confirmar: …]` saem
+  com realce amarelo no Word e uma caixa "Pendências antes do envio" logo após a capa, que a pessoa apaga ao
+  concluir; baixar o Word ou marcar "Enviei no HUB" com marcadores abertos avisa a contagem (e o envio fica
+  bloqueado). O modelo `.docx` não leva a miniatura do Word (4,6 MB): cada relatório sem imagens pesa
+  cerca de 300 KB. A data de "Consulta em" das referências e a "data-limite das informações" seguem a data
+  "Informações até" da etapa (vazia: o fim previsto). Na conclusão, a "Matriz de entregas da Etapa 0X" traz o
+  status de cada entregável (Atendido, Atendido parcialmente, Pendente de evidência, `statusDoEntregavel`).
+  A seção final da última etapa é "Continuidade do programa após a consultoria" (`ehUltimaEtapa`).
 - **Assinatura online (Autentique)** nas Entregas: "Ou enviar para assinatura online" manda o PDF do
   relatório, o consultor e o responsável da empresa recebem o link por e-mail, e a tela mostra quem
   assinou ("Conferir assinaturas", "Lembrar quem falta"). Quando os dois assinam, o PDF assinado e as
@@ -218,7 +227,21 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   vista. Projeto concluído mostra "projeto entregue" (previsto 100%) e, se a última etapa saiu depois do
   plano, "entregue N dias além do plano do HUB" (`entregueAlemDoPlano`); o fim dele é o envio real da última etapa.
 - **Chat**: Enter envia a mensagem; Shift+Enter pula a linha. A mensagem do plano de trabalho para a FUNCERN
-  não fica mais na aba: a IA entrega pronta quando pedida (o texto vai no contexto do projeto).
+  não fica mais na aba: a IA entrega pronta quando pedida (o texto vai no contexto do projeto). A resposta
+  da IA vem em fluxo (uma linha JSON por evento: `vivo`, `progresso`, `fim`, `erro`; `src/lib/ia/fluxo.ts`), então
+  a conexão não fica muda em respostas longas e o chat mostra "A IA está escrevendo…". Os erros do provedor são
+  explicados por tipo (chave, saldo ou limite, modelo, requisição inválida, tempo esgotado, conexão, provedor;
+  `src/lib/ia/erros.ts`), e o servidor registra status, tipo, request-id e corpo da resposta de erro. Para caber
+  no tempo limite da função, a IA escreve no máximo três seções ou entregáveis por resposta e pede "continue".
+  Se a conexão cair sem a resposta final, o chat diz que foi o tempo limite do servidor. As sugestões do chat
+  e o "próximo passo" acompanham o estado real (escrever, resolver marcadores, anexar evidências). O Histórico
+  mostra uma linha por alteração.
+- **Cadastro de cliente por CNPJ**: só os dados da empresa (razão social, endereço, porte, ramo…) preenchem o
+  cadastro. Responsável, e-mail e telefone da Receita são dados pessoais de sócios ou do contador: ficam como
+  "Contato sugerido pela Receita Federal: dado pessoal, a conferir", com o botão "Usar depois de conferir"
+  (minimização e finalidade, LGPD art. 6º). "Atualizar" e a importação do HUB também não os preenchem.
+- **Excluir projeto** usa um modal próprio que pede para digitar EXCLUIR (sem `window.prompt`, que não funciona em
+  navegadores embutidos); Esc e Cancelar não apagam nada.
 - **Horas**: não há registro de visitas nem de horas trabalhadas. As horas de cada etapa são as do plano
   de trabalho e contam como cumpridas quando o relatório da etapa é enviado no HUB (`horasDoProjeto`); o
   cabeçalho do projeto mostra "51 h de 333 h" e quantas etapas foram enviadas. O número de visitas do
@@ -263,6 +286,17 @@ npx supabase start          # banco local (Docker); aplica as migrações
 # .env.local com NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY do `npx supabase status`
 npm run dev                 # http://localhost:3000
 ```
+
+## Testes
+
+```bash
+npm test    # textos-padrão, matriz de entregas, Word das 5 etapas, prompts, erros e fluxo da IA, CNPJ, exclusão
+```
+
+Rodam no Node (sem navegador nem banco; `testes/registrar.mjs` resolve os imports do projeto). Para ver os 5
+Word de um projeto de teste: `SAIDA=pasta npm test`. A validação com a IA de verdade (seis cenários, projeto e
+cliente fictícios, só em banco local) é `testes/cenarios-ia.mjs`, que precisa da chave da Anthropic no servidor:
+instruções no topo do arquivo.
 
 ## Estrutura
 

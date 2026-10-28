@@ -33,7 +33,7 @@ export function BibliotecaServico({ servico: modelo }: { servico: Servico }) {
     const em = modelo?.etapas.find((e) => e.ordem === etapa);
     const etapaFake = { ordem: etapa } as never;
     return [
-      ...[...secoesAntes, ...secoesDepois].map((d) => ({ chave: d.chave, titulo: d.titulo(etapaFake) })),
+      ...[...secoesAntes, ...secoesDepois].map((d) => ({ chave: d.chave, titulo: d.titulo(etapaFake, !!modelo && etapa === Math.max(...modelo.etapas.map((x) => x.ordem))) })),
       ...(em?.entregaveis ?? []).map((t) => ({ chave: chaveEntregavel(t), titulo: `Entregável: ${t}` })),
       ...(em?.instrumentos ?? []).map((t) => ({ chave: chaveEntregavel(t), titulo: `Instrumento: ${t}` })),
     ];

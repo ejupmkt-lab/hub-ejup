@@ -5,7 +5,8 @@ import { etapaAtual, progressoAtividades } from "./projeto";
 import { assinada } from "./regras-etapa";
 import { avisoFinalizarAntecipado, passoHubDoProjeto } from "./fase";
 import type { PassoHub } from "./dados/tipos";
-import { relatorioFeitoFora, verificarCompletude } from "./relatorio/secoes";
+import { faltaDoRelatorio, relatorioFeitoFora, verificarCompletude } from "./relatorio/secoes";
+import { marcadoresEmAberto } from "./regras-etapa";
 
 // O que fazer agora, em uma frase e um botão. Usado no painel, na lista de
 // projetos, no projeto e na etapa, para ninguém precisar adivinhar o caminho.
@@ -103,6 +104,28 @@ export function passoDaEtapa(p: Projeto, e: Etapa): Passo | null {
         tom: "andamento",
         href: entrega,
       };
+    // O passo depende do que falta: escrever, resolver marcadores ou anexar evidências (não é sempre "escreva o relatório")
+    const falta = faltaDoRelatorio(p, e);
+    if (primeira !== "Registros" && primeira !== "Fechamento" && !falta.emBranco) {
+      if (falta.marcadores) {
+        const m = marcadoresEmAberto(e);
+        return {
+          texto: `Resolva os marcadores em aberto do relatório (${m})`,
+          detalhe: `O texto está escrito, mas tem [completar] ou [a confirmar]. ${qtd}`,
+          rotulo: "Resolver no Desenvolvimento",
+          tom: "andamento",
+          href: desenvolvimento,
+        };
+      }
+      if (falta.semEvidencia)
+        return {
+          texto: "Anexe as evidências do relatório",
+          detalhe: `Prints e fotos de reunião comprovam o que foi relatado. ${qtd}`,
+          rotulo: "Abrir a entrega",
+          tom: "andamento",
+          href: entrega,
+        };
+    }
     return {
       texto: primeira === "Registros" ? "Conte os dados das tabelas do relatório" : primeira === "Fechamento" ? "Resolva as pendências do relatório" : "Escreva o relatório da etapa",
       detalhe: `${pendencias[0].texto}. ${qtd}`,

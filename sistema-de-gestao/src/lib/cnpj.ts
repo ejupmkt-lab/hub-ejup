@@ -51,5 +51,27 @@ export function dadosParaFormulario(d: DadosCnpj): Record<string, string> {
     cargoResponsavel: admin?.qualificacao ?? "",
   };
 }
-export const soSeVazio = new Set(["email", "telefone", "responsavel", "cargoResponsavel"]);
+// Dados pessoais do cadastro público (sócio administrador, e-mail e telefone, que muitas vezes são do contador): não entram
+// no cadastro do cliente sozinhos. Por minimização (LGPD, art. 6º, III) e finalidade (art. 6º, I), a pessoa vê a sugestão,
+// confere com o cliente e só então usa.
+export const camposPessoais = ["responsavel", "cargoResponsavel", "email", "telefone"] as const;
+
+// Só o que é da empresa: razão social, endereço, porte, ramo…
+export function dadosDaEmpresa(d: DadosCnpj): Record<string, string> {
+  const todos = dadosParaFormulario(d);
+  return Object.fromEntries(Object.entries(todos).filter(([k]) => !(camposPessoais as readonly string[]).includes(k)));
+}
+
+export type SugestaoDeContato = { chave: "responsavel" | "email" | "telefone"; rotulo: string; valor: string; extra?: Record<string, string> };
+
+// O que a Receita traz de pessoal, como sugestão a conferir
+export function sugestoesDeContato(d: DadosCnpj): SugestaoDeContato[] {
+  const todos = dadosParaFormulario(d);
+  const lista: SugestaoDeContato[] = [];
+  if (todos.responsavel)
+    lista.push({ chave: "responsavel", rotulo: "Responsável", valor: todos.cargoResponsavel ? `${todos.responsavel} (${todos.cargoResponsavel})` : todos.responsavel, extra: { responsavel: todos.responsavel, cargoResponsavel: todos.cargoResponsavel } });
+  if (todos.email) lista.push({ chave: "email", rotulo: "E-mail", valor: todos.email, extra: { email: todos.email } });
+  if (todos.telefone) lista.push({ chave: "telefone", rotulo: "Telefone", valor: todos.telefone, extra: { telefone: todos.telefone } });
+  return lista;
+}
 

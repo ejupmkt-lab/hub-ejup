@@ -3,7 +3,7 @@
 import type { Etapa, Projeto } from "@/lib/dados/tipos";
 import { chaveEntregavel, ordenarSugestoes, preencherMarcadores } from "@/lib/biblioteca";
 import { preencherVazios } from "@/lib/relatorio/padroes";
-import { todasSecoes } from "@/lib/relatorio/secoes";
+import { ehUltimaEtapa, todasSecoes } from "@/lib/relatorio/secoes";
 import { doisDigitos } from "@/lib/rotulos";
 import { useBiblioteca } from "./sugestoes-biblioteca";
 import { useAcoesEtapa } from "./acoes-etapa";
@@ -18,7 +18,7 @@ export function PreencherComBiblioteca({ projeto, etapa }: { projeto: Projeto; e
   const biblioteca = useBiblioteca(projeto.empresa, projeto.modeloId, etapa.ordem);
   if (!cliente) return null;
   const vazias =
-    todasSecoes.filter((d) => d.obrigatoria(etapa) && !(etapa.secoes[d.chave] ?? "").trim()).length +
+    todasSecoes.filter((d) => d.obrigatoria(etapa, ehUltimaEtapa(projeto.etapas, etapa)) && !(etapa.secoes[d.chave] ?? "").trim()).length +
     etapa.entregaveis.filter((x) => x.tipo === "entregavel" && !x.conteudo.trim()).length;
   if (!vazias) return null;
   const melhor = (chave: string) => ordenarSugestoes(biblioteca.lista.filter((t) => t.chave === chave), cliente, projeto.id)[0];

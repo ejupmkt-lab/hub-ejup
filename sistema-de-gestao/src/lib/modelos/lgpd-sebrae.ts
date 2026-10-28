@@ -5,7 +5,7 @@ import type { ModeloFluxo } from "./tipos";
 // cada projeto são definidas pelo gestor no plano de trabalho.
 export const modeloLgpdSebrae: ModeloFluxo = {
   id: "lgpd-sebrae-13070-5",
-  versao: 1,
+  versao: 2, // 2: Etapa 04 com a listagem de documentos relevantes e o fortalecimento da governança, como no Relatório 4 aprovado
   empresa: "pivotto",
   nome: "Adequação à LGPD · HUB SEBRAE",
   nomeCurto: "Adequação à LGPD",
@@ -124,12 +124,17 @@ export const modeloLgpdSebrae: ModeloFluxo = {
         ["2.3", "Elaborar relatórios de impacto à proteção de dados (RIPDs) referentes a dados críticos e sensíveis"],
         ["3", "Manter documentação atualizada"],
         ["3.1", "Propor atualizações no relatório de lições aprendidas, se aplicável"],
+        ["3.2", "Elaborar a listagem de documentos relevantes do programa: políticas, normas, procedimentos, RoPA, fluxo de atendimento aos titulares, política de backup, central de incidentes e planos de treinamento e de comunicação"],
+        ["4", "Fortalecer a governança do programa"],
+        ["4.1", "Definir e documentar os papéis, os responsáveis, as evidências e as rotinas de governança do programa"],
       ],
       entregaveis: [
         "Relatório sobre treinamentos institucionais e campanhas de conscientização executadas",
         "Relatório a respeito de riscos relacionados a dados pessoais para subsidiar a estratégia de compliance",
         "Relatórios de impacto à proteção de dados (RIPDs)",
         "Relatório de lições aprendidas",
+        "Listagem de documentos relevantes do programa",
+        "Fortalecimento da governança",
       ],
       instrumentos: [],
     },

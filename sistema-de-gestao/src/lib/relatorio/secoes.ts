@@ -1,19 +1,23 @@
 import type { Etapa, Projeto } from "../dados/tipos";
 import { tipoRegistro } from "../registros";
-import { MARCA_COMPLETAR } from "./padroes";
+import { MARCA_A_CONFIRMAR, MARCA_COMPLETAR } from "./padroes";
 
 // Seções do Relatório Técnico de Nª Entrega, na ordem em que aparecem.
 // O padrão vem dos relatórios já entregues (PRD, seção 7.2).
+// "ultima": a etapa é a última do serviço (não existe etapa seguinte)
 export type DefSecao = {
   chave: string;
-  titulo: (e: Etapa) => string;
-  obrigatoria: (e: Etapa) => boolean;
+  titulo: (e: Etapa, ultima?: boolean) => string;
+  obrigatoria: (e: Etapa, ultima?: boolean) => boolean;
   quadro?: "azul"; // renderizada como quadro de destaque, não como seção numerada
   ajuda: string;
 };
 
 const n = (e: Etapa) => `${e.ordem}ª`;
 const sempre = () => true;
+
+// A última etapa do serviço (a seção final dela não encaminha para etapa nenhuma)
+export const ehUltimaEtapa = (etapas: { ordem: number }[], e: { ordem: number }) => etapas.length > 0 && e.ordem === Math.max(...etapas.map((x) => x.ordem));
 
 export const secoesAntes: DefSecao[] = [
   {
@@ -65,15 +69,15 @@ export const secoesDepois: DefSecao[] = [
   },
   {
     chave: "encaminhamentos",
-    titulo: (e) => `Encaminhamentos para a Etapa ${String(e.ordem + 1).padStart(2, "0")}`,
-    obrigatoria: (e) => e.ordem < 5,
-    ajuda: "Alíneas com o que a próxima etapa deve fazer.",
+    titulo: (e, ultima) => (ultima ? "Continuidade do programa após a consultoria" : `Encaminhamentos para a Etapa ${String(e.ordem + 1).padStart(2, "0")}`),
+    obrigatoria: (_e, ultima) => !ultima,
+    ajuda: "Alíneas com o que a próxima etapa deve fazer. Na última etapa do serviço, o que a empresa mantém e revisa depois da consultoria.",
   },
   {
     chave: "conclusao",
     titulo: (e) => `Conclusão da ${n(e)} entrega`,
     obrigatoria: sempre,
-    ajuda: "Fecha com \"considera-se cumprida…\" e lista o que foi entregue.",
+    ajuda: "Matriz de entregas da etapa (entrega esperada, resultado obtido e status) e o fechamento conforme o status; não lista como entregue o que está pendente.",
   },
   {
     chave: "evidencias",
@@ -100,9 +104,10 @@ export function verificarCompletude(projeto: Projeto, etapa: Etapa): Pendencia[]
     if (!etapa.relatorioAssinado) p.push({ onde: "Relatório", texto: "PDF assinado do relatório importado não anexado" });
     return p;
   }
+  const ultima = ehUltimaEtapa(projeto.etapas, etapa);
   for (const s of todasSecoes) {
-    if (s.obrigatoria(etapa) && !(etapa.secoes[s.chave] ?? "").trim()) {
-      p.push({ onde: "Relatório", texto: `Seção em branco: ${s.titulo(etapa)}` });
+    if (s.obrigatoria(etapa, ultima) && !(etapa.secoes[s.chave] ?? "").trim()) {
+      p.push({ onde: "Relatório", texto: `Seção em branco: ${s.titulo(etapa, ultima)}` });
     }
   }
   etapa.entregaveis.forEach((ent, i) => {
@@ -111,10 +116,17 @@ export function verificarCompletude(projeto: Projeto, etapa: Etapa): Pendencia[]
     }
   });
   for (const s of todasSecoes) {
-    if (MARCA_COMPLETAR.test(etapa.secoes[s.chave] ?? "")) p.push({ onde: "Relatório", texto: `Trecho a completar em: ${s.titulo(etapa)}` });
+    if (MARCA_COMPLETAR.test(etapa.secoes[s.chave] ?? "")) p.push({ onde: "Relatório", texto: `Trecho a completar em: ${s.titulo(etapa, ultima)}` });
   }
   etapa.entregaveis.forEach((ent) => {
     if (MARCA_COMPLETAR.test(ent.conteudo)) p.push({ onde: "Entregáveis", texto: `Trecho a completar em: ${ent.titulo}` });
+  });
+  // [a confirmar: …] também precisa ser resolvido antes do envio
+  for (const s of todasSecoes) {
+    if (MARCA_A_CONFIRMAR.test(etapa.secoes[s.chave] ?? "")) p.push({ onde: "Relatório", texto: `Trecho a confirmar em: ${s.titulo(etapa, ultima)}` });
+  }
+  etapa.entregaveis.forEach((ent) => {
+    if (MARCA_A_CONFIRMAR.test(ent.conteudo)) p.push({ onde: "Entregáveis", texto: `Trecho a confirmar em: ${ent.titulo}` });
   });
   const textos = [...Object.values(etapa.secoes), ...etapa.entregaveis.map((e) => e.conteudo)].join("\n");
   for (const m of textos.matchAll(/\[\[tabela:([a-z_]+)\]\]/g)) {
@@ -138,4 +150,15 @@ export function verificarCompletude(projeto: Projeto, etapa: Etapa): Pendencia[]
     .filter((a) => a.status === "nao_aplicavel" && !a.justificativa.trim())
     .forEach((a) => p.push({ onde: "Checklist", texto: `Atividade ${a.codigo} marcada como não aplicável sem justificativa` }));
   return p;
+}
+
+// O que falta no relatório, por tipo, para dizer o próximo passo certo (escrever, resolver marcadores, anexar evidências…)
+export function faltaDoRelatorio(projeto: Projeto, etapa: Etapa) {
+  const pend = verificarCompletude(projeto, etapa);
+  return {
+    total: pend.length,
+    emBranco: pend.filter((x) => /^Seção em branco|sem conteúdo/.test(x.texto)).length,
+    marcadores: pend.filter((x) => /^Trecho a (completar|confirmar)/.test(x.texto)).length,
+    semEvidencia: pend.some((x) => x.onde === "Evidências"),
+  };
 }

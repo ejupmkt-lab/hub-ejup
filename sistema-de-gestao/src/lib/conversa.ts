@@ -1,6 +1,6 @@
 import type { Atividade, Contratacao, Etapa, Hub, PassoHub, Projeto, Registro, RelatorioAssinado } from "./dados/tipos";
 import { ajustarPlanoAoPagamento, aplicarPlanoHub, carimbarInicios, datasMudadasAMao, reencadearExecucao, avisoEnvioAntecipado, avisoFinalizarAntecipado, bloqueioAte, dataDoPagamento, textoPlanoAjustado, mudarHub, ordemPassos, passoHubDoProjeto, registroHub } from "./fase";
-import { todasSecoes, verificarCompletude } from "./relatorio/secoes";
+import { ehUltimaEtapa, faltaDoRelatorio, todasSecoes, verificarCompletude } from "./relatorio/secoes";
 import { assinada, automatizarEtapa, bloqueioStatus, marcarAtividade } from "./regras-etapa";
 import { doisDigitos, statusEtapa, type StatusEtapa as StatusEtapaTipo } from "./rotulos";
 import { distribuirPorHoras, formatarData, hojeIso, sugerirDatas } from "./datas";
@@ -333,7 +333,7 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
       desfazer.push({ tipo: "secao", etapa: e.ordem, chave: a.chave, texto: e.secoes[a.chave] ?? null });
       const novo = !(e.secoes[a.chave] ?? "").trim();
       e.secoes[a.chave] = a.texto.trim();
-      feito(`${et}: seção “${def.titulo(e)}” ${novo ? "escrita" : "atualizada"}`);
+      feito(`${et}: seção “${def.titulo(e, ehUltimaEtapa(p.etapas, e))}” ${novo ? "escrita" : "atualizada"}`);
     } else if (a.tipo === "escrever_entregavel") {
       const ent = e.entregaveis.find((x) => x.titulo === a.titulo);
       if (!ent || !a.texto.trim()) return;
@@ -535,15 +535,26 @@ export function sugestoesConversa(p: Projeto): string[] {
       `Hoje trabalhei em: ${pendente.texto.charAt(0).toLowerCase()}${pendente.texto.slice(1)}.`,
       `O que falta para concluir a ${nomeEtapa(e)}?`,
       ...extra,
-      `Escreva o que já dá para escrever do relatório da Etapa ${n}.`,
+      ...(faltaDoRelatorio(p, e).emBranco ? [`Escreva o que já dá para escrever do relatório da Etapa ${n}.`] : []),
     ].slice(0, 3);
 
-  if (verificarCompletude(p, e).length)
+  if (verificarCompletude(p, e).length) {
+    // O que sugerir depende do que falta de fato: escrever, resolver marcadores ou reunir evidências
+    const falta = faltaDoRelatorio(p, e);
+    if (!falta.emBranco && falta.marcadores)
+      return [
+        `Resolva os marcadores [completar] e [a confirmar] do relatório da Etapa ${n}: __.`,
+        `Quais marcadores ainda estão abertos no relatório da Etapa ${n}?`,
+        ...extra,
+      ];
+    if (!falta.emBranco && falta.semEvidencia)
+      return [`Quais evidências faltam anexar ao relatório da Etapa ${n}?`, `Anexei as evidências da Etapa ${n} (fotos e prints).`, ...extra];
     return [
       `Escreva o relatório e os entregáveis da Etapa ${n} com o que já registramos.`,
       `O que ainda falta para o relatório da Etapa ${n} ficar completo?`,
       ...extra,
     ];
+  }
 
   if (!assinada(e))
     return [

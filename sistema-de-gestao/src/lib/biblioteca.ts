@@ -1,5 +1,5 @@
 import type { Cliente, Etapa, Projeto } from "./dados/tipos";
-import { todasSecoes, relatorioFeitoFora } from "./relatorio/secoes";
+import { ehUltimaEtapa, todasSecoes, relatorioFeitoFora } from "./relatorio/secoes";
 import { MARCA_COMPLETAR } from "./relatorio/padroes";
 
 // Biblioteca de textos aprovados: o que entra é anonimizado (dados do cliente
@@ -93,7 +93,7 @@ export function textosParaBiblioteca(p: Projeto, e: Etapa, cliente: Partial<Clie
   const base = { empresa: p.empresa, etapa: e.ordem, ramo: cliente.ramo ?? "", porte: cliente.porte ?? "", origem: "aprovado" as const, projeto_origem: p.id, servico_id: p.modeloId };
   for (const d of todasSecoes) {
     const t = (e.secoes[d.chave] ?? "").trim();
-    if (t && !MARCA_COMPLETAR.test(t)) linhas.push({ ...base, chave: d.chave, titulo: d.titulo(e), texto: anonimizar(t, cliente, pessoas) });
+    if (t && !MARCA_COMPLETAR.test(t)) linhas.push({ ...base, chave: d.chave, titulo: d.titulo(e, ehUltimaEtapa(p.etapas, e)), texto: anonimizar(t, cliente, pessoas) });
   }
   for (const ent of e.entregaveis) {
     const t = ent.conteudo.trim();

@@ -8,6 +8,48 @@ import { ID_SERVICO_LGPD } from "../servicos";
 // completude acusa enquanto o trecho não for substituído.
 
 export const MARCA_COMPLETAR = /\[completar[^\]]*\]/i;
+export const MARCA_A_CONFIRMAR = /\[a confirmar[^\]]*\]/i;
+
+// Quantos marcadores [completar…] e [a confirmar…] estão abertos nas seções e nos entregáveis da etapa
+const textosDaEtapa = (e: Etapa) => [...Object.values(e.secoes ?? {}), ...e.entregaveis.map((x) => x.conteudo)];
+export const contarMarcadores = (e: Etapa) => textosDaEtapa(e).reduce((a, t) => a + (t.match(/\[completar[^\]]*\]/gi)?.length ?? 0), 0);
+export const contarAConfirmar = (e: Etapa) => textosDaEtapa(e).reduce((a, t) => a + (t.match(/\[a confirmar[^\]]*\]/gi)?.length ?? 0), 0);
+
+// Até quando valem as informações do relatório: a data informada ou, sem ela, o fim da etapa. Pode ser anterior ao fechamento.
+export const dataLimiteInformacoes = (e: Etapa) => e.dataLimiteInformacoes || e.dataFim || null;
+
+export type StatusDeEntrega = "Atendido" | "Atendido parcialmente" | "Pendente de evidência";
+
+// Status de um entregável na matriz de entregas da etapa. Conservador: sem conteúdo ou sem nenhuma evidência
+// anexada na etapa é "Pendente de evidência"; com [completar]/[a confirmar] ou atividade aberta, "Atendido parcialmente".
+export function statusDoEntregavel(e: Etapa, conteudo: string): StatusDeEntrega {
+  const texto = conteudo.trim();
+  if (!texto) return "Pendente de evidência";
+  if (MARCA_COMPLETAR.test(texto) || MARCA_A_CONFIRMAR.test(texto)) return "Atendido parcialmente";
+  if (e.atividades.some((a) => a.status === "pendente")) return "Atendido parcialmente";
+  if (!(e.evidencias ?? []).length) return "Pendente de evidência";
+  return "Atendido";
+}
+
+// "Matriz de entregas da Etapa 0X" + a frase de fechamento conforme o status. Só entregáveis (instrumentos não entram).
+export function matrizDeEntregas(e: Etapa) {
+  const itens = e.entregaveis.filter((x) => x.tipo === "entregavel").map((x) => ({ titulo: x.titulo, status: statusDoEntregavel(e, x.conteudo), conteudo: x.conteudo.trim() }));
+  const linhas = itens.map((i) => {
+    const resultado = !i.conteudo ? "[completar: resultado obtido]" : i.status === "Atendido" ? "Apresentado neste relatório, com a evidência indicada." : i.status === "Atendido parcialmente" ? "Apresentado neste relatório, com pendências indicadas no próprio texto." : "Relatado neste relatório; a evidência correspondente ainda não foi anexada.";
+    return `| ${i.titulo} | ${resultado} | ${i.status} |`;
+  });
+  const n = doisDigitos(e.ordem);
+  const tudo = itens.length > 0 && itens.every((i) => i.status === "Atendido");
+  return {
+    itens,
+    tudoAtendido: tudo,
+    titulo: `Matriz de entregas da Etapa ${n}`,
+    tabela: ["| Entrega esperada | Resultado obtido | Status |", ...linhas].join("\n"),
+    fechamento: tudo
+      ? `A Etapa ${n} é considerada cumprida nos termos da matriz acima.`
+      : `A Etapa ${n} é considerada cumprida em relação aos entregáveis com status Atendido; os demais constam da matriz com a respectiva pendência.`,
+  };
+}
 
 const minuscula = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 const semPonto = (s: string) => s.replace(/[.;\s]+$/, "");
@@ -29,17 +71,16 @@ export function alineas(itens: string[]) {
 
 const natureza: Record<number, string> = {
   1: "Este relatório consolida o diagnóstico técnico-jurídico e entrega os instrumentos iniciais de governança previstos para a Etapa 01. O mapeamento exaustivo das operações, a configuração do Registro das Operações de Tratamento (RoPA), a revisão integral de contratos, a inspeção das configurações técnicas e a implementação dos controles serão aprofundados nas etapas subsequentes.",
-  2: "Esta entrega organiza o programa e prepara a implementação. O RoPA apresentado é preliminar e deverá ser validado e ampliado na Etapa 03. As políticas e procedimentos são consolidados em arquitetura mínima e controles aprovados para implantação, sem substituir a análise de contratos, configurações técnicas e bases de dados específicas.",
+  2: "Esta entrega organiza o programa e prepara a implementação. O Registro das Operações de Tratamento (RoPA) apresentado é preliminar e deverá ser validado e ampliado na Etapa 03. As políticas e procedimentos são consolidados em arquitetura mínima e controles aprovados para implantação, sem substituir a análise de contratos, configurações técnicas e bases de dados específicas.",
   3: "Esta entrega registra a execução do plano de ação: o mapeamento dos dados, o Registro das Operações de Tratamento (RoPA), o atendimento aos titulares, a integridade dos backups e a central de registro de incidentes. Os controles que dependem de terceiros permanecem acompanhados no plano de ação.",
   4: "Esta entrega reúne as informações sobre as atividades realizadas, com os relatórios de treinamento e conscientização, de riscos, de impacto à proteção de dados e de lições aprendidas, para subsidiar a estratégia de conformidade.",
-  5: "Esta entrega avalia o Programa de Conformidade em LGPD: registra o monitoramento normativo, a Avaliação Interna de Riscos à Privacidade e a autoavaliação, e propõe as mudanças para o próximo ciclo de execução.",
+  5: "Esta entrega avalia o Programa de Conformidade em LGPD (Lei Geral de Proteção de Dados Pessoais): registra o monitoramento normativo, a Avaliação Interna de Riscos à Privacidade e a autoavaliação, e propõe as mudanças para o próximo ciclo de execução.",
 };
 
 export function textoPadraoSecao(chave: string, projeto: Projeto, etapa: Etapa, cliente: Cliente): string {
   const ord = ordinalFeminino[etapa.ordem].toLowerCase();
   const proxima = projeto.etapas.find((e) => e.ordem === etapa.ordem + 1);
   const responsavel = cliente.responsavel || "o responsável interno";
-  const entregaveis = etapa.entregaveis.filter((e) => e.tipo === "entregavel").map((e) => minuscula(e.titulo));
   switch (chave) {
     case "objeto":
       return `O presente Relatório Técnico registra a ${ord} entrega da consultoria de ${projeto.fichaTecnica} da ${nomeDoCliente(cliente)}, correspondente à ${nomeEtapa(etapa)} da ficha técnica Sebraetec nº ${projeto.codigoFichaTecnica}. A etapa tem por finalidade ${minuscula(semPonto(etapa.descricao))}.`;
@@ -52,12 +93,18 @@ export function textoPadraoSecao(chave: string, projeto: Projeto, etapa: Etapa, 
         `as informações fornecidas por ${responsavel}`,
         "os processos operacionais descritos",
         `os requisitos da ficha técnica ${projeto.codigoFichaTecnica}`,
-        `as normas e orientações oficiais vigentes até ${dataPorExtenso(etapa.dataFim ?? hojeIso())}`,
+        `as normas e orientações oficiais vigentes até ${dataPorExtenso(dataLimiteInformacoes(etapa) ?? hojeIso())}`,
       ];
+      const limite = dataLimiteInformacoes(etapa);
+      const defasagem =
+        limite && etapa.dataRelatorio && limite < etapa.dataRelatorio
+          ? `As informações consideradas refletem a situação até ${dataPorExtenso(limite)}; o relatório foi fechado em ${dataPorExtenso(etapa.dataRelatorio)}, e fatos posteriores à data-limite não foram examinados nesta entrega.`
+          : null;
       const lista = fontes.map((f, i) => `(${["i", "ii", "iii", "iv", "v", "vi", "vii", "viii"][i]}) ${f}`);
       return [
         `A elaboração considerou: ${lista.slice(0, -1).join("; ")}; e ${lista[lista.length - 1]}.`,
         alineas(etapa.atividades.filter((a) => a.nivel === 1).map((a) => a.texto)),
+        ...(defasagem ? [defasagem] : []),
         "[completar: o que não foi verificado nesta etapa, como testes técnicos, inspeção de sistemas ou análise de contratos, e por isso ficou classificado como “informado” ou “pendente de verificação”.]",
       ].join("\n\n");
     }
@@ -76,13 +123,29 @@ export function textoPadraoSecao(chave: string, projeto: Projeto, etapa: Etapa, 
     case "medidas":
       return "[[tabela:acoes]]";
     case "encaminhamentos":
-      if (!proxima) return "";
+      if (!proxima)
+        return [
+          "A consultoria se encerra com esta entrega. A continuidade do programa depende da própria empresa, que deverá, sem prejuízo de outras medidas:",
+          alineas([
+            "executar o plano de ação nos prazos indicados e registrar a evidência de cada medida concluída",
+            "apresentar as evidências indicadas como pendentes na matriz de entregas",
+            "revisar periodicamente os instrumentos do programa, o inventário normativo e o registro das operações de tratamento",
+            "[completar: responsável e periodicidade da revisão do programa]",
+          ]),
+        ].join("\n\n");
       return [
         `A etapa seguinte deverá dar continuidade ao programa a partir dos instrumentos desta entrega. Prioritariamente, deverão ser realizadas as seguintes atividades:`,
         alineas(proxima.atividades.filter((a) => a.nivel === 1).map((a) => a.texto)),
       ].join("\n\n");
-    case "conclusao":
-      return `Com esta entrega, considera-se cumprida a ${nomeEtapa(etapa).toLowerCase().replace(/^etapa \d+ \| /, "")} prevista na ficha técnica ${projeto.codigoFichaTecnica}: ${entregaveis.join("; ")}. Os instrumentos deverão permanecer vivos e ser atualizados à medida que novos processos, clientes, fornecedores ou riscos forem identificados.`;
+    case "conclusao": {
+      const m = matrizDeEntregas(etapa);
+      return [
+        `## ${m.titulo}`,
+        m.tabela,
+        m.fechamento,
+        `Os instrumentos deverão permanecer vivos e ser atualizados à medida que novos processos, clientes, fornecedores ou riscos forem identificados. Esta entrega não constitui auditoria nem certificação de conformidade.`,
+      ].join("\n\n");
+    }
     case "evidencias":
       return `As evidências abaixo registram a interação consultiva, a coleta de informações e a validação junto a ${responsavel}, responsável pela empresa demandante.`;
     default:
@@ -107,7 +170,21 @@ const tabelaDoEntregavel: Record<string, string> = {
   "4:Relatório sobre treinamentos institucionais e campanhas de conscientização executadas": "[[tabela:treinamentos]]",
 };
 
+// Entregáveis sem registro próprio que se apresentam em tabela escrita no texto
+const tabelaEscrita: Record<string, string> = {
+  "4:Listagem de documentos relevantes do programa": [
+    "| Documento | Finalidade | Situação | Evidência |",
+    "| [completar: política, norma, procedimento, RoPA, fluxo de titulares, política de backup, central de incidentes, plano de treinamento ou de comunicação] | [completar: finalidade] | [completar: situação] | [completar: evidência anexada ou a anexar] |",
+  ].join("\n"),
+  "4:Fortalecimento da governança": [
+    "| Papel | Responsável | Evidência | Rotina |",
+    "| [completar: papel] | [completar: responsável] | [completar: evidência anexada ou a anexar] | [completar: rotina e periodicidade] |",
+  ].join("\n"),
+};
+
 export function textoPadraoEntregavel(etapa: Etapa, titulo: string): string {
+  const escrita = tabelaEscrita[`${etapa.ordem}:${titulo}`];
+  if (escrita) return `[completar: introdução de um parágrafo sobre ${minuscula(titulo)}.]\n\n${escrita}`;
   const tabela = tabelaDoEntregavel[`${etapa.ordem}:${titulo}`];
   if (tabela) return `[completar: introdução de um parágrafo sobre ${minuscula(titulo)}.]\n\n${tabela}`;
   return `[completar: ${minuscula(titulo)}.]`;

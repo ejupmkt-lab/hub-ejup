@@ -204,6 +204,18 @@ function Entrega({
               </label>
             )}
             {concluida && e.dataFim && <span className="num text-[13px] text-tinta-2">fim previsto {formatarData(e.dataFim)}</span>}
+            {!feitoFora && !concluida && (
+              <label className="flex items-center gap-2 text-[13px] text-tinta-2" title="A data de consulta das referências e a data-limite do escopo seguem esta data. Vazio: o fim previsto da etapa.">
+                Informações até
+                <input
+                  type="date"
+                  className="campo num !w-auto !py-1 !text-[13px]"
+                  value={e.dataLimiteInformacoes ?? ""}
+                  placeholder={e.dataFim ?? ""}
+                  onChange={(ev) => alterarEtapa(e.ordem)((x) => void (x.dataLimiteInformacoes = ev.target.value || null), { acao: `Etapa ${doisDigitos(e.ordem)}: data-limite das informações do relatório` })}
+                />
+              </label>
+            )}
             {!concluida && !importando && (
               <button type="button" onClick={() => setImportando(true)} className="text-[13px] font-semibold text-azul hover:underline">
                 Importar relatório pronto
