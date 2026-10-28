@@ -1,11 +1,11 @@
 // Recusa senhas que já apareceram em vazamentos públicos (base Have I Been
 // Pwned). Só os 5 primeiros caracteres do hash SHA-1 saem do navegador; a
-// senha nunca é enviada. Se o serviço não responder, não bloqueia o cadastro.
+// senha nunca é enviada. Se o serviço não responder em 4 segundos, não bloqueia o cadastro.
 export async function senhaVazada(senha: string): Promise<boolean> {
   try {
     const bytes = await crypto.subtle.digest("SHA-1", new TextEncoder().encode(senha));
     const hash = Array.from(new Uint8Array(bytes), (b) => b.toString(16).padStart(2, "0")).join("").toUpperCase();
-    const r = await fetch(`https://api.pwnedpasswords.com/range/${hash.slice(0, 5)}`, { headers: { "Add-Padding": "true" } });
+    const r = await fetch(`https://api.pwnedpasswords.com/range/${hash.slice(0, 5)}`, { headers: { "Add-Padding": "true" }, signal: AbortSignal.timeout(4000) });
     if (!r.ok) return false;
     const resto = hash.slice(5);
     return (await r.text()).split("\n").some((l) => {

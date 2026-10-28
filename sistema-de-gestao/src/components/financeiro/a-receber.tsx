@@ -7,10 +7,9 @@ import { useEstado } from "@/lib/dados/store";
 import { useFinanceiro } from "@/lib/dados/financeiro";
 import { dataDeEnvio, dataFinalizacao, diaDoPagamento, entradasDeRecebimento, moeda, proximoCorte, recebimento, type Entrada } from "@/lib/financeiro";
 import { etapasTodasEnviadas, faseDoProjeto } from "@/lib/fase";
-import { codigoHub, servicoDoProjeto } from "@/lib/projeto";
 import { diferencaDias, formatarData, hojeIso, mesPorExtenso } from "@/lib/datas";
 import { nomeDoCliente } from "@/lib/campos-cliente";
-import { BalaoDeParcela } from "./balao-parcela";
+import { ProjetosDoRecebimento, type LinhaDeProjeto } from "./projetos-recebimento";
 
 const pct = (n: number) => `${String(n).replace(".", ",")}%`;
 const maiuscula = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
@@ -21,7 +20,7 @@ const mesCurto = (ym: string) => `${MESES_CURTOS[Number(ym.slice(5, 7)) - 1]}/${
 
 function Numero({ rotulo, valor, detalhe, tom = "" }: { rotulo: string; valor: string; detalhe?: string; tom?: string }) {
   return (
-    <div className="rounded-[var(--radius-campo)] bg-pedra/70 p-3">
+    <div className="rounded-[var(--radius-bloco)] border border-linha bg-folha p-3.5 shadow-[var(--shadow-cartao)]">
       <dt className="text-[12px] text-tinta-2">{rotulo}</dt>
       <dd className={`num text-[19px] font-bold leading-tight ${tom}`}>{valor}</dd>
       {detalhe && <dd className="text-[12px] text-tinta-2">{detalhe}</dd>}
@@ -64,6 +63,14 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
     })
     .sort((a, b) => a.proxima.localeCompare(b.proxima) || nomeDoCliente(a.cliente).localeCompare(nomeDoCliente(b.cliente)));
   const mesEscolhido = /^\d{4}-\d{2}$/.test(escolha) ? escolha : null;
+  // Uma linha por projeto, agrupadas por cliente, na ordem do próximo pagamento
+  const linhas: LinhaDeProjeto[] = clientes.flatMap((c) =>
+    c.ps.map((p) => ({
+      projeto: p,
+      nomeCliente: nomeDoCliente(c.cliente),
+      entradas: c.todas.filter((e) => e.projeto.id === p.id).sort((a, b) => a.parcela.ordem - b.parcela.ordem),
+    })),
+  );
 
   // O que ainda dá para garantir no pagamento do próximo dia 5
   const oportunidades = projetos.flatMap((p) => {
@@ -147,47 +154,10 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
       )}
       {escolha === "sem" && <p className="text-[13px] text-tinta-2">Projetos sem plano de trabalho. Em “Editar”, combine uma data para a parcela entrar na conta.</p>}
 
-      {clientes.length === 0 ? (
+      {linhas.length === 0 ? (
         <p className="text-sm text-tinta-2">{escolha === "todos" ? "Nada a receber por enquanto." : "Nada neste período."}</p>
       ) : (
-        <ul className="space-y-5">
-          {clientes.map((c) => {
-            const aReceber = soma(c.todas.filter((e) => !e.parcela.recebidaEm), valorDe);
-            const recebido = soma(c.todas.filter((e) => e.parcela.recebidaEm), valorDe);
-            const doClienteNoMes = doMes.filter((e) => c.ps.some((p) => p.id === e.projeto.id));
-            return (
-              <li key={c.id} aria-label={nomeDoCliente(c.cliente)} className="rounded-[var(--radius-bloco)] border border-linha p-3.5 sm:p-4">
-                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
-                  <h3 className="text-[17px] font-bold text-tinta">{nomeDoCliente(c.cliente)}</h3>
-                  <p className="num text-[13px] text-tinta-2">
-                    {mesEscolhido ? <>Neste mês: <strong className="text-tinta">{moeda(soma(doClienteNoMes, valorDe))}</strong></> : <>A receber <strong className="text-tinta">{moeda(aReceber)}</strong></>}
-                    {recebido > 0 && <> · recebido <strong className="text-verde">{moeda(recebido)}</strong></>}
-                  </p>
-                </div>
-                <ul className="mt-3 space-y-4">
-                  {c.ps.map((p) => {
-                    const meus = c.todas.filter((e) => e.projeto.id === p.id).sort((a, b) => a.parcela.ordem - b.parcela.ordem);
-                    return (
-                      <li key={p.id} aria-label={`Projeto ${servicoDoProjeto(p)}`}>
-                        <p className="mb-2 text-[14px] font-semibold text-tinta-2">
-                          <Link href={`/${p.empresa}/projetos/${p.id}#ficha`} className="hover:text-azul">
-                            {servicoDoProjeto(p)}
-                          </Link>
-                          {codigoHub(p) && <span className="num font-normal"> · HUB {codigoHub(p)}</span>}
-                        </p>
-                        <ul className="grid gap-3 sm:grid-cols-2">
-                          {meus.map((e) => (
-                            <BalaoDeParcela key={e.parcela.chave} fin={fin} entrada={e} nome={`${nome(p)} · ${servicoDoProjeto(p)}`} destaque={!!mesEscolhido && e.mes === mesEscolhido} />
-                          ))}
-                        </ul>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </li>
-            );
-          })}
-        </ul>
+        <ProjetosDoRecebimento fin={fin} linhas={linhas} mesEscolhido={mesEscolhido} />
       )}
     </div>
   );

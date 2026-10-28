@@ -34,16 +34,16 @@ export default function Financeiro() {
         }
       />
       <div className="space-y-4">
-        <Cartao className="p-4 sm:p-5">
-          <h2 className="text-[17px] font-bold">Recebimentos</h2>
-          <p className="mt-0.5 text-sm text-tinta-2">
-            O SEBRAE paga até o dia 5 o que ficou pronto até o dia 20 do mês anterior: 30% quando o Relatório 1 sai e o restante quando o projeto é finalizado.
-            Antes disso o sistema projeta a data pelo andamento do projeto; corrija qualquer data, valor ou recebimento em “Editar”.
-          </p>
-          <div className="mt-4">
-            <AReceber projetos={projetos} />
+        <section className="space-y-4" aria-label="Recebimentos">
+          <div>
+            <h2 className="text-[17px] font-bold">Recebimentos</h2>
+            <p className="mt-0.5 text-sm text-tinta-2">
+              O SEBRAE paga até o dia 5 o que ficou pronto até o dia 20 do mês anterior: 30% quando o Relatório 1 sai e o restante quando o projeto é finalizado.
+              Antes disso o sistema projeta a data pelo andamento do projeto; corrija qualquer data, valor ou recebimento em “Editar”.
+            </p>
           </div>
-        </Cartao>
+          <AReceber projetos={projetos} />
+        </section>
         {empresa && (
           <Cartao className="p-4 sm:p-5">
             <ImpostoEmpresa empresa={empresa.slug} nome={empresa.nome} />
