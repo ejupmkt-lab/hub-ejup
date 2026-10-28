@@ -45,3 +45,9 @@ https://www.instagram.com/reel/Desu6f3t5_q/
 - **Texto:** a regra ASD-STE100 a 80% passa a valer para legendas, falas e telas.
 - **Estrutura:** gancho concreto, itens numerados, uma fonte com nome, um limite honesto e pergunta no fim continuam iguais ao método 07; as referências confirmam o caminho.
 - **Visual (a decidir com o Roberto):** as referências 2 e 3 são vídeo de motion design narrado, com tela trocando a cada poucos segundos. Isso pede produção, e o Roberto decidiu por vídeo caseiro sem lettering. O que dá para trazer sem contrariar a decisão: a hierarquia de duas alturas no título (linha pequena em serifa itálica e palavra grande), um elemento por tela e números grandes nos carrosséis e nas capas, dentro da paleta do caderno de obra (Caneta no lugar do amarelo).
+
+## Modelo no visual das referências
+
+`posts/modelo-referencia/artes.html` reproduz o visual do @amann.dev, aplicado ao carrossel de 26/10 e às capas dos Reels. É um modelo à parte do caderno de obra: fundo claro com sombra de janela, linha pequena em Instrument Serif itálico, título em Inter Tight 900 caixa alta com marca-texto, cartões brancos com sombra, chips pretos em JetBrains Mono, etiqueta com miras e estrelinhas. A cor do marca-texto fica em `--acento` (amarelo da referência); trocar para `#8FB0E6` volta para a paleta do Roberto.
+
+Componentes: `.lead`, `.big`, `.mk`, `.card` (com `.meta`, `.barra`), `.chip`, `.tag`, `.num`, `.lista`, `.risc`, `.input`, `.coment`, `.estrela`, `.mira`. Para gerar: `node posts/render.mjs modelo-referencia`.

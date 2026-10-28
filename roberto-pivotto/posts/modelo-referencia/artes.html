@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Modelo referência · Roberto Pivotto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Modelo no visual das referências do @amann.dev (design-system/08-referencias.md).
+   Componentes: .lead (linha pequena em serifa itálica), .big (título pesado em caixa alta),
+   .mk (marca-texto), .card, .chip, .tag (etiqueta com miras), .input (caixa de prompt/comentário),
+   .lista, .riscado, .num, .estrela. Troque --acento para mudar a cor do tema. */
+:root{--fundo:#EEEEEC;--branco:#FFFFFF;--tinta:#151515;--cinza:#6B6B6B;--cinza2:#A7A7A7;--linha:#E2E2DF;--acento:#FFD60A;
+--serif:'Instrument Serif',Georgia,serif;--sans:'Inter Tight',system-ui,sans-serif;--mono:'JetBrains Mono',monospace}
+*{box-sizing:border-box;margin:0}
+body{background:#888;padding:40px;display:flex;flex-wrap:wrap;gap:40px}
+.s{position:relative;width:1080px;height:1350px;background:var(--fundo);color:var(--tinta);overflow:hidden;font-family:var(--sans);text-align:center}
+.s.v{height:1920px}
+/* sombra de janela: caixilho em cruz, desfocado */
+.s::before{content:"";position:absolute;inset:-120px;pointer-events:none;filter:blur(46px);opacity:.55;background:
+ linear-gradient(90deg,transparent 0 14%,rgba(0,0,0,.16) 14% 19%,transparent 19% 63%,rgba(0,0,0,.13) 63% 67%,transparent 67%),
+ linear-gradient(0deg,transparent 0 30%,rgba(0,0,0,.12) 30% 34%,transparent 34% 76%,rgba(0,0,0,.10) 76% 80%,transparent 80%)}
+.s::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(255,255,255,.55),transparent 65%)}
+.s>*{position:relative;z-index:1}
+.pe{position:absolute;bottom:48px;left:0;right:0;font-size:20px;font-weight:500;color:var(--cinza2);letter-spacing:.01em}
+.s.v .pe{bottom:260px;font-size:24px}
+.topo{position:absolute;left:80px;right:80px;top:150px;display:flex;flex-direction:column;align-items:center}
+.s.v .topo{top:330px}
+.lead{font-family:var(--serif);font-style:italic;font-size:46px;line-height:1.1;color:#5E5E5E}
+.big{font-weight:900;font-size:92px;line-height:.98;letter-spacing:-.035em;text-transform:uppercase;margin-top:6px}
+.big.g{font-size:118px} .big.p{font-size:70px}
+.mk{background:var(--acento);padding:2px 18px 4px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.s.v .lead{font-size:58px} .s.v .big{font-size:122px} .s.v .big.p{font-size:96px}
+.lead+.big{margin-top:8px} .big+.lead{margin-top:18px}
+.area{position:absolute;left:110px;right:110px;top:470px;display:flex;flex-direction:column;align-items:center;gap:26px}
+.s.v .area{top:760px}
+.card{width:100%;background:var(--branco);border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.05);padding:40px 44px;text-align:left}
+.card.c{text-align:center}
+.card .meta{font-family:var(--mono);font-size:20px;font-weight:500;color:var(--cinza);letter-spacing:.04em;text-transform:uppercase;margin-bottom:16px}
+.card h3{font-weight:800;font-size:46px;line-height:1.12;letter-spacing:-.02em}
+.card h3 .mk{padding:0 8px}
+.card p{font-size:30px;line-height:1.4;color:#3A3A3A;margin-top:16px}
+.barra{margin:-40px -44px 28px;padding:16px 26px;background:var(--tinta);color:#fff;border-radius:18px 18px 0 0;font-family:var(--mono);font-size:20px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.legenda{font-family:var(--serif);font-style:italic;font-size:32px;color:#4A4A4A}
+.mono{font-family:var(--mono);font-size:19px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--cinza)}
+.chips{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.chip{background:var(--tinta);color:#fff;font-family:var(--mono);font-size:20px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:9px 14px;border-radius:4px}
+.chip.a{background:var(--acento);color:var(--tinta)}
+.tag{position:relative;display:inline-block;background:var(--acento);font-weight:800;font-size:40px;letter-spacing:-.01em;padding:10px 22px}
+.tag::before,.tag::after{content:"";position:absolute;width:22px;height:22px;border:3px solid var(--tinta)}
+.tag::before{left:-14px;top:-14px;border-right:0;border-bottom:0}
+.tag::after{right:-14px;bottom:-14px;border-left:0;border-top:0}
+.card.c .num,.num{margin-top:0;font-weight:900;font-size:220px;line-height:.9;letter-spacing:-.05em}
+.card.c .num small,.num small{font-size:90px;letter-spacing:-.02em;margin-left:10px}
+.lista .it{display:flex;align-items:center;gap:22px;padding:20px 0;border-bottom:2px solid var(--linha);font-size:34px;font-weight:700}
+.lista .it:last-child{border-bottom:0}
+.lista .q{flex:0 0 auto;width:52px;height:52px;border-radius:10px;background:var(--acento);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:22px;font-weight:700}
+.lista .it.off{color:var(--cinza2);font-weight:600} .lista .it.off .q{background:var(--linha);color:var(--cinza)}
+.lista .it small{display:block;font-size:24px;font-weight:500;color:var(--cinza);margin-top:2px}
+.risc{display:flex;justify-content:space-between;align-items:center;background:var(--branco);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.07);padding:22px 28px;font-size:30px;font-weight:700;width:100%;position:relative}
+.risc span{font-family:var(--mono);font-size:22px;color:var(--cinza)}
+.risc.x::after{content:"";position:absolute;left:22px;right:22px;top:50%;height:4px;background:var(--acento);transform:rotate(-1deg)}
+.risc.x{color:var(--cinza)}
+.risc.ok span{color:var(--tinta);background:var(--acento);padding:4px 10px;border-radius:4px}
+.input{width:100%;background:var(--branco);border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.10);padding:30px 34px;display:flex;align-items:center;gap:22px;text-align:left;font-size:34px;font-weight:500}
+.input .ic{flex:0 0 auto;width:66px;height:66px;border-radius:14px;background:#FFF5C2;display:flex;align-items:center;justify-content:center;font-size:34px}
+.cur{display:inline-block;width:3px;height:40px;background:var(--tinta);vertical-align:-8px;margin-left:2px}
+.input .env{margin-left:auto;flex:0 0 auto;width:46px;height:46px;border-radius:50%;background:#D9D9D6;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px}
+.s.v .card{padding:52px 56px} .s.v .card .meta{font-size:28px} .s.v .card h3{font-size:62px} .s.v .card p{font-size:40px} .s.v .chip{font-size:28px;padding:12px 18px}
+.s.v .input{font-size:44px;padding:38px 40px} .s.v .input .ic{width:84px;height:84px;font-size:42px} .s.v .cur{height:52px}
+.coment{width:100%;border:4px solid var(--tinta);border-radius:60px;background:var(--branco);padding:24px 36px;display:flex;align-items:center;justify-content:space-between;font-size:44px;font-weight:800}
+.coment b{width:0;height:0;border-left:34px solid var(--tinta);border-top:22px solid transparent;border-bottom:22px solid transparent}
+.estrela{position:absolute;width:34px;height:34px;z-index:2}
+.estrela::before{content:"✦";position:absolute;inset:0;font-size:34px;line-height:34px;color:var(--tinta)}
+.estrela.a::before{color:var(--acento);text-shadow:0 0 0 #000}
+.mira{position:absolute;width:12px;height:12px;background:var(--tinta);z-index:2}
+.logos{display:flex;gap:22px;justify-content:center}
+.logo{width:120px;height:120px;border-radius:22px;background:var(--branco);box-shadow:0 14px 30px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:34px;letter-spacing:-.02em}
+.logo small{display:block;font-size:16px;font-weight:600;color:var(--cinza);margin-top:4px}
+.selo{width:520px;height:340px;border-radius:24px;background:var(--branco);box-shadow:0 30px 70px rgba(0,0,0,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-3deg)}
+.selo .num{font-size:130px}
+.selo .mono{margin-top:14px}
+</style>
+</head>
+<body>
+
+<!-- 1 · capa: lead + título com marca-texto + objeto central com etiqueta -->
+<section class="s" data-out="carrossel-01">
+  <div class="topo"><p class="lead">a multa da LGPD tem teto de</p><p class="big"><span class="mk">R$ 50 milhões</span></p></div>
+  <div class="area" style="top:520px">
+    <div class="selo"><p class="num">153,7<small>mi</small></p><p class="mono">o que o TikTok levou · ANPD</p></div>
+    <span class="tag" style="margin-top:40px">TikTok · ANPD</span>
+  </div>
+  <i class="estrela" style="left:830px;top:520px"></i><i class="mira" style="left:200px;top:880px"></i><i class="estrela a" style="left:190px;top:600px"></i>
+  <div class="pe">@robertopivotto</div>
+</section>
+
+<!-- 2 · notícia em cartão, com legenda em itálico -->
+<section class="s" data-out="carrossel-02">
+  <div class="topo"><p class="lead">em agosto saiu no</p><p class="big"><span class="mk">Diário Oficial</span></p></div>
+  <div class="area">
+    <div class="card"><p class="meta">notícia · 25 ago 2026</p><h3><span class="mk">ANPD multa a dona do TikTok em R$ 153,7 milhões</span></h3><p>É a maior sanção da história da autoridade.</p></div>
+    <p class="mono">fonte: Tecnoblog · diário oficial da união</p>
+    <p class="legenda">"dados de crianças e adolescentes tratados sem base legal"</p>
+  </div>
+  <div class="pe">@robertopivotto</div>
+</section>
+
+<!-- 3 · número grande + chips -->
+<section class="s" data-out="carrossel-03">
+  <div class="topo"><p class="lead">o teto da LGPD vale</p><p class="big"><span class="mk">por infração</span></p></div>
+  <div class="area" style="top:520px">
+    <div class="card c"><p class="num">R$ 50<small>mi</small></p><p>para cada infração</p></div>
+    <div class="chips"><span class="chip">até 2% do faturamento</span><span class="chip">no Brasil</span><span class="chip a">por infração</span></div>
+    <p class="mono">LGPD · art. 52, II</p>
+  </div>
+  <div class="pe">@robertopivotto</div>
+</section>
+
+<!-- 4 · cartão com barra preta e lista numerada -->
+<section class="s" data-out="carrossel-04">
+  <div class="topo"><p class="lead">a mesma prática virou</p><p class="big"><span class="mk">5 infrações</span></p></div>
+  <div class="area">
+    <div class="card lista"><div class="barra">decisão da ANPD</div>
+      <div class="it"><span class="q">01</span>sem base legal</div>
+      <div class="it"><span class="q">02</span>sem prevenção</div>
+      <div class="it"><span class="q">03</span>sem prova de conformidade</div>
+      <div class="it off"><span class="q">+2</span><div>outras duas<small>não detalhadas na matéria</small></div></div>
+    </div>
+    <p class="legenda">cada uma com o próprio teto de R$ 50 milhões</p>
+  </div>
+  <div class="pe">@robertopivotto</div>
+</section>
+
+<!-- 5 · respiro: só o título -->
+<section class="s" data-out="carrossel-05">
+  <div class="topo" style="top:470px"><p class="lead">e a multa</p><p class="big g"><span class="mk">foi só</span></p><p class="big g">uma parte</p></div>
+  <i class="estrela" style="left:840px;top:430px"></i><i class="mira" style="left:230px;top:860px"></i>
+  <div class="pe">@robertopivotto</div>
+</section>
+
+<!-- 6 · itens riscados e mantidos -->
+<section class="s" data-out="carrossel-06">
+  <div class="topo"><p class="lead">a ANPD também mandou</p><p class="big"><span class="mk">mudar o produto</span></p></div>
+  <div class="area" style="gap:20px">
+    <div class="risc x">dados coletados sem base legal<span>apagar</span></div>
+    <div class="risc x">anúncios para quem usa sem cadastro<span>suspender</span></div>
+    <div class="risc ok">menores de 16 anos<span>privacidade restrita</span></div>
+    <div class="risc ok">supervisão dos pais<span>reforçada</span></div>
+    <p class="mono" style="margin-top:14px">fonte: Tecnoblog · 25/08/2026</p>
+  </div>
+  <div class="pe">@robertopivotto</div>
+</section>
+
+<!-- 7 · fecho: pergunta + caixa de comentário -->
+<section class="s" data-out="carrossel-07">
+  <div class="topo" style="top:300px"><p class="lead">na sua empresa,</p><p class="big p">qual prática com dados</p><p class="big p"><span class="mk">toca mais de uma regra?</span></p></div>
+  <div class="area" style="top:760px;left:150px;right:150px">
+    <p class="lead" style="font-size:40px">comenta</p>
+    <div class="coment"><span>a sua prática</span><b></b></div>
+    <p class="mono" style="margin-top:20px">desde fevereiro, a ANPD é autarquia e fiscaliza o ECA Digital</p>
+  </div>
+  <i class="estrela a" style="left:900px;top:1120px"></i>
+  <div class="pe">@robertopivotto</div>
+</section>
+
+<!-- Capa do Reels de quarta -->
+<section class="s v" data-out="reels-quarta-capa">
+  <div class="topo"><p class="lead">a IA erra, e</p><p class="big"><span class="mk">quem paga</span></p><p class="lead">é quem assina</p></div>
+  <div class="area" style="top:880px">
+    <div class="card"><p class="meta">TJMG · 13 ago 2026</p><h3>Advogado cita decisões do STJ e do STF <span class="mk">que não existem</span></h3><p>Multa de 2%, ofício à OAB e cópia ao Ministério Público.</p></div>
+    <div class="chips"><span class="chip">jurisprudência inventada</span><span class="chip a">quem assina responde</span></div>
+  </div>
+  <i class="estrela" style="left:860px;top:700px"></i>
+  <div class="pe">@robertopivotto</div>
+</section>
+
+<!-- Capa do Reels de sexta -->
+<section class="s v" data-out="reels-sexta-capa">
+  <div class="topo"><p class="lead">seu time já cola</p><p class="big"><span class="mk">dado de cliente</span></p><p class="lead">no ChatGPT</p></div>
+  <div class="area" style="top:900px">
+    <div class="input"><span class="ic">✦</span><span>resume esse contrato do cliente<span class="cur"></span></span><span class="env">↑</span></div>
+    <div class="chips"><span class="chip">conta pessoal</span><span class="chip">sem registro</span><span class="chip a">LGPD</span></div>
+  </div>
+  <i class="estrela a" style="left:170px;top:760px"></i><i class="mira" style="left:880px;top:1230px"></i>
+  <div class="pe">@robertopivotto</div>
+</section>
+
+<script>document.fonts.ready.then(()=>{document.body.dataset.pronto='1'});</script>
+</body>
+</html>
