@@ -48,6 +48,8 @@ https://www.instagram.com/reel/Desu6f3t5_q/
 
 ## Modelo no visual das referências
 
-`posts/modelo-referencia/artes.html` reproduz o visual do @amann.dev, aplicado ao carrossel de 26/10 e às capas dos Reels. É um modelo à parte do caderno de obra: fundo claro com sombra de janela, linha pequena em Instrument Serif itálico, título em Inter Tight 900 caixa alta com marca-texto, cartões brancos com sombra, chips pretos em JetBrains Mono, etiqueta com miras e estrelinhas. A cor do marca-texto fica em `--acento` (amarelo da referência); trocar para `#8FB0E6` volta para a paleta do Roberto.
+`posts/modelo-referencia/artes.html` reproduz o visual do @amann.dev, aplicado ao carrossel de 26/10 e às capas dos Reels. É um modelo à parte do caderno de obra: fundo claro com sombra de janela, linha pequena em Instrument Serif itálico, título em Inter Tight 900 caixa alta com marca-texto, cartões brancos com sombra, chips pretos em JetBrains Mono, etiqueta com miras e estrelinhas. A cor do marca-texto fica em `--acento`, hoje azul (`#8FB8FF`), com o azul Caneta (`#2B57A6`) nos pontos das linhas e nas estrelas.
+
+Linhas e figuras das referências: linhas-guia com ponto entre objeto e rótulo (`data-ligas` na seção), rótulos pretos e azuis (`.rot`), régua no máximo (`.slider`), linha do tempo (`.tempo`), ícones riscados (`.icones` + `.xis`), curva que pivota, quadradinhos (`.quad`), cruzes (`.cruz`) e cartão de perfil (`.avatar`).
 
 Componentes: `.lead`, `.big`, `.mk`, `.card` (com `.meta`, `.barra`), `.chip`, `.tag`, `.num`, `.lista`, `.risc`, `.input`, `.coment`, `.estrela`, `.mira`. Para gerar: `node posts/render.mjs modelo-referencia`.

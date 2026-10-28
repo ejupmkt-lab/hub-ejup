@@ -11,7 +11,7 @@
    Componentes: .lead (linha pequena em serifa itálica), .big (título pesado em caixa alta),
    .mk (marca-texto), .card, .chip, .tag (etiqueta com miras), .input (caixa de prompt/comentário),
    .lista, .riscado, .num, .estrela. Troque --acento para mudar a cor do tema. */
-:root{--fundo:#EEEEEC;--branco:#FFFFFF;--tinta:#151515;--cinza:#6B6B6B;--cinza2:#A7A7A7;--linha:#E2E2DF;--acento:#FFD60A;
+:root{--fundo:#EEEEEC;--branco:#FFFFFF;--tinta:#151515;--cinza:#6B6B6B;--cinza2:#A7A7A7;--linha:#E2E2DF;--acento:#8FB8FF;--azul:#2B57A6;
 --serif:'Instrument Serif',Georgia,serif;--sans:'Inter Tight',system-ui,sans-serif;--mono:'JetBrains Mono',monospace}
 *{box-sizing:border-box;margin:0}
 body{background:#888;padding:40px;display:flex;flex-wrap:wrap;gap:40px}
@@ -64,7 +64,7 @@ body{background:#888;padding:40px;display:flex;flex-wrap:wrap;gap:40px}
 .risc.x{color:var(--cinza)}
 .risc.ok span{color:var(--tinta);background:var(--acento);padding:4px 10px;border-radius:4px}
 .input{width:100%;background:var(--branco);border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.10);padding:30px 34px;display:flex;align-items:center;gap:22px;text-align:left;font-size:34px;font-weight:500}
-.input .ic{flex:0 0 auto;width:66px;height:66px;border-radius:14px;background:#FFF5C2;display:flex;align-items:center;justify-content:center;font-size:34px}
+.input .ic{flex:0 0 auto;width:66px;height:66px;border-radius:14px;background:#E3EDFF;color:var(--azul);display:flex;align-items:center;justify-content:center;font-size:34px}
 .cur{display:inline-block;width:3px;height:40px;background:var(--tinta);vertical-align:-8px;margin-left:2px}
 .input .env{margin-left:auto;flex:0 0 auto;width:46px;height:46px;border-radius:50%;background:#D9D9D6;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px}
 .s.v .card{padding:52px 56px} .s.v .card .meta{font-size:28px} .s.v .card h3{font-size:62px} .s.v .card p{font-size:40px} .s.v .chip{font-size:28px;padding:12px 18px}
@@ -73,7 +73,7 @@ body{background:#888;padding:40px;display:flex;flex-wrap:wrap;gap:40px}
 .coment b{width:0;height:0;border-left:34px solid var(--tinta);border-top:22px solid transparent;border-bottom:22px solid transparent}
 .estrela{position:absolute;width:34px;height:34px;z-index:2}
 .estrela::before{content:"✦";position:absolute;inset:0;font-size:34px;line-height:34px;color:var(--tinta)}
-.estrela.a::before{color:var(--acento);text-shadow:0 0 0 #000}
+.estrela.a::before{color:var(--azul)}
 .mira{position:absolute;width:12px;height:12px;background:var(--tinta);z-index:2}
 .logos{display:flex;gap:22px;justify-content:center}
 .logo{width:120px;height:120px;border-radius:22px;background:var(--branco);box-shadow:0 14px 30px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:34px;letter-spacing:-.02em}
@@ -81,112 +81,178 @@ body{background:#888;padding:40px;display:flex;flex-wrap:wrap;gap:40px}
 .selo{width:520px;height:340px;border-radius:24px;background:var(--branco);box-shadow:0 30px 70px rgba(0,0,0,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-3deg)}
 .selo .num{font-size:130px}
 .selo .mono{margin-top:14px}
+/* linhas e figuras das referências */
+svg.ligas{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;overflow:visible}
+.rot{position:absolute;z-index:4;font-family:var(--mono);font-size:19px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta)}
+.rot.ch{background:var(--tinta);color:#fff;padding:7px 11px;border-radius:4px}
+.rot.az{background:var(--acento);color:var(--tinta);padding:7px 11px;border-radius:4px}
+.quad{position:absolute;z-index:2;width:40px;height:40px;background:var(--acento)}
+.quad.p{width:14px;height:14px;background:var(--tinta)}
+.cruz{position:absolute;z-index:2;width:30px;height:30px}
+.cruz::before,.cruz::after{content:"";position:absolute;background:var(--tinta)}
+.cruz::before{left:14px;top:0;width:2px;height:30px}.cruz::after{top:14px;left:0;height:2px;width:30px}
+.slider{width:100%;text-align:left}
+.slider .t{display:flex;justify-content:space-between;align-items:baseline;font-size:26px;color:var(--cinza)}
+.slider .t b{font-weight:900;font-size:64px;color:var(--tinta);letter-spacing:-.03em}
+.slider .trilho{position:relative;height:8px;border-radius:4px;background:var(--tinta);margin:30px 0 16px}
+.slider .trilho i{position:absolute;right:-18px;top:-16px;width:40px;height:40px;border-radius:50%;background:var(--acento);border:4px solid var(--tinta)}
+.slider .esc{display:flex;justify-content:space-between;font-family:var(--mono);font-size:18px;color:var(--cinza)}
+.icones{display:flex;gap:26px;justify-content:center;position:relative}
+.icones .ico{width:110px;height:110px;border-radius:22px;background:var(--branco);box-shadow:0 14px 30px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center}
+.icones .ico svg{width:58px;height:58px}
+.xis{position:absolute;left:-20px;top:-14px;width:calc(100% + 40px);height:calc(100% + 28px);z-index:2}
+.tempo{width:100%;display:flex;align-items:center;gap:0;font-family:var(--mono);font-size:19px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.05em}
+.tempo .seg{flex:1;height:3px;background:var(--tinta);margin:0 14px;position:relative}
+.tempo .seg.tr{background:repeating-linear-gradient(90deg,var(--tinta) 0 10px,transparent 10px 18px)}
+.tempo .pt{width:20px;height:20px;border-radius:50%;background:var(--tinta)} .tempo .pt.az{background:var(--acento);border:3px solid var(--tinta);width:26px;height:26px}
+.tempo .lb{display:flex;flex-direction:column;align-items:center;gap:10px}
+.s.v .rot{font-size:28px} .s.v .rot.ch,.s.v .rot.az{padding:10px 16px}
+.avatar{display:flex;align-items:center;gap:16px;background:var(--branco);border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.08);padding:14px 22px 14px 14px;text-align:left}
+.avatar .f{width:56px;height:56px;border-radius:50%;background:var(--tinta);color:#fff;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center}
+.avatar b{display:block;font-size:22px} .avatar span{font-size:18px;color:var(--cinza)}
 </style>
 </head>
 <body>
 
-<!-- 1 · capa: lead + título com marca-texto + objeto central com etiqueta -->
-<section class="s" data-out="carrossel-01">
+<!-- 1 · capa: objeto central, linha-guia até a etiqueta com miras, figuras soltas -->
+<section class="s" data-out="carrossel-01" data-ligas="selo@b>tag1@t:ponto">
   <div class="topo"><p class="lead">a multa da LGPD tem teto de</p><p class="big"><span class="mk">R$ 50 milhões</span></p></div>
-  <div class="area" style="top:520px">
-    <div class="selo"><p class="num">153,7<small>mi</small></p><p class="mono">o que o TikTok levou · ANPD</p></div>
-    <span class="tag" style="margin-top:40px">TikTok · ANPD</span>
+  <div class="area" style="top:500px">
+    <div class="selo" id="selo"><p class="num">153,7<small>mi</small></p><p class="mono">o que o TikTok levou</p></div>
+    <span class="tag" id="tag1" style="margin-top:110px">TikTok · ANPD</span>
   </div>
-  <i class="estrela" style="left:830px;top:520px"></i><i class="mira" style="left:200px;top:880px"></i><i class="estrela a" style="left:190px;top:600px"></i>
+  <span class="rot az" id="r2" style="left:790px;top:560px;font-size:24px">3× o teto</span>
+  <i class="estrela" style="left:850px;top:470px"></i><i class="estrela a" style="left:150px;top:860px"></i>
+  <i class="quad" style="left:860px;top:640px"></i><i class="quad p" style="left:190px;top:1080px"></i><i class="cruz" style="left:880px;top:1120px"></i>
   <div class="pe">@robertopivotto</div>
 </section>
 
-<!-- 2 · notícia em cartão, com legenda em itálico -->
-<section class="s" data-out="carrossel-02">
+<!-- 2 · notícia em cartão, anotação pontilhada para o rótulo -->
+<section class="s" data-out="carrossel-02" data-ligas="hl2@r>an2@l:tracejada">
   <div class="topo"><p class="lead">em agosto saiu no</p><p class="big"><span class="mk">Diário Oficial</span></p></div>
-  <div class="area">
-    <div class="card"><p class="meta">notícia · 25 ago 2026</p><h3><span class="mk">ANPD multa a dona do TikTok em R$ 153,7 milhões</span></h3><p>É a maior sanção da história da autoridade.</p></div>
+  <div class="area" style="right:250px">
+    <div class="card"><p class="meta">notícia · 25 ago 2026</p><h3><span class="mk" id="hl2">ANPD multa a dona do TikTok em R$ 153,7 milhões</span></h3><p>Dados de crianças e adolescentes tratados sem base legal.</p></div>
     <p class="mono">fonte: Tecnoblog · diário oficial da união</p>
-    <p class="legenda">"dados de crianças e adolescentes tratados sem base legal"</p>
   </div>
+  <span class="rot ch" id="an2" style="left:870px;top:560px;width:150px;line-height:1.35">maior multa da ANPD</span>
+  <div class="area" style="top:1010px"><div class="tempo"><div class="lb"><span class="pt"></span>2021</div><div class="seg tr"></div><div class="lb"><span class="pt"></span>fiscalização</div><div class="seg"></div><div class="lb"><span class="pt az"></span>ago/2026</div></div></div>
+  <i class="estrela" style="left:120px;top:420px"></i><i class="cruz" style="left:930px;top:880px"></i>
   <div class="pe">@robertopivotto</div>
 </section>
 
-<!-- 3 · número grande + chips -->
+<!-- 3 · número + régua no máximo -->
 <section class="s" data-out="carrossel-03">
   <div class="topo"><p class="lead">o teto da LGPD vale</p><p class="big"><span class="mk">por infração</span></p></div>
-  <div class="area" style="top:520px">
+  <div class="area" style="top:480px">
     <div class="card c"><p class="num">R$ 50<small>mi</small></p><p>para cada infração</p></div>
-    <div class="chips"><span class="chip">até 2% do faturamento</span><span class="chip">no Brasil</span><span class="chip a">por infração</span></div>
+    <div class="card slider"><div class="t"><span>multa por infração</span><b>máx.</b></div><div class="trilho"><i></i></div><div class="esc"><span>R$ 0</span><span>2% do faturamento</span><span>R$ 50 mi</span></div></div>
     <p class="mono">LGPD · art. 52, II</p>
   </div>
+  <i class="quad" style="left:900px;top:470px"></i><i class="estrela a" style="left:120px;top:1100px"></i>
   <div class="pe">@robertopivotto</div>
 </section>
 
-<!-- 4 · cartão com barra preta e lista numerada -->
-<section class="s" data-out="carrossel-04">
+<!-- 4 · lista no cartão, colchete e linha até o total -->
+<section class="s" data-out="carrossel-04" data-ligas="it1@r>tot@l;it2@r>tot@l;it3@r>tot@l">
   <div class="topo"><p class="lead">a mesma prática virou</p><p class="big"><span class="mk">5 infrações</span></p></div>
-  <div class="area">
+  <div class="area" style="right:330px;left:90px">
     <div class="card lista"><div class="barra">decisão da ANPD</div>
-      <div class="it"><span class="q">01</span>sem base legal</div>
-      <div class="it"><span class="q">02</span>sem prevenção</div>
-      <div class="it"><span class="q">03</span>sem prova de conformidade</div>
-      <div class="it off"><span class="q">+2</span><div>outras duas<small>não detalhadas na matéria</small></div></div>
+      <div class="it" id="it1"><span class="q">01</span>sem base legal</div>
+      <div class="it" id="it2"><span class="q">02</span>sem prevenção</div>
+      <div class="it" id="it3"><span class="q">03</span>sem prova de conformidade</div>
+      <div class="it off"><span class="q">+2</span><div>outras duas<small>não detalhadas</small></div></div>
     </div>
-    <p class="legenda">cada uma com o próprio teto de R$ 50 milhões</p>
   </div>
+  <span class="tag" id="tot" style="position:absolute;left:830px;top:690px;font-size:34px">× 5</span>
+  <p class="legenda" style="position:absolute;left:0;right:0;top:1150px">cada uma com o próprio teto de R$ 50 milhões</p>
+  <i class="estrela" style="left:930px;top:520px"></i><i class="quad p" style="left:960px;top:980px"></i>
   <div class="pe">@robertopivotto</div>
 </section>
 
-<!-- 5 · respiro: só o título -->
+<!-- 5 · respiro com a curva que pivota -->
 <section class="s" data-out="carrossel-05">
-  <div class="topo" style="top:470px"><p class="lead">e a multa</p><p class="big g"><span class="mk">foi só</span></p><p class="big g">uma parte</p></div>
-  <i class="estrela" style="left:840px;top:430px"></i><i class="mira" style="left:230px;top:860px"></i>
+  <div class="topo" style="top:360px"><p class="lead">e a multa</p><p class="big g"><span class="mk">foi só</span></p><p class="big g">uma parte</p></div>
+  <svg style="position:absolute;left:190px;top:880px;width:700px;height:240px;z-index:2" viewBox="0 0 700 240"><path d="M10 200 C 170 190, 280 170, 350 150" stroke="#A7A7A7" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M350 150 C 450 120, 560 60, 690 20" stroke="#151515" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="350" cy="150" r="16" fill="#8FB8FF" stroke="#151515" stroke-width="4"/></svg>
+  <span class="rot" style="left:190px;top:1140px;color:#6B6B6B">multa</span><span class="rot ch" style="left:760px;top:860px">o produto muda</span>
+  <i class="estrela" style="left:850px;top:340px"></i><i class="cruz" style="left:150px;top:520px"></i>
   <div class="pe">@robertopivotto</div>
 </section>
 
-<!-- 6 · itens riscados e mantidos -->
+<!-- 6 · ícones riscados + itens riscados e mantidos -->
 <section class="s" data-out="carrossel-06">
   <div class="topo"><p class="lead">a ANPD também mandou</p><p class="big"><span class="mk">mudar o produto</span></p></div>
-  <div class="area" style="gap:20px">
-    <div class="risc x">dados coletados sem base legal<span>apagar</span></div>
+  <div class="area" style="gap:18px;top:440px">
+    <div class="icones"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#151515" stroke-width="2"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg></span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#151515" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 15l2.5-6 2.5 6M7.8 13h3.4M15 9v6h1.2a2.8 3 0 000-6z"/></svg></span><svg class="xis" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 8 L96 92 M96 8 L4 92" stroke="#2B57A6" stroke-width="3.5" stroke-linecap="round"/></svg></div>
+    <div class="risc x" style="margin-top:20px">dados coletados sem base legal<span>apagar</span></div>
     <div class="risc x">anúncios para quem usa sem cadastro<span>suspender</span></div>
     <div class="risc ok">menores de 16 anos<span>privacidade restrita</span></div>
     <div class="risc ok">supervisão dos pais<span>reforçada</span></div>
-    <p class="mono" style="margin-top:14px">fonte: Tecnoblog · 25/08/2026</p>
   </div>
+  <i class="estrela a" style="left:880px;top:470px"></i><i class="quad p" style="left:170px;top:520px"></i>
   <div class="pe">@robertopivotto</div>
 </section>
 
-<!-- 7 · fecho: pergunta + caixa de comentário -->
-<section class="s" data-out="carrossel-07">
-  <div class="topo" style="top:300px"><p class="lead">na sua empresa,</p><p class="big p">qual prática com dados</p><p class="big p"><span class="mk">toca mais de uma regra?</span></p></div>
-  <div class="area" style="top:760px;left:150px;right:150px">
+<!-- 7 · fecho: pergunta, caixa de comentário e cartão do perfil -->
+<section class="s" data-out="carrossel-07" data-ligas="coment@b>av@t:ponto">
+  <div class="topo" style="top:250px"><p class="lead">na sua empresa,</p><p class="big p">qual prática com dados</p><p class="big p"><span class="mk">toca mais de uma regra?</span></p></div>
+  <div class="area" style="top:690px;left:150px;right:150px">
     <p class="lead" style="font-size:40px">comenta</p>
-    <div class="coment"><span>a sua prática</span><b></b></div>
-    <p class="mono" style="margin-top:20px">desde fevereiro, a ANPD é autarquia e fiscaliza o ECA Digital</p>
+    <div class="coment" id="coment"><span>a sua prática</span><b></b></div>
+    <div class="avatar" id="av" style="margin-top:90px"><span class="f">RP</span><div><b>robertopivotto</b><span>advogado · negócios e tecnologia</span></div></div>
   </div>
-  <i class="estrela a" style="left:900px;top:1120px"></i>
+  <i class="estrela a" style="left:900px;top:1120px"></i><i class="estrela" style="left:140px;top:640px"></i><i class="cruz" style="left:150px;top:1130px"></i>
   <div class="pe">@robertopivotto</div>
 </section>
 
-<!-- Capa do Reels de quarta -->
-<section class="s v" data-out="reels-quarta-capa">
+<!-- Capa do Reels de quarta: cartão com linhas para os rótulos riscados -->
+<section class="s v" data-out="reels-quarta-capa" data-ligas="c4@l>st@r:tracejada;c4@r>sf@l:tracejada">
   <div class="topo"><p class="lead">a IA erra, e</p><p class="big"><span class="mk">quem paga</span></p><p class="lead">é quem assina</p></div>
-  <div class="area" style="top:880px">
-    <div class="card"><p class="meta">TJMG · 13 ago 2026</p><h3>Advogado cita decisões do STJ e do STF <span class="mk">que não existem</span></h3><p>Multa de 2%, ofício à OAB e cópia ao Ministério Público.</p></div>
+  <div class="area" style="top:860px;left:210px;right:210px">
+    <div class="card" id="c4"><p class="meta">TJMG · 13 ago 2026</p><h3>Decisões citadas <span class="mk">que não existem</span></h3><p>Multa de 2%, ofício à OAB e cópia ao MP.</p></div>
     <div class="chips"><span class="chip">jurisprudência inventada</span><span class="chip a">quem assina responde</span></div>
   </div>
-  <i class="estrela" style="left:860px;top:700px"></i>
+  <span class="rot ch" id="st" style="left:40px;top:1330px">STJ ✕</span><span class="rot ch" id="sf" style="left:920px;top:1330px">STF ✕</span>
+  <i class="estrela" style="left:880px;top:700px"></i><i class="quad" style="left:150px;top:760px"></i><i class="cruz" style="left:880px;top:1520px"></i>
   <div class="pe">@robertopivotto</div>
 </section>
 
-<!-- Capa do Reels de sexta -->
-<section class="s v" data-out="reels-sexta-capa">
+<!-- Capa do Reels de sexta: caixa de chat, seta tracejada até o fornecedor -->
+<section class="s v" data-out="reels-sexta-capa" data-ligas="inp@b>forn@t:tracejada">
   <div class="topo"><p class="lead">seu time já cola</p><p class="big"><span class="mk">dado de cliente</span></p><p class="lead">no ChatGPT</p></div>
-  <div class="area" style="top:900px">
-    <div class="input"><span class="ic">✦</span><span>resume esse contrato do cliente<span class="cur"></span></span><span class="env">↑</span></div>
+  <div class="area" style="top:880px">
+    <div class="input" id="inp"><span class="ic">✦</span><span>resume esse contrato do cliente<span class="cur"></span></span><span class="env">↑</span></div>
+    <div class="icones" id="forn" style="margin-top:130px"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#151515" stroke-width="2"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg></span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#151515" stroke-width="2"><circle cx="12" cy="7" r="3.5"/><path d="M5 21c.6-4 3.3-6.5 7-6.5s6.4 2.5 7 6.5"/></svg></span></div>
     <div class="chips"><span class="chip">conta pessoal</span><span class="chip">sem registro</span><span class="chip a">LGPD</span></div>
   </div>
-  <i class="estrela a" style="left:170px;top:760px"></i><i class="mira" style="left:880px;top:1230px"></i>
+  <span class="rot az" style="left:600px;top:1170px">sai da empresa</span>
+  <i class="estrela a" style="left:160px;top:760px"></i><i class="quad p" style="left:900px;top:1500px"></i><i class="cruz" style="left:150px;top:1440px"></i>
   <div class="pe">@robertopivotto</div>
 </section>
 
-<script>document.fonts.ready.then(()=>{document.body.dataset.pronto='1'});</script>
+<script>
+// linhas-guia: data-ligas="idA@âncora>idB@âncora[:ponto|:tracejada];..." (âncoras t b l r c)
+function ponto(el,a,base){const r=el.getBoundingClientRect();const x={l:r.left,r:r.right,c:(r.left+r.right)/2,t:(r.left+r.right)/2,b:(r.left+r.right)/2}[a];const y={t:r.top,b:r.bottom,c:(r.top+r.bottom)/2,l:(r.top+r.bottom)/2,r:(r.top+r.bottom)/2}[a];return [x-base.left,y-base.top]}
+document.fonts.ready.then(()=>{
+  document.querySelectorAll('section[data-ligas]').forEach(sec=>{
+    const base=sec.getBoundingClientRect(); const NS='http://www.w3.org/2000/svg';
+    const svg=document.createElementNS(NS,'svg'); svg.classList.add('ligas'); svg.setAttribute('viewBox',`0 0 ${base.width} ${base.height}`);
+    sec.dataset.ligas.split(';').forEach(l=>{
+      const [par,tipo]=l.split(':'); const [a,b]=par.split('>'); const [ia,aa]=a.split('@'); const [ib,ab]=b.split('@');
+      const A=ponto(sec.querySelector('#'+ia),aa,base), B=ponto(sec.querySelector('#'+ib),ab,base);
+      const pad=v=>({t:[0,-6],b:[0,6],l:[-6,0],r:[6,0],c:[0,0]})[v];
+      const a0=[A[0]+pad(aa)[0],A[1]+pad(aa)[1]], b0=[B[0]+pad(ab)[0],B[1]+pad(ab)[1]];
+      const p=document.createElementNS(NS,'path');
+      const mx=(a0[0]+b0[0])/2;
+      const d=(aa==='b'||aa==='t')&&(ab==='t'||ab==='b')?`M${a0} L${b0}`:`M${a0} C${mx},${a0[1]} ${mx},${b0[1]} ${b0}`;
+      p.setAttribute('d',d); p.setAttribute('fill','none'); p.setAttribute('stroke','#151515'); p.setAttribute('stroke-width','3');
+      if(tipo==='tracejada') p.setAttribute('stroke-dasharray','10 9');
+      svg.appendChild(p);
+      [a0,b0].forEach((q,k)=>{const c=document.createElementNS(NS,'circle');c.setAttribute('cx',q[0]);c.setAttribute('cy',q[1]);c.setAttribute('r',k===0&&tipo==='ponto'?9:6);c.setAttribute('fill',k===0?'#2B57A6':'#151515');svg.appendChild(c)});
+    });
+    sec.appendChild(svg);
+  });
+  document.body.dataset.pronto='1';
+});
+</script>
 </body>
 </html>
