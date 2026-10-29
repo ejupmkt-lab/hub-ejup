@@ -16,7 +16,7 @@ const BORDA = "BFC8D6";
 const LARGURA = 9498; // largura útil da página do modelo, em twips
 const FONTE = "Times New Roman";
 
-const esc = (s: string) =>
+export const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 type Run = { t: string; b?: boolean; i?: boolean; cor?: string; tam?: number; realce?: boolean };
@@ -117,7 +117,7 @@ function faixa(linhas: string[]) {
 }
 
 // Quadro de destaque (NATUREZA DA ENTREGA, ALERTA…)
-function quadro(titulo: string, corpo: string, tipo: "azul" | "alerta") {
+export function quadro(titulo: string, corpo: string, tipo: "azul" | "alerta") {
   const borda = tipo === "azul" ? AZUL_FAIXA : "E69138";
   const fundo = tipo === "azul" ? "DCE9F5" : "FFF8E5";
   const conteudo =
@@ -445,87 +445,48 @@ export function tirarMiniatura(zip: PizZip) {
 
 export type ArquivoImagem = { dados: ArrayBuffer; tipo: string; legenda: string; largura: number; altura: number };
 
+// Imagens no pacote do Word: arquivo em word/media, relação no document.xml.rels e tipo no [Content_Types].xml
+export function incluirImagens(zip: PizZip, arquivos: ArquivoImagem[]): ImagemRelatorio[] {
+  const imagens: ImagemRelatorio[] = [];
+  if (!arquivos.length) return imagens;
+  let rels = zip.file("word/_rels/document.xml.rels")!.asText();
+  let tipos = zip.file("[Content_Types].xml")!.asText();
+  arquivos.forEach((a, i) => {
+    const ext = a.tipo === "image/png" ? "png" : a.tipo === "image/webp" ? "webp" : "jpeg";
+    const nome = `evidencia${i + 1}.${ext}`;
+    const rId = `rIdEvidencia${i + 1}`;
+    zip.file(`word/media/${nome}`, a.dados);
+    rels = rels.replace(
+      "</Relationships>",
+      `<Relationship Id="${rId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${nome}"/></Relationships>`,
+    );
+    if (!new RegExp(`Extension="${ext}"`, "i").test(tipos)) {
+      tipos = tipos.replace("<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">", (m) => `${m}<Default Extension="${ext}" ContentType="${a.tipo === "image/jpeg" ? "image/jpeg" : a.tipo}"/>`);
+    }
+    imagens.push({ rId, legenda: a.legenda, largura: a.largura, altura: a.altura });
+  });
+  zip.file("word/_rels/document.xml.rels", rels);
+  zip.file("[Content_Types].xml", tipos);
+  return imagens;
+}
+
 // Corpo novo dentro do modelo Word (cabeçalho timbrado, rodapé, margens e estilos do modelo ficam)
 async function empacotar(corpoDe: (imagens: ImagemRelatorio[]) => string, arquivos: ArquivoImagem[], modelo?: ArrayBuffer): Promise<Blob> {
   const base: ArrayBuffer = modelo ?? (await fetch("/modelos/relatorio-base.docx").then((r) => r.arrayBuffer()));
   const zip = new PizZip(base);
   tirarMiniatura(zip);
-
-  // Imagens: arquivo em word/media, relação no document.xml.rels e tipo no [Content_Types].xml
-  const imagens: ImagemRelatorio[] = [];
-  if (arquivos.length) {
-    let rels = zip.file("word/_rels/document.xml.rels")!.asText();
-    let tipos = zip.file("[Content_Types].xml")!.asText();
-    arquivos.forEach((a, i) => {
-      const ext = a.tipo === "image/png" ? "png" : a.tipo === "image/webp" ? "webp" : "jpeg";
-      const nome = `evidencia${i + 1}.${ext}`;
-      const rId = `rIdEvidencia${i + 1}`;
-      zip.file(`word/media/${nome}`, a.dados);
-      rels = rels.replace(
-        "</Relationships>",
-        `<Relationship Id="${rId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${nome}"/></Relationships>`,
-      );
-      if (!new RegExp(`Extension="${ext}"`, "i").test(tipos)) {
-        tipos = tipos.replace("<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">", (m) => `${m}<Default Extension="${ext}" ContentType="${a.tipo === "image/jpeg" ? "image/jpeg" : a.tipo}"/>`);
-      }
-      imagens.push({ rId, legenda: a.legenda, largura: a.largura, altura: a.altura });
-    });
-    zip.file("word/_rels/document.xml.rels", rels);
-    zip.file("[Content_Types].xml", tipos);
-  }
-
+  const imagens = incluirImagens(zip, arquivos);
   const doc = zip.file("word/document.xml")!.asText();
   const inicio = doc.indexOf("<w:body>") + "<w:body>".length;
   const fimSect = doc.lastIndexOf("<w:sectPr");
   zip.file("word/document.xml", doc.slice(0, inicio) + corpoDe(imagens) + doc.slice(fimSect));
   return zip.generate({
     type: "blob",
+    compression: "DEFLATE",
     mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   });
 }
 
 export async function gerarDocx(dados: Omit<DadosRelatorio, "imagens">, arquivos: ArquivoImagem[] = [], modelo?: ArrayBuffer): Promise<Blob> {
   return empacotar((imagens) => corpoRelatorio({ ...dados, imagens }), arquivos, modelo);
-}
-
-export type DadosDiagnostico = { projeto: Projeto; cliente: Cliente; consultor: Usuario | undefined };
-
-// Diagnóstico do projeto (fase 2 do HUB): a mesma capa de identificação dos relatórios (sem período e carga horária, que
-// são das etapas), o texto escrito com a IA e a assinatura só do consultor. O local e a data são os de hoje.
-export function corpoDiagnostico({ projeto, cliente, consultor }: DadosDiagnostico, hoje: string) {
-  const partes: string[] = [];
-  partes.push(par([{ t: "DIAGNÓSTICO DA DEMANDA", b: true, cor: AZUL_FAIXA }], { alinhar: "center", depois: 120 }));
-  partes.push(par([{ t: projeto.fichaTecnica, b: true }], { alinhar: "center", depois: 120 }));
-  partes.push(tabelaDaFicha(fichaDeIdentificacao(projeto, cliente)));
-  const aposACapa = partes.length;
-  partes.push(faixa(["Detalhes", `Diagnóstico - ${cliente.nomeFantasia || cliente.razaoSocial}`]));
-
-  const texto = (projeto.diagnostico?.texto ?? "").trim();
-  if (texto) partes.push(blocos(texto, projeto, "", { sub: 0, figura: { n: 0 } }));
-  else partes.push(par("[completar: o diagnóstico ainda não foi escrito. Conte à IA, no Desenvolvimento, o que o cliente pediu e o que você mapeou.]"));
-
-  partes.push(par(`${projeto.localAssinatura}, ${dataPorExtenso(hoje)}.`, { alinhar: "left", antes: 120, manterProximo: true }));
-  partes.push(
-    par("", { depois: 600, manterProximo: true }) +
-      par("_________________________________________________________________", { alinhar: "center", depois: 0, manterProximo: true }) +
-      par([{ t: consultor?.nomeCompleto ?? "Consultor", b: true }], { alinhar: "center", depois: 0, manterProximo: true }) +
-      par("Consultor Responsável", { alinhar: "center", depois: 240 }),
-  );
-
-  const pendentes = contarMarcadoresNoCorpo(partes.join(""));
-  if (pendentes > 0)
-    partes.splice(
-      aposACapa,
-      0,
-      quadro(
-        "Pendências antes do envio",
-        `Este documento tem ${pendentes} ${pendentes === 1 ? "marcador" : "marcadores"} a completar, destacados em amarelo. Resolva cada um, remova o realce e apague esta caixa antes de assinar e enviar no HUB.`,
-        "alerta",
-      ),
-    );
-  return partes.join("");
-}
-
-export async function gerarDocxDiagnostico(dados: DadosDiagnostico, hoje: string, modelo?: ArrayBuffer): Promise<Blob> {
-  return empacotar(() => corpoDiagnostico(dados, hoje), [], modelo);
 }

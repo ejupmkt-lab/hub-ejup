@@ -1,19 +1,23 @@
 "use client";
 
-import { useRef, useState } from "react";
-import type { Projeto } from "@/lib/dados/tipos";
+import { useEffect, useRef, useState } from "react";
+import type { Diagnostico, Evidencia, Projeto } from "@/lib/dados/tipos";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { traduzirErro } from "@/lib/erros";
 import { formatarData, hojeIso } from "@/lib/datas";
 import { hubDoProjeto, passoHubDoProjeto } from "@/lib/fase";
-import { gerarDocxDiagnostico, MARCADOR_NO_WORD } from "@/lib/relatorio/docx";
-import { Botao, Cartao, Status } from "@/components/ui";
+import { faltasDoDiagnostico, lerDiagnostico, secoesDoModelo, temTextoNoDiagnostico, type ChaveDeSecao } from "@/lib/diagnostico";
+import { gerarDocxDiagnostico } from "@/lib/relatorio/diagnostico-docx";
+import { MARCADOR_NO_WORD } from "@/lib/relatorio/docx";
+import { Botao, Campo, Cartao, Status } from "@/components/ui";
+import { baixarImagens, subirEvidencia } from "./evidencias";
 import { useProjeto } from "./use-projeto";
 
 const BUCKET = "evidencias";
 const TIPOS = ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword", "application/pdf"];
 const tamanho = (b: number) => (b >= 1024 * 1024 ? `${(b / 1024 / 1024).toFixed(1).replace(".", ",")} MB` : `${Math.max(1, Math.round(b / 1024))} KB`);
-const contarMarcadores = (t: string) => (t.match(MARCADOR_NO_WORD) ?? []).length;
+const contarMarcadores = (d: Diagnostico) => secoesDoModelo.reduce((a, s) => a + (d[s.chave].match(MARCADOR_NO_WORD)?.length ?? 0), 0);
+const palavras = (d: Diagnostico) => secoesDoModelo.reduce((a, s) => a + (d[s.chave].trim() ? d[s.chave].trim().split(/\s+/).length : 0), 0);
 
 async function abrirArquivo(caminho: string, nome: string) {
   const { data, error } = await supabaseNavegador().storage.from(BUCKET).createSignedUrl(caminho, 300, { download: nome });
@@ -21,39 +25,75 @@ async function abrirArquivo(caminho: string, nome: string) {
   window.location.href = data.signedUrl;
 }
 
-// Diagnóstico do projeto (fase 2 do HUB), nas Entregas, antes dos relatórios: o texto escrito com a IA, o Word gerado dele e o
-// arquivo final (a versão enviada no HUB), para o fluxo de entregas do projeto ficar registrado do começo ao fim.
+// Diagnóstico do projeto (fase 2 do HUB), nas Entregas, antes dos relatórios. Segue o modelo do SEBRAE (e não o dos relatórios):
+// os três textos escritos com a IA quando ela tem todas as informações, as imagens da reunião, o Word gerado no modelo oficial
+// e o arquivo final (a versão enviada no HUB), para o fluxo de entregas do projeto ficar registrado do começo ao fim.
 export function DiagnosticoDoProjeto({ projeto, aoDesenvolver }: { projeto: Projeto; aoDesenvolver: () => void }) {
   const { alterar, cliente, consultor, usuario } = useProjeto();
-  const entrada = useRef<HTMLInputElement>(null);
+  const entradaArquivo = useRef<HTMLInputElement>(null);
+  const entradaImagem = useRef<HTMLInputElement>(null);
   const [gerando, setGerando] = useState(false);
-  const [enviando, setEnviando] = useState(false);
+  const [enviando, setEnviando] = useState<null | "arquivo" | "imagem">(null);
   const [verTexto, setVerTexto] = useState(false);
-  const [editando, setEditando] = useState<string | null>(null);
+  const [editando, setEditando] = useState<Record<ChaveDeSecao, string> | null>(null);
   const [erro, setErro] = useState<string | null>(null);
-  const d = projeto.diagnostico;
-  const texto = (d?.texto ?? "").trim();
-  const arquivo = d?.arquivo ?? null;
-  const marcadores = contarMarcadores(texto);
+  const [urls, setUrls] = useState<Record<string, string>>({});
+  const d = lerDiagnostico(projeto);
+  const arquivo = d.arquivo;
+  const temTexto = temTextoNoDiagnostico(d);
+  const marcadores = contarMarcadores(d);
+  const faltas = cliente ? faltasDoDiagnostico(projeto, cliente) : [];
   const enviadoNoHub = hubDoProjeto(projeto).datas.diagnostico_enviado ?? null;
   const naFaseDoDiagnostico = passoHubDoProjeto(projeto) === "diagnostico";
   const doHub = (projeto.materiaisHub ?? []).filter((m) => /diagn/i.test(m.nome));
+
+  // Miniaturas das imagens de evidência
+  const caminhos = d.evidencias.map((e) => e.caminho);
+  const chave = caminhos.join("|");
+  useEffect(() => {
+    const faltam = caminhos.filter((c) => !urls[c]);
+    if (!faltam.length) return;
+    let ativo = true;
+    void supabaseNavegador()
+      .storage.from(BUCKET)
+      .createSignedUrls(faltam, 3600)
+      .then(({ data }) => {
+        if (ativo && data) setUrls((u) => ({ ...u, ...Object.fromEntries(data.filter((x) => x.signedUrl).map((x) => [x.path!, x.signedUrl as string])) }));
+      });
+    return () => {
+      ativo = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chave]);
 
   const situacao = enviadoNoHub
     ? { tom: "ok" as const, texto: `Enviado no HUB em ${formatarData(enviadoNoHub)}` }
     : arquivo
       ? { tom: "andamento" as const, texto: "Arquivo anexado" }
-      : texto
+      : temTexto
         ? { tom: "andamento" as const, texto: "Em elaboração" }
         : { tom: naFaseDoDiagnostico ? ("atencao" as const) : ("neutro" as const), texto: naFaseDoDiagnostico ? "A elaborar" : "Ainda não escrito" };
 
+  const gravar = (fn: (x: Diagnostico) => void, acao: string, detalhe?: string) =>
+    alterar(
+      (p) => {
+        const novo = lerDiagnostico(p);
+        fn(novo);
+        const { texto: legado, ...sem } = novo;
+        void legado;
+        p.diagnostico = sem;
+      },
+      { acao, detalhe },
+    );
+
   const baixarWord = async () => {
     if (!cliente) return;
-    if (marcadores && !confirm(`O diagnóstico tem ${marcadores} ${marcadores === 1 ? "marcador" : "marcadores"} a completar ou confirmar. No Word, eles saem destacados em amarelo, com uma caixa "Pendências antes do envio" logo depois da capa.\n\nBaixar mesmo assim?`)) return;
+    if (marcadores && !confirm(`O diagnóstico tem ${marcadores} ${marcadores === 1 ? "marcador" : "marcadores"} a completar ou confirmar. No Word, eles saem destacados em amarelo, com uma caixa "Pendências antes do envio" no começo da página 2.\n\nBaixar mesmo assim?`)) return;
     setGerando(true);
     setErro(null);
     try {
-      const blob = await gerarDocxDiagnostico({ projeto, cliente, consultor }, hojeIso());
+      const imagens = await baixarImagens(d.evidencias);
+      const blob = await gerarDocxDiagnostico({ projeto, cliente, consultor }, hojeIso(), imagens);
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
       const nome = (cliente.nomeFantasia || cliente.razaoSocial).replace(/[^\p{L}\p{N}]+/gu, "_");
@@ -72,7 +112,7 @@ export function DiagnosticoDoProjeto({ projeto, aoDesenvolver }: { projeto: Proj
     setErro(null);
     if (!TIPOS.includes(f.type) && !/\.(docx?|pdf)$/i.test(f.name)) return setErro("Envie o diagnóstico em Word (.docx) ou PDF.");
     if (f.size > 20 * 1024 * 1024) return setErro("O arquivo passa de 20 MB.");
-    setEnviando(true);
+    setEnviando("arquivo");
     try {
       const sb = supabaseNavegador();
       const seguro = f.name.replace(/[^\w.\-]+/g, "_").slice(-80) || "diagnostico";
@@ -81,39 +121,53 @@ export function DiagnosticoDoProjeto({ projeto, aoDesenvolver }: { projeto: Proj
       const { error } = await sb.storage.from(BUCKET).upload(caminho, f, { contentType: tipo });
       if (error) throw error;
       const antigo = arquivo?.caminho;
-      alterar(
-        (p) => {
-          p.diagnostico = { texto: p.diagnostico?.texto ?? "", atualizadoEm: p.diagnostico?.atualizadoEm ?? null, arquivo: { caminho, nome: f.name, tipo, tamanho: f.size, enviadoEm: new Date().toISOString(), por: usuario.nome } };
-        },
-        { acao: "Diagnóstico: arquivo anexado", detalhe: f.name },
-      );
+      gravar((x) => void (x.arquivo = { caminho, nome: f.name, tipo, tamanho: f.size, enviadoEm: new Date().toISOString(), por: usuario.nome }), "Diagnóstico: arquivo anexado", f.name);
       if (antigo) await sb.storage.from(BUCKET).remove([antigo]);
     } catch (e) {
       setErro(traduzirErro(e, "Não foi possível enviar o arquivo."));
     } finally {
-      setEnviando(false);
-      if (entrada.current) entrada.current.value = "";
+      setEnviando(null);
+      if (entradaArquivo.current) entradaArquivo.current.value = "";
     }
   };
 
-  const remover = async () => {
+  const removerArquivo = async () => {
     if (!arquivo || !confirm(`Remover o arquivo “${arquivo.nome}” do diagnóstico?`)) return;
     await supabaseNavegador().storage.from(BUCKET).remove([arquivo.caminho]);
-    alterar(
-      (p) => void (p.diagnostico && (p.diagnostico.arquivo = null)),
-      { acao: "Diagnóstico: arquivo removido", detalhe: arquivo.nome },
-    );
+    gravar((x) => void (x.arquivo = null), "Diagnóstico: arquivo removido", arquivo.nome);
+  };
+
+  const adicionarImagem = async (f: File | undefined) => {
+    if (!f) return;
+    setErro(null);
+    setEnviando("imagem");
+    try {
+      const ev = await subirEvidencia(projeto, "diagnostico", f, "Registro visual de reunião de qualificação da demanda com a responsável pela empresa");
+      gravar((x) => void x.evidencias.push(ev), "Diagnóstico: imagem de evidência adicionada", f.name);
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : "Não foi possível enviar a imagem.");
+    } finally {
+      setEnviando(null);
+      if (entradaImagem.current) entradaImagem.current.value = "";
+    }
+  };
+
+  const removerImagem = async (ev: Evidencia) => {
+    if (!confirm("Tirar esta imagem das evidências do diagnóstico?")) return;
+    // Só apaga o arquivo se ele foi enviado aqui; as imagens da conversa continuam guardadas lá
+    if (ev.caminho.includes("/diagnostico/")) await supabaseNavegador().storage.from(BUCKET).remove([ev.caminho]);
+    gravar((x) => void (x.evidencias = x.evidencias.filter((e) => e.id !== ev.id)), "Diagnóstico: imagem de evidência removida");
   };
 
   const salvarTexto = () => {
-    const novo = (editando ?? "").trim();
-    if (novo !== texto)
-      alterar(
-        (p) => {
-          p.diagnostico = { arquivo: p.diagnostico?.arquivo ?? null, texto: novo, atualizadoEm: hojeIso() };
-        },
-        { acao: "Diagnóstico: texto editado à mão" },
-      );
+    if (!editando) return;
+    gravar(
+      (x) => {
+        for (const s of secoesDoModelo) x[s.chave] = editando[s.chave].trim();
+        x.atualizadoEm = hojeIso();
+      },
+      "Diagnóstico: texto editado à mão",
+    );
     setEditando(null);
   };
 
@@ -125,17 +179,17 @@ export function DiagnosticoDoProjeto({ projeto, aoDesenvolver }: { projeto: Proj
           <Status tom={situacao.tom}>{situacao.texto}</Status>
         </div>
         <p className="px-1 pb-4 text-[13px] text-tinta-2">
-          Primeira entrega do projeto, antes dos relatórios das etapas. A IA escreve o diagnóstico conforme você conta o que o cliente pediu e o que mapeou; daqui
-          você baixa o Word e guarda a versão final enviada no HUB.
+          Primeira entrega do projeto, antes dos relatórios das etapas, no modelo do SEBRAE. Conte à IA o que o cliente relatou e o que você levantou, e mande as
+          imagens da reunião; quando ela tiver tudo, escreve o diagnóstico uma vez. Daqui você baixa o Word e guarda a versão final enviada no HUB.
         </p>
 
         <div className="space-y-4">
           <div className="rounded-[var(--radius-campo)] border border-linha p-3.5">
-            <p className="text-[13px] font-bold uppercase tracking-wide text-tinta-2">Texto e arquivo em Word</p>
-            {texto ? (
+            <p className="text-[13px] font-bold uppercase tracking-wide text-tinta-2">Texto e Word no modelo do SEBRAE</p>
+            {temTexto ? (
               <>
                 <p className="num mt-1 text-[14px] text-tinta">
-                  Texto atualizado em {d?.atualizadoEm ? formatarData(d.atualizadoEm) : "data não registrada"} · {texto.split(/\s+/).length} palavras
+                  Texto atualizado em {d.atualizadoEm ? formatarData(d.atualizadoEm) : "data não registrada"} · {palavras(d)} palavras
                   {marcadores > 0 && <span className="text-laranja"> · {marcadores} {marcadores === 1 ? "marcador" : "marcadores"} a completar</span>}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -145,7 +199,7 @@ export function DiagnosticoDoProjeto({ projeto, aoDesenvolver }: { projeto: Proj
                   <Botao tamanho="pequeno" variante="secundario" aria-expanded={verTexto} onClick={() => setVerTexto(!verTexto)}>
                     {verTexto ? "Ocultar o texto" : "Ver o texto"}
                   </Botao>
-                  <Botao tamanho="pequeno" variante="secundario" onClick={() => setEditando(texto)}>
+                  <Botao tamanho="pequeno" variante="secundario" onClick={() => setEditando({ anamnese: d.anamnese, analise: d.analise, parecer: d.parecer })}>
                     Editar o texto
                   </Botao>
                   <Botao tamanho="pequeno" variante="secundario" onClick={aoDesenvolver}>
@@ -153,33 +207,51 @@ export function DiagnosticoDoProjeto({ projeto, aoDesenvolver }: { projeto: Proj
                   </Botao>
                 </div>
                 {verTexto && !editando && (
-                  <div className="mt-3 max-h-[28rem] overflow-auto whitespace-pre-line rounded-[var(--radius-campo)] bg-pedra/60 p-3 text-[14px] leading-relaxed text-tinta" aria-label="Texto do diagnóstico">
-                    {texto}
+                  <div className="mt-3 max-h-[28rem] space-y-3 overflow-auto rounded-[var(--radius-campo)] bg-pedra/60 p-3 text-[14px] leading-relaxed text-tinta" aria-label="Texto do diagnóstico">
+                    {secoesDoModelo.map((s) => (
+                      <div key={s.chave}>
+                        <p className="font-semibold">
+                          {s.numero}. {s.titulo}
+                        </p>
+                        <p className="whitespace-pre-line">{d[s.chave].trim() || "(em branco)"}</p>
+                      </div>
+                    ))}
                   </div>
                 )}
               </>
             ) : (
               <>
                 <p className="mt-1 text-[14px] text-tinta-2">
-                  Ainda não há texto. No Desenvolvimento, conte à IA o que o cliente pediu e o que você mapeou: ela escreve o diagnóstico e o Word aparece aqui.
+                  Ainda não há texto. A IA só escreve o diagnóstico quando tem tudo o que o modelo pede; até lá, ela vai perguntando o que falta.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Botao tamanho="pequeno" onClick={aoDesenvolver}>
                     Escrever o diagnóstico com a IA
                   </Botao>
-                  <Botao tamanho="pequeno" variante="secundario" onClick={() => setEditando("")}>
+                  <Botao tamanho="pequeno" variante="secundario" onClick={() => setEditando({ anamnese: "", analise: "", parecer: "" })}>
                     Escrever à mão
                   </Botao>
                 </div>
               </>
             )}
-            {editando !== null && (
-              <div className="mt-3 space-y-2">
-                <label className="block text-[13px] font-semibold text-tinta">
-                  Texto do diagnóstico
-                  <textarea className="campo mt-1.5 min-h-64" value={editando} onChange={(e) => setEditando(e.target.value)} />
-                </label>
-                <p className="text-[12px] text-tinta-2">Parágrafos separados por uma linha em branco; subtítulos em linha própria começando com “## ”.</p>
+            {faltas.length > 0 && (
+              <div className="mt-3 rounded-[var(--radius-campo)] bg-pedra/60 p-3 text-[13px] text-tinta-2">
+                <p className="font-semibold text-tinta">O que ainda falta para o diagnóstico ficar completo</p>
+                <ul className="mt-1 list-disc space-y-0.5 pl-5">
+                  {faltas.map((f) => (
+                    <li key={f}>{f}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {editando && (
+              <div className="mt-3 space-y-3">
+                {secoesDoModelo.map((s) => (
+                  <Campo key={s.chave} rotulo={`${s.numero}. ${s.titulo}`}>
+                    <textarea className="campo min-h-40" value={editando[s.chave]} onChange={(e) => setEditando({ ...editando, [s.chave]: e.target.value })} />
+                  </Campo>
+                ))}
+                <p className="text-[12px] text-tinta-2">Parágrafos separados por uma linha em branco. Na investigação, cada necessidade começa com “1. Título da necessidade. Texto…”.</p>
                 <div className="flex gap-2">
                   <Botao tamanho="pequeno" onClick={salvarTexto}>
                     Salvar o texto
@@ -190,6 +262,62 @@ export function DiagnosticoDoProjeto({ projeto, aoDesenvolver }: { projeto: Proj
                 </div>
               </div>
             )}
+          </div>
+
+          <div className="rounded-[var(--radius-campo)] border border-linha p-3.5" aria-label="Evidências do diagnóstico" role="group">
+            <p className="text-[13px] font-bold uppercase tracking-wide text-tinta-2">4. Evidências da reunião</p>
+            {d.evidencias.length === 0 ? (
+              <p className="mt-1 text-[14px] text-tinta-2">Nenhuma imagem. Mande na conversa a foto ou o print da reunião de diagnóstico, ou adicione aqui.</p>
+            ) : (
+              <ul className="mt-2 grid gap-3 sm:grid-cols-2">
+                {d.evidencias.map((ev, i) => (
+                  <li key={ev.id} className="rounded-[var(--radius-campo)] border border-linha p-2.5">
+                    {urls[ev.caminho] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={urls[ev.caminho]} alt={ev.legenda} className="mx-auto h-40 w-full rounded-md bg-pedra object-contain" />
+                    ) : (
+                      <div className="h-40 w-full animate-pulse rounded-md bg-linha" />
+                    )}
+                    <label className="mt-2 block text-[12px] font-semibold text-tinta-2">
+                      Evidência 0{i + 1} – legenda
+                      <input
+                        key={ev.legenda}
+                        className="campo mt-1 text-[13px]"
+                        defaultValue={ev.legenda}
+                        onBlur={(e) => e.target.value.trim() !== ev.legenda && gravar((x) => void (x.evidencias.find((v) => v.id === ev.id)!.legenda = e.target.value.trim() || ev.legenda), "Diagnóstico: legenda da evidência alterada")}
+                      />
+                    </label>
+                    <Botao tamanho="pequeno" variante="fantasma" className="mt-1 hover:!text-vermelho" onClick={() => void removerImagem(ev)}>
+                      Tirar da evidência
+                    </Botao>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="mt-3">
+              <Botao tamanho="pequeno" variante="secundario" onClick={() => entradaImagem.current?.click()} disabled={enviando === "imagem"}>
+                {enviando === "imagem" ? "Enviando…" : "Adicionar imagem"}
+              </Botao>
+              <input ref={entradaImagem} type="file" aria-label="Imagem da evidência do diagnóstico" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(e) => void adicionarImagem(e.target.files?.[0])} />
+            </div>
+          </div>
+
+          <div className="rounded-[var(--radius-campo)] border border-linha p-3.5">
+            <p className="text-[13px] font-bold uppercase tracking-wide text-tinta-2">Quadro de assinatura do Word</p>
+            <p className="mt-1 text-[13px] text-tinta-2">
+              Instituição credenciada: {projeto.prestadoraVinculada || "—"} · Local e data: {projeto.localAssinatura || "—"}, na data em que o Word é gerado (ou a que você definir).
+            </p>
+            <div className="mt-2 grid gap-3 sm:grid-cols-3">
+              <Campo rotulo="Telefone do prestador">
+                <input key={d.telefone ?? ""} className="campo" defaultValue={d.telefone ?? ""} onBlur={(e) => e.target.value.trim() !== (d.telefone ?? "") && gravar((x) => void (x.telefone = e.target.value.trim()), "Diagnóstico: telefone do prestador alterado")} />
+              </Campo>
+              <Campo rotulo="E-mail do prestador" dica={d.email ? undefined : `Vazio: ${consultor?.email ?? "e-mail do consultor"}`}>
+                <input key={d.email ?? ""} className="campo" defaultValue={d.email ?? ""} onBlur={(e) => e.target.value.trim() !== (d.email ?? "") && gravar((x) => void (x.email = e.target.value.trim()), "Diagnóstico: e-mail do prestador alterado")} />
+              </Campo>
+              <Campo rotulo="Data do documento" dica="Vazio: o dia em que o Word é gerado.">
+                <input key={d.dataDoDocumento ?? ""} type="date" className="campo num" defaultValue={d.dataDoDocumento ?? ""} onBlur={(e) => e.target.value !== (d.dataDoDocumento ?? "") && gravar((x) => void (x.dataDoDocumento = e.target.value || null), "Diagnóstico: data do documento alterada")} />
+              </Campo>
+            </div>
           </div>
 
           <div className="rounded-[var(--radius-campo)] border border-linha p-3.5">
@@ -204,10 +332,10 @@ export function DiagnosticoDoProjeto({ projeto, aoDesenvolver }: { projeto: Proj
                   <Botao tamanho="pequeno" onClick={() => void abrirArquivo(arquivo.caminho, arquivo.nome)}>
                     Abrir o arquivo
                   </Botao>
-                  <Botao tamanho="pequeno" variante="secundario" onClick={() => entrada.current?.click()} disabled={enviando}>
-                    {enviando ? "Enviando…" : "Trocar o arquivo"}
+                  <Botao tamanho="pequeno" variante="secundario" onClick={() => entradaArquivo.current?.click()} disabled={enviando === "arquivo"}>
+                    {enviando === "arquivo" ? "Enviando…" : "Trocar o arquivo"}
                   </Botao>
-                  <Botao tamanho="pequeno" variante="fantasma" onClick={() => void remover()} className="hover:!text-vermelho">
+                  <Botao tamanho="pequeno" variante="fantasma" onClick={() => void removerArquivo()} className="hover:!text-vermelho">
                     Remover
                   </Botao>
                 </div>
@@ -216,18 +344,14 @@ export function DiagnosticoDoProjeto({ projeto, aoDesenvolver }: { projeto: Proj
               <>
                 <p className="mt-1 text-[14px] text-tinta-2">Nenhum arquivo anexado. Anexe aqui a versão final, em Word ou PDF, a mesma que foi enviada no HUB.</p>
                 <div className="mt-3">
-                  <Botao tamanho="pequeno" variante="secundario" onClick={() => entrada.current?.click()} disabled={enviando}>
-                    {enviando ? "Enviando…" : "Anexar o arquivo do diagnóstico"}
+                  <Botao tamanho="pequeno" variante="secundario" onClick={() => entradaArquivo.current?.click()} disabled={enviando === "arquivo"}>
+                    {enviando === "arquivo" ? "Enviando…" : "Anexar o arquivo do diagnóstico"}
                   </Botao>
                 </div>
               </>
             )}
-            <input ref={entrada} type="file" aria-label="Arquivo do diagnóstico" accept=".docx,.doc,.pdf,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="sr-only" onChange={(e) => void anexar(e.target.files?.[0])} />
-            {doHub.length > 0 && (
-              <p className="mt-3 text-[13px] text-tinta-2">
-                Do HUB: {doHub.map((m) => m.nome).join("; ")} (em Dados do projeto, Materiais do HUB).
-              </p>
-            )}
+            <input ref={entradaArquivo} type="file" aria-label="Arquivo do diagnóstico" accept=".docx,.doc,.pdf,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" className="sr-only" onChange={(e) => void anexar(e.target.files?.[0])} />
+            {doHub.length > 0 && <p className="mt-3 text-[13px] text-tinta-2">Do HUB: {doHub.map((m) => m.nome).join("; ")} (em Dados do projeto, Materiais do HUB).</p>}
           </div>
         </div>
         {erro && (

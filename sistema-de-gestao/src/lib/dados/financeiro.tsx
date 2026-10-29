@@ -131,6 +131,15 @@ export function useFinanceiro() {
     });
   };
 
+  // Contrapartida do projeto: desconto sobre o total a receber (vazio ou zero tira o desconto)
+  const definirContrapartida = (p: { id: string; empresa: string }, valor: number | null) => {
+    const base: FinProjeto = projetos[p.id] ?? { projetoId: p.id, empresa: p.empresa, valorHora: null, percFuncern: null, recebidos: {}, previsoes: {}, valores: {}, notas: {} };
+    const valores = { ...base.valores };
+    if (valor && valor > 0) valores.contrapartida = valor;
+    else delete valores.contrapartida;
+    return salvarProjeto({ ...base, valores });
+  };
+
   // Arquivo da nota fiscal (PDF, XML ou imagem) guardado no bucket privado "notas-fiscais", em "<projeto>/<arquivo>".
   // A linha do projeto no financeiro precisa existir antes (a regra do bucket olha o projeto), por isso o upsert antes.
   const anexarNota = async (p: { id: string; empresa: string }, chave: ChaveDeParcela, arquivo: File) => {
@@ -166,5 +175,5 @@ export function useFinanceiro() {
   };
 
   if (!pode) return null;
-  return { servicos, projetos, empresas, carregado, salvarServico, salvarProjeto, ajustarParcela, anexarNota, removerArquivoDaNota, abrirArquivoDaNota, salvarEmpresa, recarregar: carregar };
+  return { servicos, projetos, empresas, carregado, salvarServico, salvarProjeto, ajustarParcela, definirContrapartida, anexarNota, removerArquivoDaNota, abrirArquivoDaNota, salvarEmpresa, recarregar: carregar };
 }

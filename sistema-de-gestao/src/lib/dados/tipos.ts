@@ -165,13 +165,21 @@ export type Contratacao = {
   pagoEm: string | null;
 };
 
-// Diagnóstico do projeto (fase 2 do HUB): o texto é escrito com a IA a partir do que o consultor conta, o sistema gera o
-// Word, e o arquivo final (Word ou PDF, o que foi enviado no HUB) pode ser guardado aqui
+// Diagnóstico do projeto (fase 2 do HUB), no modelo próprio do SEBRAE (não é o modelo dos relatórios): três textos, as
+// imagens de evidência da reunião e o arquivo final (Word ou PDF, o que foi enviado no HUB). A IA só escreve os textos
+// uma vez, quando tem todas as informações; as imagens ela guarda assim que o consultor as manda.
 export type ArquivoDoDiagnostico = { caminho: string; nome: string; tipo: string; tamanho: number; enviadoEm: string; por: string };
 export type Diagnostico = {
-  texto: string;
+  anamnese: string; // 1. Contextualização / Anamnese
+  analise: string; // 2. Investigação / Análise documental
+  parecer: string; // 3. Parecer técnico – Diagnóstico
+  evidencias: Evidencia[]; // 4. Evidências (imagens da reunião de diagnóstico)
+  telefone?: string; // contato do prestador, no quadro de assinatura
+  email?: string;
+  dataDoDocumento?: string | null; // data do quadro de assinatura (vazia: a do dia em que o Word é gerado)
   atualizadoEm: string | null; // AAAA-MM-DD do último texto escrito
   arquivo: ArquivoDoDiagnostico | null;
+  texto?: string; // formato antigo (um texto só): lido como a Contextualização
 };
 
 export type Projeto = {

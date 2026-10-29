@@ -74,8 +74,9 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   paga até o dia 5 o que ficou pronto até o dia 20 do mês anterior: **30%** quando o Relatório 1 foi enviado e o
   restante (**70%**) quando o projeto é finalizado no HUB (último relatório e avaliação do cliente).
   - **Aba "Financeiro" de cada projeto** (`FinanceiroDoProjeto`; só aparece para quem vê o financeiro; antes ficava em
-    "Dados"): valor do projeto, FUNCERN, o que fica para o consultor e o recebido até agora; a **contrapartida do
-    cliente** (valor opcional que vira uma terceira entrada, com data, "Recebi" e nota); e as parcelas em balões
+    "Dados"): valor do projeto, FUNCERN, o que fica para o consultor e o recebido até agora; a **Contrapartida**
+    (desconto sobre o total a receber, uma espécie de cashback: o "Você recebe" já vem sem ela, e os 30% e 70% saem do
+    valor descontado); e as parcelas em balões
     (`BalaoDeParcela`), cada uma com **nota fiscal** (número, data de emissão, valor se for outro, arquivo PDF/XML/imagem
     no bucket privado `notas-fiscais`, caminho `<projeto>/<arquivo>`, regra por empresa atual do projeto; lê e apaga só
     quem vê o financeiro). Mostra "NF emitida · nº …" ou "NF pendente" e quantas notas já saíram.
@@ -86,10 +87,10 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
       telas largas, cartões nas menores) com Cliente / projeto, Etapa atual, Progresso e as duas parcelas. Cada
       parcela tem valor, "Previsto até" (ou "Recebida em"), situação (Projetada, Data do HUB, Combinada, Atrasada,
       Recebida), selo da nota fiscal e **Recebi** / **Editar** (data prevista em `previsoes`, valor em `valores`, dia
-      em `recebidos`, nota em `notas`, "Voltar à projeção"). A contrapartida aparece numa faixa na linha do projeto.
-      "Sem data (n)" lista as parcelas de projetos sem plano de trabalho. O pagamento único antigo ("100") vale para
+      em `recebidos`, nota em `notas`, "Voltar à projeção").       "Sem data (n)" lista as parcelas de projetos sem plano de trabalho. O pagamento único antigo ("100") vale para
       as duas parcelas.
     - **Configurações**: o imposto da empresa (abaixo).
+  - **Sem a data do Relatório 1, sem perspectiva de recebimento**: enquanto o projeto não tem o Relatório 1 enviado nem a data dele na execução (antes do pagamento o plano ainda é proposta), as duas parcelas ficam "Sem data prevista" (botão "Sem data"); só a data combinada à mão vale.
   - **Projeção das datas** (`src/lib/projecao.ts`): vem do andamento do projeto. Etapa em curso termina em duração × o
     que falta (`avancoEtapa`); etapa que não começou começa quando a anterior termina (ou na data do plano, se for
     depois) e dura o que o plano previa. O fim da etapa 1 dá a 1ª parcela e o da última etapa, a 2ª (nunca no mesmo
@@ -183,15 +184,22 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   A seção final da última etapa é "Continuidade do programa após a consultoria" (`ehUltimaEtapa`).
 - **Diagnóstico nas Entregas** (`DiagnosticoDoProjeto`, `src/components/projeto/diagnostico.tsx`; campo `projeto.diagnostico`):
   a área "Diagnóstico" fica no topo das Entregas, antes do Plano de Entrega (relatórios), para registrar o fluxo do
-  projeto desde o diagnóstico (fase 2 do HUB). A IA escreve o texto com a ação `escrever_diagnostico` (sempre o texto
-  completo e atualizado, com desfazer) conforme o consultor conta o que o cliente pediu e o que mapeou; o sistema gera
-  o **Word** dele ("Baixar diagnóstico em Word", `gerarDocxDiagnostico`: mesma capa de identificação dos relatórios,
-  sem período e carga horária, marcadores realçados com a caixa de pendências, assinatura só do consultor). Dá para
-  ler e **editar o texto à mão**, e **anexar o arquivo final** (Word ou PDF, o enviado no HUB; bucket `evidencias`,
-  pasta `<empresa>/<projeto>/diagnostico/`), trocar e remover. A situação mostra "A elaborar", "Em elaboração",
-  "Arquivo anexado" ou "Enviado no HUB em…". O "próximo passo" da fase do diagnóstico leva a `#diagnostico`. A IA
-  nunca diz que "não pode enviar" o arquivo: aponta o botão em Entregas. O arquivo acompanha o projeto ao mover
-  para outra empresa e é apagado com ele. O bucket aceita Word desde a migração `20261101000000_evidencias_word.sql`.
+  projeto desde a fase 2 do HUB. **O diagnóstico segue o modelo do SEBRAE, nunca o dos relatórios**: o Word é o
+  arquivo oficial (`public/modelos/diagnostico-base.docx`: capa, tabela "Dados da empresa demandante", os quatro quadros
+  Contextualização/Anamnese, Investigação/Análise documental, Parecer técnico e Evidências, e o quadro de assinatura),
+  preenchido por `gerarDocxDiagnostico` (`src/lib/relatorio/diagnostico-docx.ts`): os dados da empresa vêm do cadastro do
+  cliente (e o código da solicitação, do projeto), as orientações em cinza do modelo saem, o que falta vira
+  `[completar: …]` realçado, com uma caixa "Pendências antes do envio" antes da seção 1. **A IA não reescreve o texto a
+  cada mensagem**: durante a conversa ela só reúne as informações e diz o que falta (a lista de `faltasDoDiagnostico` vai
+  no contexto e aparece na tela); escreve os três textos **uma vez** (`escrever_diagnostico`, com desfazer) quando tem tudo
+  ou quando o consultor pede, e só mexe depois a pedido. **A imagem da reunião** (foto ou print) é guardada na hora como
+  evidência do diagnóstico (`guardar_evidencia_diagnostico`, não `guardar_anexo`, que é das etapas) e vai ao fim do Word com
+  a legenda "Evidência 01 – …". Na área: ver e editar os três textos à mão, adicionar/tirar imagens e editar legendas,
+  telefone e e-mail do prestador e a data do quadro de assinatura, baixar o Word, e **anexar o arquivo final** (Word ou PDF,
+  o enviado no HUB; bucket `evidencias`, pasta `<empresa>/<projeto>/diagnostico/`), trocar e remover. A situação mostra
+  "A elaborar", "Em elaboração", "Arquivo anexado" ou "Enviado no HUB em…". O "próximo passo" da fase do diagnóstico leva a
+  `#diagnostico`. A IA nunca diz que "não pode enviar" o arquivo: aponta o botão em Entregas. O bucket aceita Word desde a
+  migração `20261101000000_evidencias_word.sql`. O formato antigo (um texto só) é lido como a Contextualização.
 - **Assinatura online (Autentique)** nas Entregas: "Ou enviar para assinatura online" manda o PDF do
   relatório, o consultor e o responsável da empresa recebem o link por e-mail, e a tela mostra quem
   assinou ("Conferir assinaturas", "Lembrar quem falta"). Quando os dois assinam, o PDF assinado e as

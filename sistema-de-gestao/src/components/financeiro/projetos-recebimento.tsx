@@ -121,7 +121,6 @@ export function ProjetosDoRecebimento({ fin, linhas, mesEscolhido }: { fin: Fina
             const nome = `${nomeCliente} · ${servicoDoProjeto(p)}`;
             const editando = edicao?.id === p.id ? entradas.find((e) => e.parcela.chave === edicao.chave) : undefined;
             const entrega = entregaFinal(p);
-            const contrapartida = entradas.find((e) => e.parcela.chave === "contrapartida");
             return (
               <li key={p.id} aria-label={nome} className="relative">
                 <div className={`px-5 py-4 hover:bg-pedra/40 ${colunas}`}>
@@ -149,7 +148,7 @@ export function ProjetosDoRecebimento({ fin, linhas, mesEscolhido }: { fin: Fina
                     </div>
                     <p className="num mt-1 text-[12px] text-tinta-2">entrega {entrega ? formatarData(entrega) : "—"}</p>
                   </div>
-                  {entradas.filter((e) => e.parcela.ordem < 3).map((e) => (
+                  {entradas.map((e) => (
                     <CelulaDeParcela
                       key={e.parcela.chave}
                       fin={fin}
@@ -160,20 +159,6 @@ export function ProjetosDoRecebimento({ fin, linhas, mesEscolhido }: { fin: Fina
                     />
                   ))}
                 </div>
-                {contrapartida && (
-                  <div className="relative z-10 grid grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_8.5rem_minmax(0,1.1fr)_minmax(0,1.1fr)] items-start gap-5 border-t border-dashed border-linha px-5 py-3">
-                    <p className="text-[13px] font-semibold text-tinta-2">Contrapartida do cliente</p>
-                    <span />
-                    <span />
-                    <CelulaDeParcela
-                      fin={fin}
-                      entrada={contrapartida}
-                      nome={nome}
-                      aberta={edicao?.id === p.id && edicao.chave === "contrapartida"}
-                      aoEditar={() => setEdicao(edicao?.id === p.id && edicao.chave === "contrapartida" ? null : { id: p.id, chave: "contrapartida" })}
-                    />
-                  </div>
-                )}
                 {editando && (
                   <div className="relative z-10 border-t border-linha bg-pedra/40 px-5 py-4">
                     <p className="mb-3 text-[13px] font-bold uppercase tracking-wide text-tinta-2">

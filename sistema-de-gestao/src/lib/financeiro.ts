@@ -1,6 +1,6 @@
 import type { Etapa, Projeto } from "./dados/tipos";
 import { formatarData, hojeIso } from "./datas";
-import { hubDoProjeto, ordemPassos } from "./fase";
+import { antesDaContratacao, hubDoProjeto, ordemPassos } from "./fase";
 import { etapaConcluida } from "./projeto";
 import { projetarEnvios, type EnvioProjetado } from "./projecao";
 import { aliquotaNoMes, imposto, type ConfigImposto } from "./imposto";
@@ -45,8 +45,8 @@ export type NotaFiscal = {
 };
 export const notaEmitida = (n: NotaFiscal | undefined | null) => !!n && (!!n.emitidaEm || !!n.numero.trim());
 
-// A contrapartida do cliente (quando há) é uma terceira entrada, além das duas parcelas do SEBRAE
-export type ChaveDeParcela = "30" | "70" | "contrapartida";
+// As duas parcelas do SEBRAE. A "Contrapartida" não é uma parcela: é um desconto sobre o total a receber (valores.contrapartida)
+export type ChaveDeParcela = "30" | "70";
 export type FinEmpresa = ConfigImposto & { empresa: string };
 
 export const moeda = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -96,7 +96,7 @@ export type OrigemDaData = "hub" | "plano" | "manual";
 
 export type Parcela = {
   chave: ChaveDeParcela;
-  ordem: 1 | 2 | 3;
+  ordem: 1 | 2;
   explicacao: string | null; // de onde vem a data, quando é uma projeção
   percentual: number;
   valor: number;
@@ -108,7 +108,7 @@ export type Parcela = {
 };
 
 // Projetos antigos guardaram o pagamento único como "100": vale para as duas parcelas
-const lerMapa = <T,>(mapa: Record<string, T> | undefined, chave: string): T | undefined => mapa?.[chave] ?? (chave === "contrapartida" ? undefined : mapa?.["100"]);
+const lerMapa = <T,>(mapa: Record<string, T> | undefined, chave: string): T | undefined => mapa?.[chave] ?? mapa?.["100"];
 
 export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje = hojeIso()) {
   const valorHora = fp?.valorHora ?? fs?.valorHora ?? VALOR_HORA_PADRAO;
@@ -116,11 +116,16 @@ export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje =
   const horas = p.etapas.reduce((a, e) => a + (e.horasPrevistas || 0), 0);
   const bruto = horas * valorHora;
   const funcern = (bruto * percFuncern) / 100;
-  const liquido = bruto - funcern;
+  // Contrapartida: desconto sobre o total a receber (uma espécie de cashback), tirado antes de repartir em 30% e 70%
+  const contrapartida = Math.min(Math.max(0, fp?.valores?.contrapartida ?? 0), bruto - funcern);
+  const liquido = bruto - funcern - contrapartida;
   const envio1 = p.etapas[0] ? dataDeEnvio(p, p.etapas[0]) : null;
   const fim = dataFinalizacao(p);
   // Sem relatório ou finalização, a projeção pelo andamento do projeto (ver projecao.ts)
-  const noPlano = !!p.planoFechadoEm && p.status !== "encerrado";
+  // Sem a data do Relatório 1 definida (enviado, ou com data na execução do plano), não há perspectiva de receber: antes do
+  // pagamento o plano é só proposta e as datas ainda vão mudar
+  const relatorio1Definido = !!envio1 || (!!p.etapas[0]?.dataFim && !antesDaContratacao(p));
+  const noPlano = !!p.planoFechadoEm && p.status !== "encerrado" && relatorio1Definido;
   const projecao = noPlano ? projetarEnvios(p, hoje) : new Map<number, EnvioProjetado>();
   const primeira = p.etapas[0];
   const ultima = p.etapas[p.etapas.length - 1];
@@ -147,7 +152,13 @@ export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje =
       valorCalculado,
       previsao: manual ?? previsao,
       origem: manual ? "manual" : previsao ? (doHub ? "hub" : "plano") : null,
-      explicacao: manual ? "Data combinada por você" : previsao && !doHub && porque ? `${porque}.${base && Number(base.slice(8)) > 20 ? " Passando do dia 20, o pagamento fica para o mês seguinte." : ""}` : null,
+      explicacao: manual
+        ? "Data combinada por você"
+        : !previsao
+          ? "Sem a data do Relatório 1 definida, ainda não há perspectiva de recebimento."
+          : !doHub && porque
+            ? `${porque}.${base && Number(base.slice(8)) > 20 ? " Passando do dia 20, o pagamento fica para o mês seguinte." : ""}`
+            : null,
       condicao,
       recebidaEm: lerMapa(fp?.recebidos, chave) ?? null,
     };
@@ -157,24 +168,7 @@ export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje =
     parcela("30", 1, 30, ciclo1, !!envio1, envio1 ? `Relatório 1 enviado em ${formatarData(envio1)}` : "Quando o Relatório 1 for enviado no HUB", porque1, data1),
     parcela("70", 2, 70, cicloFim, !!fim, condicaoFim, porqueFim, dataFim),
   ];
-  // Contrapartida do cliente: só existe se o valor foi informado; a data e o "recebi" são combinados à mão
-  const valorContrapartida = fp?.valores?.contrapartida ?? 0;
-  if (valorContrapartida > 0) {
-    const manual = fp?.previsoes?.contrapartida;
-    parcelas.push({
-      chave: "contrapartida",
-      ordem: 3,
-      explicacao: manual ? "Data combinada por você" : null,
-      percentual: 0,
-      valor: valorContrapartida,
-      valorCalculado: 0,
-      previsao: manual ?? null,
-      origem: manual ? "manual" : null,
-      condicao: "Contrapartida paga pelo cliente",
-      recebidaEm: fp?.recebidos?.contrapartida ?? null,
-    });
-  }
-  return { horas, valorHora, percFuncern, bruto, funcern, liquido, parcelas };
+  return { horas, valorHora, percFuncern, bruto, funcern, contrapartida, liquido, parcelas };
 }
 
 export type Entrada = {

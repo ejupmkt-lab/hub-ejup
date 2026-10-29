@@ -7,6 +7,7 @@ import { avisoFinalizarAntecipado, passoHubDoProjeto } from "./fase";
 import type { PassoHub } from "./dados/tipos";
 import { faltaDoRelatorio, relatorioFeitoFora, verificarCompletude } from "./relatorio/secoes";
 import { marcadoresEmAberto } from "./regras-etapa";
+import { lerDiagnostico, temTextoNoDiagnostico } from "./diagnostico";
 
 // O que fazer agora, em uma frase e um botão. Usado no painel, na lista de
 // projetos, no projeto e na etapa, para ninguém precisar adivinhar o caminho.
@@ -182,7 +183,7 @@ export function passoDoProjeto(p: Projeto): (Passo & { etapa?: Etapa }) | null {
     };
   if (hub === "diagnostico")
     return {
-      texto: p.diagnostico?.texto?.trim() ? "Revise o diagnóstico, baixe o Word e envie no HUB" : "Elabore o diagnóstico e envie no HUB",
+      texto: temTextoNoDiagnostico(lerDiagnostico(p)) ? "Revise o diagnóstico, baixe o Word e envie no HUB" : "Elabore o diagnóstico e envie no HUB",
       detalhe: "O diagnóstico segue o modelo do SEBRAE e é assinado só pelo consultor. O arquivo fica em Entregas, antes dos relatórios.",
       rotulo: "Abrir o diagnóstico",
       tom: "atencao",

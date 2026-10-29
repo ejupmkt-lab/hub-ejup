@@ -9,9 +9,9 @@ import { Botao, Campo, Chip, Status } from "@/components/ui";
 
 const origemTexto = { hub: "Data do HUB", plano: "Projetada", manual: "Combinada" } as const;
 export const pct = (n: number) => `${String(n).replace(".", ",")}%`;
-export const tituloDaParcela = (x: Parcela) => (x.chave === "contrapartida" ? "Contrapartida do cliente" : `${x.ordem}ª parcela · ${pct(x.percentual)}`);
+export const tituloDaParcela = (x: Parcela) => `${x.ordem}ª parcela · ${pct(x.percentual)}`;
 // Nome acessível da parcela (leitor de tela e testes)
-export const rotuloAcessivel = (nome: string, x: Parcela) => `${nome}, ${x.chave === "contrapartida" ? "contrapartida" : `${x.percentual}%`}`;
+export const rotuloAcessivel = (nome: string, x: Parcela) => `${nome}, ${x.percentual}%`;
 
 // Em que pé está a parcela: recebida, atrasada, com a data de onde vem (projetada, do HUB, combinada) ou sem data
 export function situacaoDaParcela(e: Entrada, hoje = hojeIso()): { texto: string; tom: Tom; atrasada: boolean } {
@@ -112,8 +112,7 @@ export function EditorDeNota({ fin, entrada: e }: { fin: Financeiro; entrada: En
 export function EditorDeParcela({ fin, entrada: e, comImposto = true }: { fin: Financeiro; entrada: Entrada; comImposto?: boolean }) {
   const { parcela: x } = e;
   const { salvar } = useAjusteDeParcela(fin, e);
-  const contrapartida = x.chave === "contrapartida";
-  const ajustada = !contrapartida && (x.origem === "manual" || x.valor !== x.valorCalculado);
+  const ajustada = x.origem === "manual" || x.valor !== x.valorCalculado;
   const data = (campo: "previsao" | "recebidaEm") => (ev: React.FocusEvent<HTMLInputElement>) => {
     const atual = (campo === "previsao" ? x.previsao : x.recebidaEm) ?? "";
     if (ev.target.value !== atual) salvar({ [campo]: ev.target.value || null });
@@ -121,7 +120,7 @@ export function EditorDeParcela({ fin, entrada: e, comImposto = true }: { fin: F
   const valor = (ev: React.FocusEvent<HTMLInputElement>) => {
     const v = Number(ev.target.value.replace(",", "."));
     if (!Number.isFinite(v) || v < 0 || ev.target.value === "") return;
-    if (Math.round(v * 100) !== Math.round(x.valor * 100)) salvar({ valor: !contrapartida && Math.round(v * 100) === Math.round(x.valorCalculado * 100) ? null : v });
+    if (Math.round(v * 100) !== Math.round(x.valor * 100)) salvar({ valor: Math.round(v * 100) === Math.round(x.valorCalculado * 100) ? null : v });
   };
   return (
     <div className="space-y-3">
@@ -146,11 +145,6 @@ export function EditorDeParcela({ fin, entrada: e, comImposto = true }: { fin: F
       {ajustada && (
         <Botao tamanho="pequeno" variante="secundario" onClick={() => salvar({ previsao: null, valor: null })}>
           Voltar à projeção
-        </Botao>
-      )}
-      {contrapartida && (
-        <Botao tamanho="pequeno" variante="secundario" onClick={() => confirm("Remover a contrapartida deste projeto?") && salvar({ valor: null, previsao: null, recebidaEm: null })}>
-          Remover contrapartida
         </Botao>
       )}
     </div>

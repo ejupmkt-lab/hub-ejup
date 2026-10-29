@@ -5,6 +5,7 @@ import { assinada, automatizarEtapa, bloqueioStatus, marcarAtividade } from "./r
 import { doisDigitos, statusEtapa, type StatusEtapa as StatusEtapaTipo } from "./rotulos";
 import { distribuirPorHoras, formatarData, hojeIso, sugerirDatas } from "./datas";
 import { etapaAtual } from "./projeto";
+import { lerDiagnostico, temTextoNoDiagnostico } from "./diagnostico";
 import { tipoRegistro } from "./registros";
 
 // Conversa do projeto: o que a IA pode fazer no projeto a partir de uma
@@ -25,8 +26,10 @@ export type AcaoIA =
   | { tipo: "mudar_situacao_etapa"; etapa: number; situacao: "a_enviar" | "enviada" | "aprovada" | "devolvida"; observacao: string }
   | { tipo: "avancar_hub"; passo: PassoHub; data: string }
   | { tipo: "preencher_tabela"; tabela: string; linhas: string[][]; substituir: boolean }
-  // O diagnóstico do projeto (texto completo e atualizado); o Word sai dele em Entregas
-  | { tipo: "escrever_diagnostico"; texto: string }
+  // O diagnóstico do projeto no modelo do SEBRAE, escrito uma vez, quando as informações estão completas; o Word sai dele em Entregas
+  | { tipo: "escrever_diagnostico"; anamnese: string; analise: string; parecer: string }
+  // Imagem da reunião de diagnóstico (print, foto): evidência do diagnóstico, guardada assim que chega
+  | { tipo: "guardar_evidencia_diagnostico"; anexo: string; legenda: string }
   // Só vem da importação do HUB (a conversa não oferece): código do pedido e gestor lidos na página do HUB
   | { tipo: "dados_hub"; codigo_hub: string; gestor: string }
   // Só vem da importação do HUB: a etapa já foi enviada no HUB na data dada; com o PDF do relatório, ele fica em Entregas
@@ -120,14 +123,29 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
       feito(`Dados do pedido: ${[mudaCodigo ? `código do HUB ${codigo}` : "", mudaGestor ? `gestor ${gestor}` : ""].filter(Boolean).join("; ")}`);
       return;
     }
-    // Diagnóstico do projeto: o texto inteiro, sempre atualizado (o arquivo anexado, se houver, não muda)
+    // Diagnóstico do projeto: os três textos do modelo, de uma vez (as evidências e o arquivo anexado não mudam)
     if (a.tipo === "escrever_diagnostico") {
-      const texto = String(a.texto ?? "").trim();
-      if (!texto) return;
+      const novos = { anamnese: String(a.anamnese ?? "").trim(), analise: String(a.analise ?? "").trim(), parecer: String(a.parecer ?? "").trim() };
+      if (!novos.anamnese && !novos.analise && !novos.parecer) return;
       desfazer.push({ tipo: "diagnostico", antes: p.diagnostico ? structuredClone(p.diagnostico) : null });
-      const novo = !(p.diagnostico?.texto ?? "").trim();
-      p.diagnostico = { arquivo: null, ...p.diagnostico, texto, atualizadoEm: hojeIso() };
-      feito(`Diagnóstico: texto ${novo ? "escrito" : "atualizado"} (o Word está em Entregas, na área Diagnóstico)`);
+      const antes = lerDiagnostico(p);
+      const novo = !temTextoNoDiagnostico(antes);
+      const { texto: _legado, ...resto } = antes;
+      void _legado;
+      p.diagnostico = { ...resto, ...novos, atualizadoEm: hojeIso() };
+      feito(`Diagnóstico: texto ${novo ? "escrito" : "atualizado"}, nas três seções do modelo do SEBRAE (o Word está em Entregas, na área Diagnóstico)`);
+      return;
+    }
+    if (a.tipo === "guardar_evidencia_diagnostico") {
+      const anexo = anexos.find((x) => x.id === a.anexo);
+      if (!anexo || !anexo.tipo.startsWith("image/")) return;
+      const id = `evd-${anexo.id}`;
+      const atual = lerDiagnostico(p);
+      if (atual.evidencias.some((x) => x.id === id)) return;
+      desfazer.push({ tipo: "diagnostico", antes: p.diagnostico ? structuredClone(p.diagnostico) : null });
+      const legenda = a.legenda.trim() || anexo.nome;
+      p.diagnostico = { ...atual, evidencias: [...atual.evidencias, { id, caminho: anexo.caminho, legenda, largura: anexo.largura ?? 1600, altura: anexo.altura ?? 1200, tipo: anexo.tipo }] };
+      feito(`Diagnóstico: imagem guardada como evidência 0${p.diagnostico.evidencias.length} (“${resumo(legenda)}”)`);
       return;
     }
     // Tabelas do relatório ([[tabela:tipo]]): linhas com as células na ordem das colunas
@@ -428,9 +446,10 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
 export function desfazerAcoes(p: Projeto, passos: Desfazer[]) {
   for (const d of [...passos].reverse()) {
     if (d.tipo === "diagnostico") {
-      // O arquivo anexado depois da ação fica; só o texto volta
-      if (d.antes) p.diagnostico = { ...d.antes, arquivo: p.diagnostico?.arquivo ?? d.antes.arquivo };
-      else if (p.diagnostico?.arquivo) p.diagnostico = { ...p.diagnostico, texto: "", atualizadoEm: null };
+      // O arquivo final anexado depois da ação fica; voltam os textos e as evidências
+      const arquivoAgora = p.diagnostico?.arquivo ?? null;
+      if (d.antes) p.diagnostico = { ...d.antes, arquivo: arquivoAgora ?? d.antes.arquivo };
+      else if (arquivoAgora) p.diagnostico = { ...lerDiagnostico({ diagnostico: undefined }), arquivo: arquivoAgora };
       else delete p.diagnostico;
       continue;
     }
@@ -509,7 +528,7 @@ export function sugestoesConversa(p: Projeto): string[] {
   if (passo === "solicitacao") return [`O gestor me enviou a demanda hoje (${hoje}).`, "O que preciso para começar o diagnóstico?"];
   if (passo === "diagnostico")
     return [
-      p.diagnostico?.texto?.trim() ? "Atualize o diagnóstico com o que acabei de mapear: __." : "Me ajude a montar o diagnóstico. O cliente pediu: __. O que mapeei: __.",
+      "Me ajude a montar o diagnóstico. O cliente pediu: __. O que mapeei: __.",
       "Por que esta solicitação se justifica para o cliente? Monte os argumentos.",
       `Enviei o diagnóstico no HUB hoje (${hoje}).`,
     ];

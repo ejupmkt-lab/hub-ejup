@@ -15,7 +15,7 @@ async function dimensoes(arquivo: File) {
 }
 
 // Envia uma imagem para o armazenamento e devolve a evidência pronta para a etapa
-export async function subirEvidencia(projeto: Projeto, ordem: number, arquivo: File, legenda?: string): Promise<Evidencia> {
+export async function subirEvidencia(projeto: Projeto, ordem: number | string, arquivo: File, legenda?: string): Promise<Evidencia> {
   if (!ACEITOS.includes(arquivo.type)) throw new Error(`“${arquivo.name}” não é PNG, JPG ou WEBP.`);
   if (arquivo.size > 10 * 1024 * 1024) throw new Error(`“${arquivo.name}” passa de 10 MB.`);
   const { largura, altura } = await dimensoes(arquivo);

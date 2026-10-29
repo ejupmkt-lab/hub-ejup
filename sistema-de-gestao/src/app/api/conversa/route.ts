@@ -10,6 +10,7 @@ import { hojeIso } from "@/lib/datas";
 import { statusEtapa } from "@/lib/rotulos";
 import { SISTEMA } from "@/lib/ia/conversa-prompt";
 import { descreverErroDaIA } from "@/lib/ia/erros";
+import { faltasDoDiagnostico, lerDiagnostico, secoesDoModelo } from "@/lib/diagnostico";
 import { textoDoPrazo } from "@/lib/projeto";
 import { textoPlano } from "@/lib/plano-texto";
 import { contarAConfirmar, contarMarcadores, dataLimiteInformacoes } from "@/lib/relatorio/padroes";
@@ -82,8 +83,14 @@ const ESQUEMA = {
           },
           {
             type: "object",
-            properties: { tipo: { type: "string", const: "escrever_diagnostico" }, texto: { type: "string" } },
-            required: ["tipo", "texto"],
+            properties: { tipo: { type: "string", const: "escrever_diagnostico" }, anamnese: { type: "string" }, analise: { type: "string" }, parecer: { type: "string" } },
+            required: ["tipo", "anamnese", "analise", "parecer"],
+            additionalProperties: false,
+          },
+          {
+            type: "object",
+            properties: { tipo: { type: "string", const: "guardar_evidencia_diagnostico" }, anexo: { type: "string" }, legenda: { type: "string" } },
+            required: ["tipo", "anexo", "legenda"],
             additionalProperties: false,
           },
           {
@@ -359,9 +366,14 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>, preDiagnostico: stri
       `Evidências guardadas: ${(e.evidencias ?? []).length ? (e.evidencias ?? []).map((x) => x.legenda).join("; ") : "nenhuma"}`,
     );
   }
-  // Diagnóstico do projeto: o texto atual (a IA devolve sempre o texto completo)
-  const diag = (p.diagnostico?.texto ?? "").trim();
-  partes.push("", "## Diagnóstico", diag ? `Texto atual (atualizado em ${p.diagnostico?.atualizadoEm ?? "data não registrada"}):\n<diagnostico>\n${diag}\n</diagnostico>` : "(ainda não escrito)", p.diagnostico?.arquivo ? `Arquivo do diagnóstico anexado em Entregas: ${p.diagnostico.arquivo.nome}.` : "Nenhum arquivo do diagnóstico anexado em Entregas.");
+  // Diagnóstico do projeto (modelo do SEBRAE): os três textos atuais, as evidências guardadas e o que ainda falta
+  const dg = lerDiagnostico(p);
+  partes.push("", "## Diagnóstico");
+  for (const s of secoesDoModelo) partes.push(`${s.numero}. ${s.titulo}: ${dg[s.chave].trim() ? `\n<texto>\n${dg[s.chave].trim()}\n</texto>` : "(em branco)"}`);
+  partes.push(`Evidências guardadas: ${dg.evidencias.length ? dg.evidencias.map((e, i) => `0${i + 1} – ${e.legenda}`).join("; ") : "nenhuma"}`);
+  partes.push(dg.arquivo ? `Arquivo do diagnóstico anexado em Entregas: ${dg.arquivo.nome}.` : "Nenhum arquivo do diagnóstico anexado em Entregas.");
+  const faltas = faltasDoDiagnostico(p, c);
+  partes.push(faltas.length ? `O que ainda falta para o diagnóstico ficar completo: ${faltas.join("; ")}.` : "O diagnóstico tem tudo o que o modelo pede.");
   // Tabelas do relatório (marcador [[tabela:tipo]] no texto), com as linhas atuais
   partes.push("", "## Tabelas do relatório (tipo: nome; colunas na ordem)");
   for (const t of tiposRegistro) {
