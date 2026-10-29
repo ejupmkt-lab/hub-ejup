@@ -22,6 +22,7 @@ export const ancoraAbaProjeto = {
   cronograma: "Plano de trabalho",
   plano: "Plano de trabalho",
   entregas: "Entregas",
+  diagnostico: "Entregas",
   relatorios: "Entregas",
   historico: "Histórico",
   financeiro: "Financeiro",
@@ -181,11 +182,11 @@ export function passoDoProjeto(p: Projeto): (Passo & { etapa?: Etapa }) | null {
     };
   if (hub === "diagnostico")
     return {
-      texto: "Elabore o diagnóstico e envie no HUB",
-      detalhe: "O diagnóstico segue o modelo do SEBRAE e é assinado só pelo consultor.",
+      texto: p.diagnostico?.texto?.trim() ? "Revise o diagnóstico, baixe o Word e envie no HUB" : "Elabore o diagnóstico e envie no HUB",
+      detalhe: "O diagnóstico segue o modelo do SEBRAE e é assinado só pelo consultor. O arquivo fica em Entregas, antes dos relatórios.",
       rotulo: "Abrir o diagnóstico",
       tom: "atencao",
-      href: desenvolvimento,
+      href: `${base}#diagnostico`,
     };
   if (hub === "diagnostico_enviado")
     return {

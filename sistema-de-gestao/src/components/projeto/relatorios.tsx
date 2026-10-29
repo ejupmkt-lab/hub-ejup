@@ -12,6 +12,7 @@ import { relatorioFeitoFora, verificarCompletude } from "@/lib/relatorio/secoes"
 import { doisDigitos } from "@/lib/rotulos";
 import { Botao, Cartao } from "@/components/ui";
 import { RelatorioAssinado } from "./assinado";
+import { DiagnosticoDoProjeto } from "./diagnostico";
 import { ImportarRelatorio } from "./importar-relatorio";
 import { AssinaturaOnline } from "./assinatura-online";
 import { useAcoesEtapa } from "./acoes-etapa";
@@ -33,6 +34,7 @@ export function Relatorios({ projeto, aoDesenvolver, abrirOrdem }: { projeto: Pr
   const atual = etapaAtual(projeto);
   return (
     <div className="space-y-4">
+      <DiagnosticoDoProjeto projeto={projeto} aoDesenvolver={aoDesenvolver} />
       <Cartao className="p-3 sm:p-5">
         <h2 className="px-1 pb-4 text-[17px] font-bold">Plano de Entrega</h2>
         <ol className="space-y-4">

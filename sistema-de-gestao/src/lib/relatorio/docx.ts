@@ -295,15 +295,30 @@ function figuraXml(img: ImagemRelatorio, n: number) {
 // Quantos marcadores [completar] e [a confirmar] o texto do corpo ainda tem
 export const contarMarcadoresNoCorpo = (xml: string) => (xml.match(MARCADOR_NO_WORD) ?? []).length;
 
-export function corpoRelatorio({ projeto, etapa, cliente, consultor, imagens = [] }: DadosRelatorio) {
-  const partes: string[] = [];
-  const ordinal = ordinalFeminino[etapa.ordem];
-  const etapaNome = `ETAPA ${doisDigitos(etapa.ordem)} | ${etapa.nome}`;
+// Como nos relatórios: rótulo em faixa azul à esquerda, valor em cinza-claro à direita,
+// linhas separadas por branco. Campo em branco não entra na ficha.
+function tabelaDaFicha(ficha: [string, string][]) {
+  const lf = [4100, LARGURA - 4100];
+  const celulaFicha = (t: string, opc: Parameters<typeof textoCelula>[1]) =>
+    `<w:p><w:pPr><w:spacing w:before="40" w:after="40" w:line="252" w:lineRule="auto"/><w:jc w:val="${opc?.alinhar ?? "left"}"/></w:pPr>${comRealce({ t, b: opc?.b, cor: opc?.cor, tam: 24 }).map(run).join("")}</w:p>`;
+  return tabela(
+    ficha
+      .filter(([, v]) => v.trim())
+      .map(([k, v]) =>
+        linhaTabela([
+          celula(celulaFicha(k, { b: true, cor: "FFFFFF" }), lf[0], { fundo: AZUL_FAIXA }),
+          celula(celulaFicha(v, { alinhar: "both" }), lf[1], { fundo: "F2F2F2" }),
+        ]),
+      ),
+    lf,
+    "FFFFFF",
+    12,
+  );
+}
 
-  partes.push(par([{ t: `RELATÓRIO TÉCNICO DE ${etapa.ordem}ª ENTREGA`, b: true, cor: AZUL_FAIXA }], { alinhar: "center", depois: 120 }));
-  partes.push(par([{ t: "Adequação à Lei Geral de Proteção de Dados Pessoais (LGPD)", b: true }], { alinhar: "center", depois: 120 }));
-
-  const ficha: [string, string][] = [
+// As 12 linhas de identificação da capa, comuns ao diagnóstico e aos relatórios
+function fichaDeIdentificacao(projeto: Projeto, cliente: Cliente): [string, string][] {
+  return [
     ["Prestadora vinculada", projeto.prestadoraVinculada],
     ["Cliente", [cliente.razaoSocial, cliente.nomeFantasia].filter(Boolean).join(" - ")],
     ["CNPJ", cliente.cnpj],
@@ -317,29 +332,21 @@ export function corpoRelatorio({ projeto, etapa, cliente, consultor, imagens = [
     ["Segmento", projeto.segmento],
     ["Área de atuação da consultoria", projeto.areaAtuacao],
   ];
+}
+
+export function corpoRelatorio({ projeto, etapa, cliente, consultor, imagens = [] }: DadosRelatorio) {
+  const partes: string[] = [];
+  const ordinal = ordinalFeminino[etapa.ordem];
+  const etapaNome = `ETAPA ${doisDigitos(etapa.ordem)} | ${etapa.nome}`;
+
+  partes.push(par([{ t: `RELATÓRIO TÉCNICO DE ${etapa.ordem}ª ENTREGA`, b: true, cor: AZUL_FAIXA }], { alinhar: "center", depois: 120 }));
+  partes.push(par([{ t: "Adequação à Lei Geral de Proteção de Dados Pessoais (LGPD)", b: true }], { alinhar: "center", depois: 120 }));
+
+  const ficha = fichaDeIdentificacao(projeto, cliente);
   // Período e carga horária entram em todas as etapas; sem plano de trabalho, "A definir"
   ficha.push([`Período da Etapa ${doisDigitos(etapa.ordem)}`, etapa.dataInicio && etapa.dataFim ? `${formatarData(etapa.dataInicio)} a ${formatarData(etapa.dataFim)}` : "A definir"]);
   ficha.push(["Carga horária prevista", etapa.horasPrevistas > 0 ? `${etapa.horasPrevistas} horas` : "A definir"]);
-  // Como nos relatórios: rótulo em faixa azul à esquerda, valor em cinza-claro à direita,
-  // linhas separadas por branco. Campo em branco não entra na ficha.
-  const lf = [4100, LARGURA - 4100];
-  const celulaFicha = (t: string, opc: Parameters<typeof textoCelula>[1]) =>
-    `<w:p><w:pPr><w:spacing w:before="40" w:after="40" w:line="252" w:lineRule="auto"/><w:jc w:val="${opc?.alinhar ?? "left"}"/></w:pPr>${comRealce({ t, b: opc?.b, cor: opc?.cor, tam: 24 }).map(run).join("")}</w:p>`;
-  partes.push(
-    tabela(
-      ficha
-        .filter(([, v]) => v.trim())
-        .map(([k, v]) =>
-          linhaTabela([
-            celula(celulaFicha(k, { b: true, cor: "FFFFFF" }), lf[0], { fundo: AZUL_FAIXA }),
-            celula(celulaFicha(v, { alinhar: "both" }), lf[1], { fundo: "F2F2F2" }),
-          ]),
-        ),
-      lf,
-      "FFFFFF",
-      12,
-    ),
-  );
+  partes.push(tabelaDaFicha(ficha));
   const aposACapa = partes.length;
   partes.push(faixa(["Detalhes", `${ordinal} entrega - ${etapaNome}`]));
 
@@ -438,7 +445,8 @@ export function tirarMiniatura(zip: PizZip) {
 
 export type ArquivoImagem = { dados: ArrayBuffer; tipo: string; legenda: string; largura: number; altura: number };
 
-export async function gerarDocx(dados: Omit<DadosRelatorio, "imagens">, arquivos: ArquivoImagem[] = [], modelo?: ArrayBuffer): Promise<Blob> {
+// Corpo novo dentro do modelo Word (cabeçalho timbrado, rodapé, margens e estilos do modelo ficam)
+async function empacotar(corpoDe: (imagens: ImagemRelatorio[]) => string, arquivos: ArquivoImagem[], modelo?: ArrayBuffer): Promise<Blob> {
   const base: ArrayBuffer = modelo ?? (await fetch("/modelos/relatorio-base.docx").then((r) => r.arrayBuffer()));
   const zip = new PizZip(base);
   tirarMiniatura(zip);
@@ -469,10 +477,55 @@ export async function gerarDocx(dados: Omit<DadosRelatorio, "imagens">, arquivos
   const doc = zip.file("word/document.xml")!.asText();
   const inicio = doc.indexOf("<w:body>") + "<w:body>".length;
   const fimSect = doc.lastIndexOf("<w:sectPr");
-  const novo = doc.slice(0, inicio) + corpoRelatorio({ ...dados, imagens }) + doc.slice(fimSect);
-  zip.file("word/document.xml", novo);
+  zip.file("word/document.xml", doc.slice(0, inicio) + corpoDe(imagens) + doc.slice(fimSect));
   return zip.generate({
     type: "blob",
     mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   });
+}
+
+export async function gerarDocx(dados: Omit<DadosRelatorio, "imagens">, arquivos: ArquivoImagem[] = [], modelo?: ArrayBuffer): Promise<Blob> {
+  return empacotar((imagens) => corpoRelatorio({ ...dados, imagens }), arquivos, modelo);
+}
+
+export type DadosDiagnostico = { projeto: Projeto; cliente: Cliente; consultor: Usuario | undefined };
+
+// Diagnóstico do projeto (fase 2 do HUB): a mesma capa de identificação dos relatórios (sem período e carga horária, que
+// são das etapas), o texto escrito com a IA e a assinatura só do consultor. O local e a data são os de hoje.
+export function corpoDiagnostico({ projeto, cliente, consultor }: DadosDiagnostico, hoje: string) {
+  const partes: string[] = [];
+  partes.push(par([{ t: "DIAGNÓSTICO DA DEMANDA", b: true, cor: AZUL_FAIXA }], { alinhar: "center", depois: 120 }));
+  partes.push(par([{ t: projeto.fichaTecnica, b: true }], { alinhar: "center", depois: 120 }));
+  partes.push(tabelaDaFicha(fichaDeIdentificacao(projeto, cliente)));
+  const aposACapa = partes.length;
+  partes.push(faixa(["Detalhes", `Diagnóstico - ${cliente.nomeFantasia || cliente.razaoSocial}`]));
+
+  const texto = (projeto.diagnostico?.texto ?? "").trim();
+  if (texto) partes.push(blocos(texto, projeto, "", { sub: 0, figura: { n: 0 } }));
+  else partes.push(par("[completar: o diagnóstico ainda não foi escrito. Conte à IA, no Desenvolvimento, o que o cliente pediu e o que você mapeou.]"));
+
+  partes.push(par(`${projeto.localAssinatura}, ${dataPorExtenso(hoje)}.`, { alinhar: "left", antes: 120, manterProximo: true }));
+  partes.push(
+    par("", { depois: 600, manterProximo: true }) +
+      par("_________________________________________________________________", { alinhar: "center", depois: 0, manterProximo: true }) +
+      par([{ t: consultor?.nomeCompleto ?? "Consultor", b: true }], { alinhar: "center", depois: 0, manterProximo: true }) +
+      par("Consultor Responsável", { alinhar: "center", depois: 240 }),
+  );
+
+  const pendentes = contarMarcadoresNoCorpo(partes.join(""));
+  if (pendentes > 0)
+    partes.splice(
+      aposACapa,
+      0,
+      quadro(
+        "Pendências antes do envio",
+        `Este documento tem ${pendentes} ${pendentes === 1 ? "marcador" : "marcadores"} a completar, destacados em amarelo. Resolva cada um, remova o realce e apague esta caixa antes de assinar e enviar no HUB.`,
+        "alerta",
+      ),
+    );
+  return partes.join("");
+}
+
+export async function gerarDocxDiagnostico(dados: DadosDiagnostico, hoje: string, modelo?: ArrayBuffer): Promise<Blob> {
+  return empacotar(() => corpoDiagnostico(dados, hoje), [], modelo);
 }

@@ -181,6 +181,17 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   "Informações até" da etapa (vazia: o fim previsto). Na conclusão, a "Matriz de entregas da Etapa 0X" traz o
   status de cada entregável (Atendido, Atendido parcialmente, Pendente de evidência, `statusDoEntregavel`).
   A seção final da última etapa é "Continuidade do programa após a consultoria" (`ehUltimaEtapa`).
+- **Diagnóstico nas Entregas** (`DiagnosticoDoProjeto`, `src/components/projeto/diagnostico.tsx`; campo `projeto.diagnostico`):
+  a área "Diagnóstico" fica no topo das Entregas, antes do Plano de Entrega (relatórios), para registrar o fluxo do
+  projeto desde o diagnóstico (fase 2 do HUB). A IA escreve o texto com a ação `escrever_diagnostico` (sempre o texto
+  completo e atualizado, com desfazer) conforme o consultor conta o que o cliente pediu e o que mapeou; o sistema gera
+  o **Word** dele ("Baixar diagnóstico em Word", `gerarDocxDiagnostico`: mesma capa de identificação dos relatórios,
+  sem período e carga horária, marcadores realçados com a caixa de pendências, assinatura só do consultor). Dá para
+  ler e **editar o texto à mão**, e **anexar o arquivo final** (Word ou PDF, o enviado no HUB; bucket `evidencias`,
+  pasta `<empresa>/<projeto>/diagnostico/`), trocar e remover. A situação mostra "A elaborar", "Em elaboração",
+  "Arquivo anexado" ou "Enviado no HUB em…". O "próximo passo" da fase do diagnóstico leva a `#diagnostico`. A IA
+  nunca diz que "não pode enviar" o arquivo: aponta o botão em Entregas. O arquivo acompanha o projeto ao mover
+  para outra empresa e é apagado com ele. O bucket aceita Word desde a migração `20261101000000_evidencias_word.sql`.
 - **Assinatura online (Autentique)** nas Entregas: "Ou enviar para assinatura online" manda o PDF do
   relatório, o consultor e o responsável da empresa recebem o link por e-mail, e a tela mostra quem
   assinou ("Conferir assinaturas", "Lembrar quem falta"). Quando os dois assinam, o PDF assinado e as

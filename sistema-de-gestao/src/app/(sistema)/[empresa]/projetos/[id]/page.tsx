@@ -90,6 +90,7 @@ export default function PaginaProjeto() {
       }
       if (ancora === "registrar") setFocar((n) => n + 1);
       if (ancora === "plano") setTimeout(() => document.getElementById("plano")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+      if (ancora === "diagnostico") setTimeout(() => document.getElementById("diagnostico")?.scrollIntoView({ behavior: "smooth", block: "start" }), 150);
     };
     const t = setTimeout(ler, 0);
     window.addEventListener("hashchange", ler);

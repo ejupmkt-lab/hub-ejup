@@ -238,8 +238,9 @@ export function ProvedorEstado({ children }: { children: React.ReactNode }) {
           ...(e.evidencias ?? []).map((ev) => ev.caminho),
           ...(e.relatorioAssinado ? [e.relatorioAssinado.caminho] : []),
         ]);
-        // Arquivos baixados do HUB pela extensão
+        // Arquivos baixados do HUB pela extensão e o arquivo final do diagnóstico
         arquivos.push(...(p?.materiaisHub ?? []).map((m) => m.caminho));
+        if (p?.diagnostico?.arquivo) arquivos.push(p.diagnostico.arquivo.caminho);
         // Fotos e PDFs mandados na conversa do projeto
         if (p) {
           const pasta = `${p.empresa}/${id}/conversa`;

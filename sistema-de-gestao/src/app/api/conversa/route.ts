@@ -82,6 +82,12 @@ const ESQUEMA = {
           },
           {
             type: "object",
+            properties: { tipo: { type: "string", const: "escrever_diagnostico" }, texto: { type: "string" } },
+            required: ["tipo", "texto"],
+            additionalProperties: false,
+          },
+          {
+            type: "object",
             properties: { tipo: { type: "string", const: "definir_cronograma" }, inicio: { type: "string" }, fim: { type: "string" } },
             required: ["tipo", "inicio", "fim"],
             additionalProperties: false,
@@ -353,6 +359,9 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>, preDiagnostico: stri
       `Evidências guardadas: ${(e.evidencias ?? []).length ? (e.evidencias ?? []).map((x) => x.legenda).join("; ") : "nenhuma"}`,
     );
   }
+  // Diagnóstico do projeto: o texto atual (a IA devolve sempre o texto completo)
+  const diag = (p.diagnostico?.texto ?? "").trim();
+  partes.push("", "## Diagnóstico", diag ? `Texto atual (atualizado em ${p.diagnostico?.atualizadoEm ?? "data não registrada"}):\n<diagnostico>\n${diag}\n</diagnostico>` : "(ainda não escrito)", p.diagnostico?.arquivo ? `Arquivo do diagnóstico anexado em Entregas: ${p.diagnostico.arquivo.nome}.` : "Nenhum arquivo do diagnóstico anexado em Entregas.");
   // Tabelas do relatório (marcador [[tabela:tipo]] no texto), com as linhas atuais
   partes.push("", "## Tabelas do relatório (tipo: nome; colunas na ordem)");
   for (const t of tiposRegistro) {

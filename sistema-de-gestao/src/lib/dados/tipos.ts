@@ -165,6 +165,15 @@ export type Contratacao = {
   pagoEm: string | null;
 };
 
+// Diagnóstico do projeto (fase 2 do HUB): o texto é escrito com a IA a partir do que o consultor conta, o sistema gera o
+// Word, e o arquivo final (Word ou PDF, o que foi enviado no HUB) pode ser guardado aqui
+export type ArquivoDoDiagnostico = { caminho: string; nome: string; tipo: string; tamanho: number; enviadoEm: string; por: string };
+export type Diagnostico = {
+  texto: string;
+  atualizadoEm: string | null; // AAAA-MM-DD do último texto escrito
+  arquivo: ArquivoDoDiagnostico | null;
+};
+
 export type Projeto = {
   id: string;
   empresa: EmpresaSlug;
@@ -191,6 +200,7 @@ export type Projeto = {
   registros: Registro[];
   referencias: Referencia[];
   historico: Evento[];
+  diagnostico?: Diagnostico;
   materiaisHub?: MaterialHub[]; // arquivos baixados da página do HUB pela extensão
 };
 

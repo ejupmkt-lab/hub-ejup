@@ -1,4 +1,4 @@
-import type { Atividade, Contratacao, Etapa, Hub, PassoHub, Projeto, Registro, RelatorioAssinado } from "./dados/tipos";
+import type { Atividade, Contratacao, Diagnostico, Etapa, Hub, PassoHub, Projeto, Registro, RelatorioAssinado } from "./dados/tipos";
 import { ajustarPlanoAoPagamento, aplicarPlanoHub, carimbarInicios, datasMudadasAMao, reencadearExecucao, avisoEnvioAntecipado, avisoFinalizarAntecipado, bloqueioAte, dataDoPagamento, textoPlanoAjustado, mudarHub, ordemPassos, passoHubDoProjeto, registroHub } from "./fase";
 import { ehUltimaEtapa, faltaDoRelatorio, todasSecoes, verificarCompletude } from "./relatorio/secoes";
 import { assinada, automatizarEtapa, bloqueioStatus, marcarAtividade } from "./regras-etapa";
@@ -25,6 +25,8 @@ export type AcaoIA =
   | { tipo: "mudar_situacao_etapa"; etapa: number; situacao: "a_enviar" | "enviada" | "aprovada" | "devolvida"; observacao: string }
   | { tipo: "avancar_hub"; passo: PassoHub; data: string }
   | { tipo: "preencher_tabela"; tabela: string; linhas: string[][]; substituir: boolean }
+  // O diagnóstico do projeto (texto completo e atualizado); o Word sai dele em Entregas
+  | { tipo: "escrever_diagnostico"; texto: string }
   // Só vem da importação do HUB (a conversa não oferece): código do pedido e gestor lidos na página do HUB
   | { tipo: "dados_hub"; codigo_hub: string; gestor: string }
   // Só vem da importação do HUB: a etapa já foi enviada no HUB na data dada; com o PDF do relatório, ele fica em Entregas
@@ -64,6 +66,7 @@ export type Desfazer =
   | { tipo: "plano"; planoFechadoEm: string | null; status: Projeto["status"] }
   | { tipo: "hub"; hub: Hub | null; contratacao: Contratacao | null; status: Projeto["status"] }
   | { tipo: "registros"; registros: Registro[] }
+  | { tipo: "diagnostico"; antes: Diagnostico | null }
   | { tipo: "etapa"; etapa: number; antes: Etapa }
   | { tipo: "dados"; numeroProjetoHub: string; codigoSolicitacaoHub: string; gestorSebrae: string }
   | { tipo: "assinatura"; etapa: number; assinaturaConsultor: string | null; assinaturaCliente: string | null; relatorioAssinado: RelatorioAssinado | null };
@@ -115,6 +118,16 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
       if (mudaCodigo) p.numeroProjetoHub = p.codigoSolicitacaoHub = codigo;
       if (mudaGestor) p.gestorSebrae = gestor;
       feito(`Dados do pedido: ${[mudaCodigo ? `código do HUB ${codigo}` : "", mudaGestor ? `gestor ${gestor}` : ""].filter(Boolean).join("; ")}`);
+      return;
+    }
+    // Diagnóstico do projeto: o texto inteiro, sempre atualizado (o arquivo anexado, se houver, não muda)
+    if (a.tipo === "escrever_diagnostico") {
+      const texto = String(a.texto ?? "").trim();
+      if (!texto) return;
+      desfazer.push({ tipo: "diagnostico", antes: p.diagnostico ? structuredClone(p.diagnostico) : null });
+      const novo = !(p.diagnostico?.texto ?? "").trim();
+      p.diagnostico = { arquivo: null, ...p.diagnostico, texto, atualizadoEm: hojeIso() };
+      feito(`Diagnóstico: texto ${novo ? "escrito" : "atualizado"} (o Word está em Entregas, na área Diagnóstico)`);
       return;
     }
     // Tabelas do relatório ([[tabela:tipo]]): linhas com as células na ordem das colunas
@@ -414,6 +427,13 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
 // Volta cada passo, do último para o primeiro
 export function desfazerAcoes(p: Projeto, passos: Desfazer[]) {
   for (const d of [...passos].reverse()) {
+    if (d.tipo === "diagnostico") {
+      // O arquivo anexado depois da ação fica; só o texto volta
+      if (d.antes) p.diagnostico = { ...d.antes, arquivo: p.diagnostico?.arquivo ?? d.antes.arquivo };
+      else if (p.diagnostico?.arquivo) p.diagnostico = { ...p.diagnostico, texto: "", atualizadoEm: null };
+      else delete p.diagnostico;
+      continue;
+    }
     if (d.tipo === "registros") {
       p.registros = d.registros;
       continue;
@@ -489,7 +509,7 @@ export function sugestoesConversa(p: Projeto): string[] {
   if (passo === "solicitacao") return [`O gestor me enviou a demanda hoje (${hoje}).`, "O que preciso para começar o diagnóstico?"];
   if (passo === "diagnostico")
     return [
-      "Me ajude a montar o diagnóstico. O cliente pediu: __. O que mapeei: __.",
+      p.diagnostico?.texto?.trim() ? "Atualize o diagnóstico com o que acabei de mapear: __." : "Me ajude a montar o diagnóstico. O cliente pediu: __. O que mapeei: __.",
       "Por que esta solicitação se justifica para o cliente? Monte os argumentos.",
       `Enviei o diagnóstico no HUB hoje (${hoje}).`,
     ];
