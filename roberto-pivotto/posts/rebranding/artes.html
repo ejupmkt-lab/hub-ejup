@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Rebranding · três direções · Roberto Pivotto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=La+Belle+Aurore&family=Inter:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Três direções de rebranding (design-system/09-rebranding.md). Mesmo conteúdo nas três. */
+*{box-sizing:border-box;margin:0}
+body{background:#777;padding:40px;display:flex;flex-wrap:wrap;gap:40px}
+.s{position:relative;width:1080px;height:1350px;overflow:hidden}
+.s.v{height:1920px}
+.foto{position:absolute;background-size:cover;background-position:center}
+.ph{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'JetBrains Mono',monospace;font-size:22px;letter-spacing:.06em;text-transform:uppercase}
+.selo-ilus{position:absolute;z-index:9;font-family:'JetBrains Mono',monospace;font-size:15px;letter-spacing:.06em;text-transform:uppercase;padding:6px 10px;background:rgba(0,0,0,.55);color:#fff}
+
+/* ===== A · Marinho clínico ===== */
+.A{--mar:#13253D;--aco:#3C5A7C;--nevoa:#A8BBD0;--gelo:#EDF0F3;--branco:#FFFFFF;font-family:'Urbanist',sans-serif;color:var(--branco);background:var(--mar)}
+.A.claro{background:var(--gelo);color:var(--mar)}
+.A .cab{position:absolute;top:70px;left:90px;right:90px;display:flex;justify-content:space-between;font-size:20px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;opacity:.85}
+.A .marca-agua{position:absolute;right:-180px;top:-120px;width:820px;opacity:.07}
+.A.claro .marca-agua{opacity:.06}
+.A .bloco{position:absolute;background:var(--aco);border-radius:34px;padding:56px 56px 50px;color:#fff}
+.A .bloco h1{font-weight:300;font-size:70px;line-height:1.08;letter-spacing:-.01em}
+.A .bloco h1 b{font-weight:700}
+.A .pill{display:inline-block;border:2px solid rgba(255,255,255,.85);border-radius:40px;padding:14px 34px;font-size:26px;font-weight:600;margin-top:40px}
+.A .ico{position:absolute;width:120px;height:120px;border-radius:26px;background:var(--nevoa);display:flex;align-items:center;justify-content:center}
+.A .perfil{position:absolute;left:90px;bottom:80px;display:flex;align-items:center;gap:14px}
+.A .perfil i{width:60px;height:60px;border-radius:50%;background:#2a3a52;border:2px solid var(--nevoa)}
+.A .perfil span{background:rgba(168,187,208,.25);border-radius:30px;padding:12px 26px;font-size:22px;font-weight:600}
+.A .chk{position:absolute;left:150px;right:150px;top:420px;display:flex;flex-direction:column;gap:22px}
+.A .chk div{display:flex;align-items:center;gap:26px;border:2px solid rgba(168,187,208,.7);border-radius:6px;padding:24px 30px;font-size:36px;font-weight:400}
+.A .chk svg{flex:0 0 auto}
+.A h2{position:absolute;left:150px;right:150px;top:250px;font-weight:300;font-size:58px;line-height:1.1}
+.A h2 b{font-weight:700}
+.A .titv{position:absolute;left:110px;right:110px;top:620px;font-weight:300;font-size:104px;line-height:1.05;color:var(--mar)}
+.A .titv em{font-style:italic} .A .titv b{font-weight:700}
+.A .titv .box{background:rgba(168,187,208,.45);padding:0 14px;outline:2px solid var(--aco);outline-offset:4px}
+.A .assin{position:absolute;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:22px;color:var(--mar)}
+.A .assin b{font-size:40px;font-weight:600;letter-spacing:.16em;line-height:1.05;text-align:left}
+.A .assin small{display:block;font-size:15px;letter-spacing:.22em;font-weight:700;color:var(--aco)}
+
+/* ===== B · Editorial boutique ===== */
+.B{--mar:#0F1E45;--osso:#F3EFE8;--areia:#D9CCB8;--madeira:#7A5A43;--tinta:#1C1B19;font-family:'Inter',sans-serif;color:var(--osso);background:var(--mar)}
+.B .rotulos{position:absolute;top:66px;left:80px;right:80px;display:flex;justify-content:space-between;font-size:17px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;opacity:.9;z-index:3}
+.B .rotulos.c{justify-content:center}
+.B .serif{font-family:'Playfair Display',serif;font-weight:400;letter-spacing:-.01em}
+.B .serif em{font-style:italic}
+.B .vel{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,30,69,.15) 0%,rgba(28,27,25,.25) 40%,rgba(28,27,25,.82) 100%)}
+.B .tit{position:absolute;left:80px;right:80px;text-align:center;z-index:3}
+.B .tit .serif{font-size:100px;line-height:1.02}
+.B .tit p.sub{font-size:24px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin-top:30px}
+.B .manus{position:absolute;left:100px;right:100px;top:470px;font-family:'La Belle Aurore',cursive;font-size:108px;line-height:1.35;text-align:center;color:var(--osso)}
+.B .base{position:absolute;bottom:70px;left:0;right:0;text-align:center;font-size:18px;font-weight:600;letter-spacing:.42em;text-transform:uppercase;z-index:3}
+.B .papel{position:absolute;background:var(--osso);color:var(--tinta);box-shadow:0 30px 60px rgba(0,0,0,.35);padding:70px 64px}
+.B .papel .serif{font-size:76px;line-height:1.02;color:var(--mar)}
+.B .papel p{font-size:26px;line-height:1.45;margin-top:34px;color:#3b3a36}
+.B .papel p b{font-weight:600}
+.B .lst{margin-top:36px;border-top:1px solid var(--areia)}
+.B .lst div{display:flex;gap:22px;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--areia);font-size:30px}
+.B .lst span{font-family:'Playfair Display',serif;font-style:italic;font-size:34px;color:var(--madeira);width:44px}
+.B .balao{position:absolute;background:#fff;color:#1c1b19;border-radius:16px;padding:16px 22px;font-size:24px;box-shadow:0 10px 24px rgba(0,0,0,.2);z-index:4}
+
+/* ===== C · Estratégia em preto ===== */
+.C{--preto:#111111;--grafite:#262626;--oliva:#5D6A3A;--osso:#EAE7E0;--taupe:#9B8E80;--lima:#D5F03C;font-family:'Inter',sans-serif;color:var(--osso);background:var(--preto)}
+.C.claro{background:var(--osso);color:var(--preto)}
+.C .cond{font-family:'Barlow Condensed',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:-.005em}
+.C .vel{position:absolute;inset:0;background:linear-gradient(90deg,rgba(17,17,17,.92) 0%,rgba(17,17,17,.7) 55%,rgba(17,17,17,.35) 100%)}
+.C .tit{position:absolute;left:90px;right:200px;z-index:3}
+.C .tit .cond{font-size:132px;line-height:.92}
+.C .tit .cond .l{color:var(--lima)}
+.C.claro .tit .cond .l{color:var(--oliva)}
+.C .tit p{font-size:30px;line-height:1.4;margin-top:34px;max-width:620px;opacity:.9}
+.C .tit p .l{color:var(--lima)}
+.C .seta{position:absolute;left:90px;bottom:90px;z-index:3}
+.C .topo{position:absolute;top:80px;left:90px;font-size:20px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;z-index:3}
+.C .num3{display:flex;gap:30px;align-items:flex-start}
+.C .num3 .n{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:250px;line-height:.78;color:var(--lima)}
+.C .itens{position:absolute;left:90px;right:90px;top:640px;display:flex;flex-direction:column;gap:20px;z-index:3}
+.C .itens div{display:flex;align-items:center;gap:26px;border:2px solid rgba(234,231,224,.7);border-radius:50px;padding:22px 34px;font-size:30px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.C .itens b{color:var(--lima);font-family:'JetBrains Mono',monospace;font-weight:500}
+.C .regua{position:absolute;left:90px;right:90px;z-index:3}
+.C .regua div{display:grid;grid-template-columns:330px 1fr;align-items:center;gap:30px;padding:16px 0;font-size:28px}
+.C .regua .tr{position:relative;height:2px;background:var(--preto)}
+.C .regua .tr i{position:absolute;top:-9px;width:20px;height:20px;border-radius:50%;background:var(--preto)}
+.C .circ{position:absolute;z-index:4}
+.C .aspas{position:absolute;left:80px;top:150px;font-family:'Playfair Display',serif;font-size:300px;line-height:1;color:rgba(17,17,17,.12)}
+.ficha{padding:80px 90px}
+.ficha .nome{font-size:24px;letter-spacing:.24em;text-transform:uppercase;font-weight:600;opacity:.75}
+.ficha h1{margin-top:14px;font-size:96px;line-height:1}
+.ficha .desc{margin-top:26px;font-size:28px;line-height:1.45;max-width:860px;opacity:.85}
+.ficha .cores{display:flex;gap:22px;margin-top:60px}
+.ficha .cor{width:150px}
+.ficha .cor i{display:block;width:150px;height:150px;border-radius:50%;border:2px solid rgba(128,128,128,.35)}
+.ficha .cor span{display:block;margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:17px;opacity:.8}
+.ficha .tipos{margin-top:64px;display:flex;flex-direction:column;gap:24px}
+.ficha .tipos div{display:flex;align-items:baseline;gap:30px;border-top:1px solid rgba(128,128,128,.35);padding-top:22px}
+.ficha .tipos small{width:220px;flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-size:17px;opacity:.75;text-transform:uppercase;letter-spacing:.06em}
+.ficha .marca{position:absolute;right:90px;bottom:90px}
+</style>
+</head>
+<body>
+
+<!-- ================= A · MARINHO CLÍNICO ================= -->
+<section class="s A claro ficha" data-out="A-0-ficha">
+  <p class="nome">Direção A</p>
+  <h1 style="font-weight:300">Marinho <b style="font-weight:700">clínico</b></h1>
+  <p class="desc">Sóbria e técnica, como o perfil do Dr. Marcos Augusto. Monograma próprio usado como selo e marca-d'água, sans geométrica com contraste de peso, cartões arredondados e retratos em fundo escuro.</p>
+  <div class="cores"><div class="cor"><i style="background:#13253D"></i><span>marinho<br>#13253D</span></div><div class="cor"><i style="background:#3C5A7C"></i><span>aço<br>#3C5A7C</span></div><div class="cor"><i style="background:#A8BBD0"></i><span>névoa<br>#A8BBD0</span></div><div class="cor"><i style="background:#EDF0F3"></i><span>gelo<br>#EDF0F3</span></div><div class="cor"><i style="background:#FFFFFF"></i><span>branco<br>#FFFFFF</span></div></div>
+  <div class="tipos">
+    <div><small>Títulos</small><span style="font-size:60px;font-weight:300">Urbanist leve com <b style="font-weight:700">negrito</b></span></div>
+    <div><small>Apoio</small><span style="font-size:52px;font-weight:300;font-style:italic">itálico para nuance</span></div>
+    <div><small>Rótulos</small><span style="font-size:26px;font-weight:700;letter-spacing:.16em">ROBERTO PIVOTTO · ADVOGADO</span></div>
+  </div>
+  <div class="marca"><svg data-mono width="150" height="150" viewBox="0 0 120 120"></svg></div>
+</section>
+
+<section class="s A" data-out="A-1-capa">
+  <div class="foto" style="left:0;top:0;width:760px;height:1350px;background-image:url(../../apresentacao/assets/foto-mesa-documentos.jpg);filter:grayscale(.5) brightness(.55)"></div>
+  <div style="position:absolute;left:760px;top:0;right:0;bottom:0;background:linear-gradient(180deg,#1b3354,#13253D)"></div>
+  <div class="bloco" style="left:380px;top:430px;width:560px"><h1><b>R$ 153,7 mi</b> numa multa com teto de <b>R$ 50 mi</b></h1><span class="pill">Arrasta para o lado</span></div>
+  <div class="ico" style="left:870px;top:360px"><svg data-mono width="80" height="80" viewBox="0 0 120 120" data-cor="#13253D"></svg></div>
+  <div class="perfil"><i></i><span>@robertopivotto</span></div>
+  <span class="selo-ilus" style="left:20px;top:20px">foto ilustrativa</span>
+</section>
+
+<section class="s A" data-out="A-2-interna">
+  <svg class="marca-agua" data-mono viewBox="0 0 120 120" data-cor="#A8BBD0"></svg>
+  <div class="cab"><span>Roberto Pivotto</span><span>Advogado</span></div>
+  <h2>A mesma prática virou <b>5 infrações</b></h2>
+  <div class="chk">
+    <div><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" fill="none" stroke="#A8BBD0" stroke-width="2.5"/><path d="M13 22l6 6 12-12" fill="none" stroke="#fff" stroke-width="2.5"/></svg>Sem base legal</div>
+    <div><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" fill="none" stroke="#A8BBD0" stroke-width="2.5"/><path d="M13 22l6 6 12-12" fill="none" stroke="#fff" stroke-width="2.5"/></svg>Sem prevenção</div>
+    <div><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" fill="none" stroke="#A8BBD0" stroke-width="2.5"/><path d="M13 22l6 6 12-12" fill="none" stroke="#fff" stroke-width="2.5"/></svg>Sem prova de conformidade</div>
+    <div style="opacity:.55"><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" fill="none" stroke="#A8BBD0" stroke-width="2.5"/></svg>Outras duas, não detalhadas</div>
+  </div>
+  <p style="position:absolute;left:150px;right:150px;top:1000px;font-size:30px;font-weight:300;line-height:1.4;color:#A8BBD0">O teto de R$ 50 milhões vale <i>para cada uma</i>.</p>
+  <div class="perfil" style="left:0;right:0;justify-content:center"><i></i><span>@robertopivotto</span></div>
+</section>
+
+<section class="s v A claro" data-out="A-3-reels">
+  <svg class="marca-agua" data-mono viewBox="0 0 120 120" data-cor="#13253D" style="width:1000px;right:-300px;top:-60px"></svg>
+  <div class="cab" style="top:260px"><span>Roberto Pivotto</span><span>Advogado</span></div>
+  <p class="titv"><span class="box">A IA erra</span><br><em>e quem paga</em><br>é quem <b>assina</b></p>
+  <div class="assin" style="bottom:300px"><svg data-mono width="110" height="110" viewBox="0 0 120 120" data-cor="#3C5A7C"></svg><b>ROBERTO<br>PIVOTTO<small>ADVOGADO</small></b></div>
+</section>
+
+<!-- ================= B · EDITORIAL BOUTIQUE ================= -->
+<section class="s B ficha" data-out="B-0-ficha" style="background:#F3EFE8;color:#1C1B19">
+  <p class="nome">Direção B</p>
+  <h1 class="serif" style="font-size:118px;color:#0F1E45">Editorial <em>boutique</em></h1>
+  <p class="desc">Elegante e calorosa, como a Basilare. Serifa editorial misturando romano e itálico, frase manuscrita em fundo marinho, fotos reais de ambiente com madeira, papel e café.</p>
+  <div class="cores"><div class="cor"><i style="background:#0F1E45"></i><span>marinho<br>#0F1E45</span></div><div class="cor"><i style="background:#F3EFE8"></i><span>osso<br>#F3EFE8</span></div><div class="cor"><i style="background:#D9CCB8"></i><span>areia<br>#D9CCB8</span></div><div class="cor"><i style="background:#7A5A43"></i><span>madeira<br>#7A5A43</span></div><div class="cor"><i style="background:#1C1B19"></i><span>tinta<br>#1C1B19</span></div></div>
+  <div class="tipos">
+    <div><small>Títulos</small><span class="serif" style="font-size:68px">Playfair Display <em>com itálico</em></span></div>
+    <div><small>Frases</small><span style="font-family:'La Belle Aurore',cursive;font-size:56px">letra manuscrita</span></div>
+    <div><small>Rótulos</small><span style="font-size:22px;font-weight:600;letter-spacing:.3em">ROBERTO PIVOTTO · ADVOCACIA</span></div>
+  </div>
+</section>
+
+<section class="s B" data-out="B-1-capa">
+  <div class="foto" style="inset:0;background-image:url(../../apresentacao/assets/foto-mesa-documentos.jpg);filter:sepia(.25) saturate(.8) brightness(.9)"></div>
+  <div class="vel"></div>
+  <div class="rotulos"><span>Roberto Pivotto</span><span>Proteção de dados</span></div>
+  <div class="tit" style="top:640px"><p class="serif">A multa tinha<br><em>teto.</em> A conta,<br><em>não.</em></p><p class="sub">R$ 153,7 milhões · ANPD x TikTok</p></div>
+  <div class="base">arraste para o lado</div>
+  <span class="selo-ilus" style="right:20px;top:110px">foto ilustrativa</span>
+</section>
+
+<section class="s B" data-out="B-2-interna" style="background:#E6DED2">
+  <div class="foto" style="inset:0;background-image:url(../../apresentacao/assets/foto-livros.jpg);filter:sepia(.3) brightness(.95)"></div>
+  <div class="papel" style="left:150px;top:190px;width:780px;transform:rotate(-1.5deg)">
+    <p style="margin:0;font-size:16px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:#7A5A43">Roberto Pivotto · Advocacia</p>
+    <p class="serif" style="margin-top:26px">Uma prática,<br><em>cinco</em> infrações.</p>
+    <div class="lst"><div><span>i.</span>sem base legal</div><div><span>ii.</span>sem prevenção</div><div><span>iii.</span>sem prova de conformidade</div></div>
+    <p>O teto de R$ 50 milhões vale <b>para cada infração</b>. É assim que a conta passa do limite.</p>
+  </div>
+  <div class="balao" style="right:90px;bottom:170px">e na sua empresa, quantas regras uma prática toca?</div>
+  <span class="selo-ilus" style="left:20px;bottom:20px">foto ilustrativa</span>
+</section>
+
+<section class="s v B" data-out="B-3-reels">
+  <div class="rotulos c" style="top:250px"><span>Roberto Pivotto</span></div>
+  <p class="manus" style="top:660px">a IA pode errar.<br>quem assina<br>não pode.</p>
+  <div class="base" style="bottom:270px">robertopivotto</div>
+</section>
+
+<!-- ================= C · ESTRATÉGIA EM PRETO ================= -->
+<section class="s C ficha" data-out="C-0-ficha">
+  <p class="nome">Direção C</p>
+  <h1 class="cond" style="font-size:150px;line-height:.9">Estratégia<br><span style="color:#D5F03C">em preto.</span></h1>
+  <p class="desc">Direta e moderna, entre o template da @olyacooper e a Novae. Sans condensada em caixa alta, fotos escuras de mesa, um acento vivo e grafismo em linha fina: réguas, círculos, setas e diagramas.</p>
+  <div class="cores"><div class="cor"><i style="background:#111111"></i><span>preto<br>#111111</span></div><div class="cor"><i style="background:#5D6A3A"></i><span>oliva<br>#5D6A3A</span></div><div class="cor"><i style="background:#EAE7E0"></i><span>osso<br>#EAE7E0</span></div><div class="cor"><i style="background:#9B8E80"></i><span>taupe<br>#9B8E80</span></div><div class="cor"><i style="background:#D5F03C"></i><span>lima<br>#D5F03C</span></div></div>
+  <div class="tipos">
+    <div><small>Títulos</small><span class="cond" style="font-size:72px">Barlow Condensed <span style="color:#D5F03C">caixa alta</span></span></div>
+    <div><small>Texto</small><span style="font-size:36px">Inter, frases curtas e diretas.</span></div>
+    <div><small>Detalhes</small><span style="font-family:'JetBrains Mono',monospace;font-size:26px">01 · 02 · 03 →</span></div>
+  </div>
+</section>
+
+<section class="s C" data-out="C-1-capa">
+  <div class="foto" style="inset:0;background-image:url(../../apresentacao/assets/foto-planta.jpg);filter:grayscale(1) brightness(.55) contrast(1.1)"></div>
+  <div class="vel"></div>
+  <div class="topo">Proteção de dados</div>
+  <div class="tit" style="top:380px"><p class="cond">A multa<br>tem teto.<br><span class="l">A conta,<br>não.</span></p><p>O TikTok levou <span class="l">R$ 153,7 milhões</span> numa lei que limita a multa a R$ 50 milhões.</p></div>
+  <svg class="seta" width="110" height="40" viewBox="0 0 110 40"><path d="M2 20h100M84 4l18 16-18 16" fill="none" stroke="#D5F03C" stroke-width="3"/></svg>
+  <span class="selo-ilus" style="right:20px;top:20px">foto ilustrativa</span>
+</section>
+
+<section class="s C claro" data-out="C-2-interna">
+  <div class="topo" style="color:#111">Decisão da ANPD</div>
+  <div class="tit" style="top:220px;right:90px"><div class="num3"><span class="n" style="color:#5D6A3A">5</span><p class="cond" style="font-size:92px;line-height:.95">infrações<br>da mesma<br>prática</p></div></div>
+  <div class="regua" style="top:720px">
+    <div><span>sem base legal</span><span class="tr"><i style="left:96%"></i></span></div>
+    <div><span>sem prevenção</span><span class="tr"><i style="left:96%"></i></span></div>
+    <div><span>sem prova</span><span class="tr"><i style="left:96%"></i></span></div>
+    <div style="color:#9B8E80"><span>outras duas</span><span class="tr" style="background:#9B8E80"><i style="left:96%;background:#9B8E80"></i></span></div>
+  </div>
+  <p style="position:absolute;left:90px;top:1110px;font-size:30px;line-height:1.4">Cada uma com o próprio <span style="position:relative;display:inline-block">teto<svg class="circ" style="left:-34px;top:-15px" width="110" height="64" viewBox="0 0 110 64"><ellipse cx="55" cy="32" rx="51" ry="27" fill="none" stroke="#5D6A3A" stroke-width="3" transform="rotate(-4 55 32)"/></svg></span> de R$ 50 milhões.</p>
+  <svg style="position:absolute;right:90px;bottom:90px" width="60" height="60" viewBox="0 0 60 60"><path d="M30 4v52M4 30h52M11 11l38 38M49 11L11 49" stroke="#5D6A3A" stroke-width="3"/></svg>
+</section>
+
+<section class="s v C" data-out="C-3-reels">
+  <div class="ph" style="inset:0;background:linear-gradient(160deg,#2a2a2a,#111);color:#8a8a8a;font-size:28px;align-items:flex-start;padding-top:500px">retrato do Roberto<br>sessão de fotos, luz lateral</div>
+  <div class="vel" style="background:linear-gradient(180deg,rgba(17,17,17,.2) 0%,rgba(17,17,17,.85) 75%)"></div>
+  <div class="tit" style="top:1060px"><p class="cond" style="font-size:150px">A IA erra.<br><span class="l">Quem assina<br>paga.</span></p></div>
+  <svg class="seta" style="bottom:280px" width="110" height="40" viewBox="0 0 110 40"><path d="M2 20h100M84 4l18 16-18 16" fill="none" stroke="#D5F03C" stroke-width="3"/></svg>
+</section>
+
+<script>
+// monograma RP provisório: losango com R e P em traço fino (só para a direção A)
+const mono=(c)=>`<g fill="none" stroke="${c}" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+<path d="M60 6 L114 60 L60 114 L6 60 Z"/>
+<path d="M40 84 V36 h16 a12 12 0 0 1 0 24 H40 M54 60 L68 84"/>
+<path d="M72 84 V36 h10 a12 12 0 0 1 0 24 H72"/></g>`;
+document.querySelectorAll('svg[data-mono]').forEach(s=>{s.innerHTML=mono(s.dataset.cor||'#3C5A7C')});
+document.fonts.ready.then(()=>{document.body.dataset.pronto='1'});
+</script>
+</body>
+</html>

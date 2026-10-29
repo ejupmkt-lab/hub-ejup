@@ -29,3 +29,13 @@ Aberto em 29/10/2026. Referências do que o Roberto gosta, em `referencias/rebra
 - O azul fica (A e B) ou ele topa sair para o preto (C)?
 - Dá para fazer uma sessão de fotos? As três direções dependem de foto real.
 - Monograma: ele quer um símbolo próprio (como o do Marcos) ou só o nome?
+
+## Rodada 1 · três direções montadas (29/10/2026)
+
+`posts/rebranding/artes.html` (gera com `node posts/render.mjs rebranding`). Cada direção tem ficha (paleta e tipografia), capa de carrossel, tela interna e capa de Reels, todas com o mesmo conteúdo (multa da ANPD ao TikTok). Painel lado a lado: `posts/rebranding/comparacao.png`.
+
+- **A · Marinho clínico:** marinho #13253D, aço #3C5A7C, névoa #A8BBD0, gelo #EDF0F3, branco. Urbanist leve com negrito e itálico. Monograma RP provisório em losango, como selo e marca-d'água.
+- **B · Editorial boutique:** marinho #0F1E45, osso #F3EFE8, areia #D9CCB8, madeira #7A5A43, tinta #1C1B19. Playfair Display com itálico, La Belle Aurore para frases manuscritas, Inter nos rótulos.
+- **C · Estratégia em preto:** preto #111111, oliva #5D6A3A, osso #EAE7E0, taupe #9B8E80, lima #D5F03C. Barlow Condensed em caixa alta, Inter no texto, réguas, círculo à mão, setas.
+
+As fotos são as do site atual, marcadas como ilustrativas; o retrato da direção C é um espaço reservado. O monograma é provisório: um símbolo definitivo precisa de desenho próprio.
