@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Projeto } from "@/lib/dados/tipos";
 import { useEstado } from "@/lib/dados/store";
 import { useFinanceiro } from "@/lib/dados/financeiro";
-import { entradasDeRecebimento, moeda, type Entrada } from "@/lib/financeiro";
+import { FONTES_DE_CUSTEIO, entradasDeRecebimento, moeda, recebimento, type Entrada } from "@/lib/financeiro";
 import {
   intervaloDoPeriodo,
   passoDoModo,
@@ -24,12 +24,15 @@ const soma = (l: Entrada[], f: (e: Entrada) => number) =>
   l.reduce((a, e) => a + f(e), 0);
 const valorDe = (e: Entrada) => e.parcela.valor;
 const diaDe = (e: Entrada) => e.parcela.recebidaEm ?? e.parcela.previsao;
-const modos: { chave: ModoDePeriodo; rotulo: string }[] = [
+// O filtro vale por período (mês, trimestre, ano, tudo, intervalo) ou por fonte de custeio da contrapartida
+type Modo = ModoDePeriodo | "fonte";
+const modos: { chave: Modo; rotulo: string }[] = [
   { chave: "mes", rotulo: "Mês" },
   { chave: "trimestre", rotulo: "Trimestre" },
   { chave: "ano", rotulo: "Ano" },
   { chave: "tudo", rotulo: "Tudo" },
   { chave: "personalizado", rotulo: "Personalizado" },
+  { chave: "fonte", rotulo: "Fonte de custeio" },
 ];
 
 function Numero({
@@ -60,7 +63,8 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
   const fin = useFinanceiro();
   const { estado } = useEstado();
   // O período abre no mês corrente; dá para andar por mês, trimestre ou ano, ver tudo ou escolher um intervalo
-  const [modo, setModo] = useState<ModoDePeriodo>("mes");
+  const [modo, setModo] = useState<Modo>("mes");
+  const [fonte, setFonte] = useState<string>("todas"); // "todas", uma das FONTES_DE_CUSTEIO ou "nenhuma" (não definida)
   const [ref, setRef] = useState(() => hojeIso().slice(0, 7));
   const [de, setDe] = useState("");
   const [ate, setAte] = useState("");
@@ -87,13 +91,20 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
   const doProximo = comData.filter((e) => e.parcela.previsao === proximoDia);
 
   // O que o período mostra: as parcelas cujo dia (recebimento ou previsão) cai nele, ou as sem data
-  const { inicio, fim } = intervaloDoPeriodo(modo, ref, de, ate);
-  const doPeriodo = semDataAberto
-    ? semData
-    : entradas.filter((e) => {
-        const d = diaDe(e);
-        return !!d && d >= inicio && d <= fim;
-      });
+  const { inicio, fim } = intervaloDoPeriodo(modo === "fonte" ? "tudo" : modo, ref, de, ate);
+  // Por fonte de custeio: todas as parcelas dos projetos que têm contrapartida e saíram dessa fonte
+  const contrapartidaDe = (p: Projeto) => recebimento(p, fin.servicos[p.modeloId], fin.projetos[p.id], hoje).contrapartida;
+  const fonteDe = (p: Projeto) => fin.projetos[p.id]?.fonteContrapartida ?? null;
+  const daFonte = (p: Projeto) => contrapartidaDe(p) > 0 && (fonte === "todas" || (fonte === "nenhuma" ? !fonteDe(p) : fonteDe(p) === fonte));
+  const doPeriodo =
+    modo === "fonte"
+      ? entradas.filter((e) => daFonte(e.projeto))
+      : semDataAberto
+        ? semData
+        : entradas.filter((e) => {
+            const d = diaDe(e);
+            return !!d && d >= inicio && d <= fim;
+          });
   const projetosDoPeriodo = [
     ...new Set(doPeriodo.map((e) => e.projeto.id)),
   ].map((id) => projetos.find((p) => p.id === id)!);
@@ -127,7 +138,13 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
         .sort((a, b) => a.parcela.ordem - b.parcela.ordem),
     })),
   );
-  const andar = (n: number) => setRef(somarMeses(ref, n * passoDoModo[modo]));
+  // Contrapartida de cada fonte, entre os projetos mostrados
+  const porFonte = modo === "fonte"
+    ? [...FONTES_DE_CUSTEIO.map((f) => ({ chave: f.valor as string, rotulo: f.rotulo })), { chave: "", rotulo: "Fonte não definida" }]
+        .map(({ chave, rotulo }) => ({ rotulo: `Contrapartida · ${rotulo}`, valor: projetosDoPeriodo.filter((p) => (fonteDe(p) ?? "") === chave).reduce((a, p) => a + contrapartidaDe(p), 0) }))
+        .filter((l) => l.valor > 0)
+    : [];
+  const andar = (n: number) => setRef(somarMeses(ref, n * (modo === "fonte" ? 0 : passoDoModo[modo])));
 
   return (
     <div className="space-y-5">
@@ -159,12 +176,12 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
 
       <div className="space-y-3 rounded-[var(--radius-bloco)] border border-linha bg-folha p-3.5 shadow-[var(--shadow-cartao)]">
         <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
-          <Campo rotulo="Período">
+          <Campo rotulo="Filtrar por">
             <select
               className="campo"
               value={modo}
               onChange={(ev) => {
-                setModo(ev.target.value as ModoDePeriodo);
+                setModo(ev.target.value as Modo);
                 setSemDataAberto(false);
               }}
             >
@@ -232,7 +249,20 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
               </Campo>
             </>
           )}
-          {semData.length > 0 && (
+          {modo === "fonte" && (
+            <Campo rotulo="Fonte de custeio">
+              <select className="campo" value={fonte} onChange={(ev) => setFonte(ev.target.value)}>
+                <option value="todas">Todas as fontes</option>
+                {FONTES_DE_CUSTEIO.map((f) => (
+                  <option key={f.valor} value={f.valor}>
+                    {f.rotulo}
+                  </option>
+                ))}
+                <option value="nenhuma">Não definida</option>
+              </select>
+            </Campo>
+          )}
+          {modo !== "fonte" && semData.length > 0 && (
             <Botao
               variante={semDataAberto ? "primario" : "secundario"}
               aria-pressed={semDataAberto}
@@ -251,11 +281,11 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
       </div>
 
       {linhas.length === 0 ? (
-        <p className="text-sm text-tinta-2">Nada neste período.</p>
+        <p className="text-sm text-tinta-2">{modo === "fonte" ? "Nenhum projeto com contrapartida nesta fonte." : "Nada neste período."}</p>
       ) : (
         <>
           <ProjetosDoRecebimento fin={fin} linhas={linhas} mesEscolhido={mesEscolhido} />
-          <TotaisDoPeriodo entradas={doPeriodo} />
+          <TotaisDoPeriodo entradas={doPeriodo} contrapartidas={porFonte} />
         </>
       )}
     </div>

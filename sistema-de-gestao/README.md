@@ -94,6 +94,10 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
       Recebida), selo da nota fiscal e **Recebi** / **Editar** (data prevista em `previsoes`, valor em `valores`, dia
       em `recebidos`, nota em `notas`, "Voltar à projeção").       "Sem data (n)" lista as parcelas de projetos sem plano de trabalho. O pagamento único antigo ("100") vale para
       as duas parcelas.
+      O filtro se chama **Filtrar por** (Mês, Trimestre, Ano, Tudo, Personalizado ou **Fonte de custeio**): por fonte, o segundo
+      seletor escolhe Todas as fontes, Roberto, Leonardo, Caixa da empresa, Outra ou Não definida, a lista traz todas as
+      parcelas dos projetos que têm contrapartida daquela fonte e os totais ganham a linha "Contrapartida · fonte" (e o total, se
+      houver mais de uma).
       Embaixo da lista, o **consolidado do período** (`TotaisDoPeriodo`): total, a receber e recebido, cada um com valor,
       imposto e o que fica. Sem título de mês (o seletor de cima já diz) e sem botão "Mês atual".
     - **Configurações**: o imposto da empresa (abaixo).
