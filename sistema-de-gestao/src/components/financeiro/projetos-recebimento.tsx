@@ -18,7 +18,7 @@ const colunas = "grid grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_8.5rem_minmax(0,
 export type LinhaDeProjeto = { projeto: Projeto; entradas: Entrada[]; nomeCliente: string };
 
 // Etapa em curso (ou a fase do HUB, antes da execução), como na lista de projetos
-function etapaDoProjeto(p: Projeto) {
+export function etapaDoProjeto(p: Projeto) {
   const et = etapaAtual(p);
   const fase = faseDoProjeto(p);
   const atrasada = !!et && (et.status === "devolvida" || etapasAtrasadas(p).some((x) => x.ordem === et.ordem));
