@@ -93,10 +93,8 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
       Recebida), selo da nota fiscal e **Recebi** / **Editar** (data prevista em `previsoes`, valor em `valores`, dia
       em `recebidos`, nota em `notas`, "Voltar à projeção").       "Sem data (n)" lista as parcelas de projetos sem plano de trabalho. O pagamento único antigo ("100") vale para
       as duas parcelas.
-      O período abre na **Planilha** (`PlanilhaDoPeriodo`): uma linha por parcela com cliente / projeto, etapa atual,
-      parcela, data, situação, nota fiscal, valor, alíquota, imposto (R$) e o que fica, fechando com o total do período, o
-      que falta receber e o que já entrou; a aba **Projetos** mostra as mesmas parcelas por projeto, para marcar o
-      recebimento e editar. Sem botão "Mês atual": o seletor de mês já escolhe qualquer período.
+      Embaixo da lista, o **consolidado do período** (`TotaisDoPeriodo`): total, a receber e recebido, cada um com valor,
+      imposto e o que fica. Sem título de mês (o seletor de cima já diz) e sem botão "Mês atual".
     - **Configurações**: o imposto da empresa (abaixo).
   - **Sem a data do Relatório 1, sem perspectiva de recebimento**: enquanto o projeto não tem o Relatório 1 enviado nem a data dele na execução (antes do pagamento o plano ainda é proposta), as duas parcelas ficam "Sem data prevista" (botão "Sem data"); só a data combinada à mão vale.
   - **Projeção das datas** (`src/lib/projecao.ts`): vem do andamento do projeto. Etapa em curso termina em duração × o

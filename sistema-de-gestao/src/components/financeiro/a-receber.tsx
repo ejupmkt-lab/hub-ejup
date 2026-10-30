@@ -18,7 +18,7 @@ import {
   ProjetosDoRecebimento,
   type LinhaDeProjeto,
 } from "./projetos-recebimento";
-import { PlanilhaDoPeriodo } from "./planilha";
+import { TotaisDoPeriodo } from "./totais";
 
 const soma = (l: Entrada[], f: (e: Entrada) => number) =>
   l.reduce((a, e) => a + f(e), 0);
@@ -65,8 +65,6 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
   const [de, setDe] = useState("");
   const [ate, setAte] = useState("");
   const [semDataAberto, setSemDataAberto] = useState(false);
-  // A planilha consolida o período; "Projetos" mostra as mesmas parcelas por projeto, para marcar o recebimento e editar
-  const [visao, setVisao] = useState<"planilha" | "projetos">("planilha");
   if (!fin || !fin.carregado) return null;
   const hoje = hojeIso();
   const mesAtual = hoje.slice(0, 7);
@@ -89,7 +87,7 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
   const doProximo = comData.filter((e) => e.parcela.previsao === proximoDia);
 
   // O que o período mostra: as parcelas cujo dia (recebimento ou previsão) cai nele, ou as sem data
-  const { inicio, fim, rotulo } = intervaloDoPeriodo(modo, ref, de, ate);
+  const { inicio, fim } = intervaloDoPeriodo(modo, ref, de, ate);
   const doPeriodo = semDataAberto
     ? semData
     : entradas.filter((e) => {
@@ -252,40 +250,14 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
         )}
       </div>
 
-      <>
-        <div
-          role="tablist"
-          aria-label="Como ver o período"
-          className="inline-flex gap-1 rounded-[var(--radius-bloco)] bg-pedra/70 p-1"
-        >
-          {(["planilha", "projetos"] as const).map((v) => (
-            <button
-              key={v}
-              role="tab"
-              aria-selected={visao === v}
-              onClick={() => setVisao(v)}
-              className={`min-h-10 rounded-[var(--radius-campo)] px-4 py-2 text-[14px] font-semibold transition-colors ${visao === v ? "bg-folha text-tinta shadow-[var(--shadow-cartao)]" : "text-tinta-2 hover:text-tinta"}`}
-            >
-              {v === "planilha" ? "Planilha" : "Projetos"}
-            </button>
-          ))}
-        </div>
-        {visao === "planilha" ? (
-          <PlanilhaDoPeriodo
-            entradas={doPeriodo}
-            nomeDoCliente={(e) => nomeDoCliente(clienteDe(e.projeto))}
-            titulo={semDataAberto ? "Parcelas sem data" : rotulo}
-          />
-        ) : linhas.length === 0 ? (
-          <p className="text-sm text-tinta-2">Nada neste período.</p>
-        ) : (
-          <ProjetosDoRecebimento
-            fin={fin}
-            linhas={linhas}
-            mesEscolhido={mesEscolhido}
-          />
-        )}
-      </>
+      {linhas.length === 0 ? (
+        <p className="text-sm text-tinta-2">Nada neste período.</p>
+      ) : (
+        <>
+          <ProjetosDoRecebimento fin={fin} linhas={linhas} mesEscolhido={mesEscolhido} />
+          <TotaisDoPeriodo entradas={doPeriodo} />
+        </>
+      )}
     </div>
   );
 }
