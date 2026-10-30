@@ -46,10 +46,8 @@ export function FinanceiroDoProjeto({ projeto: p, nomeCliente }: { projeto: Proj
           <Campo rotulo="Imposto (%)">
             <input
               key={fixa ?? "auto"}
-              type="number"
-              min={0}
-              max={100}
-              step={0.01}
+              type="text"
+              inputMode="decimal"
               className="campo num"
               defaultValue={fixa ?? ""}
               placeholder={String(aliquotaDoMes).replace(".", ",")}
@@ -69,9 +67,8 @@ export function FinanceiroDoProjeto({ projeto: p, nomeCliente }: { projeto: Proj
           <Campo rotulo="Contrapartida (R$)">
             <input
               key={r.contrapartida}
-              type="number"
-              min={0}
-              step={0.01}
+              type="text"
+              inputMode="decimal"
               className="campo num"
               defaultValue={r.contrapartida || ""}
               placeholder="0,00"
@@ -82,7 +79,6 @@ export function FinanceiroDoProjeto({ projeto: p, nomeCliente }: { projeto: Proj
               }}
             />
           </Campo>
-          <p className="mt-1 text-[12px] text-tinta-2">Desconto sobre o total a receber.</p>
           <label className="mt-2 block text-[12px] font-semibold text-tinta-2">
             Fonte de custeio
             <select
@@ -98,7 +94,6 @@ export function FinanceiroDoProjeto({ projeto: p, nomeCliente }: { projeto: Proj
               ))}
             </select>
           </label>
-          <p className="mt-1 text-[12px] text-tinta-2">De quem saiu o valor da contrapartida: é para lá que ele volta.</p>
         </div>
         <div className="rounded-[var(--radius-bloco)] border border-verde/25 bg-verde-claro p-3.5">
           <dt className="text-[12px] text-tinta-2">Você recebe do SEBRAE</dt>
