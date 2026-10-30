@@ -74,9 +74,11 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   paga até o dia 5 o que ficou pronto até o dia 20 do mês anterior: **30%** quando o Relatório 1 foi enviado e o
   restante (**70%**) quando o projeto é finalizado no HUB (último relatório e avaliação do cliente).
   - **Aba "Financeiro" de cada projeto** (`FinanceiroDoProjeto`; só aparece para quem vê o financeiro; antes ficava em
-    "Dados"): valor do projeto, FUNCERN, o que fica para o consultor e o recebido até agora; a **Contrapartida**
-    (desconto sobre o total a receber, uma espécie de cashback: o "Você recebe" já vem sem ela, e os 30% e 70% saem do
-    valor descontado); e as parcelas em balões
+    "Dados"): valor do projeto, FUNCERN, o **Imposto** (percentual da faixa do faturamento da empresa no mês de cada
+    pagamento, ou o percentual definido ali mesmo, `valores.aliquota`; vazio volta ao automático, zero vale), a
+    **Contrapartida** (desconto sobre o total a receber, uma espécie de cashback; os 30% e 70% saem do valor
+    descontado), o quadro verde "Você recebe do SEBRAE" (valor − FUNCERN − contrapartida − imposto, só o valor) e o
+    recebido até agora; e as parcelas em balões
     (`BalaoDeParcela`), cada uma com **nota fiscal** (número, data de emissão, valor se for outro, arquivo PDF/XML/imagem
     no bucket privado `notas-fiscais`, caminho `<projeto>/<arquivo>`, regra por empresa atual do projeto; lê e apaga só
     quem vê o financeiro). Mostra "NF emitida · nº …" ou "NF pendente" e quantas notas já saíram.

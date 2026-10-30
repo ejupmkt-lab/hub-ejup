@@ -45,7 +45,7 @@ export type NotaFiscal = {
 };
 export const notaEmitida = (n: NotaFiscal | undefined | null) => !!n && (!!n.emitidaEm || !!n.numero.trim());
 
-// As duas parcelas do SEBRAE. A "Contrapartida" não é uma parcela: é um desconto sobre o total a receber (valores.contrapartida)
+// As duas parcelas do SEBRAE. A "Contrapartida" (valores.contrapartida) e o percentual do imposto (valores.aliquota) não são parcelas
 export type ChaveDeParcela = "30" | "70";
 export type FinEmpresa = ConfigImposto & { empresa: string };
 
@@ -171,6 +171,12 @@ export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje =
   return { horas, valorHora, percFuncern, bruto, funcern, contrapartida, liquido, parcelas };
 }
 
+// Percentual de imposto definido à mão no projeto (valores.aliquota); vazio: vale o da faixa do faturamento da empresa
+export const aliquotaDoProjeto = (fp: FinProjeto | undefined | null): number | null => {
+  const a = fp?.valores?.aliquota;
+  return typeof a === "number" && Number.isFinite(a) && a >= 0 ? a : null;
+};
+
 export type Entrada = {
   projeto: Projeto;
   parcela: Parcela;
@@ -193,7 +199,8 @@ export function entradasDeRecebimento(
     recebimento(p, servicos[p.modeloId], fps[p.id], hoje).parcelas.map((parcela): Entrada => {
       const dia = parcela.recebidaEm ?? parcela.previsao;
       const mes = dia ? dia.slice(0, 7) : null;
-      const aliquota = mes ? aliquotaNoMes(empresas[p.empresa], mes) : null;
+      // O percentual definido no projeto vale no lugar da faixa do faturamento da empresa
+      const aliquota = aliquotaDoProjeto(fps[p.id]) ?? (mes ? aliquotaNoMes(empresas[p.empresa], mes) : null);
       const imp = aliquota === null ? 0 : imposto(parcela.valor, aliquota);
       return { projeto: p, parcela, nota: fps[p.id]?.notas?.[parcela.chave] ?? null, mes, aliquota, imposto: imp, aposImposto: parcela.valor - imp };
     }),

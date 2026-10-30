@@ -140,6 +140,15 @@ export function useFinanceiro() {
     return salvarProjeto({ ...base, valores });
   };
 
+  // Percentual do imposto do projeto, no lugar do calculado pela faixa do faturamento (null volta ao automático; 0 vale: sem imposto)
+  const definirAliquota = (p: { id: string; empresa: string }, percentual: number | null) => {
+    const base: FinProjeto = projetos[p.id] ?? { projetoId: p.id, empresa: p.empresa, valorHora: null, percFuncern: null, recebidos: {}, previsoes: {}, valores: {}, notas: {} };
+    const valores = { ...base.valores };
+    if (percentual !== null && percentual >= 0) valores.aliquota = percentual;
+    else delete valores.aliquota;
+    return salvarProjeto({ ...base, valores });
+  };
+
   // Arquivo da nota fiscal (PDF, XML ou imagem) guardado no bucket privado "notas-fiscais", em "<projeto>/<arquivo>".
   // A linha do projeto no financeiro precisa existir antes (a regra do bucket olha o projeto), por isso o upsert antes.
   const anexarNota = async (p: { id: string; empresa: string }, chave: ChaveDeParcela, arquivo: File) => {
@@ -175,5 +184,5 @@ export function useFinanceiro() {
   };
 
   if (!pode) return null;
-  return { servicos, projetos, empresas, carregado, salvarServico, salvarProjeto, ajustarParcela, definirContrapartida, anexarNota, removerArquivoDaNota, abrirArquivoDaNota, salvarEmpresa, recarregar: carregar };
+  return { servicos, projetos, empresas, carregado, salvarServico, salvarProjeto, ajustarParcela, definirContrapartida, definirAliquota, anexarNota, removerArquivoDaNota, abrirArquivoDaNota, salvarEmpresa, recarregar: carregar };
 }

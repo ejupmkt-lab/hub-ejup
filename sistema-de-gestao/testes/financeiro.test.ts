@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { recebimento, type FinProjeto } from "../src/lib/financeiro";
+import { aliquotaDoProjeto, entradasDeRecebimento, recebimento, type FinProjeto } from "../src/lib/financeiro";
 import { projetoDeExemplo } from "./fixtures";
 import type { Projeto } from "../src/lib/dados/tipos";
 
@@ -61,4 +61,25 @@ test("com o Relatório 1 enviado, os 30% têm data real mesmo sem projeção, e 
   assert.equal(r.parcelas[0].previsao, "2026-11-05");
   assert.equal(r.parcelas[0].origem, "hub");
   assert.ok(r.parcelas[1].previsao && r.parcelas[1].previsao > "2026-11-05");
+});
+
+test("o percentual de imposto do projeto vale no lugar da faixa do faturamento (vazio: automático; zero: sem imposto)", () => {
+  const p = emExecucao();
+  p.etapas[0].status = "enviada";
+  p.etapas[0].enviadaEm = "2026-10-15";
+  const empresas = { pivotto: { empresa: "pivotto", faturamento12m: 100_000, aliquotaFixa: null, mudancas: [] } };
+  const valorDa = (valores: Record<string, number>) => {
+    const f = fp(valores);
+    const [e1] = entradasDeRecebimento([p], {}, { [p.id]: f }, empresas, "2026-10-20");
+    return { aliquota: e1.aliquota, imposto: e1.imposto, valor: e1.parcela.valor };
+  };
+  const auto = valorDa({});
+  assert.equal(auto.aliquota, 6, "pela faixa do faturamento");
+  const fixo = valorDa({ aliquota: 11.2 });
+  assert.equal(fixo.aliquota, 11.2);
+  assert.ok(Math.abs(fixo.imposto - (fixo.valor * 11.2) / 100) < 0.01);
+  assert.equal(valorDa({ aliquota: 0 }).imposto, 0, "zero é um percentual válido");
+  assert.equal(aliquotaDoProjeto(fp({ aliquota: 11.2 })), 11.2);
+  assert.equal(aliquotaDoProjeto(fp({})), null);
+  assert.equal(aliquotaDoProjeto(fp({ aliquota: -1 })), null);
 });
