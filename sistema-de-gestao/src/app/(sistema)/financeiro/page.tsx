@@ -53,10 +53,6 @@ export default function Financeiro() {
 
         {aba === "Recebimentos" && (
           <section className="space-y-4" aria-label="Recebimentos">
-            <p className="text-sm text-tinta-2">
-              O SEBRAE paga até o dia 5 o que ficou pronto até o dia 20 do mês anterior: 30% quando o Relatório 1 sai e o restante quando o projeto é finalizado.
-              Antes disso o sistema projeta a data pelo andamento do projeto; corrija qualquer data, valor ou recebimento em “Editar”.
-            </p>
             <AReceber projetos={projetos} />
           </section>
         )}
