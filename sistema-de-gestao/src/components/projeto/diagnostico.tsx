@@ -40,12 +40,22 @@ export function DiagnosticoDoProjeto({ projeto, aoDesenvolver }: { projeto: Proj
   const [urls, setUrls] = useState<Record<string, string>>({});
   const d = lerDiagnostico(projeto);
   const arquivo = d.arquivo;
+  const enviadoNoHub = hubDoProjeto(projeto).datas.diagnostico_enviado ?? null;
+  // Começa recolhido quando o diagnóstico já está pronto (arquivo final anexado ou enviado no HUB); aberto enquanto ainda se elabora
+  const [aberto, setAberto] = useState(!(arquivo || enviadoNoHub));
   const temTexto = temTextoNoDiagnostico(d);
   const marcadores = contarMarcadores(d);
   const faltas = cliente ? faltasDoDiagnostico(projeto, cliente) : [];
-  const enviadoNoHub = hubDoProjeto(projeto).datas.diagnostico_enviado ?? null;
   const naFaseDoDiagnostico = passoHubDoProjeto(projeto) === "diagnostico";
   const doHub = (projeto.materiaisHub ?? []).filter((m) => /diagn/i.test(m.nome));
+
+  // Quem chega pelo "próximo passo" (#diagnostico) encontra a área aberta
+  useEffect(() => {
+    const abrirPeloEndereco = () => window.location.hash === "#diagnostico" && setAberto(true);
+    abrirPeloEndereco();
+    window.addEventListener("hashchange", abrirPeloEndereco);
+    return () => window.removeEventListener("hashchange", abrirPeloEndereco);
+  }, []);
 
   // Miniaturas das imagens de evidência
   const caminhos = d.evidencias.map((e) => e.caminho);
@@ -174,16 +184,32 @@ export function DiagnosticoDoProjeto({ projeto, aoDesenvolver }: { projeto: Proj
   return (
     <Cartao className="scroll-mt-4 p-3 sm:p-5">
       <section id="diagnostico" aria-label="Diagnóstico" className="scroll-mt-4">
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-1 pb-1">
-          <h2 className="text-[17px] font-bold">Diagnóstico</h2>
-          <Status tom={situacao.tom}>{situacao.texto}</Status>
-        </div>
-        <p className="px-1 pb-4 text-[13px] text-tinta-2">
-          Primeira entrega do projeto, antes dos relatórios das etapas, no modelo do SEBRAE. Conte à IA o que o cliente relatou e o que você levantou, e mande as
-          imagens da reunião; quando ela tiver tudo, escreve o diagnóstico uma vez. Daqui você baixa o Word e guarda a versão final enviada no HUB.
-        </p>
+        <button
+          type="button"
+          aria-expanded={aberto}
+          aria-controls="diagnostico-conteudo"
+          onClick={() => setAberto(!aberto)}
+          className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-[var(--radius-campo)] px-1 py-0.5 text-left"
+        >
+          <span className="flex items-center gap-2">
+            <svg aria-hidden viewBox="0 0 20 20" className={`size-4 shrink-0 fill-none stroke-current stroke-2 transition-transform ${aberto ? "rotate-90" : ""}`}>
+              <path d="M7 4l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span className="text-[17px] font-bold">Diagnóstico</span>
+          </span>
+          <span className="flex items-center gap-3">
+            {!aberto && (
+              <span className="num text-[13px] text-tinta-2">
+                {d.evidencias.length} {d.evidencias.length === 1 ? "imagem" : "imagens"}
+                {arquivo ? " · arquivo final anexado" : ""}
+              </span>
+            )}
+            <Status tom={situacao.tom}>{situacao.texto}</Status>
+            <span className="text-[13px] font-semibold text-tinta-2">{aberto ? "Reduzir" : "Expandir"}</span>
+          </span>
+        </button>
 
-        <div className="space-y-4">
+        <div id="diagnostico-conteudo" hidden={!aberto} className="mt-4 space-y-4">
           <div className="rounded-[var(--radius-campo)] border border-linha p-3.5">
             <p className="text-[13px] font-bold uppercase tracking-wide text-tinta-2">Texto e Word no modelo do SEBRAE</p>
             {temTexto ? (
@@ -299,24 +325,6 @@ export function DiagnosticoDoProjeto({ projeto, aoDesenvolver }: { projeto: Proj
                 {enviando === "imagem" ? "Enviando…" : "Adicionar imagem"}
               </Botao>
               <input ref={entradaImagem} type="file" aria-label="Imagem da evidência do diagnóstico" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(e) => void adicionarImagem(e.target.files?.[0])} />
-            </div>
-          </div>
-
-          <div className="rounded-[var(--radius-campo)] border border-linha p-3.5">
-            <p className="text-[13px] font-bold uppercase tracking-wide text-tinta-2">Quadro de assinatura do Word</p>
-            <p className="mt-1 text-[13px] text-tinta-2">
-              Instituição credenciada: {projeto.prestadoraVinculada || "—"} · Local e data: {projeto.localAssinatura || "—"}, na data em que o Word é gerado (ou a que você definir).
-            </p>
-            <div className="mt-2 grid gap-3 sm:grid-cols-3">
-              <Campo rotulo="Telefone do prestador">
-                <input key={d.telefone ?? ""} className="campo" defaultValue={d.telefone ?? ""} onBlur={(e) => e.target.value.trim() !== (d.telefone ?? "") && gravar((x) => void (x.telefone = e.target.value.trim()), "Diagnóstico: telefone do prestador alterado")} />
-              </Campo>
-              <Campo rotulo="E-mail do prestador" dica={d.email ? undefined : `Vazio: ${consultor?.email ?? "e-mail do consultor"}`}>
-                <input key={d.email ?? ""} className="campo" defaultValue={d.email ?? ""} onBlur={(e) => e.target.value.trim() !== (d.email ?? "") && gravar((x) => void (x.email = e.target.value.trim()), "Diagnóstico: e-mail do prestador alterado")} />
-              </Campo>
-              <Campo rotulo="Data do documento" dica="Vazio: o dia em que o Word é gerado.">
-                <input key={d.dataDoDocumento ?? ""} type="date" className="campo num" defaultValue={d.dataDoDocumento ?? ""} onBlur={(e) => e.target.value !== (d.dataDoDocumento ?? "") && gravar((x) => void (x.dataDoDocumento = e.target.value || null), "Diagnóstico: data do documento alterada")} />
-              </Campo>
             </div>
           </div>
 

@@ -28,6 +28,7 @@ export type AcaoIA =
   | { tipo: "preencher_tabela"; tabela: string; linhas: string[][]; substituir: boolean }
   // O diagnóstico do projeto no modelo do SEBRAE, escrito uma vez, quando as informações estão completas; o Word sai dele em Entregas
   | { tipo: "escrever_diagnostico"; anamnese: string; analise: string; parecer: string }
+  | { tipo: "dados_do_diagnostico"; telefone: string; email: string; data: string }
   // Imagem da reunião de diagnóstico (print, foto): evidência do diagnóstico, guardada assim que chega
   | { tipo: "guardar_evidencia_diagnostico"; anexo: string; legenda: string }
   // Só vem da importação do HUB (a conversa não oferece): código do pedido e gestor lidos na página do HUB
@@ -134,6 +135,25 @@ export function aplicarAcoes(p: Projeto, acoes: AcaoIA[], anexos: Anexo[], mensa
       void _legado;
       p.diagnostico = { ...resto, ...novos, atualizadoEm: hojeIso() };
       feito(`Diagnóstico: texto ${novo ? "escrito" : "atualizado"}, nas três seções do modelo do SEBRAE (o Word está em Entregas, na área Diagnóstico)`);
+      return;
+    }
+    // Quadro de assinatura do Word do diagnóstico: o que o consultor informou na conversa (vazio = não muda)
+    if (a.tipo === "dados_do_diagnostico") {
+      const telefone = String(a.telefone ?? "").trim();
+      const email = String(a.email ?? "").trim();
+      const data = /^\d{4}-\d{2}-\d{2}$/.test(String(a.data ?? "").trim()) ? String(a.data).trim() : "";
+      const atual = lerDiagnostico(p);
+      const muda = {
+        telefone: !!telefone && telefone !== (atual.telefone ?? ""),
+        email: !!email && email !== (atual.email ?? ""),
+        data: !!data && data !== (atual.dataDoDocumento ?? ""),
+      };
+      if (!muda.telefone && !muda.email && !muda.data) return;
+      desfazer.push({ tipo: "diagnostico", antes: p.diagnostico ? structuredClone(p.diagnostico) : null });
+      const { texto: _legado, ...resto } = atual;
+      void _legado;
+      p.diagnostico = { ...resto, ...(muda.telefone ? { telefone } : {}), ...(muda.email ? { email } : {}), ...(muda.data ? { dataDoDocumento: data } : {}) };
+      feito(`Diagnóstico: ${[muda.telefone ? `telefone do prestador ${telefone}` : "", muda.email ? `e-mail do prestador ${email}` : "", muda.data ? `data do documento ${formatarData(data)}` : ""].filter(Boolean).join("; ")}`);
       return;
     }
     if (a.tipo === "guardar_evidencia_diagnostico") {

@@ -84,7 +84,9 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
     - **Recebimentos**: resumo no topo (a receber, próximo pagamento, recebido no mês, imposto previsto), o seletor de
       **período** (Mês, Trimestre, Ano, Tudo ou Personalizado; abre no mês corrente, com setas e um seletor de mês;
       `src/lib/periodo.ts`) e, embaixo, os projetos no padrão da lista de Projetos (`ProjetosDoRecebimento`: tabela nas
-      telas largas, cartões nas menores) com Cliente / projeto, Etapa atual, Progresso e as duas parcelas. Cada
+      telas largas, cartões nas menores) com Cliente / projeto, Etapa atual, Progresso e as duas parcelas. **O período mostra só
+      as parcelas que caem nele** (data de recebimento, ou a prevista): quem recebeu a 1ª em outubro aparece em novembro só com
+      a 2ª, que continua na coluna dela. Cada
       parcela tem valor, "Previsto até" (ou "Recebida em"), situação (Projetada, Data do HUB, Combinada, Atrasada,
       Recebida), selo da nota fiscal e **Recebi** / **Editar** (data prevista em `previsoes`, valor em `valores`, dia
       em `recebidos`, nota em `notas`, "Voltar à projeção").       "Sem data (n)" lista as parcelas de projetos sem plano de trabalho. O pagamento único antigo ("100") vale para
@@ -194,8 +196,11 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   no contexto e aparece na tela); escreve os três textos **uma vez** (`escrever_diagnostico`, com desfazer) quando tem tudo
   ou quando o consultor pede, e só mexe depois a pedido. **A imagem da reunião** (foto ou print) é guardada na hora como
   evidência do diagnóstico (`guardar_evidencia_diagnostico`, não `guardar_anexo`, que é das etapas) e vai ao fim do Word com
-  a legenda "Evidência 01 – …". Na área: ver e editar os três textos à mão, adicionar/tirar imagens e editar legendas,
-  telefone e e-mail do prestador e a data do quadro de assinatura, baixar o Word, e **anexar o arquivo final** (Word ou PDF,
+  a legenda "Evidência 01 – …". **Telefone e e-mail do prestador e a data do quadro de assinatura não são campos de tela**:
+  a IA pede ao consultor na conversa (entram na lista do que falta) e registra com `dados_do_diagnostico` (com desfazer).
+  A área pode ser **reduzida ou expandida** (cabeçalho clicável; abre recolhida quando o arquivo final já está anexado
+  ou enviado no HUB, mostrando só o resumo, e `#diagnostico` sempre abre). Nela: ver e editar os três textos à mão,
+  adicionar/tirar imagens e editar legendas, baixar o Word, e **anexar o arquivo final** (Word ou PDF,
   o enviado no HUB; bucket `evidencias`, pasta `<empresa>/<projeto>/diagnostico/`), trocar e remover. A situação mostra
   "A elaborar", "Em elaboração", "Arquivo anexado" ou "Enviado no HUB em…". O "próximo passo" da fase do diagnóstico leva a
   `#diagnostico`. A IA nunca diz que "não pode enviar" o arquivo: aponta o botão em Entregas. O bucket aceita Word desde a

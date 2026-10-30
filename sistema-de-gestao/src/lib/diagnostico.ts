@@ -36,7 +36,7 @@ export function totalDeEmpregados(c: Pick<Cliente, "empregadosGestao" | "emprega
 }
 
 // O que o diagnóstico ainda precisa, para a IA saber o que perguntar antes de escrever (e para a tela dizer o que falta)
-export function faltasDoDiagnostico(p: Projeto, c: Partial<Cliente>): string[] {
+export function faltasDoDiagnostico(p: Projeto, c: Partial<Cliente>, emailDoConsultor = ""): string[] {
   const d = lerDiagnostico(p);
   const faltas: string[] = [];
   const cadastro: [keyof Cliente, string][] = [
@@ -49,5 +49,8 @@ export function faltasDoDiagnostico(p: Projeto, c: Partial<Cliente>): string[] {
   if (!(p.codigoSolicitacaoHub || p.numeroProjetoHub).trim()) faltas.push("código da solicitação no HUB");
   for (const s of secoesEmBranco(d)) faltas.push(`texto: ${s.titulo}`);
   if (!d.evidencias.length) faltas.push("evidência da reunião de diagnóstico (foto ou print)");
+  // Quadro de assinatura do Word: a IA pede ao consultor, em vez de haver uma tabela fixa para preencher na tela
+  if (!(d.telefone ?? "").trim()) faltas.push("telefone do prestador (quadro de assinatura)");
+  if (!(d.email ?? "").trim() && !emailDoConsultor.trim()) faltas.push("e-mail do prestador (quadro de assinatura)");
   return faltas;
 }

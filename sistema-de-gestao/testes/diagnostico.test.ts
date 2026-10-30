@@ -48,6 +48,20 @@ test("a IA escreve o diagnóstico uma vez (as três partes do modelo) e dá para
   assert.equal(aplicarAcoes(q, [{ tipo: "escrever_diagnostico", anamnese: " ", analise: "", parecer: "" }], [], "m3", "x").itens.length, 0);
 });
 
+test("a IA registra telefone, e-mail e data do quadro de assinatura (campo vazio não muda) e dá para desfazer", () => {
+  const p = projetoDeExemplo();
+  const r = aplicarAcoes(p, [{ tipo: "dados_do_diagnostico", telefone: "(84) 99932-1514", email: "", data: "2026-10-30" }], [], "m1", "C");
+  const d = lerDiagnostico(p);
+  assert.equal(d.telefone, "(84) 99932-1514");
+  assert.equal(d.dataDoDocumento, "2026-10-30");
+  assert.ok(!d.email);
+  assert.ok(r.itens[0].descricao.includes("telefone do prestador") && r.itens[0].descricao.includes("30/10/2026"));
+  // sem novidade ou data inválida: nada muda
+  assert.equal(aplicarAcoes(p, [{ tipo: "dados_do_diagnostico", telefone: "(84) 99932-1514", email: "", data: "amanhã" }], [], "m2", "C").itens.length, 0);
+  desfazerAcoes(p, r.desfazer);
+  assert.ok(!lerDiagnostico(p).telefone);
+});
+
 test("a imagem da reunião vira evidência do diagnóstico na hora (e não de uma etapa), com desfazer", () => {
   const p = projetoDeExemplo();
   const anexos: Anexo[] = [{ id: "a1", caminho: "pivotto/prj/conversa/reuniao.png", nome: "reuniao.png", tipo: "image/png", largura: 900, altura: 1600 }, { id: "a2", caminho: "x.pdf", nome: "x.pdf", tipo: "application/pdf" }];
@@ -129,7 +143,11 @@ test("a lista do que falta aponta cadastro, textos e evidência", () => {
   assert.ok(f.includes("texto: Contextualização / Anamnese") && f.includes("texto: Parecer técnico – Diagnóstico"));
   assert.ok(f.some((x) => x.startsWith("evidência da reunião")));
   p.diagnostico = { anamnese: "a", analise: "b", parecer: "c", evidencias: [{ id: "e", caminho: "x", legenda: "l", largura: 1, altura: 1, tipo: "image/png" }], atualizadoEm: null, arquivo: null };
-  assert.deepEqual(faltasDoDiagnostico(p, clienteDeExemplo), []);
+  // quadro de assinatura: a IA pede telefone e e-mail do prestador (o e-mail pode vir do consultor)
+  assert.deepEqual(faltasDoDiagnostico(p, clienteDeExemplo), ["telefone do prestador (quadro de assinatura)", "e-mail do prestador (quadro de assinatura)"]);
+  assert.deepEqual(faltasDoDiagnostico(p, clienteDeExemplo, "c@x.com"), ["telefone do prestador (quadro de assinatura)"]);
+  p.diagnostico.telefone = "(84) 99932-1514";
+  assert.deepEqual(faltasDoDiagnostico(p, clienteDeExemplo, "c@x.com"), []);
   assert.equal(totalDeEmpregados({ empregadosGestao: "3", empregadosOperacionais: "10" }), "13");
   assert.equal(totalDeEmpregados({ empregadosGestao: "", empregadosOperacionais: "10" }), "");
 });
@@ -140,6 +158,7 @@ test("a IA segue o modelo do SEBRAE no diagnóstico, escreve só no fim, guarda 
   for (const t of ["Contextualização / Anamnese", "Investigação / Análise documental", "Parecer técnico – Diagnóstico", "Evidências", "sintoma, problema e causa", "roteiro ou pré-diagnóstico da ficha técnica", "1. Título da necessidade. Texto…"]) assert.ok(r.includes(t), t);
   assert.ok(r.includes("Não escreva o diagnóstico a cada mensagem"));
   assert.ok(r.includes('Use "escrever_diagnostico" UMA vez'));
+  assert.ok(r.includes('"dados_do_diagnostico"') && r.includes("telefone do prestador") && r.includes("quadro de assinatura do Word"));
   assert.ok(r.includes('"guardar_evidencia_diagnostico"') && r.includes("Não use \"guardar_anexo\" para isso"));
   assert.ok(r.includes('nunca diga que "não pode enviar" o diagnóstico') && r.includes('"Baixar diagnóstico em Word"'));
   assert.ok(SISTEMA.includes(r), "as regras do diagnóstico estão no prompt do chat");

@@ -148,16 +148,24 @@ export function ProjetosDoRecebimento({ fin, linhas, mesEscolhido }: { fin: Fina
                     </div>
                     <p className="num mt-1 text-[12px] text-tinta-2">entrega {entrega ? formatarData(entrega) : "—"}</p>
                   </div>
-                  {entradas.map((e) => (
-                    <CelulaDeParcela
-                      key={e.parcela.chave}
-                      fin={fin}
-                      entrada={e}
-                      nome={nome}
-                      aberta={edicao?.id === p.id && edicao.chave === e.parcela.chave}
-                      aoEditar={() => setEdicao(edicao?.id === p.id && edicao.chave === e.parcela.chave ? null : { id: p.id, chave: e.parcela.chave })}
-                    />
-                  ))}
+                  {/* Uma coluna por parcela: a que não cai no período fica em branco, a 2ª continua na sua coluna */}
+                  {([1, 2] as const).map((ordem) => {
+                    const e = entradas.find((x) => x.parcela.ordem === ordem);
+                    return e ? (
+                      <CelulaDeParcela
+                        key={e.parcela.chave}
+                        fin={fin}
+                        entrada={e}
+                        nome={nome}
+                        aberta={edicao?.id === p.id && edicao.chave === e.parcela.chave}
+                        aoEditar={() => setEdicao(edicao?.id === p.id && edicao.chave === e.parcela.chave ? null : { id: p.id, chave: e.parcela.chave })}
+                      />
+                    ) : (
+                      <span key={ordem} aria-hidden className="num text-sm text-tinta-2">
+                        —
+                      </span>
+                    );
+                  })}
                 </div>
                 {editando && (
                   <div className="relative z-10 border-t border-linha bg-pedra/40 px-5 py-4">

@@ -75,7 +75,8 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
     c.ps.map((p) => ({
       projeto: p,
       nomeCliente: nomeDoCliente(c.cliente),
-      entradas: c.todas.filter((e) => e.projeto.id === p.id).sort((a, b) => a.parcela.ordem - b.parcela.ordem),
+      // Só as parcelas que caem no período escolhido: em novembro, quem recebeu a 1ª em outubro mostra apenas a 2ª
+      entradas: doPeriodo.filter((e) => e.projeto.id === p.id).sort((a, b) => a.parcela.ordem - b.parcela.ordem),
     })),
   );
   const totalPeriodo = soma(doPeriodo, valorDe);
