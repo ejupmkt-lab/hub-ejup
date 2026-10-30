@@ -34,7 +34,17 @@ export type FinProjeto = {
   previsoes: Record<string, string>; // data combinada de cada parcela, no lugar da estimada
   valores: Record<string, number>; // valor de cada parcela ajustado à mão, no lugar do calculado
   notas: Record<string, NotaFiscal>; // nota fiscal de cada parcela
+  fonteContrapartida: string | null; // de quem saiu o dinheiro da contrapartida (para onde ele volta): ver FONTES_DE_CUSTEIO
 };
+
+// Fontes de custeio da contrapartida: quem adiantou o valor e, por isso, recebe de volta (ou o caixa da empresa, que não devolve)
+export const FONTES_DE_CUSTEIO = [
+  { valor: "roberto", rotulo: "Roberto" },
+  { valor: "leonardo", rotulo: "Leonardo" },
+  { valor: "caixa", rotulo: "Caixa da empresa" },
+  { valor: "outra", rotulo: "Outra" },
+] as const;
+export const rotuloDaFonte = (v: string | null | undefined) => FONTES_DE_CUSTEIO.find((f) => f.valor === v)?.rotulo ?? null;
 
 // Nota fiscal de uma parcela: emitida quando tem a data de emissão (ou o número)
 export type NotaFiscal = {

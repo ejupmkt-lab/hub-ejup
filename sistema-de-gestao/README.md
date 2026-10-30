@@ -77,7 +77,8 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
     "Dados"): valor do projeto, FUNCERN, o **Imposto** (percentual da faixa do faturamento da empresa no mês de cada
     pagamento, ou o percentual definido ali mesmo, `valores.aliquota`; vazio volta ao automático, zero vale), a
     **Contrapartida** (desconto sobre o total a receber, uma espécie de cashback; os 30% e 70% saem do valor
-    descontado), o quadro verde "Você recebe do SEBRAE" (valor − FUNCERN − contrapartida − imposto, só o valor) e o
+    descontado; com o seletor **Fonte de custeio**, de quem saiu o dinheiro e para onde ele volta: Roberto, Leonardo,
+    Caixa da empresa ou Outra, em `financeiro_projetos.fonte_contrapartida`, migração `20261102000000`), o quadro verde "Você recebe do SEBRAE" (valor − FUNCERN − contrapartida − imposto, só o valor) e o
     recebido até agora; e as parcelas em balões
     (`BalaoDeParcela`), cada uma com **nota fiscal** (número, data de emissão, valor se for outro, arquivo PDF/XML/imagem
     no bucket privado `notas-fiscais`, caminho `<projeto>/<arquivo>`, regra por empresa atual do projeto; lê e apaga só

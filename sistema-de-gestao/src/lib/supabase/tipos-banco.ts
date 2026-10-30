@@ -125,14 +125,14 @@ isOneToOne: true
                   ]
                 },"financeiro_projetos": {
                   Row: {
-                    "empresa": string,"notas": NonNullable<Json>,"perc_funcern": number | null,"previsoes": NonNullable<Json>,"projeto_id": string,"recebidos": NonNullable<Json>,"updated_at": string,"valor_hora": number | null,"valores": NonNullable<Json>
+                    "empresa": string,"fonte_contrapartida": string | null,"notas": NonNullable<Json>,"perc_funcern": number | null,"previsoes": NonNullable<Json>,"projeto_id": string,"recebidos": NonNullable<Json>,"updated_at": string,"valor_hora": number | null,"valores": NonNullable<Json>
                   }
                   ComputedFields: never
                   Insert: {
-                    "empresa": string,"notas"?: NonNullable<Json>,"perc_funcern"?: number | null,"previsoes"?: NonNullable<Json>,"projeto_id": string,"recebidos"?: NonNullable<Json>,"updated_at"?: string,"valor_hora"?: number | null,"valores"?: NonNullable<Json>
+                    "empresa": string,"fonte_contrapartida"?: string | null,"notas"?: NonNullable<Json>,"perc_funcern"?: number | null,"previsoes"?: NonNullable<Json>,"projeto_id": string,"recebidos"?: NonNullable<Json>,"updated_at"?: string,"valor_hora"?: number | null,"valores"?: NonNullable<Json>
                   }
                   Update: {
-                    "empresa"?: string,"notas"?: NonNullable<Json>,"perc_funcern"?: number | null,"previsoes"?: NonNullable<Json>,"projeto_id"?: string,"recebidos"?: NonNullable<Json>,"updated_at"?: string,"valor_hora"?: number | null,"valores"?: NonNullable<Json>
+                    "empresa"?: string,"fonte_contrapartida"?: string | null,"notas"?: NonNullable<Json>,"perc_funcern"?: number | null,"previsoes"?: NonNullable<Json>,"projeto_id"?: string,"recebidos"?: NonNullable<Json>,"updated_at"?: string,"valor_hora"?: number | null,"valores"?: NonNullable<Json>
                   }
                   Relationships: [
                     {

@@ -2,7 +2,7 @@
 
 import type { Projeto } from "@/lib/dados/tipos";
 import { useFinanceiro } from "@/lib/dados/financeiro";
-import { aliquotaDoProjeto, entradasDeRecebimento, moeda, notaEmitida, recebimento } from "@/lib/financeiro";
+import { FONTES_DE_CUSTEIO, aliquotaDoProjeto, entradasDeRecebimento, moeda, notaEmitida, recebimento } from "@/lib/financeiro";
 import { aliquotaNoMes, imposto } from "@/lib/imposto";
 import { hojeIso } from "@/lib/datas";
 import { Campo } from "@/components/ui";
@@ -83,6 +83,22 @@ export function FinanceiroDoProjeto({ projeto: p, nomeCliente }: { projeto: Proj
             />
           </Campo>
           <p className="mt-1 text-[12px] text-tinta-2">Desconto sobre o total a receber.</p>
+          <label className="mt-2 block text-[12px] font-semibold text-tinta-2">
+            Fonte de custeio
+            <select
+              className="campo mt-1 !text-sm"
+              value={fin.projetos[p.id]?.fonteContrapartida ?? ""}
+              onChange={(ev) => void fin.definirFonteDaContrapartida(p, ev.target.value || null).catch((e) => alert(e instanceof Error ? e.message : "Não foi possível salvar."))}
+            >
+              <option value="">Não definida</option>
+              {FONTES_DE_CUSTEIO.map((f) => (
+                <option key={f.valor} value={f.valor}>
+                  {f.rotulo}
+                </option>
+              ))}
+            </select>
+          </label>
+          <p className="mt-1 text-[12px] text-tinta-2">De quem saiu o valor da contrapartida: é para lá que ele volta.</p>
         </div>
         <div className="rounded-[var(--radius-bloco)] border border-verde/25 bg-verde-claro p-3.5">
           <dt className="text-[12px] text-tinta-2">Você recebe do SEBRAE</dt>

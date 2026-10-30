@@ -25,7 +25,7 @@ export function useFinanceiro() {
     const sb = supabaseNavegador();
     const [s, p, e] = await Promise.all([
       sb.from("financeiro_servicos").select("servico_id, empresa, teto, valor_hora, perc_funcern"),
-      sb.from("financeiro_projetos").select("projeto_id, empresa, valor_hora, perc_funcern, recebidos, previsoes, valores, notas"),
+      sb.from("financeiro_projetos").select("projeto_id, empresa, valor_hora, perc_funcern, recebidos, previsoes, valores, notas, fonte_contrapartida"),
       sb.from("financeiro_empresas").select("empresa, faturamento_12m, aliquota_fixa, mudancas"),
     ]);
     setServicos(
@@ -49,6 +49,7 @@ export function useFinanceiro() {
             previsoes: (x.previsoes ?? {}) as Record<string, string>,
             valores: (x.valores ?? {}) as Record<string, number>,
             notas: (x.notas ?? {}) as Record<string, NotaFiscal>,
+            fonteContrapartida: (x.fonte_contrapartida as string | null) ?? null,
           },
         ]),
       ),
@@ -94,6 +95,7 @@ export function useFinanceiro() {
         previsoes: f.previsoes,
         valores: f.valores,
         notas: f.notas,
+        fonte_contrapartida: f.fonteContrapartida,
         updated_at: new Date().toISOString(),
       });
     if (error) {
@@ -109,7 +111,7 @@ export function useFinanceiro() {
 
   // Muda uma parcela: data prevista, valor e/ou dia em que foi recebida (null apaga e volta ao calculado)
   const ajustarParcela = (p: { id: string; empresa: string }, chave: ChaveDeParcela, a: AjusteDeParcela) => {
-    const base: FinProjeto = projetos[p.id] ?? { projetoId: p.id, empresa: p.empresa, valorHora: null, percFuncern: null, recebidos: {}, previsoes: {}, valores: {}, notas: {} };
+    const base: FinProjeto = projetos[p.id] ?? { projetoId: p.id, empresa: p.empresa, valorHora: null, percFuncern: null, recebidos: {}, previsoes: {}, valores: {}, notas: {}, fonteContrapartida: null };
     // O pagamento único antigo ("100") vira as duas parcelas, para poder mexer em cada uma
     const abrir = <T,>(m: Record<string, T>) => {
       const { "100": unico, ...resto } = m;
@@ -133,16 +135,22 @@ export function useFinanceiro() {
 
   // Contrapartida do projeto: desconto sobre o total a receber (vazio ou zero tira o desconto)
   const definirContrapartida = (p: { id: string; empresa: string }, valor: number | null) => {
-    const base: FinProjeto = projetos[p.id] ?? { projetoId: p.id, empresa: p.empresa, valorHora: null, percFuncern: null, recebidos: {}, previsoes: {}, valores: {}, notas: {} };
+    const base: FinProjeto = projetos[p.id] ?? { projetoId: p.id, empresa: p.empresa, valorHora: null, percFuncern: null, recebidos: {}, previsoes: {}, valores: {}, notas: {}, fonteContrapartida: null };
     const valores = { ...base.valores };
     if (valor && valor > 0) valores.contrapartida = valor;
     else delete valores.contrapartida;
     return salvarProjeto({ ...base, valores });
   };
 
+  // Fonte de custeio da contrapartida: de quem saiu o dinheiro, para onde ele volta (null: não definida)
+  const definirFonteDaContrapartida = (p: { id: string; empresa: string }, fonte: string | null) => {
+    const base: FinProjeto = projetos[p.id] ?? { projetoId: p.id, empresa: p.empresa, valorHora: null, percFuncern: null, recebidos: {}, previsoes: {}, valores: {}, notas: {}, fonteContrapartida: null };
+    return salvarProjeto({ ...base, fonteContrapartida: fonte || null });
+  };
+
   // Percentual do imposto do projeto, no lugar do calculado pela faixa do faturamento (null volta ao automático; 0 vale: sem imposto)
   const definirAliquota = (p: { id: string; empresa: string }, percentual: number | null) => {
-    const base: FinProjeto = projetos[p.id] ?? { projetoId: p.id, empresa: p.empresa, valorHora: null, percFuncern: null, recebidos: {}, previsoes: {}, valores: {}, notas: {} };
+    const base: FinProjeto = projetos[p.id] ?? { projetoId: p.id, empresa: p.empresa, valorHora: null, percFuncern: null, recebidos: {}, previsoes: {}, valores: {}, notas: {}, fonteContrapartida: null };
     const valores = { ...base.valores };
     if (percentual !== null && percentual >= 0) valores.aliquota = percentual;
     else delete valores.aliquota;
@@ -184,5 +192,5 @@ export function useFinanceiro() {
   };
 
   if (!pode) return null;
-  return { servicos, projetos, empresas, carregado, salvarServico, salvarProjeto, ajustarParcela, definirContrapartida, definirAliquota, anexarNota, removerArquivoDaNota, abrirArquivoDaNota, salvarEmpresa, recarregar: carregar };
+  return { servicos, projetos, empresas, carregado, salvarServico, salvarProjeto, ajustarParcela, definirContrapartida, definirAliquota, definirFonteDaContrapartida, anexarNota, removerArquivoDaNota, abrirArquivoDaNota, salvarEmpresa, recarregar: carregar };
 }

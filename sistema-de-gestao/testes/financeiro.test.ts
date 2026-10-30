@@ -4,7 +4,7 @@ import { aliquotaDoProjeto, entradasDeRecebimento, recebimento, type FinProjeto 
 import { projetoDeExemplo } from "./fixtures";
 import type { Projeto } from "../src/lib/dados/tipos";
 
-const fp = (valores: Record<string, number> = {}, previsoes: Record<string, string> = {}): FinProjeto => ({ projetoId: "prj-teste", empresa: "pivotto", valorHora: null, percFuncern: null, recebidos: {}, previsoes, valores, notas: {} });
+const fp = (valores: Record<string, number> = {}, previsoes: Record<string, string> = {}): FinProjeto => ({ projetoId: "prj-teste", empresa: "pivotto", valorHora: null, percFuncern: null, recebidos: {}, previsoes, valores, notas: {}, fonteContrapartida: null });
 
 // Projeto em execução (pagamento feito), com plano de trabalho
 function emExecucao(): Projeto {
