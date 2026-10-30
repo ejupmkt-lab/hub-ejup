@@ -94,6 +94,8 @@ export default function Projetos() {
         </Vazio>
       ) : (
         <div className="space-y-4">
+          {/* Os dois seletores na mesma linha e na mesma altura (no celular, um embaixo do outro) */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-stretch">
           <Segmentos
             rotulo="Projetos"
             atual={aba}
@@ -115,6 +117,7 @@ export default function Projetos() {
               { valor: "calendario", rotulo: "Calendário", icone: <IconeCalendario className="h-5 w-5" /> },
             ]}
           />
+          </div>
 
           <Cartao className={`grid grid-cols-2 gap-2 p-2 ${aba === "andamento" ? "sm:grid-cols-[minmax(0,13rem)_minmax(0,13rem)_1fr]" : "sm:grid-cols-[minmax(0,13rem)_1fr]"}`}>
             {aba === "andamento" && (
