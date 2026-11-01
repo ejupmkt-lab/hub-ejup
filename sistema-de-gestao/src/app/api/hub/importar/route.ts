@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { supabaseServidor } from "@/lib/supabase/servidor";
+import { exigirPerfil } from "@/lib/supabase/guarda";
 import type { Cliente, Projeto, Servico } from "@/lib/dados/tipos";
 import { antesDaContratacao, fases, hubDoProjeto, passosHub, passoHubDoProjeto } from "@/lib/fase";
 import { hojeIso } from "@/lib/datas";
@@ -188,7 +189,8 @@ export async function POST(req: Request) {
   const {
     data: { user },
   } = await sb.auth.getUser();
-  if (!user) return NextResponse.json({ erro: "Sessão expirada. Entre de novo." }, { status: 401 });
+  const negado = await exigirPerfil(sb, user);
+  if (negado) return negado;
 
   if (!process.env.ANTHROPIC_API_KEY)
     return NextResponse.json({ erro: "A IA ainda não foi ativada no servidor: falta cadastrar a chave da API da Anthropic na Vercel." }, { status: 503 });
@@ -213,6 +215,8 @@ export async function POST(req: Request) {
   let contexto: string;
   if (modoNovo) {
     // Projeto novo: a IA recebe a lista de serviços da empresa (as regras de acesso valem na consulta)
+    const { data: daEmpresa } = await sb.from("empresas").select("slug").eq("slug", empresa).maybeSingle();
+    if (!daEmpresa) return NextResponse.json({ erro: "Empresa não encontrada, ou o seu usuário não tem acesso a ela." }, { status: 403 });
     const { data: linhas } = await sb.from("servicos").select("id, dados").eq("empresa", empresa);
     if (!linhas) return NextResponse.json({ erro: "Empresa não encontrada." }, { status: 404 });
     contexto = contextoNovo(linhas.map((l) => ({ ...(l.dados as Servico), id: l.id as string })));

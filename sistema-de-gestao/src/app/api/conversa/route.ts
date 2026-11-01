@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { supabaseServidor } from "@/lib/supabase/servidor";
+import { exigirPerfil } from "@/lib/supabase/guarda";
 import type { Cliente, Etapa, Projeto, Servico } from "@/lib/dados/tipos";
 import { tiposRegistro } from "@/lib/registros";
 import { antesDaContratacao, comQuem, faseDoProjeto, fases, passoHubDoProjeto, passosHub } from "@/lib/fase";
@@ -177,7 +178,8 @@ export async function POST(req: Request) {
   const {
     data: { user },
   } = await sb.auth.getUser();
-  if (!user) return NextResponse.json({ erro: "Sessão expirada. Entre de novo." }, { status: 401 });
+  const negado = await exigirPerfil(sb, user);
+  if (negado) return negado;
 
   if (!process.env.ANTHROPIC_API_KEY)
     return NextResponse.json(

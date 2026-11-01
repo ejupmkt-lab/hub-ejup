@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServidor } from "@/lib/supabase/servidor";
+import { exigirPerfil } from "@/lib/supabase/guarda";
 import type { Etapa, Projeto } from "@/lib/dados/tipos";
 import { configurada } from "./autentique";
 
@@ -17,7 +18,8 @@ export async function acessarEtapa(projetoId: string | undefined, ordem: number)
   const {
     data: { user },
   } = await sb.auth.getUser();
-  if (!user) return { erro: NextResponse.json({ erro: "Sessão expirada. Entre de novo." }, { status: 401 }) };
+  const negado = await exigirPerfil(sb, user);
+  if (negado) return { erro: negado };
   if (!projetoId || !Number.isInteger(ordem)) return { erro: NextResponse.json({ erro: "Pedido inválido." }, { status: 400 }) };
   const { data } = await sb.from("projetos").select("dados").eq("id", projetoId).maybeSingle();
   const projeto = data?.dados as Projeto | undefined;

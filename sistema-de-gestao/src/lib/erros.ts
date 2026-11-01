@@ -4,6 +4,7 @@ const traducoes: [RegExp, string][] = [
   [/auth session missing|session.*expired|jwt expired/i, "Sua sessão expirou. Entre de novo pelo login ou abra o link do e-mail outra vez."],
   [/new password should be different/i, "A nova senha precisa ser diferente da atual."],
   [/password should be at least|password is too short/i, "A senha precisa ter pelo menos 8 caracteres."],
+  [/database error saving new user|signups? not allowed|not authorized to create/i, "Este e-mail ainda não foi autorizado a criar conta. Peça ao administrador do grupo para liberar o seu acesso."],
   [/user already registered|already been registered/i, "Este e-mail já tem conta. Use “Entrar” ou “Esqueci a senha”."],
   [/email not confirmed/i, "Confirme o e-mail pelo link que enviamos antes de entrar."],
   [/for security purposes|rate limit|too many requests/i, "Muitas tentativas seguidas. Aguarde um minuto e tente de novo."],

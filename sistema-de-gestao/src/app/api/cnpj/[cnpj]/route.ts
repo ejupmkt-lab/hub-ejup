@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServidor } from "@/lib/supabase/servidor";
+import { exigirPerfil } from "@/lib/supabase/guarda";
 import type { DadosCnpj } from "@/lib/cnpj";
 
 // Consulta pública de CNPJ (dados da Receita Federal) para preencher o cadastro
@@ -82,7 +83,8 @@ export async function GET(_: Request, { params }: { params: Promise<{ cnpj: stri
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ erro: "Entre no sistema para consultar." }, { status: 401 });
+  const negado = await exigirPerfil(supabase, user);
+  if (negado) return negado;
 
   const cnpj = (await params).cnpj.replace(/\D/g, "");
   if (cnpj.length !== 14) return NextResponse.json({ erro: "CNPJ deve ter 14 dígitos." }, { status: 400 });

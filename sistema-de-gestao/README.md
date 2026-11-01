@@ -10,7 +10,9 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
 
 ## O que já funciona
 
-- **Login** com e-mail e senha. Só cria acesso quem tem e-mail cadastrado em `convites`.
+- **Login** com e-mail e senha. **Ninguém cria conta sem autorização**: um gatilho no banco (`antes_de_criar_usuario`, função
+  `exigir_convite_no_cadastro`, migração `20261104000000`) recusa o cadastro de qualquer e-mail que não esteja em `convites`,
+  por qualquer caminho (tela de login, link, API). Quem autoriza um e-mail novo é o administrador do grupo.
 - **Três módulos**, um por empresa: Pivotto & Pivotto (ativo), ORB (em estruturação), EJUP (standby).
 - **Isolamento por empresa no banco (RLS):** cada pessoa só recebe os dados das empresas a que tem acesso.
   O administrador do grupo vê todas, inclusive as inativas.
@@ -308,6 +310,12 @@ completo e função) e, no botão **Acessos** de cada linha, muda a função ou 
 (`public.salvar_membro` e `public.retirar_membro`). O administrador do grupo vê ali também o acesso às outras
 empresas, o de administrador e "Retirar todo o acesso" (`public.salvar_acesso` e `public.retirar_acesso`).
 Se a pessoa ainda não tem conta, a mensagem de convite é copiada; se já tem, o acesso vale na hora.
+
+**E-mail novo (sem conta e sem convite): só o administrador do grupo** inclui, em Equipe > Incluir pessoa. É essa inclusão que
+libera o cadastro. O gestor de uma empresa inclui na equipe dela quem o administrador já liberou; para um e-mail desconhecido
+o sistema pede que o administrador libere antes. As rotas do servidor que gastam a IA ou consultas externas (conversa, importação
+do HUB, leitura de ficha, CNPJ, assinatura) também exigem perfil (`exigirPerfil`, `src/lib/supabase/guarda.ts`), então uma conta
+sem autorização não usa nenhuma.
 
 Papéis: `gestor`, `consultor`, `equipe`. Empresas: `pivotto`, `orb`, `ejup`.
 

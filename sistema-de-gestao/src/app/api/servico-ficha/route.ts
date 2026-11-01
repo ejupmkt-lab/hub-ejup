@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { supabaseServidor } from "@/lib/supabase/servidor";
+import { exigirPerfil } from "@/lib/supabase/guarda";
 
 // Cadastro de serviço: a IA lê a ficha técnica do Sebraetec (PDF ou texto
 // colado) e devolve os campos do formulário, que o gestor confere antes de salvar.
@@ -62,7 +63,8 @@ export async function POST(req: Request) {
   const {
     data: { user },
   } = await sb.auth.getUser();
-  if (!user) return NextResponse.json({ erro: "Sessão expirada. Entre de novo." }, { status: 401 });
+  const negado = await exigirPerfil(sb, user);
+  if (negado) return negado;
 
   if (!process.env.ANTHROPIC_API_KEY)
     return NextResponse.json(
