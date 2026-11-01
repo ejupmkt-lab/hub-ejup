@@ -84,7 +84,7 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
     no bucket privado `notas-fiscais`, caminho `<projeto>/<arquivo>`, regra por empresa atual do projeto; lê e apaga só
     quem vê o financeiro). Mostra "NF emitida · nº …" ou "NF pendente" e quantas notas já saíram.
   - **Página Financeiro** (menu lateral, só gestor master; em desenvolvimento), com duas abas:
-    - **Recebimentos**: resumo no topo (a receber, próximo pagamento, recebido no mês, imposto previsto), o seletor de
+    - **Recebimentos**: o filtro e, na mesma dobra, o resumo (próximo pagamento e imposto previsto); o seletor de
       **período** (Mês, Trimestre, Ano, Tudo ou Personalizado; abre no mês corrente, com setas e um seletor de mês;
       `src/lib/periodo.ts`) e, embaixo, os projetos no padrão da lista de Projetos (`ProjetosDoRecebimento`: tabela nas
       telas largas, cartões nas menores) com Cliente / projeto, Etapa atual, Progresso e as duas parcelas. **O período mostra só

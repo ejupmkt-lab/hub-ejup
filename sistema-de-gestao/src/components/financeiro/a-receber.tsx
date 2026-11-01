@@ -11,7 +11,7 @@ import {
   somarMeses,
   type ModoDePeriodo,
 } from "@/lib/periodo";
-import { formatarData, hojeIso, mesPorExtenso } from "@/lib/datas";
+import { formatarData, hojeIso } from "@/lib/datas";
 import { nomeDoCliente } from "@/lib/campos-cliente";
 import { Botao, Campo } from "@/components/ui";
 import {
@@ -35,28 +35,6 @@ const modos: { chave: Modo; rotulo: string }[] = [
   { chave: "fonte", rotulo: "Fonte de custeio" },
 ];
 
-function Numero({
-  rotulo,
-  valor,
-  detalhe,
-  tom = "",
-}: {
-  rotulo: string;
-  valor: string;
-  detalhe?: string;
-  tom?: string;
-}) {
-  return (
-    <div className="rounded-[var(--radius-bloco)] border border-linha bg-folha p-3.5 shadow-[var(--shadow-cartao)]">
-      <dt className="text-[12px] text-tinta-2">{rotulo}</dt>
-      <dd className={`num text-[19px] font-bold leading-tight ${tom}`}>
-        {valor}
-      </dd>
-      {detalhe && <dd className="text-[12px] text-tinta-2">{detalhe}</dd>}
-    </div>
-  );
-}
-
 // Financeiro (só para quem vê o financeiro): o que entra no período escolhido (abre no mês corrente), por cliente e projeto,
 // com as duas parcelas de cada um, a data prevista (projetada pelo andamento do projeto) e a nota fiscal; tudo se corrige ali.
 export function AReceber({ projetos }: { projetos: Projeto[] }) {
@@ -71,7 +49,6 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
   const [semDataAberto, setSemDataAberto] = useState(false);
   if (!fin || !fin.carregado) return null;
   const hoje = hojeIso();
-  const mesAtual = hoje.slice(0, 7);
   const clienteDe = (p: Projeto) =>
     estado.clientes.find((x) => x.id === p.clienteId);
 
@@ -84,9 +61,6 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
   const pendentes = entradas.filter((e) => !e.parcela.recebidaEm);
   const comData = pendentes.filter((e) => e.mes);
   const semData = entradas.filter((e) => !diaDe(e));
-  const recebidoNoMes = entradas.filter(
-    (e) => e.parcela.recebidaEm && e.mes === mesAtual,
-  );
   const proximoDia = comData[0]?.parcela.previsao ?? null;
   const doProximo = comData.filter((e) => e.parcela.previsao === proximoDia);
 
@@ -148,32 +122,6 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
 
   return (
     <div className="space-y-5">
-      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Numero
-          rotulo="A receber"
-          valor={moeda(soma(pendentes, valorDe))}
-          detalhe={`${pendentes.length} ${pendentes.length === 1 ? "parcela" : "parcelas"}`}
-        />
-        <Numero
-          rotulo="Próximo pagamento"
-          valor={proximoDia ? formatarData(proximoDia) : "—"}
-          detalhe={
-            proximoDia ? moeda(soma(doProximo, valorDe)) : "nada com data"
-          }
-          tom={proximoDia && proximoDia < hoje ? "text-laranja" : ""}
-        />
-        <Numero
-          rotulo={`Recebido em ${mesPorExtenso(mesAtual)}`}
-          valor={moeda(soma(recebidoNoMes, valorDe))}
-          tom="text-verde"
-        />
-        <Numero
-          rotulo="Imposto previsto"
-          valor={moeda(soma(comData, (e) => e.imposto))}
-          detalhe="sobre o que tem data"
-        />
-      </dl>
-
       <div className="space-y-3 rounded-[var(--radius-bloco)] border border-linha bg-folha p-3.5 shadow-[var(--shadow-cartao)]">
         <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
           <Campo rotulo="Filtrar por">
@@ -272,6 +220,18 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
             </Botao>
           )}
         </div>
+        <dl className="flex flex-wrap gap-x-10 gap-y-3 border-t border-linha pt-3">
+          <div>
+            <dt className="text-[12px] text-tinta-2">Próximo pagamento</dt>
+            <dd className={`num text-[19px] font-bold leading-tight ${proximoDia && proximoDia < hoje ? "text-laranja" : ""}`}>{proximoDia ? formatarData(proximoDia) : "—"}</dd>
+            <dd className="text-[12px] text-tinta-2">{proximoDia ? moeda(soma(doProximo, valorDe)) : "nada com data"}</dd>
+          </div>
+          <div>
+            <dt className="text-[12px] text-tinta-2">Imposto previsto</dt>
+            <dd className="num text-[19px] font-bold leading-tight">{moeda(soma(comData, (e) => e.imposto))}</dd>
+            <dd className="text-[12px] text-tinta-2">sobre o que tem data</dd>
+          </div>
+        </dl>
         {semDataAberto && (
           <p className="text-[13px] text-tinta-2">
             Projetos sem plano de trabalho. Em “Editar”, combine uma data para a
