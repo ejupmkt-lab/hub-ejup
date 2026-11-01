@@ -23,7 +23,19 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "biblioteca_textos": {
+            "acessos_log": {
+                  Row: {
+                    "acao": string,"antes": Json | null,"depois": Json | null,"em": string,"email": string,"empresa": string | null,"id": number,"quem": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "acao": string,"antes"?: Json | null,"depois"?: Json | null,"em"?: string,"email": string,"empresa"?: string | null,"id"?: never,"quem": string
+                  }
+                  Update: {
+                    "acao"?: string,"antes"?: Json | null,"depois"?: Json | null,"em"?: string,"email"?: string,"empresa"?: string | null,"id"?: never,"quem"?: string
+                  }
+                  Relationships: []
+                },"biblioteca_textos": {
                   Row: {
                     "chave": string,"created_at": string,"criado_por": string | null,"empresa": string,"etapa": number,"id": string,"origem": string,"porte": string,"projeto_origem": string | null,"ramo": string,"servico_id": string | null,"texto": string,"titulo": string
                   }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { supabaseNavegador } from "@/lib/supabase/navegador";
@@ -92,6 +93,11 @@ export default function Equipe() {
         titulo="Equipe"
         subtitulo={`Quem trabalha na ${empresa.nome}, com qual função e o que cada pessoa acessa.`}
       >
+        {usuario.adminGrupo && !form && (
+          <Link href="/acessos" className="inline-flex min-h-11 w-full items-center justify-center rounded-[var(--radius-campo)] border border-linha-forte bg-folha px-4 text-[15px] font-semibold text-tinta hover:bg-pedra sm:w-auto">
+            Controle de acessos do grupo
+          </Link>
+        )}
         {podeGerir && !form && (
           <Botao onClick={() => setForm(formVazio)} className="w-full sm:w-auto">
             <IconeMaisSinal className="h-4 w-4" />
@@ -331,10 +337,6 @@ function EditorAcessos({
     if (!confirm(`Retirar ${membro.nome} da ${empresa.nome}? O acesso às outras empresas continua.`)) return;
     return rodar(sb.rpc("retirar_membro", { p_empresa: empresa.slug, p_email: membro.email }), `${membro.nome} não tem mais acesso à ${empresa.nome}.`);
   };
-  const retirarTudo = () => {
-    if (!confirm(`Retirar todo o acesso de ${membro.nome}? A pessoa deixa de ver qualquer empresa. O nome continua no histórico dos projetos.`)) return;
-    return rodar(sb.rpc("retirar_acesso", { p_email: membro.email }), `${membro.nome} não tem mais acesso ao Blimp.`);
-  };
   const copiarConvite = async () => {
     try {
       await navigator.clipboard.writeText(mensagemConvite(membro, empresa.nome));
@@ -425,9 +427,9 @@ function EditorAcessos({
             {copiado ? "Convite copiado" : "Copiar convite"}
           </Botao>
         )}
-        {admin && (
-          <Botao variante="fantasma" onClick={() => void retirarTudo()} disabled={ocupado} className="!text-vermelho sm:ml-auto">
-            Retirar todo o acesso
+        {membro.membro && (
+          <Botao variante="fantasma" onClick={() => void retirarDaEmpresa()} disabled={ocupado} className="!text-vermelho sm:ml-auto">
+            Retirar da {empresa.nome}
           </Botao>
         )}
       </div>

@@ -311,6 +311,12 @@ completo e função) e, no botão **Acessos** de cada linha, muda a função ou 
 empresas, o de administrador e "Retirar todo o acesso" (`public.salvar_acesso` e `public.retirar_acesso`).
 Se a pessoa ainda não tem conta, a mensagem de convite é copiada; se já tem, o acesso vale na hora.
 
+**Controle de acessos do grupo** (`/acessos`, só o administrador; botão em Equipe): uma tabela com todas as pessoas e a função de
+cada uma em cada empresa (gestor, consultor, equipe ou sem acesso), mais "Administrador". Mudar a função numa empresa não mexe nas
+outras. "Retirar de todas as empresas" fica só aqui e só vale depois de digitar o e-mail da pessoa; na Equipe de cada empresa há apenas
+"Retirar da empresa". Toda mudança (salvar_acesso, retirar_acesso, incluir_na_equipe, retirar_da_empresa) vai para `acessos_log`, com o
+antes e o depois, e aparece em "Alterações recentes" (migração `20261105000000`).
+
 **E-mail novo (sem conta e sem convite): só o administrador do grupo** inclui, em Equipe > Incluir pessoa. É essa inclusão que
 libera o cadastro. O gestor de uma empresa inclui na equipe dela quem o administrador já liberou; para um e-mail desconhecido
 o sistema pede que o administrador libere antes. As rotas do servidor que gastam a IA ou consultas externas (conversa, importação
