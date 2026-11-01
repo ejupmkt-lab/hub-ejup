@@ -219,19 +219,19 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
               Sem data ({semData.length})
             </Botao>
           )}
+          <dl className="ml-auto flex items-stretch gap-6 sm:gap-8">
+            <div className="text-right">
+              <dt className="text-[12px] text-tinta-2">Próximo pagamento</dt>
+              <dd className={`num text-[19px] font-bold leading-tight ${proximoDia && proximoDia < hoje ? "text-laranja" : ""}`}>{proximoDia ? formatarData(proximoDia) : "—"}</dd>
+              <dd className="num text-[12px] text-tinta-2">{proximoDia ? moeda(soma(doProximo, valorDe)) : "nada com data"}</dd>
+            </div>
+            <div className="border-l border-linha pl-6 text-right sm:pl-8">
+              <dt className="text-[12px] text-tinta-2">Imposto previsto</dt>
+              <dd className="num text-[19px] font-bold leading-tight">{moeda(soma(comData, (e) => e.imposto))}</dd>
+              <dd className="text-[12px] text-tinta-2">sobre o que tem data</dd>
+            </div>
+          </dl>
         </div>
-        <dl className="flex flex-wrap gap-x-10 gap-y-3 border-t border-linha pt-3">
-          <div>
-            <dt className="text-[12px] text-tinta-2">Próximo pagamento</dt>
-            <dd className={`num text-[19px] font-bold leading-tight ${proximoDia && proximoDia < hoje ? "text-laranja" : ""}`}>{proximoDia ? formatarData(proximoDia) : "—"}</dd>
-            <dd className="text-[12px] text-tinta-2">{proximoDia ? moeda(soma(doProximo, valorDe)) : "nada com data"}</dd>
-          </div>
-          <div>
-            <dt className="text-[12px] text-tinta-2">Imposto previsto</dt>
-            <dd className="num text-[19px] font-bold leading-tight">{moeda(soma(comData, (e) => e.imposto))}</dd>
-            <dd className="text-[12px] text-tinta-2">sobre o que tem data</dd>
-          </div>
-        </dl>
         {semDataAberto && (
           <p className="text-[13px] text-tinta-2">
             Projetos sem plano de trabalho. Em “Editar”, combine uma data para a
