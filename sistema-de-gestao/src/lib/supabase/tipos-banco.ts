@@ -23,7 +23,19 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "acessos_log": {
+            "uso_ia": {
+                  Row: {
+                    "cache_escrita": number,"cache_leitura": number,"em": string,"empresa": string | null,"entrada": number,"id": number,"modelo": string,"projeto_id": string | null,"rota": string,"saida": number,"usuario": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "cache_escrita"?: number,"cache_leitura"?: number,"em"?: string,"empresa"?: string | null,"entrada"?: number,"id"?: never,"modelo": string,"projeto_id"?: string | null,"rota": string,"saida"?: number,"usuario": string
+                  }
+                  Update: {
+                    "cache_escrita"?: number,"cache_leitura"?: number,"em"?: string,"empresa"?: string | null,"entrada"?: number,"id"?: never,"modelo"?: string,"projeto_id"?: string | null,"rota"?: string,"saida"?: number,"usuario"?: string
+                  }
+                  Relationships: []
+                },"acessos_log": {
                   Row: {
                     "acao": string,"antes": Json | null,"depois": Json | null,"em": string,"email": string,"empresa": string | null,"id": number,"quem": string
                   }
@@ -365,6 +377,9 @@ isOneToOne: false
                            },
 "salvar_membro":
 { Args: { "p_email": string,"p_empresa": string,"p_nome": string,"p_nome_completo": string,"p_papel": string }; Returns: undefined
+                           },
+"registrar_uso_ia":
+{ Args: { "p_cache_escrita": number,"p_cache_leitura": number,"p_entrada": number,"p_modelo": string,"p_projeto_id": string | null,"p_rota": string,"p_saida": number }; Returns: undefined
                            },
 "salvar_projeto":
 { Args: { "p_dados": Json,"p_id": string,"p_versao": number }; Returns: number

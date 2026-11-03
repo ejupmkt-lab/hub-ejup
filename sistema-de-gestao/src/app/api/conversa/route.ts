@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { supabaseServidor } from "@/lib/supabase/servidor";
 import { exigirPerfil } from "@/lib/supabase/guarda";
+import { registrarUso } from "@/lib/ia/uso";
 import type { Cliente, Etapa, Projeto, Servico } from "@/lib/dados/tipos";
 import { tiposRegistro } from "@/lib/registros";
 import { antesDaContratacao, comQuem, faseDoProjeto, fases, passoHubDoProjeto, passosHub } from "@/lib/fase";
@@ -291,6 +292,7 @@ export async function POST(req: Request) {
           }
         });
         const resposta = await fluxo.finalMessage();
+        await registrarUso(sb, "conversa", resposta, pedido.projetoId);
         if (resposta.stop_reason === "refusal")
           return enviar({ tipo: "erro", erro: "A IA não conseguiu tratar esta mensagem. Reformule ou registre direto na etapa.", tipoDoErro: "recusa", http: 422 });
         if (resposta.stop_reason === "max_tokens")

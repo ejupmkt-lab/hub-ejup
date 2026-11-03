@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { supabaseServidor } from "@/lib/supabase/servidor";
 import { exigirPerfil } from "@/lib/supabase/guarda";
+import { registrarUso } from "@/lib/ia/uso";
 
 // Cadastro de serviço: a IA lê a ficha técnica do Sebraetec (PDF ou texto
 // colado) e devolve os campos do formulário, que o gestor confere antes de salvar.
@@ -92,6 +93,7 @@ export async function POST(req: Request) {
         messages: [{ role: "user", content: conteudo }],
       })
       .finalMessage();
+    await registrarUso(sb, "ficha-servico", resposta);
 
     if (resposta.stop_reason === "refusal") return NextResponse.json({ erro: "A IA não conseguiu ler esta ficha. Preencha à mão." }, { status: 422 });
     if (resposta.stop_reason === "max_tokens")

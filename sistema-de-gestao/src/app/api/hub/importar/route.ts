@@ -2,6 +2,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { supabaseServidor } from "@/lib/supabase/servidor";
 import { exigirPerfil } from "@/lib/supabase/guarda";
+import { registrarUso } from "@/lib/ia/uso";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Cliente, Projeto, Servico } from "@/lib/dados/tipos";
 import { antesDaContratacao, fases, hubDoProjeto, passosHub, passoHubDoProjeto } from "@/lib/fase";
 import { hojeIso } from "@/lib/datas";
@@ -210,7 +212,7 @@ export async function POST(req: Request) {
   if (arquivos.reduce((s, a) => s + a.size, 0) > LIMITE_BYTES)
     return NextResponse.json({ erro: "Os anexos passam de 4 MB. Mande menos arquivos ou prints menores." }, { status: 413 });
 
-  if (form?.get("modo") === "relatorio") return lerRelatorio(arquivos, String(form.get("etapa") ?? ""));
+  if (form?.get("modo") === "relatorio") return lerRelatorio(sb, arquivos, String(form.get("etapa") ?? ""));
 
   let contexto: string;
   if (modoNovo) {
@@ -258,6 +260,7 @@ export async function POST(req: Request) {
         ],
       })
       .finalMessage();
+    await registrarUso(sb, "importar-hub", resposta, modoNovo ? undefined : projetoId);
 
     if (resposta.stop_reason === "refusal") return NextResponse.json({ erro: "A IA não conseguiu ler este conteúdo. Confira se é a página do pedido no HUB." }, { status: 422 });
     if (resposta.stop_reason === "max_tokens") return NextResponse.json({ erro: "O conteúdo ficou grande demais. Cole só a parte do pedido." }, { status: 422 });
@@ -302,7 +305,7 @@ function contextoNovo(servicos: Servico[]) {
 }
 
 // Lê um relatório técnico (um PDF) e devolve as datas escritas nele
-async function lerRelatorio(arquivos: File[], etapa: string) {
+async function lerRelatorio(sb: SupabaseClient, arquivos: File[], etapa: string) {
   if (arquivos.length !== 1) return NextResponse.json({ erro: "Mande um relatório por vez." }, { status: 400 });
   const a = arquivos[0];
   const base64 = Buffer.from(await a.arrayBuffer()).toString("base64");
@@ -321,6 +324,7 @@ async function lerRelatorio(arquivos: File[], etapa: string) {
         messages: [{ role: "user", content: [{ type: "text", text: `Relatório da etapa ${etapa || "?"} (${a.name}). Hoje: ${hojeIso()}.` }, bloco] }],
       })
       .finalMessage();
+    await registrarUso(sb, "relatorio-hub", resposta);
     if (resposta.stop_reason === "refusal" || resposta.stop_reason === "max_tokens") return NextResponse.json({ erro: "A IA não conseguiu ler este relatório." }, { status: 422 });
     const saida = resposta.content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("");
     return NextResponse.json(JSON.parse(saida));

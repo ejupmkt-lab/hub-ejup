@@ -85,7 +85,7 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
     (`BalaoDeParcela`), cada uma com **nota fiscal** (número, data de emissão, valor se for outro, arquivo PDF/XML/imagem
     no bucket privado `notas-fiscais`, caminho `<projeto>/<arquivo>`, regra por empresa atual do projeto; lê e apaga só
     quem vê o financeiro). Mostra "NF emitida · nº …" ou "NF pendente" e quantas notas já saíram.
-  - **Página Financeiro** (menu lateral, só gestor master; em desenvolvimento), com duas abas:
+  - **Página Financeiro** (menu lateral, só gestor master; em desenvolvimento), com três abas (a do meio é o **Uso da IA**, abaixo):
     - **Recebimentos**: o filtro e, na mesma dobra, o resumo (próximo pagamento e imposto previsto); o seletor de
       **período** (Mês, Trimestre, Ano, Tudo ou Personalizado; abre no mês corrente, com setas e um seletor de mês;
       `src/lib/periodo.ts`) e, embaixo, os projetos no padrão da lista de Projetos (`ProjetosDoRecebimento`: tabela nas
@@ -102,6 +102,13 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
       houver mais de uma).
       Embaixo da lista, o **consolidado do período** (`TotaisDoPeriodo`): total, a receber e recebido, cada um com valor,
       imposto e o que fica. Sem título de mês (o seletor de cima já diz) e sem botão "Mês atual".
+    - **Uso da IA** (`UsoDaIA`, tabela `uso_ia`, migração `20261106000000`): cada chamada da IA integrada (conversa nos projetos, importar do HUB,
+      relatório lido do HUB, ficha de serviço) grava, pela função `registrar_uso_ia`, os tokens de entrada, saída e cache e o modelo que
+      respondeu (`src/lib/ia/uso.ts`, `registrarUso`; uma falha ao gravar nunca atrapalha a resposta). A tela mostra o mês escolhido: custo
+      estimado do mês e de hoje, tokens, e tabelas por tipo de uso e por dia. **O custo é estimado pelo preço de tabela de cada modelo**
+      (`PRECOS_POR_MODELO`, em US$ por milhão de tokens; ajuste ali se os preços mudarem; leitura do cache a 5% e escrita a 125% da entrada); o
+      valor cobrado de fato está no console da Anthropic. Só quem vê o financeiro lê; ninguém grava direto na tabela. O registro começa na
+      publicação: o que foi usado antes não existe.
     - **Configurações**: o imposto da empresa (abaixo).
   - **Sem a data do Relatório 1, sem perspectiva de recebimento**: enquanto o projeto não tem o Relatório 1 enviado nem a data dele na execução (antes do pagamento o plano ainda é proposta), as duas parcelas ficam "Sem data prevista" (botão "Sem data"); só a data combinada à mão vale.
   - **Projeção das datas** (`src/lib/projecao.ts`): vem do andamento do projeto. Etapa em curso termina em duração × o

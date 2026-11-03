@@ -7,11 +7,12 @@ import { useEmpresaAtual } from "@/lib/dados/empresa-atual";
 import { Cabecalho, Cartao, Chip } from "@/components/ui";
 import { AReceber } from "@/components/financeiro/a-receber";
 import { ImpostoEmpresa } from "@/components/financeiro/imposto";
+import { UsoDaIA } from "@/components/financeiro/uso-ia";
 
 // Financeiro (só o gestor master): em desenvolvimento. Recebimentos do período (abre no mês corrente), por cliente e
 // projeto; em Configurações, o imposto da empresa pela faixa do faturamento. O valor, as parcelas, a contrapartida e as
 // notas fiscais de cada projeto ficam na aba Financeiro do próprio projeto; o teto e o valor da hora, na ficha do serviço.
-const abas = ["Recebimentos", "Configurações"] as const;
+const abas = ["Recebimentos", "Uso da IA", "Configurações"] as const;
 
 export default function Financeiro() {
   const { usuario } = useAcesso();
@@ -54,6 +55,12 @@ export default function Financeiro() {
         {aba === "Recebimentos" && (
           <section className="space-y-4" aria-label="Recebimentos">
             <AReceber projetos={projetos} />
+          </section>
+        )}
+
+        {aba === "Uso da IA" && (
+          <section aria-label="Uso da IA">
+            <UsoDaIA />
           </section>
         )}
 
