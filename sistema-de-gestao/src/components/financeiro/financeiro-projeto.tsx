@@ -9,7 +9,7 @@ import { Campo } from "@/components/ui";
 import { BalaoDeParcela } from "./balao-parcela";
 
 // Aba "Financeiro" do projeto (só para quem vê o financeiro): o valor, a FUNCERN, o imposto (percentual da faixa ou definido aqui), a
-// contrapartida (desconto sobre o total a receber), o que o consultor recebe (já sem nada disso) e cada parcela com a data, o recebimento
+// contrapartida (desconto sobre o total a receber), o que o consultor recebe (o total, e abaixo o valor após o imposto, que ele paga por conta) e cada parcela com a data, o recebimento
 // e a nota fiscal.
 export function FinanceiroDoProjeto({ projeto: p, nomeCliente }: { projeto: Projeto; nomeCliente: string }) {
   const fin = useFinanceiro();
@@ -97,12 +97,14 @@ export function FinanceiroDoProjeto({ projeto: p, nomeCliente }: { projeto: Proj
         </div>
         <div className="rounded-[var(--radius-bloco)] border border-verde/25 bg-verde-claro p-3.5">
           <dt className="text-[12px] text-tinta-2">Você recebe do SEBRAE</dt>
-          <dd className="text-[19px] font-bold text-verde">{moeda(aReceber)}</dd>
+          <dd className="text-[19px] font-bold text-verde">{moeda(r.liquido)}</dd>
+          <dd className="mt-1 text-[12px] text-tinta-2">Após o imposto</dd>
+          <dd className="text-[15px] font-bold text-verde">{moeda(aReceber)}</dd>
         </div>
         <div className="rounded-[var(--radius-bloco)] border border-linha bg-folha p-3.5 shadow-[var(--shadow-cartao)]">
           <dt className="text-[12px] text-tinta-2">Recebido até agora</dt>
           <dd className="text-[19px] font-bold text-verde">{moeda(recebido)}</dd>
-          <dd className="text-[12px] text-tinta-2">de {moeda(total)}, antes do imposto</dd>
+          <dd className="text-[12px] text-tinta-2">de {moeda(total)}</dd>
         </div>
       </dl>
 

@@ -120,6 +120,11 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
   };
 
   const ident = lido?.identificacao;
+  const limpar = () => {
+    h.limpar();
+    setLido(null);
+    setErro(null);
+  };
   return (
     <div className="mt-4 space-y-4 rounded-[var(--radius-campo)] border border-linha bg-pedra/60 p-3 sm:p-4" aria-label="Importar do HUB">
       {aplicado ? (
@@ -130,14 +135,13 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
               <li key={i}>{d}</li>
             ))}
           </ul>
-          <p className="text-[13px] text-tinta-2">Está registrado na conversa do projeto, onde dá para desfazer.</p>
           {erro && <p className="text-[13px] text-vermelho">{erro}</p>}
           <Botao tamanho="pequeno" onClick={aoFechar}>
             Fechar
           </Botao>
         </div>
       ) : !lido ? (
-        <EntradaDoHub h={h} aoCancelar={aoFechar} />
+        <EntradaDoHub h={h} aoVoltar={aoFechar} aoLimpar={limpar} />
       ) : (
         <div className="space-y-4">
           <p className="text-[15px]">{lido.resumo}</p>
@@ -210,11 +214,11 @@ export function ImportarHub({ projeto, aoFechar }: { projeto: Projeto; aoFechar:
             <Botao tamanho="pequeno" onClick={() => void aplicar()} disabled={aplicando || bloqueado || nadaParaAplicar}>
               {aplicando ? "Aplicando…" : "Aplicar no projeto"}
             </Botao>
-            <Botao variante="secundario" tamanho="pequeno" onClick={() => setLido(null)} disabled={aplicando}>
+            <Botao variante="secundario" tamanho="pequeno" onClick={aoFechar} disabled={aplicando}>
               Voltar
             </Botao>
-            <Botao variante="fantasma" tamanho="pequeno" onClick={aoFechar} disabled={aplicando}>
-              Cancelar
+            <Botao variante="fantasma" tamanho="pequeno" onClick={limpar} disabled={aplicando}>
+              Limpar
             </Botao>
           </div>
         </div>

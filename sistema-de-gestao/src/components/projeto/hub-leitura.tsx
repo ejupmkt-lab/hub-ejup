@@ -104,6 +104,19 @@ export function useLeituraHub(opcoes: Opcoes) {
   const tentouSozinho = useRef(false);
   const jaRecebidos = useRef(new Set<string>());
 
+  // Limpa o que foi lido (texto, anexos, o que a extensão trouxe e o que a IA leu), para começar de novo
+  const limpar = () => {
+    setTexto("");
+    setArquivos([]);
+    setErro(null);
+    setMateriais([]);
+    setEntrega(null);
+    setLeituras({});
+    setLendoRelatorios(null);
+    if (pendenteId.current && !op.current.ignorarExtensao) void consumirPendente(pendenteId.current);
+    pendenteId.current = null;
+  };
+
   const escolher = (lista: FileList | null) => {
     setErro(null);
     setArquivos((a) => [...a, ...Array.from(lista ?? [])].slice(0, MAX_ARQUIVOS));
@@ -264,6 +277,7 @@ export function useLeituraHub(opcoes: Opcoes) {
     atribuirEtapa,
     escolher,
     ler,
+    limpar,
     puxar,
     receber,
     // Para quem consome só depois (projeto novo)
@@ -276,15 +290,11 @@ export function useLeituraHub(opcoes: Opcoes) {
 export type LeituraHub = ReturnType<typeof useLeituraHub>;
 
 // Primeira tela do painel: a extensão, o texto colado, prints e PDFs
-export function EntradaDoHub({ h, aoCancelar, aviso }: { h: LeituraHub; aoCancelar: () => void; aviso?: string }) {
+export function EntradaDoHub({ h, aoVoltar, aoLimpar, aviso }: { h: LeituraHub; aoVoltar: () => void; aoLimpar: () => void; aviso?: string }) {
   return (
     <>
       {h.extensao === "sim" && (
         <div className="space-y-2">
-          <p className="text-[13px] text-tinta-2">
-            Na página do HUB que você quer ler, clique no ícone da extensão e em <strong>Ler agora</strong>. Ela lê a página, baixa os anexos e traz tudo para cá. A IA lê,
-            mostra o que vai mudar e só aplica quando você confirmar.
-          </p>
           {h.puxando || h.lendo ? <p className="text-[13px] font-semibold text-azul">Lendo o que veio do HUB…</p> : null}
           {h.configurada && (
             <Botao tamanho="pequeno" variante="secundario" onClick={() => void h.puxar()} disabled={h.puxando || h.lendo}>
@@ -311,11 +321,6 @@ export function EntradaDoHub({ h, aoCancelar, aviso }: { h: LeituraHub; aoCancel
           </ol>
         </details>
       )}
-      <p className="text-[13px] text-tinta-2">
-        {h.extensao === "sim" ? "Ou, " : ""}
-        {h.extensao === "sim" ? "se preferir, abra" : "Abra"} o pedido no HUB, selecione a página toda (Ctrl+A), copie (Ctrl+C) e cole aqui. Também dá para anexar um print ou PDF. A IA lê,
-        mostra o que vai mudar e só aplica quando você confirmar.
-      </p>
       <label className="block text-[13px] font-semibold">
         Texto copiado do HUB
         <textarea
@@ -347,8 +352,11 @@ export function EntradaDoHub({ h, aoCancelar, aviso }: { h: LeituraHub; aoCancel
         <Botao tamanho="pequeno" variante={h.extensao === "sim" ? "secundario" : "primario"} onClick={() => void h.ler()} disabled={h.lendo || h.puxando}>
           {h.lendo ? "A IA está lendo…" : "Ler com a IA"}
         </Botao>
-        <Botao variante="fantasma" tamanho="pequeno" onClick={aoCancelar} disabled={h.lendo}>
-          Cancelar
+        <Botao variante="secundario" tamanho="pequeno" onClick={aoVoltar} disabled={h.lendo}>
+          Voltar
+        </Botao>
+        <Botao variante="fantasma" tamanho="pequeno" onClick={aoLimpar} disabled={h.lendo}>
+          Limpar
         </Botao>
       </div>
     </>

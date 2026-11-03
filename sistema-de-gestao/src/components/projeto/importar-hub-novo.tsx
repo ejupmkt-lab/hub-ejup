@@ -37,7 +37,7 @@ export function ImportarHubNovo({
   inicial,
   automatico = false,
   aoCriado,
-  rotuloFechar = "Cancelar",
+  rotuloFechar = "Voltar",
 }: {
   slug: EmpresaSlug;
   aoFechar: () => void;
@@ -160,6 +160,17 @@ export function ImportarHubNovo({
     passouDoLimite && "o cliente já está no limite de projetos em andamento",
   ].filter((m): m is string => !!m);
   const lendoAinda = h.lendo || h.puxando || !!h.lendoRelatorios;
+  // Limpar: tira o que a extensão trouxe e o que a IA leu, e volta à tela de entrada em branco
+  const limpar = () => {
+    h.limpar();
+    setLido(null);
+    setC(completarVazio);
+    setServicoEscolhido(null);
+    setClienteEscolhido("");
+    setCnpjDigitado("");
+    setInsistir(false);
+    setErro(null);
+  };
 
   const jaCriou = useRef(false);
   const criar = async () => {
@@ -252,10 +263,7 @@ export function ImportarHubNovo({
 
   return (
     <div className="mb-8 space-y-4 rounded-[var(--radius-bloco)] border border-linha bg-pedra/60 p-3 sm:p-5" aria-label="Importar do HUB">
-      <div>
-        <h2 className="text-lg font-bold">Novo projeto a partir do HUB</h2>
-        <p className="text-[13px] text-tinta-2">O Blimp lê o pedido, cadastra o cliente se ainda não existir, escolhe o serviço e registra o passo do HUB e o plano. Você confere antes de criar.</p>
-      </div>
+      <h2 className="text-lg font-bold">Novo projeto a partir do HUB</h2>
       {inicial && !lido && !erro && <p className="text-[13px] font-semibold text-azul">Lendo o pedido {entrega?.titulo ? `“${entrega.titulo.slice(0, 50)}”` : ""} e criando o projeto…</p>}
       {inicial && !lido && erro && (
         <div className="space-y-2">
@@ -270,7 +278,8 @@ export function ImportarHubNovo({
       {inicial && !lido ? null : !lido ? (
         <EntradaDoHub
           h={h}
-          aoCancelar={aoFechar}
+          aoVoltar={aoFechar}
+          aoLimpar={limpar}
           aviso="Deixe esta tela (Novo projeto) aberta aqui no Blimp, vá à página do pedido no HUB e clique no ícone da extensão em “Ler agora”."
         />
       ) : (
@@ -398,14 +407,14 @@ export function ImportarHubNovo({
             <Botao tamanho="pequeno" onClick={() => void criar()} disabled={criando || bloqueado}>
               {criando ? "Criando…" : "Criar projeto"}
             </Botao>
-            {!inicial && (
-              <Botao variante="secundario" tamanho="pequeno" onClick={() => setLido(null)} disabled={criando}>
-                Voltar
-              </Botao>
-            )}
-            <Botao variante="fantasma" tamanho="pequeno" onClick={aoFechar} disabled={criando}>
+            <Botao variante="secundario" tamanho="pequeno" onClick={aoFechar} disabled={criando}>
               {rotuloFechar}
             </Botao>
+            {!inicial && (
+              <Botao variante="fantasma" tamanho="pequeno" onClick={limpar} disabled={criando}>
+                Limpar
+              </Botao>
+            )}
           </div>
         </div>
       )}

@@ -80,7 +80,7 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
     pagamento, ou o percentual definido ali mesmo, `valores.aliquota`; vazio volta ao automático, zero vale), a
     **Contrapartida** (desconto sobre o total a receber, uma espécie de cashback; os 30% e 70% saem do valor
     descontado; com o seletor **Fonte de custeio**, de quem saiu o dinheiro e para onde ele volta: Roberto, Leonardo,
-    Caixa da empresa ou Outra, em `financeiro_projetos.fonte_contrapartida`, migração `20261102000000`), o quadro verde "Você recebe do SEBRAE" (valor − FUNCERN − contrapartida − imposto, só o valor) e o
+    Caixa da empresa ou Outra, em `financeiro_projetos.fonte_contrapartida`, migração `20261102000000`), o quadro verde "Você recebe do SEBRAE" (valor − FUNCERN − contrapartida: o que a FUNCERN repassa contra a nota fiscal) com, abaixo, "Após o imposto" (o imposto é pago por conta) e o
     recebido até agora; e as parcelas em balões
     (`BalaoDeParcela`), cada uma com **nota fiscal** (número, data de emissão, valor se for outro, arquivo PDF/XML/imagem
     no bucket privado `notas-fiscais`, caminho `<projeto>/<arquivo>`, regra por empresa atual do projeto; lê e apaga só

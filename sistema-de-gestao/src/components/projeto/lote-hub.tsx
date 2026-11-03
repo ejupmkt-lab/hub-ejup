@@ -103,10 +103,7 @@ export function LoteDoHub({ slug, aoFechar }: { slug: EmpresaSlug; aoFechar: () 
         <h2 className="text-lg font-bold">
           Pedidos lidos do HUB <span className="num text-tinta-2">({itens.length})</span>
         </h2>
-        <p className="text-[13px] text-tinta-2">
-          A extensão abriu cada pedido da lista, leu a página, o botão de situação e os anexos. Cada pedido vira um projeto, com o cliente cadastrado pelo CNPJ. Os que já existem aqui ficam de fora.
-          {lote.interrompido ? " A leitura foi interrompida antes do fim da lista." : ""}
-        </p>
+        {lote.interrompido && <p className="text-[13px] text-laranja">A leitura foi interrompida antes do fim da lista.</p>}
       </div>
 
       {lote.problemas.length > 0 && (
@@ -137,7 +134,7 @@ export function LoteDoHub({ slug, aoFechar }: { slug: EmpresaSlug; aoFechar: () 
             inicial={atual.pendente}
             automatico={atual.automatico}
             rotuloFechar={atual.automatico ? "Pular este pedido" : "Voltar à lista"}
-            aoFechar={() => terminou(atual.item, { estado: "pulado" })}
+            aoFechar={() => (atual.automatico ? terminou(atual.item, { estado: "pulado" }) : (fila.current = [], setAtual(null)))}
             aoCriado={(projetoId) => terminou(atual.item, { estado: "criado", projetoId })}
           />
         </div>
@@ -187,16 +184,13 @@ export function LoteDoHub({ slug, aoFechar }: { slug: EmpresaSlug; aoFechar: () 
           {aCriar.length ? `Criar todos automaticamente (${aCriar.length})` : "Nada mais a criar"}
         </Botao>
         <Botao variante="fantasma" tamanho="pequeno" onClick={() => void descartar()} disabled={ocupado}>
-          Descartar o que a extensão guardou
+          Limpar
         </Botao>
-        <Botao variante="fantasma" tamanho="pequeno" onClick={aoFechar} disabled={ocupado}>
-          Fechar
+        <Botao variante="secundario" tamanho="pequeno" onClick={aoFechar} disabled={ocupado}>
+          Voltar
         </Botao>
         {criados > 0 && <span className="text-[13px] font-semibold text-verde">{criados} {criados === 1 ? "projeto criado" : "projetos criados"}</span>}
       </div>
-      <p className="text-[12px] text-tinta-2">
-        Criar automaticamente cria o projeto sozinho quando o CNPJ e o serviço foram reconhecidos; quando falta algo, o pedido espera por você (resolva e ele é criado em seguida, ou pule). Datas que o HUB não mostra entram como estimativa, marcada no histórico.
-      </p>
     </div>
   );
 }
