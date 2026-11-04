@@ -108,7 +108,10 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
       estimado do mês e de hoje, tokens, e tabelas por tipo de uso e por dia. **O custo é estimado pelo preço de tabela de cada modelo**
       (`PRECOS_POR_MODELO`, em US$ por milhão de tokens; ajuste ali se os preços mudarem; leitura do cache a 5% e escrita a 125% da entrada); o
       valor cobrado de fato está no console da Anthropic. Só quem vê o financeiro lê; ninguém grava direto na tabela. O registro começa na
-      publicação: o que foi usado antes não existe.
+      publicação: o que foi usado antes não existe. **O custo real vem do console**: a planilha "Cost" exportada de lá (por dia, em UTC) é
+      importada pelo botão "Importar planilha do console" (`lerPlanilhaDoConsole`, `src/lib/ia/console.ts`) para `custo_ia_console`
+      (migração `20261107000000`, já com o histórico de 22/10 a 03/11). Cada dia vale o custo do console quando ele existe; sem a
+      planilha, vale o estimado pelos tokens do Blimp. Importar de novo o mesmo período corrige os dias, sem duplicar.
     - **Configurações**: o imposto da empresa (abaixo).
   - **Sem a data do Relatório 1, sem perspectiva de recebimento**: enquanto o projeto não tem o Relatório 1 enviado nem a data dele na execução (antes do pagamento o plano ainda é proposta), as duas parcelas ficam "Sem data prevista" (botão "Sem data"); só a data combinada à mão vale.
   - **Projeção das datas** (`src/lib/projecao.ts`): vem do andamento do projeto. Etapa em curso termina em duração × o

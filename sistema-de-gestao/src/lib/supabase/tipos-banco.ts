@@ -23,7 +23,19 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "uso_ia": {
+            "custo_ia_console": {
+                  Row: {
+                    "atualizado_em": string,"custo_usd": number,"dia": string,"modelo": string,"tipo": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "atualizado_em"?: string,"custo_usd": number,"dia": string,"modelo": string,"tipo": string
+                  }
+                  Update: {
+                    "atualizado_em"?: string,"custo_usd"?: number,"dia"?: string,"modelo"?: string,"tipo"?: string
+                  }
+                  Relationships: []
+                },"uso_ia": {
                   Row: {
                     "cache_escrita": number,"cache_leitura": number,"em": string,"empresa": string | null,"entrada": number,"id": number,"modelo": string,"projeto_id": string | null,"rota": string,"saida": number,"usuario": string
                   }
