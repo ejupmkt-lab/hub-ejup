@@ -118,6 +118,27 @@ test("o Word do diagnóstico é o modelo do SEBRAE preenchido: capa, dados da em
   assert.ok(!/Não procede caracterizar|Etapa 06/.test(texto));
 });
 
+test("o Word do diagnóstico flui de uma página para a outra e a numeração das páginas segue a sequência", async () => {
+  const p = projetoDeExemplo();
+  p.diagnostico = { ...lerDiagnostico(p), anamnese: ANAMNESE, analise: ANALISE, parecer: PARECER };
+  const { xml, zip, texto } = await docx(p, 1);
+  // quadro de assinatura: sem posição fixa na página (a tabela flutuante deixava páginas em branco), inteiro na mesma página, separado do quadro anterior
+  assert.ok(!xml.includes("<w:tblpPr"), "nenhuma tabela flutuante");
+  assert.ok(texto.includes("Consultor Responsável"), "o quadro de assinatura continua no documento");
+  const evidencias = xml.slice(xml.indexOf("Evidências"), xml.indexOf("Prestador de Servi"));
+  assert.ok(!xml.slice(xml.indexOf("DIAGNÓSTICO PARA QUALIFICA"), xml.indexOf("Prestador de Servi")).includes("<w:cantSplit/>"), "os quadros do diagnóstico podem continuar na página seguinte");
+  assert.ok(evidencias.includes("<w:drawing>"));
+  // uma seção só, numeração a partir da capa (0): nada de página final em branco com enfeites
+  assert.equal((xml.match(/<w:sectPr\b/g) ?? []).length, 1);
+  assert.ok(xml.includes('<w:pgNumType w:start="0"/>') && !xml.includes('w:start="22"'));
+  // rodapé: número de página como campo (01, 02, 03…), não o texto fixo do modelo (01/02 alternados)
+  for (const nome of ["word/footer1.xml", "word/footer2.xml"]) {
+    const rodape = zip.file(nome)!.asText();
+    assert.ok(/PAGE \\# "00"/.test(rodape), `${nome} tem o campo da página`);
+    assert.ok(!/<w:t>0[12]<\/w:t><\/w:r><\/w:p><\/w:txbxContent>/.test(rodape), `${nome} sem número fixo`);
+  }
+});
+
 test("diagnóstico sem texto nem imagem: cada parte sai com marcador a completar", async () => {
   const { texto, xml } = await docx(projetoDeExemplo());
   assert.ok(texto.includes("[completar: contexto do cliente"));
@@ -161,6 +182,9 @@ test("a IA segue o modelo do SEBRAE no diagnóstico, escreve só no fim, guarda 
   assert.ok(r.includes('"dados_do_diagnostico"') && r.includes("telefone do prestador") && r.includes("quadro de assinatura do Word"));
   assert.ok(r.includes('"guardar_evidencia_diagnostico"') && r.includes("Não use \"guardar_anexo\" para isso"));
   assert.ok(r.includes('nunca diga que "não pode enviar" o diagnóstico') && r.includes('"Baixar diagnóstico em Word"'));
+  // elaboração: nada de copiar o que o consultor ditou, mas sem inventar fatos
+  assert.ok(r.includes("nunca copie as frases do consultor") && r.includes("de mais de um ângulo") && r.includes("pelo menos dois parágrafos"));
+  assert.ok(r.includes("Aprofundar não é inventar") && r.includes("[completar: …] ou [a confirmar: …]"));
   assert.ok(SISTEMA.includes(r), "as regras do diagnóstico estão no prompt do chat");
   assert.ok(SISTEMA.includes("as regras abaixo valem só para os relatórios, nunca para o diagnóstico"));
   assert.ok(SISTEMA.includes("exceto as imagens da reunião de diagnóstico"));

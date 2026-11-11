@@ -108,7 +108,7 @@ function tabelaDeDados(tbl: string, projeto: Projeto, c: Cliente) {
 }
 
 // Parágrafo de corpo dos quadros: Arial pequeno do modelo (TableParagraph), justificado, cor do texto do modelo
-const PPR_CORPO = `<w:pPr><w:pStyle w:val="TableParagraph"/><w:spacing w:before="40"/><w:ind w:left="113" w:right="113"/><w:jc w:val="both"/><w:rPr><w:color w:val="${COR_TEXTO}"/><w:spacing w:val="-2"/><w:sz w:val="18"/></w:rPr></w:pPr>`;
+const PPR_CORPO = `<w:pPr><w:pStyle w:val="TableParagraph"/><w:spacing w:before="40" w:after="40"/><w:ind w:left="113" w:right="113"/><w:jc w:val="both"/><w:rPr><w:color w:val="${COR_TEXTO}"/><w:spacing w:val="-2"/><w:sz w:val="18"/></w:rPr></w:pPr>`;
 const RPR_CORPO = `<w:color w:val="${COR_TEXTO}"/><w:spacing w:val="-2"/><w:sz w:val="18"/>`;
 
 // "1. Título da necessidade. Texto…" (as necessidades da investigação): o número e o título saem em negrito, como no modelo
@@ -127,11 +127,9 @@ const paragrafosDoTexto = (texto: string) =>
     .map(paragrafoDeTexto)
     .join("");
 
-const paragrafoVazio = `<w:p><w:pPr><w:pStyle w:val="TableParagraph"/><w:spacing w:before="20"/><w:rPr><w:sz w:val="12"/></w:rPr></w:pPr></w:p>`;
-
 const EMU_CM = 360000;
 function imagemXml(img: ImagemRelatorio, n: number) {
-  const escala = Math.min((11 * EMU_CM) / img.largura, (9.5 * EMU_CM) / img.altura);
+  const escala = Math.min((11 * EMU_CM) / img.largura, (8 * EMU_CM) / img.altura);
   const cx = Math.round(img.largura * escala);
   const cy = Math.round(img.altura * escala);
   const id = 2000 + n;
@@ -144,6 +142,13 @@ function imagemXml(img: ImagemRelatorio, n: number) {
     `<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic>` +
     `</a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`
   );
+}
+
+// Parágrafo que fica na mesma página do seguinte (w:keepNext vem logo depois do estilo, na ordem do w:pPr)
+function manterComOProximo(p: string) {
+  if (/<w:keepNext\b/.test(p)) return p;
+  if (/<w:pPr>/.test(p)) return /<w:pStyle [^>]*\/>/.test(p) ? p.replace(/(<w:pStyle [^>]*\/>)/, "$1<w:keepNext/>") : p.replace("<w:pPr>", "<w:pPr><w:keepNext/>");
+  return p.replace(/^<w:p([ >])/, (_, c) => `<w:p${c === ">" ? "" : c}`).replace(/^(<w:p\b[^>]*>)/, "$1<w:pPr><w:keepNext/></w:pPr>");
 }
 
 const numeroDaEvidencia = (n: number) => String(n).padStart(2, "0");
@@ -177,8 +182,10 @@ function tabelaDoDiagnostico(tbl: string, projeto: Projeto, imagens: ImagemRelat
         ? imagens.map((img, k) => imagemXml(img, k + 1) + `<w:p>${PPR_CORPO.replace('<w:jc w:val="both"/>', '<w:jc w:val="left"/>')}${runs(`Evidência ${numeroDaEvidencia(k + 1)} – ${img.legenda}`, { modelo: RPR_CORPO })}</w:p>`).join("")
         : paragrafoDeTexto(vazioComo("imagem da reunião de diagnóstico (foto ou print) como evidência"));
     }
-    const novaCelula = `${abertura}${cabecalho}${corpo}${paragrafoVazio}</w:tc>`;
-    const novaLinha = (secao ? tr : tr.replace(/<w:trPr>/, "<w:trPr><w:cantSplit/>")).replace(tc, () => novaCelula);
+    // O quadro continua de uma página para a outra (nada de linha que não parte, que deixava a página em branco); só o título das
+    // evidências vai junto da primeira imagem
+    const novaCelula = `${abertura}${secao ? cabecalho : manterComOProximo(cabecalho)}${corpo}</w:tc>`;
+    const novaLinha = tr.replace(tc, () => novaCelula);
     novoTbl = novoTbl.replace(tr, () => novaLinha);
   });
   return novoTbl;
@@ -193,7 +200,7 @@ function tabelaDeAssinatura(tbl: string, projeto: Projeto, consultor: Usuario | 
     [/^E-mail:/, (d.email ?? "").trim() || consultor?.email || vazioComo("e-mail do prestador")],
     [/^Local e Data:/, `${projeto.localAssinatura || vazioComo("local")}, ${dataPorExtenso(d.dataDoDocumento || hoje)}`],
   ];
-  return linhasDe(tbl).reduce((acc, tr) => {
+  const preenchida = linhasDe(tbl).reduce((acc, tr) => {
     const nova = celulasDe(tr).reduce((trAcc, tc) => {
       const rotulo = textoDe(tc);
       const achado = valores.find(([re]) => re.test(rotulo));
@@ -201,6 +208,42 @@ function tabelaDeAssinatura(tbl: string, projeto: Projeto, consultor: Usuario | 
     }, tr);
     return acc.replace(tr, () => nova);
   }, tbl);
+  return quadroEmFluxo(preenchida);
+}
+
+// O quadro de assinatura do modelo é uma tabela flutuante (posição fixa na página): tira a posição e junta as linhas, para
+// seguir o texto do diagnóstico e ficar inteiro na mesma página
+function quadroEmFluxo(tbl: string) {
+  const solto = tbl.replace(/<w:tblpPr [^>]*\/>/, "");
+  const linhas = linhasDe(solto);
+  return linhas.reduce((acc, tr, i) => {
+    const comTrPr = /<w:trPr>/.test(tr) ? tr.replace("<w:trPr>", "<w:trPr><w:cantSplit/>") : tr.replace(/^(<w:tr\b[^>]*>)/, "$1<w:trPr><w:cantSplit/></w:trPr>");
+    const unida = i < linhas.length - 1 ? comTrPr.replace(/<w:p[ >][\s\S]*?<\/w:p>/g, manterComOProximo) : comTrPr;
+    return acc.replace(tr, () => unida);
+  }, solto);
+}
+
+// Duas tabelas coladas viram uma só no Word: um parágrafo pequeno entre os quadros
+const ESPACO_ENTRE_QUADROS = `<w:p><w:pPr><w:keepNext/><w:spacing w:before="0" w:after="0" w:line="120" w:lineRule="exact"/><w:rPr><w:sz w:val="4"/></w:rPr></w:pPr></w:p>`;
+
+// O modelo termina com uma seção "contínua" e uma última página só com enfeites (que deixava uma página em branco no fim).
+// Aqui o documento tem uma seção só: a do corpo, com a numeração começando em 0 na capa (a primeira página de texto é a 01)
+function documentoEmUmaSecao(xml: string) {
+  const paragrafoDaSecao = xml.match(/<w:p [^>]*>(?:(?!<\/w:p>)[\s\S])*?<w:sectPr\b[\s\S]*?<\/w:sectPr>[\s\S]*?<\/w:p>/);
+  const corpoFinal = xml.match(/<w:sectPr\b[^>]*>(?:(?!<w:sectPr)[\s\S])*?<\/w:sectPr><\/w:body>/);
+  if (!paragrafoDaSecao || !corpoFinal || paragrafoDaSecao.index === undefined || corpoFinal.index === undefined) return xml;
+  const sectPr = paragrafoDaSecao[0].match(/<w:sectPr\b[\s\S]*?<\/w:sectPr>/)![0].replace(/<w:type [^>]*\/>/, "").replace(/<w:pgNumType [^>]*\/>/, '<w:pgNumType w:start="0"/>');
+  // fecha o corpo com um parágrafo mínimo (o Word exige um parágrafo depois de uma tabela) e a seção única
+  const ultimo = `<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/><w:rPr><w:sz w:val="2"/></w:rPr></w:pPr></w:p>`;
+  return xml.slice(0, paragrafoDaSecao.index) + ultimo + sectPr + "</w:body>" + xml.slice(corpoFinal.index + corpoFinal[0].length);
+}
+
+// Rodapé do modelo: o número da página era um texto fixo ("01" nas páginas ímpares, "02" nas pares). Vira o campo de número de
+// página do Word, com dois dígitos, para seguir a sequência (01, 02, 03…)
+export function numerarRodape(xml: string) {
+  const campo = (rpr: string) =>
+    `<w:r>${rpr}<w:fldChar w:fldCharType="begin"/></w:r><w:r>${rpr}<w:instrText xml:space="preserve"> PAGE \\# "00" </w:instrText></w:r><w:r>${rpr}<w:fldChar w:fldCharType="separate"/></w:r><w:r>${rpr}<w:t>01</w:t></w:r><w:r>${rpr}<w:fldChar w:fldCharType="end"/></w:r>`;
+  return xml.replace(/<w:r(?: [^>]*)?>(<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)<w:t>\d\d<\/w:t><\/w:r>/g, (_, rpr) => campo(rpr));
 }
 
 export const contarMarcadoresDoDiagnostico = (xml: string) => (xml.match(MARCADOR_NO_WORD) ?? []).length;
@@ -211,8 +254,9 @@ export function preencherModeloDoDiagnostico(xml: string, dados: DadosDoDiagnost
   if (t.length < 3) throw new Error("O modelo do diagnóstico não tem as três tabelas esperadas.");
   const [dados0, quadros, assinatura] = t.map((x) => xml.slice(x.inicio, x.fim));
   let saida = xml.slice(0, t[0].inicio) + tabelaDeDados(dados0, dados.projeto, dados.cliente) + xml.slice(t[0].fim, t[1].inicio);
-  saida += tabelaDoDiagnostico(quadros, dados.projeto, imagens) + xml.slice(t[1].fim, t[2].inicio);
+  saida += tabelaDoDiagnostico(quadros, dados.projeto, imagens) + xml.slice(t[1].fim, t[2].inicio) + ESPACO_ENTRE_QUADROS;
   saida += tabelaDeAssinatura(assinatura, dados.projeto, dados.consultor, hoje) + xml.slice(t[2].fim);
+  saida = documentoEmUmaSecao(saida);
 
   // Caixa de pendências antes de "1. Qualificação da Demanda", que a pessoa apaga ao concluir
   const pendentes = contarMarcadoresDoDiagnostico(saida);
@@ -234,6 +278,7 @@ export async function gerarDocxDiagnostico(dados: DadosDoDiagnosticoWord, hoje: 
   const zip = new PizZip(base);
   tirarMiniatura(zip);
   const imagens = incluirImagens(zip, arquivos);
+  for (const rodape of Object.keys(zip.files).filter((n) => /^word\/footer\d+\.xml$/.test(n))) zip.file(rodape, numerarRodape(zip.file(rodape)!.asText()));
   zip.file("word/document.xml", preencherModeloDoDiagnostico(zip.file("word/document.xml")!.asText(), dados, hoje, imagens));
   return zip.generate({ type: "blob", compression: "DEFLATE", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
 }
