@@ -92,4 +92,14 @@ test("cliente em mais de uma empresa: acha as outras cópias pelo CNPJ e só os 
   // só o que mudou: vazio e ausente são iguais, espaços nas pontas não contam
   assert.deepEqual(camposAlterados(base, { ...base, email: "novo@exemplo.test", site: "  " }), { email: "novo@exemplo.test" });
   assert.deepEqual(camposAlterados(base, { ...base }), {});
+  // "Alterar em todas": leva o que mudou e o que está preenchido e diferente na outra cópia; vazio só apaga se foi apagado agora
+  const { dadosParaAsOutrasCopias } = await import("../src/lib/campos-cliente");
+  const editado = { ...base, telefone: "(84) 5555-5555", responsavel: "Maria Completa", cargoResponsavel: "Diretora", site: "" };
+  const cadastroIncompleto = { ...base, id: "c9", empresa: "eix-core" as never, responsavel: "maria", cargoResponsavel: "", empregadosGestao: "9", site: "www.exemplo.test" };
+  assert.deepEqual(dadosParaAsOutrasCopias(base, editado, cadastroIncompleto), { telefone: "(84) 5555-5555", responsavel: "Maria Completa", cargoResponsavel: "Diretora", empregadosGestao: "3" });
+  // campo em branco no cadastro editado e que não foi mexido agora não apaga o da outra cópia
+  assert.deepEqual(dadosParaAsOutrasCopias(base, { ...base, site: "" }, { ...base, id: "c9", site: "www.exemplo.test" }), {});
+  // já estava preenchido e foi apagado agora: apaga também na outra cópia
+  assert.deepEqual(dadosParaAsOutrasCopias(base, { ...base, ramo: "" }, { ...base, id: "c9", ramo: "Comércio" }), { ramo: "" });
+  assert.deepEqual(dadosParaAsOutrasCopias(base, { ...base }, { ...base, id: "c9" }), {});
 });

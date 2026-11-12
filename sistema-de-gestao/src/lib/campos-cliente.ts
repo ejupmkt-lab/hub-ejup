@@ -77,3 +77,17 @@ export function mesmoClienteEmOutrasEmpresas(clientes: Cliente[], cliente: Pick<
   const cnpj = soDigitos(cliente.cnpj);
   return cnpj.length === 14 ? clientes.filter((c) => c.empresa !== cliente.empresa && c.id !== cliente.id && soDigitos(c.cnpj) === cnpj) : [];
 }
+
+// O que "Alterar em todas" leva para uma das outras cópias: o que mudou nesta edição (inclusive o que foi apagado) e tudo o que
+// está preenchido no cadastro editado e é diferente na outra cópia. Campo vazio no cadastro editado não apaga o da outra cópia,
+// a não ser que a pessoa o tenha apagado agora.
+export function dadosParaAsOutrasCopias(original: Partial<Cliente>, depois: Partial<Cliente>, outra: Partial<Cliente>): Partial<Cliente> {
+  const alterados = camposAlterados(original, depois);
+  const levar: Partial<Record<keyof Cliente, string>> = {};
+  for (const { chave } of camposCliente) {
+    const novo = String(depois[chave] ?? "").trim();
+    const naOutra = String(outra[chave] ?? "").trim();
+    if (novo !== naOutra && (novo || chave in alterados)) levar[chave] = novo;
+  }
+  return levar as Partial<Cliente>;
+}
