@@ -58,3 +58,22 @@ export function nomeDoCliente(c: Partial<Pick<Cliente, "nomeFantasia" | "razaoSo
     })
     .join("");
 }
+
+const soDigitos = (t: string | undefined) => (t ?? "").replace(/\D/g, "");
+
+// Campos do cadastro que mudaram entre a versão gravada e o formulário (vazio e ausente contam como igual)
+export function camposAlterados(antes: Partial<Cliente>, depois: Partial<Cliente>): Partial<Cliente> {
+  const mudou: Partial<Record<keyof Cliente, string>> = {};
+  for (const { chave } of camposCliente) {
+    const a = String(antes[chave] ?? "").trim();
+    const d = String(depois[chave] ?? "").trim();
+    if (a !== d) mudou[chave] = d;
+  }
+  return mudou as Partial<Cliente>;
+}
+
+// O mesmo cliente (mesmo CNPJ) cadastrado em outras empresas do grupo a que a pessoa tem acesso
+export function mesmoClienteEmOutrasEmpresas(clientes: Cliente[], cliente: Pick<Cliente, "id" | "empresa" | "cnpj">): Cliente[] {
+  const cnpj = soDigitos(cliente.cnpj);
+  return cnpj.length === 14 ? clientes.filter((c) => c.empresa !== cliente.empresa && c.id !== cliente.id && soDigitos(c.cnpj) === cnpj) : [];
+}

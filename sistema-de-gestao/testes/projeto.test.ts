@@ -4,7 +4,7 @@ import { passoDoProjeto } from "../src/lib/proximo-passo";
 import { sugestoesConversa } from "../src/lib/conversa";
 import { dadosDaEmpresa, sugestoesDeContato, type DadosCnpj } from "../src/lib/cnpj";
 import { confirmouExclusao } from "../src/lib/exclusao";
-import { projetoDeExemplo } from "./fixtures";
+import { clienteDeExemplo, projetoDeExemplo } from "./fixtures";
 import type { Projeto } from "../src/lib/dados/tipos";
 
 // Projeto em execução, com a etapa 1 toda escrita, o checklist cumprido e evidência anexada, mas com marcador aberto
@@ -76,4 +76,20 @@ test("a exclusão só é liberada com a palavra EXCLUIR digitada por inteiro", (
   assert.equal(confirmouExclusao("EXCLUIR"), true);
   assert.equal(confirmouExclusao("  excluir "), true);
   for (const v of ["", "EXCLU", "EXCLUIR TUDO", "apagar", "EXCLUIRR"]) assert.equal(confirmouExclusao(v), false, v);
+});
+
+test("cliente em mais de uma empresa: acha as outras cópias pelo CNPJ e só os campos alterados são levados", async () => {
+  const { camposAlterados, mesmoClienteEmOutrasEmpresas } = await import("../src/lib/campos-cliente");
+  const base = { ...clienteDeExemplo, id: "c1", empresa: "pivotto" as const };
+  const outra = { ...base, id: "c2", empresa: "eix-core" as never, telefone: "(84) 3000-0000" };
+  const outroCnpj = { ...base, id: "c3", empresa: "orb" as const, cnpj: "99.999.999/0001-99" };
+  const mesma = { ...base, id: "c4" }; // mesma empresa: não conta
+  const irmaos = mesmoClienteEmOutrasEmpresas([base, outra, outroCnpj, mesma], base);
+  assert.deepEqual(irmaos.map((c) => c.id), ["c2"]);
+  // máscara diferente no CNPJ ainda é o mesmo cliente
+  assert.equal(mesmoClienteEmOutrasEmpresas([{ ...outra, cnpj: "11222333000181" }], base).length, 1);
+  assert.equal(mesmoClienteEmOutrasEmpresas([outra], { ...base, cnpj: "" }).length, 0);
+  // só o que mudou: vazio e ausente são iguais, espaços nas pontas não contam
+  assert.deepEqual(camposAlterados(base, { ...base, email: "novo@exemplo.test", site: "  " }), { email: "novo@exemplo.test" });
+  assert.deepEqual(camposAlterados(base, { ...base }), {});
 });

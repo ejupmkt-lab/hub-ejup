@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { novoId, useAcesso, useEstado } from "@/lib/dados/store";
 import type { Cliente, EmpresaSlug } from "@/lib/dados/tipos";
-import { camposCliente, gruposCliente, nomeDoCliente } from "@/lib/campos-cliente";
+import { camposAlterados, camposCliente, gruposCliente, mesmoClienteEmOutrasEmpresas, nomeDoCliente } from "@/lib/campos-cliente";
 import { dadosDaEmpresa, formatarCnpj, sugestoesDeContato, type DadosCnpj, type SugestaoDeContato } from "@/lib/cnpj";
 import Link from "next/link";
 import { servicoDoProjeto } from "@/lib/projeto";
@@ -81,9 +81,27 @@ function Conteudo() {
   const digitos = (form.cnpj ?? "").replace(/\D/g, "");
   const duplicado = digitos.length === 14 ? clientes.find((c) => c.id !== editando && c.cnpj.replace(/\D/g, "") === digitos) : undefined;
 
+  // O mesmo cliente em outras empresas: antes de gravar, pergunta se a alteração vale para elas também
+  const [confirmando, setConfirmando] = useState<{ irmaos: Cliente[]; mudancas: Partial<Cliente> } | null>(null);
+
   const salvar = (e: React.FormEvent) => {
     e.preventDefault();
     if (faltando.length || duplicado) return;
+    if (editando !== "novo") {
+      const original = clientes.find((c) => c.id === editando);
+      const mudancas = original ? camposAlterados(original, form as unknown as Cliente) : {};
+      const irmaos = original && Object.keys(mudancas).length ? mesmoClienteEmOutrasEmpresas(estado.clientes, original) : [];
+      // Só pergunta quando alguma das outras cópias ainda difere do que vai ser gravado
+      const diferentes = irmaos.filter((i) => Object.keys(camposAlterados(i, { ...i, ...mudancas })).length > 0);
+      if (diferentes.length) {
+        setConfirmando({ irmaos: diferentes, mudancas });
+        return;
+      }
+    }
+    gravarCliente(false);
+  };
+
+  const gravarCliente = (nasDemais: boolean, irmaos: Cliente[] = [], mudancas: Partial<Cliente> = {}) => {
     // O id é gerado antes: a atualização do estado roda depois, e a volta ao projeto precisa dele já
     const id = editando === "novo" ? novoId("cli") : editando!;
     atualizar((r) => {
@@ -92,8 +110,13 @@ function Conteudo() {
       } else {
         const i = r.clientes.findIndex((c) => c.id === editando);
         r.clientes[i] = { ...r.clientes[i], ...(form as unknown as Cliente) };
+        if (nasDemais) for (const irmao of irmaos) {
+          const j = r.clientes.findIndex((c) => c.id === irmao.id);
+          if (j >= 0) r.clientes[j] = { ...r.clientes[j], ...mudancas };
+        }
       }
     });
+    setConfirmando(null);
     setEditando(null);
     if (voltarParaProjeto) router.push(`/${slug}/projetos/novo?cliente=${id}`);
     else if (projetoDeOrigem) router.push(`/${slug}/projetos/${projetoDeOrigem}`);
@@ -123,6 +146,37 @@ function Conteudo() {
       >
         {!editando && <Botao onClick={() => abrir()}>Novo cliente</Botao>}
       </Cabecalho>
+
+      {confirmando && (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-tinta/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Alterar também nas demais empresas"
+          onKeyDown={(e) => e.key === "Escape" && setConfirmando(null)}
+        >
+          <div className="w-full max-w-md space-y-4 rounded-[var(--radius-bloco)] bg-folha p-5 shadow-xl">
+            <div>
+              <h2 className="text-lg font-bold">Deseja alterar os dados do cliente nas demais empresas?</h2>
+              <p className="mt-1 text-[14px] text-tinta-2">
+                {nomeDoCliente(form as unknown as Cliente)} também está cadastrado em{" "}
+                {[...new Set(confirmando.irmaos.map((i) => estado.empresas.find((e) => e.slug === i.empresa)?.nome ?? i.empresa))].join(", ")}.
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-end gap-2">
+              <Botao type="button" variante="fantasma" onClick={() => setConfirmando(null)}>
+                Voltar
+              </Botao>
+              <Botao type="button" variante="secundario" onClick={() => gravarCliente(false)}>
+                Só nesta empresa
+              </Botao>
+              <Botao type="button" autoFocus onClick={() => gravarCliente(true, confirmando.irmaos, confirmando.mudancas)}>
+                Alterar em todas
+              </Botao>
+            </div>
+          </div>
+        </div>
+      )}
 
       {editando && (
         <Cartao className="mb-10 p-6 sm:p-8">

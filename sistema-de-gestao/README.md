@@ -42,6 +42,8 @@ Especificação completa no PRD: [`docs/prd-hub-gestao.md`](docs/prd-hub-gestao.
   ficha (`/api/servico-ficha`). O projeto novo escolhe o serviço na lista e copia as etapas dele; mudar a
   ficha depois não altera projetos em andamento.
 - **Clientes** com os campos do Modelo de Diagnóstico do HUB SEBRAE.
+  Cliente com o mesmo CNPJ em mais de uma empresa (que a pessoa acessa): ao salvar uma alteração, um aviso pergunta se vale também nas demais
+  empresas; só os campos que mudaram são levados ("Alterar em todas", "Só nesta empresa" ou "Voltar").
 - **Projetos** a partir dos serviços cadastrados; o primeiro é *Adequação à LGPD* (ficha 13070-5): 5
   etapas, 333 h, checklist de atividades e 23 entregáveis, com textos-padrão e referências próprios.
 - **Régua do HUB** (`src/lib/fase.ts`): todo projeto segue as 6 etapas do HUB SEBRAE (1 Solicitação
