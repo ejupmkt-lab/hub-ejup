@@ -40,16 +40,19 @@ function Conteudo() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Abre direto pelo endereço: ?editar=<id> ou ?novo=1
-  const abriuPeloEndereco = useRef(false);
+  // Abre direto pelo endereço: ?editar=<id> ou ?novo=1 (também quando se chega pelo botão "Editar dados" da página do cliente,
+  // sem recarregar a página). Abre uma vez por pedido; se o cliente ainda não carregou, tenta de novo quando a lista chegar
+  const abriuPeloEndereco = useRef<string | null>(null);
+  const pedidoEditar = busca_.get("editar");
+  const pedidoNovo = busca_.get("novo");
   useEffect(() => {
-    if (abriuPeloEndereco.current) return;
-    abriuPeloEndereco.current = true;
-    const id = busca_.get("editar");
-    const c = id ? clientes.find((x) => x.id === id) : undefined;
-    if (c || busca_.get("novo")) queueMicrotask(() => abrir(c));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const chave = pedidoEditar ?? (pedidoNovo ? "novo" : null);
+    if (!chave || abriuPeloEndereco.current === chave) return;
+    const c = pedidoEditar ? clientes.find((x) => x.id === pedidoEditar) : undefined;
+    if (pedidoEditar && !c) return;
+    abriuPeloEndereco.current = chave;
+    queueMicrotask(() => abrir(c));
+  }, [pedidoEditar, pedidoNovo, clientes]);
 
   const consultarCnpj = async (cnpj: string, sobrescrever: boolean) => {
     const digitos = cnpj.replace(/\D/g, "");
