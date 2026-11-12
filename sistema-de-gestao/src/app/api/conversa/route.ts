@@ -12,7 +12,7 @@ import { formatarData, hojeIso } from "@/lib/datas";
 import { statusEtapa } from "@/lib/rotulos";
 import { SISTEMA } from "@/lib/ia/conversa-prompt";
 import { descreverErroDaIA } from "@/lib/ia/erros";
-import { faltasDoDiagnostico, lerDiagnostico, secoesDoModelo } from "@/lib/diagnostico";
+import { faltasDoDiagnostico, lerDiagnostico, secoesDoModelo, telefoneDoConsultor } from "@/lib/diagnostico";
 import { textoDoPrazo } from "@/lib/projeto";
 import { textoPlano } from "@/lib/plano-texto";
 import { contarAConfirmar, contarMarcadores, dataLimiteInformacoes } from "@/lib/relatorio/padroes";
@@ -201,8 +201,9 @@ export async function POST(req: Request) {
   const { data: linhaServico } = await sb.from("servicos").select("dados").eq("id", projeto.modeloId).maybeSingle();
   const preDiagnostico = ((linhaServico?.dados ?? {}) as Partial<Servico>).preDiagnostico ?? [];
   // O e-mail do consultor do projeto é o que sai no quadro de assinatura do diagnóstico, se ninguém informar outro
-  const { data: perfilConsultor } = await sb.from("perfis").select("email").eq("id", projeto.consultorId).maybeSingle();
+  const { data: perfilConsultor } = await sb.from("perfis").select("email, nome, nome_completo").eq("id", projeto.consultorId).maybeSingle();
   const emailDoConsultor = perfilConsultor?.email ?? "";
+  const foneDoConsultor = telefoneDoConsultor({ nome: perfilConsultor?.nome, nomeCompleto: perfilConsultor?.nome_completo });
 
   const { data: ultimas } = await sb
     .from("mensagens_projeto")
@@ -257,7 +258,7 @@ export async function POST(req: Request) {
         content: [
           {
             type: "text",
-            text: `<projeto>\n${contextoDoProjeto(projeto, cliente, preDiagnostico, emailDoConsultor)}\n</projeto>\n\n<conversa_anterior>\n${historico}\n</conversa_anterior>`,
+            text: `<projeto>\n${contextoDoProjeto(projeto, cliente, preDiagnostico, emailDoConsultor, foneDoConsultor)}\n</projeto>\n\n<conversa_anterior>\n${historico}\n</conversa_anterior>`,
           },
           { type: "text", text: `<mensagem_atual>\n${atual.texto || "(sem texto, só anexos)"}\n</mensagem_atual>` },
           ...blocos,
@@ -326,7 +327,7 @@ function corpoDoErro(e: unknown) {
 
 // Tudo o que a IA precisa saber do projeto: cliente, etapas, checklist, modelo
 // do relatório (seções e entregáveis, com o texto atual) e o que já foi registrado
-function contextoDoProjeto(p: Projeto, c: Partial<Cliente>, preDiagnostico: string[], emailDoConsultor = "") {
+function contextoDoProjeto(p: Projeto, c: Partial<Cliente>, preDiagnostico: string[], emailDoConsultor = "", foneDoConsultor = "") {
   const linha = (rotulo: string, valor?: string | null) => (valor?.trim() ? `${rotulo}: ${valor.trim()}` : null);
   const concluida = (e: Etapa) => e.status === "enviada" || e.status === "aprovada";
   const emCurso = p.etapas.find((e) => !concluida(e));
@@ -385,8 +386,8 @@ function contextoDoProjeto(p: Projeto, c: Partial<Cliente>, preDiagnostico: stri
   for (const s of secoesDoModelo) partes.push(`${s.numero}. ${s.titulo}: ${dg[s.chave].trim() ? `\n<texto>\n${dg[s.chave].trim()}\n</texto>` : "(em branco)"}`);
   partes.push(`Evidências guardadas: ${dg.evidencias.length ? dg.evidencias.map((e, i) => `0${i + 1} – ${e.legenda}`).join("; ") : "nenhuma"}`);
   partes.push(dg.arquivo ? `Arquivo do diagnóstico anexado em Entregas: ${dg.arquivo.nome}.` : "Nenhum arquivo do diagnóstico anexado em Entregas.");
-  partes.push(`Quadro de assinatura do Word: telefone do prestador ${dg.telefone?.trim() || "(não informado)"}; e-mail do prestador ${dg.email?.trim() || (emailDoConsultor ? `(não informado; sai o do consultor, ${emailDoConsultor})` : "(não informado)")}; data do documento ${dg.dataDoDocumento ? formatarData(dg.dataDoDocumento) : "(não informada; sai o dia em que o Word é gerado)"}.`);
-  const faltas = faltasDoDiagnostico(p, c, emailDoConsultor);
+  partes.push(`Quadro de assinatura do Word: telefone do prestador ${dg.telefone?.trim() || (foneDoConsultor ? `(não informado; sai o do consultor, ${foneDoConsultor})` : "(não informado)")}; e-mail do prestador ${dg.email?.trim() || (emailDoConsultor ? `(não informado; sai o do consultor, ${emailDoConsultor})` : "(não informado)")}; data do documento ${dg.dataDoDocumento ? formatarData(dg.dataDoDocumento) : "(não informada; sai o dia em que o Word é gerado)"}.`);
+  const faltas = faltasDoDiagnostico(p, c, emailDoConsultor, foneDoConsultor);
   partes.push(faltas.length ? `O que ainda falta para o diagnóstico ficar completo: ${faltas.join("; ")}.` : "O diagnóstico tem tudo o que o modelo pede.");
   // Tabelas do relatório (marcador [[tabela:tipo]] no texto), com as linhas atuais
   partes.push("", "## Tabelas do relatório (tipo: nome; colunas na ordem)");

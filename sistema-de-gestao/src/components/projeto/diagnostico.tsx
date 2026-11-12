@@ -6,7 +6,7 @@ import { supabaseNavegador } from "@/lib/supabase/navegador";
 import { traduzirErro } from "@/lib/erros";
 import { formatarData, hojeIso } from "@/lib/datas";
 import { hubDoProjeto, passoHubDoProjeto } from "@/lib/fase";
-import { faltasDoDiagnostico, lerDiagnostico, secoesDoModelo, temTextoNoDiagnostico, type ChaveDeSecao } from "@/lib/diagnostico";
+import { faltasDoDiagnostico, lerDiagnostico, secoesDoModelo, telefoneDoConsultor, temTextoNoDiagnostico, type ChaveDeSecao } from "@/lib/diagnostico";
 import { gerarDocxDiagnostico } from "@/lib/relatorio/diagnostico-docx";
 import { MARCADOR_NO_WORD } from "@/lib/relatorio/docx";
 import { Botao, Campo, Cartao, Status } from "@/components/ui";
@@ -45,7 +45,7 @@ export function DiagnosticoDoProjeto({ projeto, aoDesenvolver }: { projeto: Proj
   const [aberto, setAberto] = useState(!(arquivo || enviadoNoHub));
   const temTexto = temTextoNoDiagnostico(d);
   const marcadores = contarMarcadores(d);
-  const faltas = cliente ? faltasDoDiagnostico(projeto, cliente) : [];
+  const faltas = cliente ? faltasDoDiagnostico(projeto, cliente, consultor?.email ?? "", telefoneDoConsultor(consultor)) : [];
   const naFaseDoDiagnostico = passoHubDoProjeto(projeto) === "diagnostico";
   const doHub = (projeto.materiaisHub ?? []).filter((m) => /diagn/i.test(m.nome));
 

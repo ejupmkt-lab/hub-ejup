@@ -1,7 +1,7 @@
 import PizZip from "pizzip";
 import type { Cliente, Projeto, Usuario } from "../dados/tipos";
 import { dataPorExtenso } from "../datas";
-import { lerDiagnostico, secoesDoModelo, totalDeEmpregados } from "../diagnostico";
+import { lerDiagnostico, secoesDoModelo, telefoneDoConsultor, totalDeEmpregados } from "../diagnostico";
 import { esc, incluirImagens, MARCADOR_NO_WORD, quadro, tirarMiniatura, type ArquivoImagem, type ImagemRelatorio } from "./docx";
 
 // Diagnóstico no modelo do SEBRAE (public/modelos/diagnostico-base.docx, o arquivo oficial): a capa, as tabelas e os cabeçalhos
@@ -196,7 +196,7 @@ function tabelaDeAssinatura(tbl: string, projeto: Projeto, consultor: Usuario | 
   const d = lerDiagnostico(projeto);
   const valores: [RegExp, string][] = [
     [/^Prestador de Serviços|^Instituição Credenciada/, projeto.prestadoraVinculada.trim() || vazioComo("prestador de serviços credenciado")],
-    [/^Telefone:/, (d.telefone ?? "").trim() || vazioComo("telefone do prestador")],
+    [/^Telefone:/, (d.telefone ?? "").trim() || telefoneDoConsultor(consultor) || vazioComo("telefone do prestador")],
     [/^E-mail:/, (d.email ?? "").trim() || consultor?.email || vazioComo("e-mail do prestador")],
     [/^Local e Data:/, `${projeto.localAssinatura || vazioComo("local")}, ${dataPorExtenso(d.dataDoDocumento || hoje)}`],
   ];

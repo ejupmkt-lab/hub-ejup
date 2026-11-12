@@ -35,8 +35,14 @@ export function totalDeEmpregados(c: Pick<Cliente, "empregadosGestao" | "emprega
   return a !== null && b !== null ? String(a + b) : "";
 }
 
+// Contato fixo dos consultores no quadro de assinatura do Word: o do Roberto é sempre este (a IA não pergunta e a tela não cobra)
+export const TELEFONE_DO_ROBERTO = "(84) 99932-1514";
+export function telefoneDoConsultor(c: { nome?: string; nomeCompleto?: string } | null | undefined) {
+  return /\broberto\b/i.test(`${c?.nome ?? ""} ${c?.nomeCompleto ?? ""}`) ? TELEFONE_DO_ROBERTO : "";
+}
+
 // O que o diagnóstico ainda precisa, para a IA saber o que perguntar antes de escrever (e para a tela dizer o que falta)
-export function faltasDoDiagnostico(p: Projeto, c: Partial<Cliente>, emailDoConsultor = ""): string[] {
+export function faltasDoDiagnostico(p: Projeto, c: Partial<Cliente>, emailDoConsultor = "", telefoneDoConsultor = ""): string[] {
   const d = lerDiagnostico(p);
   const faltas: string[] = [];
   const cadastro: [keyof Cliente, string][] = [
@@ -50,7 +56,7 @@ export function faltasDoDiagnostico(p: Projeto, c: Partial<Cliente>, emailDoCons
   for (const s of secoesEmBranco(d)) faltas.push(`texto: ${s.titulo}`);
   if (!d.evidencias.length) faltas.push("evidência da reunião de diagnóstico (foto ou print)");
   // Quadro de assinatura do Word: a IA pede ao consultor, em vez de haver uma tabela fixa para preencher na tela
-  if (!(d.telefone ?? "").trim()) faltas.push("telefone do prestador (quadro de assinatura)");
+  if (!(d.telefone ?? "").trim() && !telefoneDoConsultor.trim()) faltas.push("telefone do prestador (quadro de assinatura)");
   if (!(d.email ?? "").trim() && !emailDoConsultor.trim()) faltas.push("e-mail do prestador (quadro de assinatura)");
   return faltas;
 }

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import PizZip from "pizzip";
 import { aplicarAcoes, desfazerAcoes, type Anexo } from "../src/lib/conversa";
-import { faltasDoDiagnostico, lerDiagnostico, totalDeEmpregados } from "../src/lib/diagnostico";
+import { faltasDoDiagnostico, lerDiagnostico, telefoneDoConsultor, totalDeEmpregados } from "../src/lib/diagnostico";
 import { gerarDocxDiagnostico } from "../src/lib/relatorio/diagnostico-docx";
 import { REGRAS_DO_DIAGNOSTICO, SISTEMA } from "../src/lib/ia/conversa-prompt";
 import { passoDoProjeto } from "../src/lib/proximo-passo";
@@ -137,6 +137,25 @@ test("o Word do diagnóstico flui de uma página para a outra e a numeração da
     assert.ok(/PAGE \\# "00"/.test(rodape), `${nome} tem o campo da página`);
     assert.ok(!/<w:t>0[12]<\/w:t><\/w:r><\/w:p><\/w:txbxContent>/.test(rodape), `${nome} sem número fixo`);
   }
+});
+
+test("o telefone do consultor Roberto é sempre (84) 99932-1514 no quadro de assinatura, sem a IA perguntar", async () => {
+  const roberto = { ...consultorDeExemplo, nome: "Roberto", nomeCompleto: "Roberto Pivotto Nicodemo" };
+  assert.equal(telefoneDoConsultor(roberto), "(84) 99932-1514");
+  assert.equal(telefoneDoConsultor(consultorDeExemplo), "");
+  const p = projetoDeExemplo();
+  assert.ok(faltasDoDiagnostico(p, clienteDeExemplo, "r@x.com").some((f) => f.includes("telefone do prestador")));
+  assert.ok(!faltasDoDiagnostico(p, clienteDeExemplo, "r@x.com", telefoneDoConsultor(roberto)).some((f) => f.includes("telefone do prestador")));
+  const gerar = async (consultor: typeof roberto) => {
+    const blob = await gerarDocxDiagnostico({ projeto: p, cliente: clienteDeExemplo, consultor }, "2026-11-12", [], modelo());
+    return textoDoXml(new PizZip(new Uint8Array(await blob.arrayBuffer())).file("word/document.xml")!.asText());
+  };
+  assert.ok((await gerar(roberto)).includes("Telefone: (84) 99932-1514"));
+  assert.ok((await gerar(consultorDeExemplo)).includes("[completar: telefone do prestador]"));
+  // o que o consultor informar no chat vale mais que o contato fixo
+  p.diagnostico = { ...lerDiagnostico(p), telefone: "(84) 3000-0000" };
+  assert.ok((await gerar(roberto)).includes("Telefone: (84) 3000-0000"));
+  assert.ok(SISTEMA.includes("(84) 99932-1514"));
 });
 
 test("diagnóstico sem texto nem imagem: cada parte sai com marcador a completar", async () => {
