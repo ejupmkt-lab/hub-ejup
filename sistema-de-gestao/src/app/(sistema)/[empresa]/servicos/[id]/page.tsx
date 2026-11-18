@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAcesso, useEstado } from "@/lib/dados/store";
 import type { EmpresaSlug } from "@/lib/dados/tipos";
-import type { EtapaModelo } from "@/lib/modelos/tipos";
+import type { EtapaModelo, Servico } from "@/lib/modelos/tipos";
 import { horasDoServico } from "@/lib/servicos";
 import { doisDigitos } from "@/lib/rotulos";
 import { traduzirErro } from "@/lib/erros";
@@ -81,6 +81,7 @@ export default function PaginaServico() {
                 <EtapaFicha e={e} />
               </li>
             ))}
+            <ListasDaFicha servico={s} />
           </ol>
           <aside className="min-w-0 space-y-4">
             <Cartao className="p-4 sm:p-5">
@@ -179,5 +180,44 @@ function EtapaFicha({ e }: { e: EtapaModelo }) {
         </>
       )}
     </Cartao>
+  );
+}
+
+// Benefícios e responsabilidades da ficha técnica
+function ListasDaFicha({ servico: s }: { servico: Servico }) {
+  const listas: [string, string[] | undefined, boolean][] = [
+    ["Benefícios e resultados esperados", s.beneficios, false],
+    ["Responsabilidades da empresa demandante", s.responsabilidadeEmpresa, true],
+    ["Responsabilidades da prestadora de serviço", s.responsabilidadePrestadora, true],
+  ];
+  const preenchidas = listas.filter(([, itens]) => itens?.length);
+  if (!preenchidas.length) return null;
+  return (
+    <li>
+      <Cartao className="space-y-5 p-4 sm:p-6">
+        {preenchidas.map(([titulo, itens, numerada]) => (
+          <section key={titulo}>
+            <h2 className="text-[13px] font-bold uppercase tracking-wide text-tinta-2">{titulo}</h2>
+            {numerada ? (
+              <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-tinta">
+                {itens!.map((t) => (
+                  <li key={t} className="break-words">
+                    {t}
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-tinta">
+                {itens!.map((t) => (
+                  <li key={t} className="break-words">
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        ))}
+      </Cartao>
+    </li>
   );
 }

@@ -67,6 +67,9 @@ export function FormServico({
     ...dados,
     nome: dados.nome || dados.fichaTecnica,
     preDiagnostico: linhasEmLista((dados.preDiagnostico ?? []).join("\n")).map((q) => q.replace(/^\d+[.)]\s*/, "")),
+    beneficios: linhasEmLista((dados.beneficios ?? []).join("\n")),
+    responsabilidadeEmpresa: linhasEmLista((dados.responsabilidadeEmpresa ?? []).join("\n")).map((q) => q.replace(/^\d+[.)]\s*/, "")),
+    responsabilidadePrestadora: linhasEmLista((dados.responsabilidadePrestadora ?? []).join("\n")).map((q) => q.replace(/^\d+[.)]\s*/, "")),
     etapas: etapas.map(doForm),
   };
   const problemas = problemasDoServico(servico);
@@ -114,6 +117,9 @@ export function FormServico({
         prestadoraVinculada: texto(f.prestadoraVinculada, x.prestadoraVinculada),
         areaAtuacao: texto(f.areaAtuacao, x.areaAtuacao),
         preDiagnostico: f.preDiagnostico?.length ? f.preDiagnostico : x.preDiagnostico,
+        beneficios: f.beneficios?.length ? f.beneficios : x.beneficios,
+        responsabilidadeEmpresa: f.responsabilidadeEmpresa?.length ? f.responsabilidadeEmpresa : x.responsabilidadeEmpresa,
+        responsabilidadePrestadora: f.responsabilidadePrestadora?.length ? f.responsabilidadePrestadora : x.responsabilidadePrestadora,
       }));
       if (f.etapas?.length)
         setEtapas(
@@ -233,6 +239,42 @@ export function FormServico({
               className="campo"
               value={(dados.preDiagnostico ?? []).join("\n")}
               onChange={(e) => setDados({ ...dados, preDiagnostico: e.target.value.split("\n") })}
+            />
+          </Campo>
+          <Campo
+            rotulo="Benefícios e resultados esperados (opcional)"
+            className="sm:col-span-2"
+            dica="Um por linha, como na ficha."
+          >
+            <textarea
+              rows={4}
+              className="campo"
+              value={(dados.beneficios ?? []).join("\n")}
+              onChange={(e) => setDados({ ...dados, beneficios: e.target.value.split("\n") })}
+            />
+          </Campo>
+          <Campo
+            rotulo="Responsabilidades da empresa demandante (opcional)"
+            className="sm:col-span-2"
+            dica="Uma por linha, como na ficha."
+          >
+            <textarea
+              rows={4}
+              className="campo"
+              value={(dados.responsabilidadeEmpresa ?? []).join("\n")}
+              onChange={(e) => setDados({ ...dados, responsabilidadeEmpresa: e.target.value.split("\n") })}
+            />
+          </Campo>
+          <Campo
+            rotulo="Responsabilidades da prestadora de serviço (opcional)"
+            className="sm:col-span-2"
+            dica="Uma por linha, como na ficha."
+          >
+            <textarea
+              rows={4}
+              className="campo"
+              value={(dados.responsabilidadePrestadora ?? []).join("\n")}
+              onChange={(e) => setDados({ ...dados, responsabilidadePrestadora: e.target.value.split("\n") })}
             />
           </Campo>
           <label className="flex items-center gap-3 sm:col-span-2">

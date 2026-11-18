@@ -19,6 +19,7 @@ Regras:
 - Cada etapa traz o nome (como na ficha), a carga horária em horas, a descrição ou o objetivo, as atividades com o código hierárquico ("1", "1.1"…) e os entregáveis. Se a ficha numerar as atividades de outro jeito, refaça os códigos em ordem, mantendo a hierarquia. "instrumentos" são documentos de apoio que não são entregáveis formais; deixe vazio se a ficha não citar.
 - "duracaoReferenciaDias" é a duração da etapa em dias corridos, se a ficha disser; senão, estime pela carga horária (cerca de 1 dia para cada 12 horas, no mínimo 1).
 - "preDiagnostico" são as perguntas da seção de pré-diagnóstico da ficha, uma por item, sem a numeração.
+- "beneficios" são os itens de "Benefícios e resultados esperados"; "responsabilidadeEmpresa" e "responsabilidadePrestadora" são os itens das seções de responsabilidade da empresa demandante e da prestadora de serviço. Um por item, sem a numeração nem o marcador; deixe vazio se a ficha não trouxer.
 - A carga horária de cada etapa só entra se a ficha disser; senão, zero (ela virá da proposta de cada projeto).
 - O que a ficha não trouxer fica em branco (texto vazio ou zero). Não invente.`;
 
@@ -34,6 +35,9 @@ const ESQUEMA = {
     prestadoraVinculada: texto,
     areaAtuacao: texto,
     preDiagnostico: { type: "array", items: texto },
+    beneficios: { type: "array", items: texto },
+    responsabilidadeEmpresa: { type: "array", items: texto },
+    responsabilidadePrestadora: { type: "array", items: texto },
     etapas: {
       type: "array",
       items: {
@@ -55,7 +59,7 @@ const ESQUEMA = {
       },
     },
   },
-  required: ["fichaTecnica", "nomeCurto", "codigoFichaTecnica", "area", "descricao", "prestadoraVinculada", "areaAtuacao", "preDiagnostico", "etapas"],
+  required: ["fichaTecnica", "nomeCurto", "codigoFichaTecnica", "area", "descricao", "prestadoraVinculada", "areaAtuacao", "preDiagnostico", "beneficios", "responsabilidadeEmpresa", "responsabilidadePrestadora", "etapas"],
   additionalProperties: false,
 } as const;
 
