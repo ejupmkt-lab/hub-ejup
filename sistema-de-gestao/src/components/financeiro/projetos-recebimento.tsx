@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Projeto } from "@/lib/dados/tipos";
 import type { Financeiro } from "@/lib/dados/financeiro";
+import { useEstado } from "@/lib/dados/store";
+import { useEmpresaAtual } from "@/lib/dados/empresa-atual";
 import { moeda, type ChaveDeParcela, type Entrada } from "@/lib/financeiro";
 import { formatarData } from "@/lib/datas";
 import { avancoProjeto, codigoHub, entregaFinal, etapaAtual, etapasAtrasadas, previstoProjeto, servicoDoProjeto, situacaoProjeto } from "@/lib/projeto";
@@ -14,6 +16,15 @@ import { BalaoDeParcela, EditorDeParcela, SeloDaNota, rotuloAcessivel, situacaoD
 
 const capitalizar = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 const colunas = "grid grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_8.5rem_minmax(0,1.1fr)_minmax(0,1.1fr)] items-start gap-5";
+
+// "· Eix Core" ao lado do serviço quando o projeto é de outra empresa que não a escolhida (o Financeiro da Pivotto reúne todas)
+export function EmpresaDoProjeto({ projeto }: { projeto: Projeto }) {
+  const { estado } = useEstado();
+  const { empresa } = useEmpresaAtual();
+  if (!empresa || projeto.empresa === empresa.slug) return null;
+  const nome = estado.empresas.find((e) => e.slug === projeto.empresa)?.nome;
+  return nome ? <> · {nome}</> : null;
+}
 
 export type LinhaDeProjeto = { projeto: Projeto; entradas: Entrada[]; nomeCliente: string };
 
@@ -82,7 +93,7 @@ export function ProjetosDoRecebimento({ fin, linhas, mesEscolhido }: { fin: Fina
                 </Link>
               </h3>
               <p className="num mt-0.5 break-words text-sm text-tinta-2">
-                {servicoDoProjeto(p)} · HUB {codigoHub(p) || "sem número"}
+                {servicoDoProjeto(p)} · HUB {codigoHub(p) || "sem número"}<EmpresaDoProjeto projeto={p} />
               </p>
               <div className="mt-3 flex items-end justify-between gap-3">
                 <span className="num text-[1.6rem] font-bold leading-none tracking-tight text-tinta">{avanco}%</span>
@@ -132,7 +143,7 @@ export function ProjetosDoRecebimento({ fin, linhas, mesEscolhido }: { fin: Fina
                       {nomeCliente}
                     </Link>
                     <p className="num break-words text-[13px] text-tinta-2">
-                      {servicoDoProjeto(p)} · HUB {codigoHub(p) || "sem número"}
+                      {servicoDoProjeto(p)} · HUB {codigoHub(p) || "sem número"}<EmpresaDoProjeto projeto={p} />
                     </p>
                   </div>
                   <p className="flex min-w-0 items-start gap-2 text-sm text-tinta">

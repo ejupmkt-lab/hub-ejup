@@ -37,7 +37,9 @@ const modos: { chave: Modo; rotulo: string }[] = [
 
 // Financeiro (só para quem vê o financeiro): o que entra no período escolhido (abre no mês corrente), por cliente e projeto,
 // com as duas parcelas de cada um, a data prevista (projetada pelo andamento do projeto) e a nota fiscal; tudo se corrige ali.
-export function AReceber({ projetos }: { projetos: Projeto[] }) {
+// impostoDaEmpresa: quando os projetos são de várias empresas (o Financeiro da Pivotto reúne todas), o imposto de todos segue a
+// faixa de faturamento dessa empresa; o percentual definido à mão no projeto continua valendo.
+export function AReceber({ projetos, impostoDaEmpresa }: { projetos: Projeto[]; impostoDaEmpresa?: string }) {
   const fin = useFinanceiro();
   const { estado } = useEstado();
   // O período abre no mês corrente; dá para andar por mês, trimestre ou ano, ver tudo ou escolher um intervalo
@@ -56,7 +58,7 @@ export function AReceber({ projetos }: { projetos: Projeto[] }) {
     projetos,
     fin.servicos,
     fin.projetos,
-    fin.empresas,
+    impostoDaEmpresa ? Object.fromEntries([...new Set(projetos.map((p) => p.empresa))].map((e) => [e, fin.empresas[impostoDaEmpresa]])) : fin.empresas,
   );
   const pendentes = entradas.filter((e) => !e.parcela.recebidaEm);
   const comData = pendentes.filter((e) => e.mes);

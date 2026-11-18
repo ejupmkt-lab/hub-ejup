@@ -24,7 +24,10 @@ export default function Financeiro() {
     if (!usuario.veFinanceiro) router.replace("/");
   }, [usuario.veFinanceiro, router]);
   if (!usuario.veFinanceiro) return null;
-  const projetos = estado.projetos.filter((p) => !empresa || p.empresa === empresa.slug);
+  // O Financeiro da Pivotto & Pivotto Advocacia concentra os projetos de todas as empresas (todos os que rodaram e os em andamento);
+  // nas demais, só os da empresa escolhida
+  const reuneTodas = empresa?.slug === "pivotto";
+  const projetos = estado.projetos.filter((p) => !empresa || reuneTodas || p.empresa === empresa.slug);
 
   return (
     <>
@@ -32,7 +35,7 @@ export default function Financeiro() {
         titulo="Financeiro"
         subtitulo={
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-            <span>{empresa ? `${empresa.nome} · ` : ""}só você vê esta área</span>
+            <span>{empresa ? `${empresa.nome} · ` : ""}{reuneTodas ? "reúne os projetos de todas as empresas · " : ""}só você vê esta área</span>
             <Chip tom="atencao">Em desenvolvimento</Chip>
           </p>
         }
@@ -54,7 +57,7 @@ export default function Financeiro() {
 
         {aba === "Recebimentos" && (
           <section className="space-y-4" aria-label="Recebimentos">
-            <AReceber projetos={projetos} />
+            <AReceber projetos={projetos} impostoDaEmpresa={reuneTodas ? "pivotto" : undefined} />
           </section>
         )}
 
