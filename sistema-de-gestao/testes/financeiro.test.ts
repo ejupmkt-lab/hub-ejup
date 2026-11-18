@@ -83,3 +83,24 @@ test("o percentual de imposto do projeto vale no lugar da faixa do faturamento (
   assert.equal(aliquotaDoProjeto(fp({})), null);
   assert.equal(aliquotaDoProjeto(fp({ aliquota: -1 })), null);
 });
+
+test("projeto sem horas no plano de trabalho: o valor é estimado pelo teto do serviço; com horas, vale o plano", () => {
+  const semHoras = emExecucao();
+  for (const e of semHoras.etapas) e.horasPrevistas = 0;
+  const pet = { servicoId: "pet", empresa: "pivotto", teto: 25000, valorHora: 90, percFuncern: 10 };
+  const r = recebimento(semHoras, pet, undefined, "2026-10-05");
+  assert.equal(r.horas, 277);
+  assert.equal(r.horasEstimadas, true);
+  assert.equal(r.bruto, 277 * 90);
+  assert.equal(r.funcern, 277 * 90 * 0.1);
+  assert.ok(Math.abs(r.parcelas[0].valor + r.parcelas[1].valor - r.liquido) < 0.005 && r.liquido > 22000 && r.liquido < 22500, "cerca de R$ 22,4 mil depois da FUNCERN");
+  // LGPD: 30 mil / 90 = 333 horas
+  assert.equal(recebimento(semHoras, { ...pet, teto: 30000 }, undefined, "2026-10-05").horas, 333);
+  // sem a ficha financeira do serviço (sem teto), continua zero
+  assert.equal(recebimento(semHoras, undefined, undefined, "2026-10-05").bruto, 0);
+  // com horas no plano, o plano manda
+  const comHoras = emExecucao();
+  const plano = recebimento(comHoras, pet, undefined, "2026-10-05");
+  assert.equal(plano.horasEstimadas, false);
+  assert.equal(plano.horas, comHoras.etapas.reduce((a, e) => a + (e.horasPrevistas || 0), 0));
+});

@@ -123,7 +123,11 @@ const lerMapa = <T,>(mapa: Record<string, T> | undefined, chave: string): T | un
 export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje = hojeIso()) {
   const valorHora = fp?.valorHora ?? fs?.valorHora ?? VALOR_HORA_PADRAO;
   const percFuncern = fp?.percFuncern ?? fs?.percFuncern ?? PERC_FUNCERN_PADRAO;
-  const horas = p.etapas.reduce((a, e) => a + (e.horasPrevistas || 0), 0);
+  const horasDoPlano = p.etapas.reduce((a, e) => a + (e.horasPrevistas || 0), 0);
+  // Plano de trabalho ainda sem horas (a ficha do serviço não traz as horas): o valor é estimado pelo teto do serviço (LGPD:
+  // 333 h, cerca de R$ 30 mil; Planejamento Tecnológico: 277 h, cerca de R$ 25 mil), até as horas do plano serem definidas
+  const horasEstimadas = horasDoPlano === 0 && !!fs && fs.teto > 0 && valorHora > 0;
+  const horas = horasEstimadas ? horasNoTeto(fs.teto, valorHora) : horasDoPlano;
   const bruto = horas * valorHora;
   const funcern = (bruto * percFuncern) / 100;
   // Contrapartida: desconto sobre o total a receber (uma espécie de cashback), tirado antes de repartir em 30% e 70%
@@ -178,7 +182,7 @@ export function recebimento(p: Projeto, fs?: FinServico, fp?: FinProjeto, hoje =
     parcela("30", 1, 30, ciclo1, !!envio1, envio1 ? `Relatório 1 enviado em ${formatarData(envio1)}` : "Quando o Relatório 1 for enviado no HUB", porque1, data1),
     parcela("70", 2, 70, cicloFim, !!fim, condicaoFim, porqueFim, dataFim),
   ];
-  return { horas, valorHora, percFuncern, bruto, funcern, contrapartida, liquido, parcelas };
+  return { horas, horasEstimadas, valorHora, percFuncern, bruto, funcern, contrapartida, liquido, parcelas };
 }
 
 // Percentual de imposto definido à mão no projeto (valores.aliquota); vazio: vale o da faixa do faturamento da empresa

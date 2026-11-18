@@ -37,6 +37,7 @@ export function FinanceiroDoProjeto({ projeto: p, nomeCliente }: { projeto: Proj
           <dd className="text-[12px] text-tinta-2">
             {r.horas} h × {moeda(r.valorHora)}
           </dd>
+          {r.horasEstimadas && <dd className="text-[12px] text-tinta-2">Estimado pelo teto do serviço: o plano de trabalho ainda não tem as horas.</dd>}
         </div>
         <div className="rounded-[var(--radius-bloco)] border border-linha bg-folha p-3.5 shadow-[var(--shadow-cartao)]">
           <dt className="text-[12px] text-tinta-2">FUNCERN ({r.percFuncern}%)</dt>
